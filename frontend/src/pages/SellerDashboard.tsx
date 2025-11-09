@@ -218,7 +218,7 @@ export default function SellerDashboard() {
 
         .page-header h1 {
           margin: 0;
-          color: #3a00bb;
+          color: #0055f4;
           font-size: 1.8rem;
         }
 
@@ -240,7 +240,7 @@ export default function SellerDashboard() {
 
         .registration-form h2 {
           margin: 0 0 2rem 0;
-          color: #3a00bb;
+          color: #0055f4;
           font-size: 1.8rem;
           padding-bottom: 1rem;
           border-bottom: 2px solid rgba(0, 162, 255, 0.2);
@@ -289,7 +289,7 @@ export default function SellerDashboard() {
         .submit-button {
           width: 100%;
           padding: 1.25rem;
-          background: linear-gradient(135deg, #3a00bb 0%, #0055f4 50%, #0080ff 100%);
+          background: linear-gradient(135deg, #0055f4 0%, #0055f4 50%, #0080ff 100%);
           color: white;
           border: none;
           border-radius: 12px;

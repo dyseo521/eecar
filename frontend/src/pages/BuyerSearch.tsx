@@ -377,7 +377,7 @@ export default function BuyerSearch() {
 
         .page-header h1 {
           margin: 0;
-          color: #3a00bb;
+          color: #0055f4;
           font-size: 1.8rem;
         }
 
@@ -413,7 +413,7 @@ export default function BuyerSearch() {
 
         .search-box-compact h3 {
           margin: 0 0 1rem 0;
-          color: #3a00bb;
+          color: #0055f4;
           font-size: 1.1rem;
           font-weight: 700;
         }

@@ -125,7 +125,7 @@ export default function LandingPage() {
           <h2 className="section-title">핵심 기능</h2>
           <div className="features-grid">
             <div className="feature-card animate-on-scroll" style={{ transitionDelay: '0s' }}>
-              <div className="feature-icon" style={{ background: '#3a00bb' }}>
+              <div className="feature-icon" style={{ background: '#0055f4' }}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
@@ -210,7 +210,7 @@ export default function LandingPage() {
 
           <div className="timeline-container buyer-timeline active">
             <div className="timeline-item">
-              <div className="timeline-marker" style={{ background: '#3a00bb' }}>1</div>
+              <div className="timeline-marker" style={{ background: '#0055f4' }}>1</div>
               <div className="timeline-content">
                 <h3>AI 검색 시작</h3>
                 <p>자연어로 필요한 부품을 설명하면 RAG 시스템이 최적의 부품을 추천합니다</p>
@@ -260,7 +260,7 @@ export default function LandingPage() {
 
           <div className="timeline-container seller-timeline">
             <div className="timeline-item">
-              <div className="timeline-marker" style={{ background: '#3a00bb' }}>1</div>
+              <div className="timeline-marker" style={{ background: '#0055f4' }}>1</div>
               <div className="timeline-content">
                 <h3>부품 등록</h3>
                 <p>보유한 부품의 정보와 물성 데이터를 입력합니다</p>
@@ -400,7 +400,7 @@ export default function LandingPage() {
         .logo {
           font-size: 4rem;
           font-weight: 900;
-          background: linear-gradient(135deg, #3a00bb 0%, #0055f4 50%, #0080ff 100%);
+          background: linear-gradient(135deg, #0055f4 0%, #0055f4 50%, #0080ff 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -502,7 +502,7 @@ export default function LandingPage() {
         }
 
         .buyer-icon {
-          background: linear-gradient(135deg, #3a00bb, #0055f4);
+          background: linear-gradient(135deg, #0055f4, #0055f4);
           color: white;
         }
 
@@ -565,7 +565,7 @@ export default function LandingPage() {
         }
 
         .buyer-button {
-          background: linear-gradient(135deg, #3a00bb, #0055f4);
+          background: linear-gradient(135deg, #0055f4, #0055f4);
           color: white;
         }
 
@@ -706,7 +706,7 @@ export default function LandingPage() {
           top: 0;
           bottom: 0;
           width: 3px;
-          background: linear-gradient(180deg, #3a00bb 0%, #0055f4 33%, #0080ff 66%, #00a2ff 100%);
+          background: linear-gradient(180deg, #0055f4 0%, #0055f4 33%, #0080ff 66%, #00a2ff 100%);
         }
 
         .timeline-item {
@@ -790,7 +790,7 @@ export default function LandingPage() {
         /* CTA Section */
         .cta-section {
           padding: 6rem 0;
-          background: linear-gradient(135deg, #3a00bb 0%, #0055f4 50%, #0080ff 100%);
+          background: linear-gradient(135deg, #0055f4 0%, #0055f4 50%, #0080ff 100%);
           position: relative;
           z-index: 5;
         }
@@ -911,7 +911,7 @@ export default function LandingPage() {
         .footer-logo {
           font-size: 2rem;
           font-weight: 900;
-          background: linear-gradient(135deg, #3a00bb 0%, #0055f4 50%, #0080ff 100%);
+          background: linear-gradient(135deg, #0055f4 0%, #0055f4 50%, #0080ff 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;

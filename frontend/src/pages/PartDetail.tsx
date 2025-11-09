@@ -130,7 +130,7 @@ export default function PartDetail() {
         }
 
         .loading {
-          color: #3a00bb;
+          color: #0055f4;
           font-size: 1.3rem;
           font-weight: 600;
         }
@@ -203,7 +203,7 @@ export default function PartDetail() {
 
         .page-header h1 {
           margin: 0;
-          color: #3a00bb;
+          color: #0055f4;
           font-size: 1.8rem;
         }
 
@@ -226,7 +226,7 @@ export default function PartDetail() {
 
         .part-info h2 {
           margin: 0 0 2rem 0;
-          color: #3a00bb;
+          color: #0055f4;
           font-size: 2rem;
           padding-bottom: 1rem;
           border-bottom: 2px solid rgba(0, 162, 255, 0.2);
@@ -337,7 +337,7 @@ export default function PartDetail() {
         }
 
         .primary-button {
-          background: linear-gradient(135deg, #3a00bb 0%, #0055f4 50%, #0080ff 100%);
+          background: linear-gradient(135deg, #0055f4 0%, #0055f4 50%, #0080ff 100%);
           color: white;
           border: none;
           box-shadow: 0 4px 16px rgba(58, 0, 187, 0.3);
