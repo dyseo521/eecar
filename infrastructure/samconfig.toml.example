@@ -1,0 +1,21 @@
+# Example SAM configuration file
+# Copy this to samconfig.toml and update with your values
+
+version = 0.1
+
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "eecar-stack"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-XXXXX"
+s3_prefix = "eecar"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = []
+image_repositories = []
+
+[default.build]
+[default.build.parameters]
+cached = true
+parallel = true

@@ -1,0 +1,42 @@
+{
+  "name": "eecar",
+  "version": "1.0.0",
+  "description": "B2B platform for trading used electric vehicle parts",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared"
+  ],
+  "scripts": {
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install && cd ../backend/local-server && npm install && cd ../../shared && npm install",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:local": "cd backend/local-server && npm run dev",
+    "dev:all": "concurrently \"npm run docker:up\" \"npm run dev:local\" \"npm run dev:frontend\"",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "deploy": "cd infrastructure && sam build && sam deploy",
+    "test": "npm run test --workspaces",
+    "local:setup": "npm run docker:up && sleep 5 && echo 'Local services ready!'"
+  },
+  "keywords": [
+    "ev",
+    "parts",
+    "b2b",
+    "rag",
+    "serverless",
+    "aws"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@playwright/test": "^1.56.1"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

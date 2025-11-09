@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+# Build outputs
+dist/
+build/
+.aws-sam/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+ref/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# AWS
+.aws-sam/
+samconfig.toml
+
+# Test coverage
+coverage/
+
+# Temporary files
+tmp/
+temp/

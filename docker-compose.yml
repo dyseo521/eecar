@@ -1,0 +1,52 @@
+services:
+  # DynamoDB Local
+  dynamodb:
+    image: amazon/dynamodb-local:latest
+    container_name: eecar-dynamodb
+    ports:
+      - "8000:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    volumes:
+      - dynamodb-data:/home/dynamodblocal/data
+    networks:
+      - eecar-network
+
+  # LocalStack for S3 and SNS
+  localstack:
+    image: localstack/localstack:latest
+    container_name: eecar-localstack
+    ports:
+      - "4566:4566"  # LocalStack Gateway
+      - "4510-4559:4510-4559"  # External services port range
+    environment:
+      - SERVICES=s3,sns
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - localstack-data:/tmp/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - eecar-network
+
+  # DynamoDB Admin (optional UI)
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: eecar-dynamodb-admin
+    ports:
+      - "8001:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://dynamodb:8000
+      - AWS_REGION=us-east-1
+    depends_on:
+      - dynamodb
+    networks:
+      - eecar-network
+
+volumes:
+  dynamodb-data:
+  localstack-data:
+
+networks:
+  eecar-network:
+    driver: bridge
