@@ -372,7 +372,12 @@ export default function LandingPage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+          background:
+            linear-gradient(180deg, rgba(248, 250, 252, 0.75) 0%, rgba(255, 255, 255, 0.8) 100%),
+            url('/image/background.png');
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
           position: relative;
           z-index: 1;
         }
@@ -385,9 +390,9 @@ export default function LandingPage() {
           right: 0;
           bottom: 0;
           background:
-            radial-gradient(circle at 20% 50%, rgba(58, 0, 187, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, rgba(0, 85, 244, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 40% 20%, rgba(0, 192, 225, 0.05) 0%, transparent 50%);
+            radial-gradient(circle at 20% 50%, rgba(0, 85, 244, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(0, 128, 255, 0.06) 0%, transparent 50%),
+            radial-gradient(circle at 40% 20%, rgba(0, 162, 255, 0.05) 0%, transparent 50%);
           pointer-events: none;
         }
 
