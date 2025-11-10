@@ -1,9 +1,69 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { UseCase } from '@shared/index';
+
+// 카테고리별 사양 필드 정의
+const categorySpecFields: Record<string, { label: string; placeholder: string; key: string }[]> = {
+  battery: [
+    { key: 'voltage', label: '전압 (V)', placeholder: '예: 400V' },
+    { key: 'capacity', label: '용량', placeholder: '예: 85kWh' },
+    { key: 'chemistry', label: '셀 종류', placeholder: '예: NCM, LFP, NCA' },
+    { key: 'soc', label: 'SOC 범위', placeholder: '예: 0-100%' },
+    { key: 'cycles', label: '충방전 사이클', placeholder: '예: 2000 cycles' },
+    { key: 'weight', label: '무게', placeholder: '예: 540kg' },
+  ],
+  motor: [
+    { key: 'power', label: '출력', placeholder: '예: 150kW' },
+    { key: 'voltage', label: '전압 (V)', placeholder: '예: 400V' },
+    { key: 'torque', label: '토크', placeholder: '예: 395Nm' },
+    { key: 'rpm', label: '최대 RPM', placeholder: '예: 14000 RPM' },
+    { key: 'cooling', label: '냉각 방식', placeholder: '예: 수냉식' },
+    { key: 'weight', label: '무게', placeholder: '예: 45kg' },
+  ],
+  inverter: [
+    { key: 'power', label: '출력', placeholder: '예: 100kW' },
+    { key: 'voltage', label: '입력 전압 (V)', placeholder: '예: 400V DC' },
+    { key: 'phases', label: '상', placeholder: '예: 3상' },
+    { key: 'efficiency', label: '효율', placeholder: '예: 95%' },
+    { key: 'cooling', label: '냉각 방식', placeholder: '예: 수냉식' },
+    { key: 'weight', label: '무게', placeholder: '예: 15kg' },
+  ],
+  charger: [
+    { key: 'power', label: '충전 출력', placeholder: '예: 11kW' },
+    { key: 'voltage', label: '전압 범위 (V)', placeholder: '예: 200-450V' },
+    { key: 'current', label: '최대 전류 (A)', placeholder: '예: 32A' },
+    { key: 'type', label: '충전 타입', placeholder: '예: AC/DC, Type 2' },
+    { key: 'efficiency', label: '효율', placeholder: '예: 94%' },
+    { key: 'weight', label: '무게', placeholder: '예: 8kg' },
+  ],
+  electronics: [
+    { key: 'voltage', label: '전압 (V)', placeholder: '예: 12V' },
+    { key: 'power', label: '소비 전력', placeholder: '예: 500W' },
+    { key: 'type', label: '타입', placeholder: '예: BMS, OBC' },
+    { key: 'weight', label: '무게', placeholder: '예: 2kg' },
+  ],
+  body: [
+    { key: 'material', label: '재질', placeholder: '예: 알루미늄, 카본파이버' },
+    { key: 'dimensions', label: '치수', placeholder: '예: 1200x800x600mm' },
+    { key: 'weight', label: '무게', placeholder: '예: 25kg' },
+    { key: 'color', label: '색상', placeholder: '예: 흰색' },
+  ],
+  interior: [
+    { key: 'material', label: '재질', placeholder: '예: 가죽, 직물' },
+    { key: 'color', label: '색상', placeholder: '예: 검정' },
+    { key: 'condition', label: '상태', placeholder: '예: 찢어짐 없음' },
+  ],
+  other: [
+    { key: 'type', label: '타입', placeholder: '부품 타입' },
+    { key: 'specifications', label: '사양', placeholder: '주요 사양' },
+    { key: 'weight', label: '무게', placeholder: '예: 10kg' },
+  ],
+};
 
 export default function SellerDashboard() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [scrollY, setScrollY] = useState(0);
   const [formData, setFormData] = useState({
     name: '',
@@ -17,13 +77,8 @@ export default function SellerDashboard() {
     description: '',
   });
 
-  // 상세 사양 (카테고리별로 다름)
-  const [specifications, setSpecifications] = useState<Record<string, string>>({
-    voltage: '',
-    capacity: '',
-    power: '',
-    weight: '',
-  });
+  // 상세 사양 (카테고리별로 동적으로 변경)
+  const [specifications, setSpecifications] = useState<Record<string, string>>({});
 
   // 활용 사례
   const [useCases, setUseCases] = useState<UseCase[]>([
@@ -33,6 +88,11 @@ export default function SellerDashboard() {
   // 이미지 URL들 (나중에 S3 업로드로 변경)
   const [imageUrls, setImageUrls] = useState<string[]>(['']);
 
+  // 카테고리 변경 시 specifications 초기화
+  useEffect(() => {
+    setSpecifications({});
+  }, [formData.category]);
+
   useEffect(() => {
     const handleScroll = () => {
       setScrollY(window.scrollY);
@@ -41,41 +101,24 @@ export default function SellerDashboard() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      // Filter out empty specifications
-      const filteredSpecs = Object.entries(specifications)
-        .filter(([_, value]) => value.trim() !== '')
-        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-
-      // Filter out empty use cases
-      const filteredUseCases = useCases.filter(
-        uc => uc.industry && uc.application && uc.description
-      );
-
-      // Filter out empty image URLs
-      const filteredImages = imageUrls.filter(url => url.trim() !== '');
-
+  // 부품 등록 mutation
+  const registerPartMutation = useMutation({
+    mutationFn: async (partData: any) => {
       const response = await fetch('/api/parts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          year: parseInt(formData.year.toString()),
-          price: parseFloat(formData.price),
-          quantity: parseInt(formData.quantity),
-          sellerId: 'demo-seller', // TODO: Replace with actual user ID
-          images: filteredImages,
-          specifications: Object.keys(filteredSpecs).length > 0 ? filteredSpecs : undefined,
-          useCases: filteredUseCases.length > 0 ? filteredUseCases : undefined,
-        }),
+        body: JSON.stringify(partData),
       });
 
       if (!response.ok) {
         throw new Error('부품 등록에 실패했습니다');
       }
+
+      return response.json();
+    },
+    onSuccess: (data) => {
+      // 부품 목록 캐시 무효화 (BuyerSearch가 자동으로 새로고침됨)
+      queryClient.invalidateQueries({ queryKey: ['parts'] });
 
       alert('✅ 부품이 성공적으로 등록되었습니다!');
 
@@ -91,12 +134,46 @@ export default function SellerDashboard() {
         quantity: '1',
         description: '',
       });
-      setSpecifications({ voltage: '', capacity: '', power: '', weight: '' });
+      setSpecifications({});
       setUseCases([{ industry: '', application: '', description: '' }]);
       setImageUrls(['']);
-    } catch (error) {
-      alert(`❌ ${(error as Error).message}`);
-    }
+
+      // BuyerSearch로 리다이렉트하여 등록된 부품 확인
+      setTimeout(() => {
+        navigate('/buyer');
+      }, 1000);
+    },
+    onError: (error: Error) => {
+      alert(`❌ ${error.message}`);
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Filter out empty specifications
+    const filteredSpecs = Object.entries(specifications)
+      .filter(([_, value]) => value.trim() !== '')
+      .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+
+    // Filter out empty use cases
+    const filteredUseCases = useCases.filter(
+      uc => uc.industry && uc.application && uc.description
+    );
+
+    // Filter out empty image URLs
+    const filteredImages = imageUrls.filter(url => url.trim() !== '');
+
+    registerPartMutation.mutate({
+      ...formData,
+      year: parseInt(formData.year.toString()),
+      price: parseFloat(formData.price),
+      quantity: parseInt(formData.quantity),
+      sellerId: 'demo-seller', // TODO: Replace with actual user ID
+      images: filteredImages,
+      specifications: Object.keys(filteredSpecs).length > 0 ? filteredSpecs : undefined,
+      useCases: filteredUseCases.length > 0 ? filteredUseCases : undefined,
+    });
   };
 
   const addUseCase = () => {
@@ -291,54 +368,49 @@ export default function SellerDashboard() {
               </button>
             </div>
 
-            {/* 상세 사양 */}
+            {/* 상세 사양 - 카테고리별 동적 필드 */}
             <div className="form-section">
               <h3>상세 사양 (선택사항)</h3>
-              <p className="section-hint">부품의 주요 사양을 입력하세요</p>
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="voltage">전압 (V)</label>
-                  <input
-                    id="voltage"
-                    type="text"
-                    value={specifications.voltage}
-                    onChange={(e) => setSpecifications({ ...specifications, voltage: e.target.value })}
-                    placeholder="예: 400V"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="capacity">용량</label>
-                  <input
-                    id="capacity"
-                    type="text"
-                    value={specifications.capacity}
-                    onChange={(e) => setSpecifications({ ...specifications, capacity: e.target.value })}
-                    placeholder="예: 85kWh"
-                  />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="power">출력</label>
-                  <input
-                    id="power"
-                    type="text"
-                    value={specifications.power}
-                    onChange={(e) => setSpecifications({ ...specifications, power: e.target.value })}
-                    placeholder="예: 150kW"
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="weight">무게</label>
-                  <input
-                    id="weight"
-                    type="text"
-                    value={specifications.weight}
-                    onChange={(e) => setSpecifications({ ...specifications, weight: e.target.value })}
-                    placeholder="예: 540kg"
-                  />
-                </div>
-              </div>
+              <p className="section-hint">
+                {formData.category === 'battery' && '배터리 부품의 주요 사양을 입력하세요'}
+                {formData.category === 'motor' && '모터 부품의 주요 사양을 입력하세요'}
+                {formData.category === 'inverter' && '인버터 부품의 주요 사양을 입력하세요'}
+                {formData.category === 'charger' && '충전기 부품의 주요 사양을 입력하세요'}
+                {!['battery', 'motor', 'inverter', 'charger'].includes(formData.category) && '부품의 주요 사양을 입력하세요'}
+              </p>
+              {categorySpecFields[formData.category]?.map((field, index) => {
+                // 2개씩 묶어서 한 행에 표시
+                if (index % 2 === 0) {
+                  const nextField = categorySpecFields[formData.category][index + 1];
+                  return (
+                    <div key={index} className="form-row">
+                      <div className="form-group">
+                        <label htmlFor={field.key}>{field.label}</label>
+                        <input
+                          id={field.key}
+                          type="text"
+                          value={specifications[field.key] || ''}
+                          onChange={(e) => setSpecifications({ ...specifications, [field.key]: e.target.value })}
+                          placeholder={field.placeholder}
+                        />
+                      </div>
+                      {nextField && (
+                        <div className="form-group">
+                          <label htmlFor={nextField.key}>{nextField.label}</label>
+                          <input
+                            id={nextField.key}
+                            type="text"
+                            value={specifications[nextField.key] || ''}
+                            onChange={(e) => setSpecifications({ ...specifications, [nextField.key]: e.target.value })}
+                            placeholder={nextField.placeholder}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                return null;
+              })}
             </div>
 
             {/* 활용 사례 */}
@@ -395,8 +467,12 @@ export default function SellerDashboard() {
               </button>
             </div>
 
-            <button type="submit" className="submit-button">
-              부품 등록하기
+            <button
+              type="submit"
+              className="submit-button"
+              disabled={registerPartMutation.isPending}
+            >
+              {registerPartMutation.isPending ? '등록 중...' : '부품 등록하기'}
             </button>
           </form>
 
@@ -628,9 +704,15 @@ export default function SellerDashboard() {
           margin-top: 0.5rem;
         }
 
-        .submit-button:hover {
+        .submit-button:hover:not(:disabled) {
           transform: translateY(-2px);
           box-shadow: 0 6px 24px rgba(58, 0, 187, 0.4);
+        }
+
+        .submit-button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
         }
 
         .info-box {
