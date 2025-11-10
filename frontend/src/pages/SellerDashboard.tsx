@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { UseCase } from '@shared/index';
 
 export default function SellerDashboard() {
   const navigate = useNavigate();
@@ -9,10 +10,28 @@ export default function SellerDashboard() {
     category: 'battery',
     manufacturer: '',
     model: '',
+    year: new Date().getFullYear() - 1,
+    condition: 'used' as 'new' | 'used' | 'refurbished' | 'for-parts',
     price: '',
     quantity: '1',
     description: '',
   });
+
+  // 상세 사양 (카테고리별로 다름)
+  const [specifications, setSpecifications] = useState<Record<string, string>>({
+    voltage: '',
+    capacity: '',
+    power: '',
+    weight: '',
+  });
+
+  // 활용 사례
+  const [useCases, setUseCases] = useState<UseCase[]>([
+    { industry: '', application: '', description: '' }
+  ]);
+
+  // 이미지 URL들 (나중에 S3 업로드로 변경)
+  const [imageUrls, setImageUrls] = useState<string[]>(['']);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,14 +45,31 @@ export default function SellerDashboard() {
     e.preventDefault();
 
     try {
+      // Filter out empty specifications
+      const filteredSpecs = Object.entries(specifications)
+        .filter(([_, value]) => value.trim() !== '')
+        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+
+      // Filter out empty use cases
+      const filteredUseCases = useCases.filter(
+        uc => uc.industry && uc.application && uc.description
+      );
+
+      // Filter out empty image URLs
+      const filteredImages = imageUrls.filter(url => url.trim() !== '');
+
       const response = await fetch('/api/parts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          year: parseInt(formData.year.toString()),
           price: parseFloat(formData.price),
           quantity: parseInt(formData.quantity),
-          sellerId: 'demo-seller',
+          sellerId: 'demo-seller', // TODO: Replace with actual user ID
+          images: filteredImages,
+          specifications: Object.keys(filteredSpecs).length > 0 ? filteredSpecs : undefined,
+          useCases: filteredUseCases.length > 0 ? filteredUseCases : undefined,
         }),
       });
 
@@ -41,20 +77,54 @@ export default function SellerDashboard() {
         throw new Error('부품 등록에 실패했습니다');
       }
 
-      alert('부품이 성공적으로 등록되었습니다!');
+      alert('✅ 부품이 성공적으로 등록되었습니다!');
+
       // Reset form
       setFormData({
         name: '',
         category: 'battery',
         manufacturer: '',
         model: '',
+        year: new Date().getFullYear() - 1,
+        condition: 'used',
         price: '',
         quantity: '1',
         description: '',
       });
+      setSpecifications({ voltage: '', capacity: '', power: '', weight: '' });
+      setUseCases([{ industry: '', application: '', description: '' }]);
+      setImageUrls(['']);
     } catch (error) {
-      alert((error as Error).message);
+      alert(`❌ ${(error as Error).message}`);
     }
+  };
+
+  const addUseCase = () => {
+    setUseCases([...useCases, { industry: '', application: '', description: '' }]);
+  };
+
+  const removeUseCase = (index: number) => {
+    setUseCases(useCases.filter((_, i) => i !== index));
+  };
+
+  const updateUseCase = (index: number, field: keyof UseCase, value: string) => {
+    const updated = [...useCases];
+    updated[index] = { ...updated[index], [field]: value };
+    setUseCases(updated);
+  };
+
+  const addImageUrl = () => {
+    setImageUrls([...imageUrls, '']);
+  };
+
+  const removeImageUrl = (index: number) => {
+    setImageUrls(imageUrls.filter((_, i) => i !== index));
+  };
+
+  const updateImageUrl = (index: number, value: string) => {
+    const updated = [...imageUrls];
+    updated[index] = value;
+    setImageUrls(updated);
   };
 
   return (
@@ -115,28 +185,46 @@ export default function SellerDashboard() {
               </div>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="model">차량 모델</label>
-              <input
-                id="model"
-                type="text"
-                value={formData.model}
-                onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                placeholder="예: Model S"
-              />
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="model">차량 모델</label>
+                <input
+                  id="model"
+                  type="text"
+                  value={formData.model}
+                  onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                  placeholder="예: Model S"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="year">연식 *</label>
+                <input
+                  id="year"
+                  type="number"
+                  required
+                  value={formData.year}
+                  onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
+                  min="2000"
+                  max={new Date().getFullYear() + 1}
+                />
+              </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="price">가격 (원) *</label>
-                <input
-                  id="price"
-                  type="number"
+                <label htmlFor="condition">상태 *</label>
+                <select
+                  id="condition"
                   required
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  placeholder="1000000"
-                />
+                  value={formData.condition}
+                  onChange={(e) => setFormData({ ...formData, condition: e.target.value as any })}
+                >
+                  <option value="new">신품</option>
+                  <option value="used">중고</option>
+                  <option value="refurbished">리퍼</option>
+                  <option value="for-parts">부품용</option>
+                </select>
               </div>
 
               <div className="form-group">
@@ -153,6 +241,18 @@ export default function SellerDashboard() {
             </div>
 
             <div className="form-group">
+              <label htmlFor="price">가격 (원) *</label>
+              <input
+                id="price"
+                type="number"
+                required
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                placeholder="1000000"
+              />
+            </div>
+
+            <div className="form-group">
               <label htmlFor="description">설명</label>
               <textarea
                 id="description"
@@ -161,6 +261,138 @@ export default function SellerDashboard() {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="부품의 상태, 특징 등을 설명해주세요"
               />
+            </div>
+
+            {/* 이미지 URL */}
+            <div className="form-section">
+              <h3>이미지</h3>
+              <p className="section-hint">이미지 URL을 입력하세요 (나중에 파일 업로드 기능 추가 예정)</p>
+              {imageUrls.map((url, index) => (
+                <div key={index} className="dynamic-field">
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => updateImageUrl(index, e.target.value)}
+                    placeholder="https://example.com/image.jpg"
+                  />
+                  {imageUrls.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeImageUrl(index)}
+                      className="remove-button"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button type="button" onClick={addImageUrl} className="add-button">
+                + 이미지 추가
+              </button>
+            </div>
+
+            {/* 상세 사양 */}
+            <div className="form-section">
+              <h3>상세 사양 (선택사항)</h3>
+              <p className="section-hint">부품의 주요 사양을 입력하세요</p>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="voltage">전압 (V)</label>
+                  <input
+                    id="voltage"
+                    type="text"
+                    value={specifications.voltage}
+                    onChange={(e) => setSpecifications({ ...specifications, voltage: e.target.value })}
+                    placeholder="예: 400V"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="capacity">용량</label>
+                  <input
+                    id="capacity"
+                    type="text"
+                    value={specifications.capacity}
+                    onChange={(e) => setSpecifications({ ...specifications, capacity: e.target.value })}
+                    placeholder="예: 85kWh"
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="power">출력</label>
+                  <input
+                    id="power"
+                    type="text"
+                    value={specifications.power}
+                    onChange={(e) => setSpecifications({ ...specifications, power: e.target.value })}
+                    placeholder="예: 150kW"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="weight">무게</label>
+                  <input
+                    id="weight"
+                    type="text"
+                    value={specifications.weight}
+                    onChange={(e) => setSpecifications({ ...specifications, weight: e.target.value })}
+                    placeholder="예: 540kg"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 활용 사례 */}
+            <div className="form-section">
+              <h3>활용 사례 (선택사항)</h3>
+              <p className="section-hint">이 부품을 어떻게 활용할 수 있는지 설명하세요</p>
+              {useCases.map((useCase, index) => (
+                <div key={index} className="use-case-group">
+                  <div className="use-case-header">
+                    <span>사례 {index + 1}</span>
+                    {useCases.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeUseCase(index)}
+                        className="remove-button"
+                      >
+                        ✕ 삭제
+                      </button>
+                    )}
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>산업 분야</label>
+                      <input
+                        type="text"
+                        value={useCase.industry}
+                        onChange={(e) => updateUseCase(index, 'industry', e.target.value)}
+                        placeholder="예: 에너지 저장"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>응용 분야</label>
+                      <input
+                        type="text"
+                        value={useCase.application}
+                        onChange={(e) => updateUseCase(index, 'application', e.target.value)}
+                        placeholder="예: ESS 구축"
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>설명</label>
+                    <textarea
+                      rows={2}
+                      value={useCase.description}
+                      onChange={(e) => updateUseCase(index, 'description', e.target.value)}
+                      placeholder="활용 사례에 대한 설명을 입력하세요"
+                    />
+                  </div>
+                </div>
+              ))}
+              <button type="button" onClick={addUseCase} className="add-button">
+                + 활용 사례 추가
+              </button>
             </div>
 
             <button type="submit" className="submit-button">
@@ -284,6 +516,101 @@ export default function SellerDashboard() {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 1.5rem;
+        }
+
+        .form-section {
+          margin-top: 2.5rem;
+          padding: 1.5rem;
+          background: rgba(0, 162, 255, 0.03);
+          border-radius: 12px;
+          border: 1px dashed rgba(0, 162, 255, 0.3);
+        }
+
+        .form-section h3 {
+          margin: 0 0 0.5rem 0;
+          color: #0055f4;
+          font-size: 1.2rem;
+          font-weight: 700;
+        }
+
+        .section-hint {
+          margin: 0 0 1.25rem 0;
+          color: #6b7280;
+          font-size: 0.875rem;
+        }
+
+        .dynamic-field {
+          display: flex;
+          gap: 0.75rem;
+          margin-bottom: 0.75rem;
+        }
+
+        .dynamic-field input {
+          flex: 1;
+        }
+
+        .remove-button {
+          padding: 0.5rem 1rem;
+          background: #ef4444;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-size: 0.875rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .remove-button:hover {
+          background: #dc2626;
+          transform: scale(1.05);
+        }
+
+        .add-button {
+          width: 100%;
+          padding: 0.875rem;
+          background: white;
+          color: #0055f4;
+          border: 2px dashed #0055f4;
+          border-radius: 8px;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          margin-top: 0.5rem;
+        }
+
+        .add-button:hover {
+          background: rgba(0, 85, 244, 0.05);
+          border-color: #0080ff;
+          color: #0080ff;
+        }
+
+        .use-case-group {
+          background: white;
+          padding: 1.25rem;
+          border-radius: 8px;
+          margin-bottom: 1rem;
+          border: 1px solid rgba(0, 162, 255, 0.15);
+        }
+
+        .use-case-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid rgba(0, 162, 255, 0.15);
+        }
+
+        .use-case-header span {
+          font-weight: 700;
+          color: #0055f4;
+        }
+
+        .use-case-header .remove-button {
+          padding: 0.375rem 0.875rem;
+          font-size: 0.8125rem;
         }
 
         .submit-button {
