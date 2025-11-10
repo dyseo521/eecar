@@ -42,7 +42,7 @@ export default function LandingPage() {
   return (
     <div className="landing-page">
       {/* Hero Section with Parallax */}
-      <section className="hero" style={{ transform: `translateY(${scrollY * 0.5}px)` }}>
+      <section className="hero" style={{ transform: `translateY(${scrollY * 0.3}px)` }}>
         <div className="hero-content">
           <div className="logo">EECAR</div>
           <h1 className="hero-title">전기차 중고 부품 B2B 거래 플랫폼</h1>
@@ -73,79 +73,71 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Entry Points */}
+      {/* Entry Points - Toss Style */}
       <section className="entry-section animate-on-scroll">
         <div className="container">
-          <h2 className="section-title">시작하기</h2>
+          <h2 className="section-title-large">EV 부품 거래,<br/>이제 EECAR에서</h2>
+          <p className="section-subtitle">AI가 찾아주는 최적의 부품, 안전한 B2B 거래</p>
+
           <div className="entry-grid">
             <div className="entry-card" onClick={() => navigate('/buyer')}>
-              <div className="entry-icon buyer-icon">
+              <div className="entry-icon-large">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <h3>부품 구매</h3>
-              <p>AI 검색으로 필요한 부품을 빠르게 찾아보세요</p>
-              <ul className="entry-features">
-                <li>자연어 AI 검색</li>
-                <li>맞춤 추천 시스템</li>
-                <li>실시간 알림</li>
-              </ul>
-              <button className="entry-button buyer-button">
-                구매 시작하기
-                <span className="arrow">→</span>
+              <h3>AI로 부품 찾기</h3>
+              <p>자연어로 물어보면 AI가 최적의 부품을 추천합니다</p>
+              <button className="entry-button-large">
+                부품 검색하기 →
               </button>
             </div>
 
             <div className="entry-card" onClick={() => navigate('/seller')}>
-              <div className="entry-icon seller-icon">
+              <div className="entry-icon-large">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 4v16m8-8H4" />
                 </svg>
               </div>
-              <h3>부품 판매</h3>
-              <p>보유 부품을 등록하고 구매 제안을 받아보세요</p>
-              <ul className="entry-features">
-                <li>간편한 부품 등록</li>
-                <li>자동 규성 검증</li>
-                <li>계약 제안 관리</li>
-              </ul>
-              <button className="entry-button seller-button">
-                판매 시작하기
-                <span className="arrow">→</span>
+              <h3>부품 등록하고 판매하기</h3>
+              <p>간편한 등록으로 구매 제안을 받아보세요</p>
+              <button className="entry-button-large">
+                부품 등록하기 →
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - Toss Style */}
       <section className="features-section animate-on-scroll">
         <div className="container">
-          <h2 className="section-title">핵심 기능</h2>
-          <div className="features-grid">
-            <div className="feature-card animate-on-scroll" style={{ transitionDelay: '0s' }}>
-              <div className="feature-icon" style={{ background: '#0055f4' }}>
+          <h2 className="section-title-large">필요한 부품,<br/>AI가 찾아드립니다</h2>
+          <p className="section-subtitle">검증된 데이터로 안전하게, RAG 기술로 정확하게</p>
+
+          <div className="features-grid-simple">
+            <div className="feature-card-large animate-on-scroll">
+              <div className="feature-icon-xl">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
               </div>
               <h3>AI 기반 검색</h3>
-              <p>자연어 질문만으로 RAG 시스템이 최적의 부품을 찾아드립니다</p>
+              <p>자연어로 물어보면 RAG 시스템이 최적의 부품을 찾아드립니다</p>
             </div>
 
-            <div className="feature-card animate-on-scroll" style={{ transitionDelay: '0.05s' }}>
-              <div className="feature-icon" style={{ background: '#0055f4' }}>
+            <div className="feature-card-large animate-on-scroll">
+              <div className="feature-icon-xl">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <h3>물성 데이터베이스</h3>
-              <p>검증된 부품별 물성 데이터를 체계적으로 관리합니다</p>
+              <h3>검증된 물성 데이터</h3>
+              <p>부품별 물성 데이터를 체계적으로 관리하고 제공합니다</p>
             </div>
 
-            <div className="feature-card animate-on-scroll" style={{ transitionDelay: '0.1s' }}>
-              <div className="feature-icon" style={{ background: '#0080ff' }}>
+            <div className="feature-card-large animate-on-scroll">
+              <div className="feature-icon-xl">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
@@ -154,173 +146,58 @@ export default function LandingPage() {
               <p>원하는 부품이 등록되면 즉시 알림을 받아보세요</p>
             </div>
 
-            <div className="feature-card animate-on-scroll" style={{ transitionDelay: '0.15s' }}>
-              <div className="feature-icon" style={{ background: '#00a2ff' }}>
+            <div className="feature-card-large animate-on-scroll">
+              <div className="feature-icon-xl">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h3>B2B 매칭</h3>
-              <p>기업 간 계약 제안 및 협상을 효율적으로 지원합니다</p>
-            </div>
-
-            <div className="feature-card animate-on-scroll" style={{ transitionDelay: '0.2s' }}>
-              <div className="feature-icon" style={{ background: '#00c0e1' }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3>자동 규성 검증</h3>
-              <p>부품 등록 시 자동으로 규성 준수 여부를 확인합니다</p>
-            </div>
-
-            <div className="feature-card animate-on-scroll" style={{ transitionDelay: '0.25s' }}>
-              <div className="feature-icon" style={{ background: '#00dcb4' }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
-              </div>
-              <h3>서버리스 아키텍처</h3>
-              <p>AWS 기반 확장 가능한 인프라로 안정적인 서비스 제공</p>
+              <h3>안전한 B2B 거래</h3>
+              <p>기업 간 계약과 협상을 안전하게 지원합니다</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Workflow Timeline */}
-      <section className="timeline-section animate-on-scroll">
+      {/* Workflow - Toss Style */}
+      <section className="workflow-section animate-on-scroll">
         <div className="container">
-          <h2 className="section-title">이용 워크플로우</h2>
-          <p className="timeline-subtitle">EECAR를 통해 부품 거래를 시작하는 간단한 과정</p>
+          <h2 className="section-title-large">간편하게, 안전하게</h2>
+          <p className="section-subtitle">3단계로 끝나는 부품 거래</p>
 
-          <div className="timeline-tabs">
-            <button className="timeline-tab active" onClick={(e) => {
-              document.querySelectorAll('.timeline-tab').forEach(t => t.classList.remove('active'));
-              e.currentTarget.classList.add('active');
-              document.querySelector('.buyer-timeline')?.classList.add('active');
-              document.querySelector('.seller-timeline')?.classList.remove('active');
-            }}>구매자 워크플로우</button>
-            <button className="timeline-tab" onClick={(e) => {
-              document.querySelectorAll('.timeline-tab').forEach(t => t.classList.remove('active'));
-              e.currentTarget.classList.add('active');
-              document.querySelector('.seller-timeline')?.classList.add('active');
-              document.querySelector('.buyer-timeline')?.classList.remove('active');
-            }}>판매자 워크플로우</button>
-          </div>
-
-          <div className="timeline-container buyer-timeline active">
-            <div className="timeline-item">
-              <div className="timeline-marker" style={{ background: '#0055f4' }}>1</div>
-              <div className="timeline-content">
-                <h3>AI 검색 시작</h3>
-                <p>자연어로 필요한 부품을 설명하면 RAG 시스템이 최적의 부품을 추천합니다</p>
-                <div className="timeline-tags">
-                  <span className="tag">AI 검색</span>
-                  <span className="tag">벡터 임베딩</span>
-                </div>
-              </div>
+          <div className="workflow-grid">
+            <div className="workflow-step animate-on-scroll">
+              <div className="step-number">①</div>
+              <h3>AI가 부품을 찾아드립니다</h3>
+              <p>자연어로 물어보면 최적의 부품을 추천받습니다</p>
             </div>
 
-            <div className="timeline-item">
-              <div className="timeline-marker" style={{ background: '#0055f4' }}>2</div>
-              <div className="timeline-content">
-                <h3>부품 비교 및 선택</h3>
-                <p>물성 데이터, 가격, 수량 등을 비교하고 상세 정보를 확인합니다</p>
-                <div className="timeline-tags">
-                  <span className="tag">물성 데이터</span>
-                  <span className="tag">상세 스펙</span>
-                </div>
-              </div>
+            <div className="workflow-step animate-on-scroll">
+              <div className="step-number">②</div>
+              <h3>물성 데이터를 확인하세요</h3>
+              <p>검증된 데이터로 안전하게 비교하고 선택합니다</p>
             </div>
 
-            <div className="timeline-item">
-              <div className="timeline-marker" style={{ background: '#0080ff' }}>3</div>
-              <div className="timeline-content">
-                <h3>구매 제안 전송</h3>
-                <p>원하는 조건으로 판매자에게 구매 제안을 보냅니다</p>
-                <div className="timeline-tags">
-                  <span className="tag">제안서 작성</span>
-                  <span className="tag">조건 협상</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="timeline-item">
-              <div className="timeline-marker" style={{ background: '#00a2ff' }}>4</div>
-              <div className="timeline-content">
-                <h3>계약 체결</h3>
-                <p>판매자의 응답을 받고 최종 계약을 체결합니다</p>
-                <div className="timeline-tags">
-                  <span className="tag">계약서</span>
-                  <span className="tag">거래 완료</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="timeline-container seller-timeline">
-            <div className="timeline-item">
-              <div className="timeline-marker" style={{ background: '#0055f4' }}>1</div>
-              <div className="timeline-content">
-                <h3>부품 등록</h3>
-                <p>보유한 부품의 정보와 물성 데이터를 입력합니다</p>
-                <div className="timeline-tags">
-                  <span className="tag">부품 정보</span>
-                  <span className="tag">사진 업로드</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="timeline-item">
-              <div className="timeline-marker" style={{ background: '#0055f4' }}>2</div>
-              <div className="timeline-content">
-                <h3>자동 규성 검증</h3>
-                <p>AI가 자동으로 규성 준수 여부를 확인하고 임베딩을 생성합니다</p>
-                <div className="timeline-tags">
-                  <span className="tag">규성 검증</span>
-                  <span className="tag">AI 분석</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="timeline-item">
-              <div className="timeline-marker" style={{ background: '#0080ff' }}>3</div>
-              <div className="timeline-content">
-                <h3>구매 제안 수신</h3>
-                <p>구매자들의 제안을 받고 조건을 검토합니다</p>
-                <div className="timeline-tags">
-                  <span className="tag">제안 알림</span>
-                  <span className="tag">조건 검토</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="timeline-item">
-              <div className="timeline-marker" style={{ background: '#00a2ff' }}>4</div>
-              <div className="timeline-content">
-                <h3>계약 수락 및 거래</h3>
-                <p>최적의 제안을 선택하고 계약을 체결합니다</p>
-                <div className="timeline-tags">
-                  <span className="tag">제안 수락</span>
-                  <span className="tag">거래 완료</span>
-                </div>
-              </div>
+            <div className="workflow-step animate-on-scroll">
+              <div className="step-number">③</div>
+              <h3>계약하고 거래 완료</h3>
+              <p>안전한 B2B 프로세스로 거래를 진행합니다</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Section - Toss Style */}
       <section className="cta-section animate-on-scroll">
         <div className="container">
-          <div className="cta-content">
-            <h2>지금 바로 시작하세요</h2>
-            <p>1세대 전기차 부품의 효율적인 거래와 재활용을 경험해보세요</p>
-            <div className="cta-buttons">
-              <button className="cta-button primary" onClick={() => navigate('/buyer')}>
+          <div className="cta-content-large">
+            <h2 className="cta-title-large">지금 바로<br/>시작하세요</h2>
+            <p className="cta-subtitle">EV 부품 거래의 새로운 기준</p>
+            <div className="cta-buttons-large">
+              <button className="cta-button-primary" onClick={() => navigate('/buyer')}>
                 부품 검색하기
               </button>
-              <button className="cta-button secondary" onClick={() => navigate('/seller')}>
+              <button className="cta-button-secondary" onClick={() => navigate('/seller')}>
                 부품 등록하기
               </button>
             </div>
@@ -373,7 +250,8 @@ export default function LandingPage() {
           align-items: center;
           justify-content: center;
           background:
-            linear-gradient(180deg, rgba(248, 250, 252, 0.75) 0%, rgba(255, 255, 255, 0.8) 100%),
+            linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.6) 80%, white 100%),
+            linear-gradient(180deg, rgba(248, 250, 252, 0.75) 0%, rgba(255, 255, 255, 0.6) 100%),
             url('/image/background.png');
           background-size: cover;
           background-position: center;
@@ -462,7 +340,7 @@ export default function LandingPage() {
         /* Entry Section */
         .entry-section {
           padding: 6rem 0;
-          background: white;
+          background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7) 0%, white 200px);
           position: relative;
           z-index: 10;
         }
@@ -473,6 +351,25 @@ export default function LandingPage() {
           font-weight: 800;
           color: #1e293b;
           margin-bottom: 3rem;
+        }
+
+        /* Toss Style - Large Title */
+        .section-title-large {
+          text-align: center;
+          font-size: 3.5rem;
+          font-weight: 800;
+          color: #191F28;
+          margin-bottom: 1.5rem;
+          line-height: 1.2;
+          letter-spacing: -0.03em;
+        }
+
+        .section-subtitle {
+          text-align: center;
+          font-size: 1.25rem;
+          color: #4E5968;
+          margin-bottom: 4rem;
+          font-weight: 500;
         }
 
         .entry-grid {
@@ -592,9 +489,47 @@ export default function LandingPage() {
           transform: translateX(4px);
         }
 
+        /* Toss Style - Entry Components */
+        .entry-icon-large {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          background: #0055f4;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 2rem;
+          color: white;
+        }
+
+        .entry-icon-large svg {
+          width: 40px;
+          height: 40px;
+        }
+
+        .entry-button-large {
+          width: 100%;
+          padding: 1.25rem 2rem;
+          background: #0055f4;
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-size: 1.125rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s;
+          margin-top: 2rem;
+        }
+
+        .entry-button-large:hover {
+          background: #0040c0;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 85, 244, 0.3);
+        }
+
         /* Features Section */
         .features-section {
-          padding: 15rem 0;
+          padding: 5rem 0;
           background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
           position: relative;
           z-index: 15;
@@ -646,6 +581,59 @@ export default function LandingPage() {
         .feature-card p {
           color: #64748b;
           line-height: 1.6;
+        }
+
+        /* Toss Style - Features */
+        .features-grid-simple {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 2rem;
+          max-width: 900px;
+          margin: 0 auto;
+        }
+
+        .feature-card-large {
+          background: white;
+          padding: 3rem;
+          border-radius: 24px;
+          text-align: center;
+          transition: all 0.3s;
+          box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .feature-card-large:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .feature-icon-xl {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          background: #0055f4;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 2rem;
+          color: white;
+        }
+
+        .feature-icon-xl svg {
+          width: 40px;
+          height: 40px;
+        }
+
+        .feature-card-large h3 {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #191F28;
+          margin-bottom: 1rem;
+        }
+
+        .feature-card-large p {
+          color: #4E5968;
+          line-height: 1.7;
+          font-size: 1.0625rem;
         }
 
         /* Timeline Section */
@@ -850,6 +838,106 @@ export default function LandingPage() {
           box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
         }
 
+        /* Toss Style - Workflow */
+        .workflow-section {
+          padding: 8rem 0;
+          background: #F9FAFB;
+        }
+
+        .workflow-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 3rem;
+          max-width: 1000px;
+          margin: 0 auto;
+        }
+
+        .workflow-step {
+          text-align: center;
+        }
+
+        .step-number {
+          font-size: 3.5rem;
+          font-weight: 800;
+          color: #0055f4;
+          margin-bottom: 1.5rem;
+          line-height: 1;
+        }
+
+        .workflow-step h3 {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #191F28;
+          margin-bottom: 1rem;
+        }
+
+        .workflow-step p {
+          font-size: 1.0625rem;
+          color: #4E5968;
+          line-height: 1.6;
+        }
+
+        /* Toss Style - CTA */
+        .cta-content-large {
+          text-align: center;
+          color: white;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+
+        .cta-title-large {
+          font-size: 3.5rem;
+          font-weight: 800;
+          margin-bottom: 1rem;
+          line-height: 1.2;
+        }
+
+        .cta-subtitle {
+          font-size: 1.25rem;
+          opacity: 0.9;
+          margin-bottom: 3rem;
+        }
+
+        .cta-buttons-large {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .cta-button-primary,
+        .cta-button-secondary {
+          padding: 1.25rem 2.5rem;
+          border: none;
+          border-radius: 12px;
+          font-size: 1.125rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .cta-button-primary {
+          background: white;
+          color: #0055f4;
+        }
+
+        .cta-button-secondary {
+          background: rgba(255, 255, 255, 0.15);
+          color: white;
+          border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .cta-button-primary:hover,
+        .cta-button-secondary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-button-secondary:hover {
+          background: rgba(255, 255, 255, 0.25);
+          border-color: white;
+        }
+
         /* Scroll Indicator */
         .scroll-indicator {
           position: absolute;
@@ -959,7 +1047,12 @@ export default function LandingPage() {
           font-size: 0.875rem;
           margin: 0;
         }
-
+        .eecar-highlight {
+        color: #0055f4;
+        font-weight: 700;
+        /* 아래 두 줄을 추가하여 빛나는 효과를 줍니다 */
+        filter: drop-shadow(0 0 8px rgba(0, 85, 244, 0.7));
+        }
         /* Responsive */
         @media (max-width: 768px) {
           .logo {
@@ -989,6 +1082,42 @@ export default function LandingPage() {
 
           .features-grid {
             grid-template-columns: 1fr;
+          }
+
+          /* Toss Style Responsive */
+          .section-title-large {
+            font-size: 2.5rem;
+          }
+
+          .section-subtitle {
+            font-size: 1rem;
+          }
+
+          .features-grid-simple {
+            grid-template-columns: 1fr;
+          }
+
+          .workflow-grid {
+            grid-template-columns: 1fr;
+            gap: 3rem;
+          }
+
+          .step-number {
+            font-size: 3rem;
+          }
+
+          .cta-title-large {
+            font-size: 2.5rem;
+          }
+
+          .cta-buttons-large {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .cta-button-primary,
+          .cta-button-secondary {
+            width: 100%;
           }
 
           .timeline-tabs {
