@@ -53,6 +53,9 @@ export default function Signup() {
 
   return (
     <div className="signup-page">
+      <button className="back-to-home" onClick={() => navigate('/')}>
+        ← 홈으로
+      </button>
       <div className="signup-container">
         <div className="signup-card">
           <div className="logo">EECAR</div>
@@ -164,6 +167,31 @@ export default function Signup() {
           align-items: center;
           justify-content: center;
           padding: 2rem;
+          position: relative;
+        }
+
+        .back-to-home {
+          position: absolute;
+          top: 2rem;
+          left: 2rem;
+          padding: 0.75rem 1.5rem;
+          background: rgba(255, 255, 255, 0.95);
+          color: #0055f4;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-radius: 8px;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-to-home:hover {
+          background: white;
+          border-color: white;
+          transform: translateX(-4px);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
 
         .signup-container {
@@ -260,7 +288,7 @@ export default function Signup() {
         .checkbox-label {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: 1rem;
           cursor: pointer;
           margin: 0;
         }
@@ -270,18 +298,23 @@ export default function Signup() {
           height: 20px;
           cursor: pointer;
           accent-color: #0055f4;
+          flex-shrink: 0;
+          margin: 0;
         }
 
         .checkbox-label span {
           font-size: 1rem;
           font-weight: 600;
           color: #1f2937;
+          line-height: 1.2;
+          margin-top: 1px;
         }
 
         .checkbox-hint {
           margin: 0.5rem 0 0 2.25rem;
           color: #6b7280;
           font-size: 0.8125rem;
+          line-height: 1.4;
         }
 
         .seller-info {
@@ -355,6 +388,13 @@ export default function Signup() {
 
           .signup-card h1 {
             font-size: 1.5rem;
+          }
+
+          .back-to-home {
+            top: 1rem;
+            left: 1rem;
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
           }
         }
       `}</style>

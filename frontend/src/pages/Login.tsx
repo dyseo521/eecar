@@ -29,6 +29,9 @@ export default function Login() {
 
   return (
     <div className="login-page">
+      <button className="back-to-home" onClick={() => navigate('/')}>
+        ← 홈으로
+      </button>
       <div className="login-container">
         <div className="login-card">
           <div className="logo">EECAR</div>
@@ -87,6 +90,31 @@ export default function Login() {
           align-items: center;
           justify-content: center;
           padding: 2rem;
+          position: relative;
+        }
+
+        .back-to-home {
+          position: absolute;
+          top: 2rem;
+          left: 2rem;
+          padding: 0.75rem 1.5rem;
+          background: rgba(255, 255, 255, 0.95);
+          color: #0055f4;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-radius: 8px;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-to-home:hover {
+          background: white;
+          border-color: white;
+          transform: translateX(-4px);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
 
         .login-container {
@@ -221,6 +249,13 @@ export default function Login() {
 
           .login-card h1 {
             font-size: 1.5rem;
+          }
+
+          .back-to-home {
+            top: 1rem;
+            left: 1rem;
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
           }
         }
       `}</style>
