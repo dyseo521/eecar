@@ -288,7 +288,7 @@ export default function Signup() {
         .checkbox-label {
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: 1.75rem;
           cursor: pointer;
           margin: 0;
         }
@@ -306,12 +306,11 @@ export default function Signup() {
           font-size: 1rem;
           font-weight: 600;
           color: #1f2937;
-          line-height: 1.2;
-          margin-top: 1px;
+          line-height: 20px;
         }
 
         .checkbox-hint {
-          margin: 0.5rem 0 0 2.25rem;
+          margin: 0.5rem 0 0 2.75rem;
           color: #6b7280;
           font-size: 0.8125rem;
           line-height: 1.4;
