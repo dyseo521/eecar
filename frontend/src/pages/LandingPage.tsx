@@ -522,7 +522,7 @@ export default function LandingPage() {
           z-index: 10;
           padding: 4rem 3rem;
           border-radius: 32px;
-          background: rgba(255, 255, 255, 0.25);
+          background: rgba(255, 255, 255, 0.75);
           backdrop-filter: blur(10px) saturate(150%);
           -webkit-backdrop-filter: blur(10px) saturate(150%);
           border: 1px solid rgba(255, 255, 255, 0.3);
