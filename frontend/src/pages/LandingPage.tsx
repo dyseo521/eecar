@@ -1482,30 +1482,30 @@ export default function LandingPage() {
         }
         /* Responsive */
         @media (max-width: 768px) {
-          /* Blob sizes for mobile */
+          /* Blob sizes for mobile - reduced for better mobile experience */
           .blob-1 {
-            width: 400px;
-            height: 400px;
+            width: 280px;
+            height: 280px;
           }
 
           .blob-2 {
-            width: 350px;
-            height: 350px;
+            width: 250px;
+            height: 250px;
           }
 
           .blob-3 {
-            width: 380px;
-            height: 380px;
+            width: 270px;
+            height: 270px;
           }
 
           .blob-4 {
-            width: 320px;
-            height: 320px;
+            width: 230px;
+            height: 230px;
           }
 
           .blob-5 {
-            width: 360px;
-            height: 360px;
+            width: 260px;
+            height: 260px;
           }
 
           .hero-content {
