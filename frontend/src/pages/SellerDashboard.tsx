@@ -117,7 +117,7 @@ export default function SellerDashboard() {
 
       return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       // 부품 목록 캐시 무효화 (BuyerSearch가 자동으로 새로고침됨)
       queryClient.invalidateQueries({ queryKey: ['parts'] });
 
@@ -191,18 +191,8 @@ export default function SellerDashboard() {
     setUseCases(updated);
   };
 
-  const addImageUrl = () => {
-    setImageUrls([...imageUrls, '']);
-  };
-
   const removeImageUrl = (index: number) => {
     setImageUrls(imageUrls.filter((_, i) => i !== index));
-  };
-
-  const updateImageUrl = (index: number, value: string) => {
-    const updated = [...imageUrls];
-    updated[index] = value;
-    setImageUrls(updated);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
