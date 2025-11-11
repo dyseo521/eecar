@@ -390,8 +390,8 @@ export default function LandingPage() {
         .blob {
           position: absolute;
           border-radius: 50%;
-          filter: blur(80px);
-          opacity: 0.5;
+          filter: blur(60px);
+          opacity: 0.8;
           animation-timing-function: ease-in-out;
           animation-iteration-count: infinite;
           animation-direction: alternate;
@@ -503,27 +503,30 @@ export default function LandingPage() {
           }
         }
 
-        .hero::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background:
-            radial-gradient(circle at 20% 50%, rgba(0, 85, 244, 0.08) 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, rgba(0, 128, 255, 0.06) 0%, transparent 50%),
-            radial-gradient(circle at 40% 20%, rgba(0, 162, 255, 0.05) 0%, transparent 50%);
-          pointer-events: none;
-        }
-
         .hero-content {
           text-align: center;
           position: relative;
           z-index: 10;
-          padding: 2rem;
+          padding: 4rem 3rem;
           max-width: 900px;
-          margin: 0 auto;
+          margin: 0 2rem;
+          border-radius: 32px;
+          background: rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(8px) saturate(140%);
+          -webkit-backdrop-filter: blur(8px) saturate(140%);
+          border: 1px solid rgba(255, 255, 255, 0.25);
+          box-shadow:
+            0 8px 32px 0 rgba(0, 85, 244, 0.08),
+            0 2px 8px 0 rgba(0, 0, 0, 0.02),
+            inset 0 1px 1px 0 rgba(255, 255, 255, 0.4);
+          transition: all 0.3s ease;
+        }
+
+        .hero-content:hover {
+          transform: translateY(-3px);
+          box-shadow:
+            0 12px 40px 0 rgba(0, 85, 244, 0.12),
+            0 4px 12px 0 rgba(0, 0, 0, 0.04);
         }
 
         .logo {
@@ -1506,7 +1509,9 @@ export default function LandingPage() {
           }
 
           .hero-content {
-            padding: 1.5rem 1rem;
+            padding: 2.5rem 1.5rem;
+            margin: 0 1rem;
+            border-radius: 24px;
           }
 
           .logo {
