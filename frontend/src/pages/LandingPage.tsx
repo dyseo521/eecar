@@ -390,7 +390,7 @@ export default function LandingPage() {
         .blob {
           position: absolute;
           border-radius: 50%;
-          filter: blur(60px);
+          filter: blur(5px);
           opacity: 0.8;
           animation-timing-function: ease-in-out;
           animation-iteration-count: infinite;
@@ -510,7 +510,7 @@ export default function LandingPage() {
           padding: 4rem 3rem;
           border-radius: 32px;
           background: rgba(255, 255, 255, 0.25);
-          backdrop-filter: blur(10px) saturate(150%);
+          backdrop-filter: blur(20px) saturate(150%);
           -webkit-backdrop-filter: blur(10px) saturate(150%);
           border: 1px solid rgba(255, 255, 255, 0.3);
           box-shadow:
