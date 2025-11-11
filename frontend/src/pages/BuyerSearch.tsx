@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import type { SearchRequest, SearchResponse, Part, WatchCriteria } from '@shared/index';
+import { mockParts } from '../data/mockParts';
 
 // 카테고리 매핑 (한글 -> 영문)
 const categoryMap: Record<string, string> = {
@@ -29,6 +30,33 @@ const getPartImageUrl = (part: Part): string => {
     return part.images[0];
   }
   return categoryDefaultImages[part.category] || '/image/car_body_1.jpg';
+};
+
+// mockParts를 Part 타입으로 변환하는 헬퍼 함수
+const convertMockPartToPart = (mockPart: any): Part => {
+  // 한글 카테고리를 영문으로 변환
+  const categoryEng = Object.entries(categoryMap).find(
+    ([kor, _]) => mockPart.category === kor
+  )?.[1] || 'other';
+
+  return {
+    partId: mockPart.id,
+    name: mockPart.name,
+    category: categoryEng as any,
+    manufacturer: mockPart.manufacturer,
+    model: mockPart.model,
+    year: mockPart.year,
+    condition: 'used' as any,
+    price: mockPart.price,
+    quantity: mockPart.quantity,
+    sellerId: mockPart.seller?.company || 'demo-seller',
+    description: mockPart.description,
+    images: mockPart.images,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    specifications: mockPart.specifications,
+    useCases: mockPart.useCases
+  };
 };
 
 export default function BuyerSearch() {
@@ -70,20 +98,40 @@ export default function BuyerSearch() {
   const { data: partsData, isLoading: isPartsLoading } = useQuery({
     queryKey: ['parts', selectedCategory],
     queryFn: async () => {
-      // 전체 카테고리인 경우 카테고리 필터 없이 모든 부품 조회
-      let url = '/api/parts?limit=50';
-      if (selectedCategory !== 'all') {
-        const category = categoryMap[selectedCategory] || selectedCategory;
-        url = `/api/parts?category=${category}&limit=50`;
+      try {
+        // 전체 카테고리인 경우 카테고리 필터 없이 모든 부품 조회
+        let url = '/api/parts?limit=50';
+        if (selectedCategory !== 'all') {
+          const category = categoryMap[selectedCategory] || selectedCategory;
+          url = `/api/parts?category=${category}&limit=50`;
+        }
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error('부품 목록을 불러오는데 실패했습니다');
+        }
+
+        return response.json() as Promise<{ parts: Part[]; count: number }>;
+      } catch (error) {
+        // API 호출 실패 시 mock 데이터 사용 (정적 호스팅 대응)
+        console.log('API 호출 실패, mock 데이터 사용:', error);
+
+        // mockParts를 Part 타입으로 변환
+        const convertedParts = mockParts.map(convertMockPartToPart);
+
+        // 카테고리 필터링
+        let filteredParts = convertedParts;
+        if (selectedCategory !== 'all') {
+          const category = categoryMap[selectedCategory] || selectedCategory;
+          filteredParts = convertedParts.filter(part => part.category === category);
+        }
+
+        return {
+          parts: filteredParts,
+          count: filteredParts.length
+        };
       }
-
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error('부품 목록을 불러오는데 실패했습니다');
-      }
-
-      return response.json() as Promise<{ parts: Part[]; count: number }>;
     },
     enabled: !searchParams, // AI 검색 중이 아닐 때만 실행
   });
