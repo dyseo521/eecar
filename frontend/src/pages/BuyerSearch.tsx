@@ -521,7 +521,7 @@ export default function BuyerSearch() {
 
         .search-form textarea {
           width: 100%;
-          padding: 1.25rem 4rem 1.25rem 1.5rem;
+          padding: 0.75rem 4rem 0.75rem 1.5rem;
           border: 2px solid #d1d5db;
           border-radius: 50px;
           font-size: 1rem;
@@ -545,7 +545,7 @@ export default function BuyerSearch() {
 
         .search-arrow-btn {
           position: absolute;
-          right: 0.375rem;
+          right: 0.625rem;
           top: 50%;
           transform: translateY(-50%);
           width: 2.5rem;
@@ -1046,13 +1046,14 @@ export default function BuyerSearch() {
 
           .search-form textarea {
             font-size: 0.9375rem;
-            padding: 1rem 3.5rem 1rem 1.25rem;
+            padding: 0.625rem 3.5rem 0.625rem 1.25rem;
           }
 
           .search-arrow-btn {
             width: 2.25rem;
             height: 2.25rem;
             font-size: 1rem;
+            right: 0.5rem;
           }
 
           .search-layout {
@@ -1098,7 +1099,7 @@ export default function BuyerSearch() {
           }
 
           .search-form textarea {
-            padding: 0.875rem 3rem 0.875rem 1rem;
+            padding: 0.5rem 3rem 0.5rem 1rem;
             font-size: 0.875rem;
             border-radius: 40px;
           }
@@ -1107,7 +1108,7 @@ export default function BuyerSearch() {
             width: 2rem;
             height: 2rem;
             font-size: 0.875rem;
-            right: 0.375rem;
+            right: 0.5rem;
           }
 
           .parts-grid {
