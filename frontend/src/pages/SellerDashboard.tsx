@@ -250,22 +250,18 @@ export default function SellerDashboard() {
                   </div>
                   <span>클릭하여 이미지 업로드</span>
                 </label>
-                {imageUrls.filter(url => url !== '').length > 0 && (
-                  <div className="uploaded-images">
-                    {imageUrls.filter(url => url !== '').map((url, index) => (
-                      <div key={index} className="image-preview">
-                        <img src={url} alt={`preview-${index}`} />
-                        <button
-                          type="button"
-                          onClick={() => removeImageUrl(index)}
-                          className="remove-image-btn"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
+                {imageUrls.filter(url => url !== '').map((url, index) => (
+                  <div key={index} className="image-preview">
+                    <img src={url} alt={`preview-${index}`} />
+                    <button
+                      type="button"
+                      onClick={() => removeImageUrl(index)}
+                      className="remove-image-btn"
+                    >
+                      ✕
+                    </button>
                   </div>
-                )}
+                ))}
               </div>
             </div>
 
@@ -283,26 +279,32 @@ export default function SellerDashboard() {
               />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="category">카테고리 *</label>
-                <select
-                  id="category"
-                  required
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                >
-                  <option value="battery">배터리</option>
-                  <option value="motor">모터</option>
-                  <option value="inverter">인버터</option>
-                  <option value="charger">충전기</option>
-                  <option value="electronics">전장 부품</option>
-                  <option value="body">차체</option>
-                  <option value="interior">내장재</option>
-                  <option value="other">기타</option>
-                </select>
+            <div className="form-group">
+              <label>카테고리 *</label>
+              <div className="category-scroll-container">
+                {[
+                  { value: 'battery', label: '배터리' },
+                  { value: 'motor', label: '모터' },
+                  { value: 'inverter', label: '인버터' },
+                  { value: 'charger', label: '충전기' },
+                  { value: 'electronics', label: '전장 부품' },
+                  { value: 'body', label: '차체' },
+                  { value: 'interior', label: '내장재' },
+                  { value: 'other', label: '기타' },
+                ].map((cat) => (
+                  <button
+                    key={cat.value}
+                    type="button"
+                    className={`category-button ${formData.category === cat.value ? 'active' : ''}`}
+                    onClick={() => setFormData({ ...formData, category: cat.value })}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
               </div>
+            </div>
 
+            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="manufacturer">제조사 *</label>
                 <input
@@ -681,8 +683,9 @@ export default function SellerDashboard() {
 
         .image-upload-container {
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           gap: 1rem;
+          flex-wrap: wrap;
         }
 
         .upload-box {
@@ -707,8 +710,8 @@ export default function SellerDashboard() {
         }
 
         .camera-icon {
-          width: 48px;
-          height: 48px;
+          width: 36px;
+          height: 36px;
           color: #00a2ff;
         }
 
@@ -723,17 +726,11 @@ export default function SellerDashboard() {
           font-weight: 600;
         }
 
-        .uploaded-images {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 1rem;
-        }
-
         .image-preview {
           position: relative;
-          width: 120px;
-          height: 120px;
-          border-radius: 8px;
+          width: 180px;
+          height: 180px;
+          border-radius: 12px;
           overflow: hidden;
           border: 2px solid #e5e7eb;
         }
@@ -776,6 +773,7 @@ export default function SellerDashboard() {
         .radio-option {
           display: flex;
           align-items: center;
+          justify-content: center;
           gap: 0.5rem;
           padding: 0.75rem 1.25rem;
           border: 2px solid #e5e7eb;
@@ -783,6 +781,7 @@ export default function SellerDashboard() {
           cursor: pointer;
           transition: all 0.2s;
           background: white;
+          min-width: 100px;
         }
 
         .radio-option:hover {
@@ -795,6 +794,8 @@ export default function SellerDashboard() {
           height: 18px;
           cursor: pointer;
           accent-color: #0055f4;
+          margin: 0;
+          flex-shrink: 0;
         }
 
         .radio-option input[type="radio"]:checked + span {
@@ -811,6 +812,60 @@ export default function SellerDashboard() {
           font-size: 1rem;
           color: #374151;
           transition: all 0.2s;
+          white-space: nowrap;
+        }
+
+        .category-scroll-container {
+          display: flex;
+          gap: 0.75rem;
+          overflow-x: auto;
+          padding: 0.5rem 0;
+          scrollbar-width: thin;
+          scrollbar-color: #00a2ff #f3f4f6;
+        }
+
+        .category-scroll-container::-webkit-scrollbar {
+          height: 6px;
+        }
+
+        .category-scroll-container::-webkit-scrollbar-track {
+          background: #f3f4f6;
+          border-radius: 3px;
+        }
+
+        .category-scroll-container::-webkit-scrollbar-thumb {
+          background: #00a2ff;
+          border-radius: 3px;
+        }
+
+        .category-scroll-container::-webkit-scrollbar-thumb:hover {
+          background: #0055f4;
+        }
+
+        .category-button {
+          padding: 0.75rem 1.5rem;
+          border: 2px solid #e5e7eb;
+          background: white;
+          color: #374151;
+          border-radius: 8px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+
+        .category-button:hover {
+          border-color: #00a2ff;
+          background: rgba(0, 162, 255, 0.05);
+        }
+
+        .category-button.active {
+          border-color: #0055f4;
+          background: rgba(0, 85, 244, 0.08);
+          color: #0055f4;
+          font-weight: 700;
         }
 
         .form-section h3 {
