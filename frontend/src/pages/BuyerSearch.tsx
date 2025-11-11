@@ -210,25 +210,31 @@ export default function BuyerSearch() {
         </button>
       </header>
 
+      {/* AI 검색창 - 상단 */}
+      <section className="search-section-top">
+        <div className="search-container">
+          <div className="search-header">
+            <h2>🤖 AI 검색</h2>
+            <p className="search-subtitle">자연어로 원하는 부품을 설명해보세요</p>
+          </div>
+          <form onSubmit={handleSearch} className="search-form">
+            <textarea
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="예: ESS 구축용 안전한 배터리를 찾습니다. 5년 이상 사용 가능하고 60kWh 이상이면 좋겠어요."
+              rows={3}
+            />
+            <button type="submit" disabled={!query.trim() || isLoading}>
+              {isLoading ? '🔍 검색 중...' : '🔍 AI 검색 시작'}
+            </button>
+          </form>
+        </div>
+      </section>
+
       <main className="search-layout">
         {/* 왼쪽 필터 영역 */}
         <aside className="filter-sidebar">
           <div className="filter-sticky">
-            <section className="search-box-compact">
-              <h3>AI 검색</h3>
-              <form onSubmit={handleSearch}>
-                <textarea
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="예: ESS 구축용 안전한 배터리를 찾습니다. 5년 이상 사용 가능하고 60kWh 이상이면 좋겠어요."
-                  rows={3}
-                />
-                <button type="submit" disabled={!query.trim() || isLoading}>
-                  {isLoading ? '검색 중...' : '검색하기'}
-                </button>
-              </form>
-            </section>
-
             <section className="filter-section">
               <h3>카테고리</h3>
               <div className="category-filters">
@@ -500,6 +506,96 @@ export default function BuyerSearch() {
           z-index: 100;
         }
 
+        /* 상단 AI 검색 섹션 */
+        .search-section-top {
+          background: linear-gradient(135deg, #0055f4 0%, #0080ff 100%);
+          padding: 3rem 2rem;
+          box-shadow: 0 8px 32px rgba(0, 85, 244, 0.2);
+        }
+
+        .search-container {
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .search-header {
+          text-align: center;
+          margin-bottom: 2rem;
+        }
+
+        .search-header h2 {
+          margin: 0 0 0.75rem 0;
+          color: white;
+          font-size: 2.5rem;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+        }
+
+        .search-subtitle {
+          margin: 0;
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 1.125rem;
+          font-weight: 400;
+        }
+
+        .search-form {
+          display: flex;
+          gap: 1rem;
+          align-items: flex-end;
+        }
+
+        .search-form textarea {
+          flex: 1;
+          padding: 1.25rem;
+          border: 3px solid rgba(255, 255, 255, 0.2);
+          border-radius: 16px;
+          font-size: 1rem;
+          font-family: inherit;
+          resize: none;
+          background: rgba(255, 255, 255, 0.95);
+          color: #1f2937;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-form textarea:focus {
+          outline: none;
+          border-color: white;
+          background: white;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+          transform: translateY(-2px);
+        }
+
+        .search-form textarea::placeholder {
+          color: #9ca3af;
+        }
+
+        .search-form button[type="submit"] {
+          padding: 1.25rem 2.5rem;
+          background: white;
+          color: #0055f4;
+          border: 3px solid transparent;
+          border-radius: 16px;
+          font-size: 1.0625rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          white-space: nowrap;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-form button[type="submit"]:hover:not(:disabled) {
+          background: #f8f9fa;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-form button[type="submit"]:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
+        }
+
         .page-header h1 {
           margin: 0;
           color: #0055f4;
@@ -568,72 +664,23 @@ export default function BuyerSearch() {
           box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
         }
 
-        .search-box-compact {
-          margin-bottom: 2rem;
+        /* 필터 섹션 */
+        .filter-section {
           padding-bottom: 1.5rem;
+          margin-bottom: 1.5rem;
           border-bottom: 1px solid #e5e7eb;
         }
 
-        .search-box-compact h3 {
-          margin: 0 0 1rem 0;
-          color: #0055f4;
-          font-size: 1.1rem;
-          font-weight: 700;
-        }
-
-        .search-box-compact form {
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-        }
-
-        .search-box-compact textarea {
-          width: 100%;
-          padding: 0.75rem;
-          border: 1px solid #d1d5db;
-          border-radius: 8px;
-          font-size: 0.875rem;
-          font-family: inherit;
-          resize: none;
-          transition: all 0.2s ease;
-        }
-
-        .search-box-compact textarea:focus {
-          outline: none;
-          border-color: #0055f4;
-          box-shadow: 0 0 0 3px rgba(0, 85, 244, 0.1);
-        }
-
-        .search-box-compact button[type="submit"] {
-          padding: 0.75rem 1rem;
-          background: #0055f4;
-          color: white;
-          border: none;
-          border-radius: 8px;
-          font-size: 0.875rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .search-box-compact button[type="submit"]:hover:not(:disabled) {
-          background: #0040c0;
-        }
-
-        .search-box-compact button[type="submit"]:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        /* 필터 섹션 */
-        .filter-section {
-          margin-bottom: 2rem;
+        .filter-section:last-child {
+          border-bottom: none;
+          margin-bottom: 0;
+          padding-bottom: 0;
         }
 
         .filter-section h3 {
           margin: 0 0 1rem 0;
           color: #1f2937;
-          font-size: 0.95rem;
+          font-size: 1rem;
           font-weight: 700;
         }
 
@@ -987,6 +1034,14 @@ export default function BuyerSearch() {
         }
 
         @media (max-width: 1024px) {
+          .search-section-top {
+            padding: 2.5rem 1.5rem;
+          }
+
+          .search-header h2 {
+            font-size: 2rem;
+          }
+
           .search-layout {
             grid-template-columns: 250px 1fr;
             gap: 1rem;
@@ -1008,6 +1063,28 @@ export default function BuyerSearch() {
 
           .page-header h1 {
             font-size: 1.4rem;
+          }
+
+          .search-section-top {
+            padding: 2rem 1rem;
+          }
+
+          .search-header h2 {
+            font-size: 1.75rem;
+          }
+
+          .search-subtitle {
+            font-size: 0.9375rem;
+          }
+
+          .search-form {
+            flex-direction: column;
+            gap: 0.75rem;
+          }
+
+          .search-form button[type="submit"] {
+            width: 100%;
+            padding: 1rem;
           }
 
           .search-layout {
@@ -1048,6 +1125,27 @@ export default function BuyerSearch() {
         }
 
         @media (max-width: 480px) {
+          .search-section-top {
+            padding: 1.5rem 1rem;
+          }
+
+          .search-header h2 {
+            font-size: 1.5rem;
+          }
+
+          .search-subtitle {
+            font-size: 0.875rem;
+          }
+
+          .search-form textarea {
+            padding: 1rem;
+            font-size: 0.9375rem;
+          }
+
+          .search-form button[type="submit"] {
+            font-size: 0.9375rem;
+          }
+
           .parts-grid {
             grid-template-columns: repeat(2, 1fr);
           }
