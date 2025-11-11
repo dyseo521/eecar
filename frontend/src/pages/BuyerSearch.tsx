@@ -201,18 +201,18 @@ export default function BuyerSearch() {
   return (
     <div className="buyer-search">
       <header className="page-header">
-        <button onClick={() => navigate('/')} className="back-button">
-          ← 홈으로
-        </button>
-        <h1>부품 검색</h1>
-        <button onClick={() => setShowWatchModal(true)} className="watch-button">
-          관심 부품 알림 설정
-        </button>
-      </header>
+        <div className="header-top">
+          <button onClick={() => navigate('/')} className="back-button">
+            ← 홈으로
+          </button>
+          <h1>부품 검색</h1>
+          <button onClick={() => setShowWatchModal(true)} className="watch-button">
+            관심 부품 알림 설정
+          </button>
+        </div>
 
-      {/* AI 검색창 - 헤더 바로 아래 */}
-      <section className="search-section-top">
-        <div className="search-container">
+        {/* AI 검색창 - 헤더 안 */}
+        <div className="header-search">
           <form onSubmit={handleSearch} className="search-form">
             <input
               type="text"
@@ -225,7 +225,7 @@ export default function BuyerSearch() {
             </button>
           </form>
         </div>
-      </section>
+      </header>
 
       <main className="search-layout">
         {/* 왼쪽 필터 영역 */}
@@ -492,24 +492,21 @@ export default function BuyerSearch() {
         .page-header {
           background: rgba(255, 255, 255, 0.95);
           backdrop-filter: blur(10px);
-          padding: 1.5rem 2rem;
+          padding: 1.5rem 2rem 1rem 2rem;
           box-shadow: 0 4px 20px rgba(58, 0, 187, 0.1);
-          display: flex;
-          align-items: center;
-          gap: 1rem;
           position: sticky;
           top: 0;
           z-index: 100;
         }
 
-        /* 상단 AI 검색 섹션 */
-        .search-section-top {
-          padding: 1rem 2rem;
-          background: white;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        .header-top {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 1rem;
         }
 
-        .search-container {
+        .header-search {
           max-width: 1200px;
           margin: 0 auto;
         }
@@ -1016,8 +1013,12 @@ export default function BuyerSearch() {
         }
 
         @media (max-width: 1024px) {
-          .search-section-top {
-            padding: 0.75rem 1.5rem;
+          .page-header {
+            padding: 1.25rem 1.5rem 0.875rem 1.5rem;
+          }
+
+          .header-top {
+            margin-bottom: 0.875rem;
           }
 
           .search-form input[type="text"] {
@@ -1045,15 +1046,15 @@ export default function BuyerSearch() {
 
         @media (max-width: 768px) {
           .page-header {
-            padding: 1rem 1.5rem;
+            padding: 1rem 1rem 0.75rem 1rem;
+          }
+
+          .header-top {
+            margin-bottom: 0.75rem;
           }
 
           .page-header h1 {
             font-size: 1.4rem;
-          }
-
-          .search-section-top {
-            padding: 0.75rem 1rem;
           }
 
           .search-form input[type="text"] {
@@ -1111,8 +1112,12 @@ export default function BuyerSearch() {
         }
 
         @media (max-width: 480px) {
-          .search-section-top {
-            padding: 0.625rem 0.75rem;
+          .page-header {
+            padding: 0.875rem 0.75rem 0.625rem 0.75rem;
+          }
+
+          .header-top {
+            margin-bottom: 0.625rem;
           }
 
           .search-form input[type="text"] {
