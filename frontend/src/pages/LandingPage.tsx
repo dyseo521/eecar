@@ -222,6 +222,13 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Mission Banner Section */}
+      <section className="mission-banner animate-on-scroll">
+        <div className="mission-overlay">
+          <h2 className="mission-text">버려지는 부품은 없습니다.<br/>새로운 가치로 이어집니다.</h2>
+        </div>
+      </section>
+
       {/* CTA Section - Toss Style */}
       <section className="cta-section animate-on-scroll">
         <div className="container">
@@ -980,6 +987,44 @@ export default function LandingPage() {
           font-weight: 600;
         }
 
+        /* Mission Banner Section */
+        .mission-banner {
+          width: 100%;
+          height: 339px;
+          background-image: url('/image/background_consult.webp');
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0;
+          padding: 0;
+        }
+
+        .mission-overlay {
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.35);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem;
+        }
+
+        .mission-text {
+          font-size: 3rem;
+          font-weight: 800;
+          color: white;
+          text-align: center;
+          line-height: 1.3;
+          letter-spacing: -0.02em;
+          text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+          max-width: 1000px;
+          margin: 0;
+        }
+
         /* CTA Section */
         .cta-section {
           padding: 6rem 0;
@@ -1344,6 +1389,15 @@ export default function LandingPage() {
           .step-keyword {
             font-size: 1rem;
             padding: 0.5rem 1.25rem;
+          }
+
+          .mission-banner {
+            height: 250px;
+          }
+
+          .mission-text {
+            font-size: 1.75rem;
+            line-height: 1.4;
           }
 
           .cta-title-large {
