@@ -1,0 +1,200 @@
+name: CD - Deploy to Production
+
+on:
+  # 수동 배포만 허용 (안전성)
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "DEPLOY" to confirm production deployment'
+        required: true
+        type: string
+
+  # Release 태그 생성 시 자동 배포
+  release:
+    types: [published]
+
+env:
+  AWS_REGION: us-east-1
+  ENVIRONMENT: prod
+  NODE_VERSION: '20'
+
+jobs:
+  # 배포 전 확인
+  pre-deployment-check:
+    name: 🔍 Pre-deployment Validation
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.confirm == 'DEPLOY') ||
+      github.event_name == 'release'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run all tests
+        run: |
+          cd frontend && npm ci && npm run lint && npm run type-check && npm run build
+          cd ../backend && npm ci && npm run lint && npm run build && npm test
+
+      - name: Validate SAM template
+        run: |
+          pip install aws-sam-cli
+          cd infrastructure
+          sam validate --lint
+
+  deploy-production:
+    name: 🚀 Deploy to PRODUCTION
+    runs-on: ubuntu-latest
+    needs: pre-deployment-check
+    environment:
+      name: production
+      url: https://eecar.com  # 실제 URL로 변경
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Frontend 빌드 및 배포
+      - name: Build Frontend
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run build
+        env:
+          VITE_API_ENDPOINT: ${{ secrets.VITE_API_ENDPOINT_PROD }}
+          VITE_ENVIRONMENT: production
+
+      - name: Deploy Frontend to S3
+        working-directory: ./frontend
+        run: |
+          aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_PROD }} \
+            --delete \
+            --cache-control "public, max-age=31536000, immutable" \
+            --exclude "index.html"
+
+          aws s3 cp dist/index.html s3://${{ secrets.S3_BUCKET_PROD }}/index.html \
+            --cache-control "no-cache, no-store, must-revalidate"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_PROD }} \
+            --paths "/*"
+
+      # Backend 빌드 및 배포
+      - name: Build Backend
+        working-directory: ./backend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Setup SAM CLI
+        uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - name: Build SAM application
+        working-directory: ./infrastructure
+        run: sam build
+
+      - name: Deploy to AWS Lambda (PRODUCTION)
+        working-directory: ./infrastructure
+        run: |
+          sam deploy \
+            --stack-name eecar-prod \
+            --s3-bucket ${{ secrets.SAM_DEPLOYMENT_BUCKET_PROD }} \
+            --capabilities CAPABILITY_IAM \
+            --region ${{ env.AWS_REGION }} \
+            --parameter-overrides \
+              Environment=prod \
+              BedrockModelId=anthropic.claude-3-sonnet-20240229-v1:0 \
+            --no-fail-on-empty-changeset \
+            --no-confirm-changeset
+
+      - name: Get API endpoint
+        id: get-endpoint
+        run: |
+          API_URL=$(aws cloudformation describe-stacks \
+            --stack-name eecar-prod \
+            --query 'Stacks[0].Outputs[?OutputKey==`ApiEndpoint`].OutputValue' \
+            --output text)
+          echo "API_URL=$API_URL" >> $GITHUB_OUTPUT
+          echo "::notice::Production API: $API_URL"
+
+      # 배포 후 스모크 테스트
+      - name: Run production smoke tests
+        run: |
+          echo "🔍 Running production smoke tests..."
+          sleep 20
+
+          API_URL="${{ steps.get-endpoint.outputs.API_URL }}"
+
+          # Critical endpoints health check
+          for endpoint in "/api/parts" "/api/search"; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL$endpoint" || echo "000")
+
+            if [ "$STATUS" -eq "200" ] || [ "$STATUS" -eq "404" ]; then
+              echo "✅ $endpoint - OK (Status: $STATUS)"
+            else
+              echo "❌ $endpoint - FAILED (Status: $STATUS)"
+              exit 1
+            fi
+          done
+
+      - name: Create deployment record
+        if: success()
+        run: |
+          echo "## 🎉 Production 배포 완료" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 배포 정보" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: Production" >> $GITHUB_STEP_SUMMARY
+          echo "- **API Endpoint**: ${{ steps.get-endpoint.outputs.API_URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deployed at**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 다음 단계" >> $GITHUB_STEP_SUMMARY
+          echo "1. 프로덕션 모니터링 확인" >> $GITHUB_STEP_SUMMARY
+          echo "2. 사용자 피드백 모니터링" >> $GITHUB_STEP_SUMMARY
+          echo "3. CloudWatch 메트릭 확인" >> $GITHUB_STEP_SUMMARY
+
+  rollback:
+    name: 🔄 Rollback (if needed)
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    if: failure()
+    environment:
+      name: production
+
+    steps:
+      - name: Alert team
+        run: |
+          echo "⚠️ PRODUCTION 배포 실패!"
+          echo "즉시 롤백이 필요할 수 있습니다."
+          echo "CloudFormation 콘솔에서 이전 스택으로 롤백하세요."
+
+      - name: Get previous stack status
+        run: |
+          echo "이전 배포 상태 확인 중..."
+          # 여기에 롤백 스크립트 추가 가능

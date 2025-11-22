@@ -1,0 +1,21 @@
+version = 0.1
+
+[staging]
+[staging.deploy]
+[staging.deploy.parameters]
+stack_name = "eecar-staging"
+s3_bucket = "eecar-sam-deployments-staging"  # GitHub Secrets에서 관리
+s3_prefix = "eecar-staging"
+region = "us-east-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = [
+    "Environment=staging",
+    "BedrockModelId=anthropic.claude-3-haiku-20240307-v1:0"
+]
+image_repositories = []
+
+[staging.build]
+[staging.build.parameters]
+cached = true
+parallel = true

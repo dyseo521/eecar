@@ -208,6 +208,82 @@ curl -X POST https://your-api-url/api/synthetic \
 - `POST /api/watch` - 알림 등록
 - `POST /api/proposals` - 계약 제안 생성
 
+## CI/CD 파이프라인
+
+이 프로젝트는 GitHub Actions를 사용한 자동화된 CI/CD 파이프라인을 포함합니다.
+
+### 워크플로우
+
+#### 1. CI - Pull Request 검증 (`.github/workflows/ci.yml`)
+
+모든 PR에 대해 자동 실행:
+- ✅ Frontend: ESLint, TypeScript 타입 체크, 빌드
+- ✅ Backend: ESLint, 빌드, 유닛 테스트
+- ✅ SAM Template 검증
+- ✅ E2E 테스트 (Playwright)
+- ✅ 보안 스캔 (npm audit)
+
+#### 2. CD-Dev - 개발 환경 배포 (`.github/workflows/cd-dev.yml`)
+
+`develop` 브랜치에 푸시 시 자동 배포:
+- 🚀 Frontend → S3 + CloudFront
+- 🚀 Backend → AWS Lambda (SAM)
+- 🔍 스모크 테스트 실행
+
+#### 3. CD-Staging - 스테이징 환경 배포 (`.github/workflows/cd-staging.yml`)
+
+`main` 브랜치에 푸시 시 자동 배포:
+- 🚀 Frontend → S3 + CloudFront
+- 🚀 Backend → AWS Lambda (SAM)
+- 🧪 통합 테스트 실행
+
+#### 4. CD-Prod - 프로덕션 배포 (`.github/workflows/cd-prod.yml`)
+
+수동 승인 후 배포:
+- 🔒 배포 전 전체 테스트 실행
+- 🚀 Production 환경 배포
+- 🔍 프로덕션 스모크 테스트
+- 🔄 실패 시 롤백 안내
+
+### GitHub Secrets 설정
+
+CI/CD를 사용하려면 다음 Secrets를 설정해야 합니다. 자세한 내용은 [.github/SECRETS.md](.github/SECRETS.md)를 참고하세요.
+
+**필수 Secrets:**
+```
+AWS_ACCESS_KEY_ID_DEV / _STAGING / _PROD
+AWS_SECRET_ACCESS_KEY_DEV / _STAGING / _PROD
+S3_BUCKET_DEV / _STAGING / _PROD
+SAM_DEPLOYMENT_BUCKET_DEV / _STAGING / _PROD
+VITE_API_ENDPOINT_DEV / _STAGING / _PROD
+CLOUDFRONT_DISTRIBUTION_ID_DEV / _STAGING / _PROD (선택적)
+```
+
+### 배포 전략
+
+```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│     DEV     │───→│   STAGING   │───→│    PROD     │
+│  (자동 배포)  │    │  (자동 배포)  │    │  (수동 승인) │
+│   develop   │    │     main    │    │  release/*  │
+└─────────────┘    └─────────────┘    └─────────────┘
+```
+
+### 로컬 Docker 빌드
+
+Frontend를 Docker로 빌드하여 테스트:
+
+```bash
+cd frontend
+docker build -t eecar-frontend:latest \
+  --build-arg VITE_API_ENDPOINT=http://localhost:3001 \
+  --build-arg VITE_ENVIRONMENT=local \
+  .
+
+docker run -p 8080:80 eecar-frontend:latest
+# http://localhost:8080 접속
+```
+
 ## 아키텍처
 
 ### 데이터 플로우
@@ -294,13 +370,22 @@ Bedrock 모델 접근 권한 확인 필요. AWS Console에서 Bedrock 모델 액
 
 ## 로드맵
 
+### 완료
+- [x] GitHub Actions CI/CD 파이프라인
+- [x] 환경별 배포 자동화 (Dev/Staging/Prod)
+- [x] Docker 컨테이너화 (Frontend)
+
+### 진행 중
 - [ ] 사용자 인증 (Cognito)
 - [ ] 이미지 업로드 (S3 pre-signed URLs)
+
+### 계획
 - [ ] 실시간 알림 (WebSocket API)
 - [ ] 관리자 대시보드
 - [ ] 부품 상태 추적
 - [ ] 결제 통합
 - [ ] 다국어 지원
+- [ ] Kubernetes 배포 옵션 (선택적)
 
 ## 라이선스
 

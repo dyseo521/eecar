@@ -1,0 +1,21 @@
+version = 0.1
+
+[prod]
+[prod.deploy]
+[prod.deploy.parameters]
+stack_name = "eecar-prod"
+s3_bucket = "eecar-sam-deployments-prod"  # GitHub Secrets에서 관리
+s3_prefix = "eecar-prod"
+region = "us-east-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = [
+    "Environment=prod",
+    "BedrockModelId=anthropic.claude-3-sonnet-20240229-v1:0"  # Production uses Sonnet
+]
+image_repositories = []
+
+[prod.build]
+[prod.build.parameters]
+cached = true
+parallel = true

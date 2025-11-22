@@ -1,0 +1,21 @@
+version = 0.1
+
+[dev]
+[dev.deploy]
+[dev.deploy.parameters]
+stack_name = "eecar-dev"
+s3_bucket = "eecar-sam-deployments-dev"  # GitHub Secrets에서 관리
+s3_prefix = "eecar-dev"
+region = "us-east-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = [
+    "Environment=dev",
+    "BedrockModelId=anthropic.claude-3-haiku-20240307-v1:0"
+]
+image_repositories = []
+
+[dev.build]
+[dev.build.parameters]
+cached = true
+parallel = true
