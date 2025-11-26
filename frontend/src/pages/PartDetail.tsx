@@ -10,7 +10,11 @@ const categoryDefaultImages: Record<string, string> = {
   'battery': '/image/batterypack_1.jpg',
   'motor': '/image/motor_1.jpg',
   'inverter': '/image/inverter_1.png',
-  'body': '/image/car_body_1.jpg',
+  'body-chassis-frame': '/image/car_body_1.jpg',
+  'body-panel': '/image/car_body_2.jpg',
+  'body-door': '/image/car_body_3.png',
+  'body-window': '/image/car_body_1.jpg',
+  'body': '/image/car_body_1.jpg', // 하위 호환성
   'charger': '/image/batterypack_1.jpg',
   'electronics': '/image/inverter_1.png',
   'interior': '/image/car_body_1.jpg',
@@ -398,12 +402,19 @@ https://eecar.com`;
           <section className="specifications-section">
             <h3>상세 사양</h3>
             <div className="specs-grid">
-              {Object.entries(part.specifications).map(([key, value]) => (
-                <div key={key} className="spec-row">
-                  <span className="spec-key">{key}</span>
-                  <span className="spec-val">{value as string}</span>
-                </div>
-              ))}
+              {Object.entries(part.specifications).map(([key, value]) => {
+                // 객체인 경우 적절히 처리
+                const displayValue = typeof value === 'object' && value !== null
+                  ? JSON.stringify(value, null, 2)
+                  : String(value);
+
+                return (
+                  <div key={key} className="spec-row">
+                    <span className="spec-key">{key}</span>
+                    <span className="spec-val" style={{ whiteSpace: 'pre-wrap' }}>{displayValue}</span>
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}
