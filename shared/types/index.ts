@@ -22,6 +22,7 @@ export interface Part {
   updatedAt: string;
   specifications?: PartSpecifications;
   useCases?: UseCase[];
+  batteryHealth?: BatteryHealthInfo;  // For battery category parts
 }
 
 export type PartCategory =
@@ -30,7 +31,10 @@ export type PartCategory =
   | 'inverter'
   | 'charger'
   | 'electronics'
-  | 'body'
+  | 'body-chassis-frame'    // 샤시 및 프레임
+  | 'body-panel'            // 외판, 패널
+  | 'body-door'             // 도어 및 주변 연결부
+  | 'body-window'           // 창 및 유리 구조
   | 'interior'
   | 'other';
 
@@ -50,6 +54,16 @@ export interface MaterialComposition {
   primary: string;
   secondary?: string[];
   percentage?: Record<string, number>;
+  // Extended material properties
+  tensileStrengthMPa?: number;
+  yieldStrengthMPa?: number;
+  elasticModulusGPa?: number;
+  elongationPercent?: number;
+  hardness?: string;
+  density?: number; // g/cm³
+  meltingPoint?: number; // °C
+  alloyNumber?: string; // e.g., "2024", "6061", "7075"
+  recyclability?: number; // 0-100%
 }
 
 export interface Dimensions {
@@ -65,6 +79,40 @@ export interface ElectricalProperties {
   power?: number; // W
   current?: number; // A
   resistance?: number; // Ω
+}
+
+// ==================== Battery Types ====================
+
+export type CathodeType =
+  | 'NCM Ni 33%'
+  | 'NCM Ni 60%'
+  | 'NCM Ni 80%'
+  | 'NCA'
+  | 'LMO'
+  | 'LFP'
+  | 'Other';
+
+export type RecyclingMethod =
+  | 'wet_metallurgy'        // 습식 제련
+  | 'dry_smelting'          // 건식 제련
+  | 'direct_recycling'      // 직접 재활용
+  | 'mechanical_separation' // 기계적 분리
+  | 'thermal_treatment';    // 열처리
+
+export interface BatteryHealthInfo {
+  soh: number;                          // State of Health (%)
+  soc?: number;                         // State of Charge (%)
+  cycleCount?: number;
+  estimatedMileageKm?: number;          // 예상 주행거리
+  cathodeType: CathodeType;
+  manufacturer: string;
+  model: string;
+  year: number;
+  recommendedUse: 'reuse' | 'recycle' | 'dispose';
+  suitableApplications?: string[];      // ["ESS", "전동킥보드", etc.]
+  degradationRate?: number;             // % per year
+  recyclingMethod?: RecyclingMethod[];
+  vendorRecommendations?: string[];     // 추천 재활용 업체
 }
 
 export interface UseCase {
@@ -90,6 +138,32 @@ export interface SearchFilters {
   minQuantity?: number;
   yearRange?: [number, number];
   condition?: PartCondition[];
+  // Advanced material filters
+  materialFilters?: AdvancedMaterialFilters;
+  // Battery-specific filters
+  batteryFilters?: BatteryFilters;
+}
+
+export interface AdvancedMaterialFilters {
+  tensileStrengthMPa?: { min?: number; max?: number };
+  yieldStrengthMPa?: { min?: number; max?: number };
+  elasticModulusGPa?: { min?: number; max?: number };
+  elongationPercent?: { min?: number; max?: number };
+  purity?: { min?: number };
+  alloyNumber?: string;
+  composition?: Array<{
+    element: string;
+    percentage?: { min?: number; max?: number };
+  }>;
+  recyclability?: { min?: number };
+}
+
+export interface BatteryFilters {
+  soh?: { min?: number; max?: number };
+  cathodeType?: CathodeType[];
+  recommendedUse?: Array<'reuse' | 'recycle' | 'dispose'>;
+  suitableApplications?: string[];
+  estimatedMileageKm?: { min?: number; max?: number };
 }
 
 export interface SearchResult {

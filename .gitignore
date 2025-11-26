@@ -45,7 +45,7 @@ temp/
 
 # Project documentation
 CLAUDE.md
-
+회의자료.md
 #dev
 .playwright-mcp/
 .claude/

@@ -1,7 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand, GetCommand, QueryCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
 
 const app = express();
 const PORT = 3001;
@@ -10,27 +8,21 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-// DynamoDB Local client
-const ddbClient = new DynamoDBClient({
-  region: 'us-east-1',
-  endpoint: 'http://localhost:8000',
-  credentials: {
-    accessKeyId: 'dummy',
-    secretAccessKey: 'dummy',
-  },
-});
-
-const ddbDocClient = DynamoDBDocumentClient.from(ddbClient);
-const TABLE_NAME = 'eecar-parts-table-local';
-
-// Mock data store (in-memory fallback)
+// Mock data store (in-memory)
 const mockParts = [];
-const mockSearchCache = new Map();
 const mockUsers = new Map(); // email -> user object
+
+// Initialize with dummy data
+initializeDummyData();
 
 // ==================== HEALTH CHECK ====================
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', service: 'EECAR Local API', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'ok',
+    service: 'EECAR Local API',
+    timestamp: new Date().toISOString(),
+    partsCount: mockParts.length
+  });
 });
 
 // ==================== AUTHENTICATION API ====================
@@ -42,12 +34,10 @@ app.post('/api/auth/signup', async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Check if user already exists
     if (mockUsers.has(email)) {
       return res.status(400).json({ error: '이미 등록된 이메일입니다' });
     }
 
-    // Create user
     const user = {
       id: `user-${Date.now()}`,
       email,
@@ -57,18 +47,11 @@ app.post('/api/auth/signup', async (req, res) => {
       createdAt: new Date().toISOString(),
     };
 
-    mockUsers.set(email, { ...user, password }); // Store with password
-
-    // Generate simple token (not real JWT for simplicity)
+    mockUsers.set(email, { ...user, password });
     const token = Buffer.from(`${user.id}:${email}:${Date.now()}`).toString('base64');
 
     console.log(`[AUTH] User registered: ${email} (${role})`);
-
-    res.status(201).json({
-      message: 'User registered successfully',
-      token,
-      user: { ...user }, // Don't send password
-    });
+    res.status(201).json({ message: 'User registered successfully', token, user });
   } catch (error) {
     console.error('[AUTH ERROR]', error);
     res.status(500).json({ error: 'Failed to register user', message: error.message });
@@ -83,30 +66,16 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    // Check if user exists
     const storedUser = mockUsers.get(email);
-    if (!storedUser) {
+    if (!storedUser || storedUser.password !== password) {
       return res.status(401).json({ error: '이메일 또는 비밀번호가 잘못되었습니다' });
     }
 
-    // Check password
-    if (storedUser.password !== password) {
-      return res.status(401).json({ error: '이메일 또는 비밀번호가 잘못되었습니다' });
-    }
-
-    // Generate token
     const token = Buffer.from(`${storedUser.id}:${email}:${Date.now()}`).toString('base64');
-
-    // Remove password from response
     const { password: _, ...user } = storedUser;
 
     console.log(`[AUTH] User logged in: ${email}`);
-
-    res.json({
-      message: 'Login successful',
-      token,
-      user,
-    });
+    res.json({ message: 'Login successful', token, user });
   } catch (error) {
     console.error('[AUTH ERROR]', error);
     res.status(500).json({ error: 'Failed to login', message: error.message });
@@ -122,13 +91,11 @@ app.post('/api/search', async (req, res) => {
       return res.status(400).json({ error: 'Query is required' });
     }
 
-    console.log(`[SEARCH] Query: "${query}"`);
+    console.log(`[SEARCH] Query: "${query}", Filters:`, filters);
 
-    // Simple mock search (keyword matching)
     let results = mockParts.filter(part => {
       const searchText = `${part.name} ${part.description} ${part.category} ${part.manufacturer}`.toLowerCase();
-      const queryLower = query.toLowerCase();
-      return searchText.includes(queryLower);
+      return searchText.includes(query.toLowerCase());
     });
 
     // Apply filters
@@ -144,33 +111,109 @@ app.post('/api/search', async (req, res) => {
       }
     }
 
-    // Limit results
     results = results.slice(0, topK);
 
-    // Format response
     const searchResults = results.map((part, index) => ({
       partId: part.partId,
-      score: 0.9 - (index * 0.05), // Mock similarity score
-      part: {
-        name: part.name,
-        category: part.category,
-        manufacturer: part.manufacturer,
-        model: part.model,
-        price: part.price,
-        quantity: part.quantity,
-        images: part.images || [],
-      },
+      score: 0.9 - (index * 0.05),
+      part,
       reason: `"${query}"와 관련된 ${part.category} 부품입니다.`,
     }));
 
-    res.json({
-      results: searchResults,
-      cached: false,
-      count: searchResults.length,
-    });
+    res.json({ results: searchResults, cached: false, count: searchResults.length });
   } catch (error) {
     console.error('[SEARCH ERROR]', error);
     res.status(500).json({ error: 'Search failed', message: error.message });
+  }
+});
+
+// ==================== MATERIAL PROPERTY SEARCH API ====================
+app.post('/api/material-search', async (req, res) => {
+  try {
+    const { materialFilters, category, topK = 10 } = req.body;
+
+    console.log('[MATERIAL SEARCH] Filters:', materialFilters);
+
+    if (!materialFilters) {
+      return res.status(400).json({
+        success: false,
+        error: 'materialFilters is required'
+      });
+    }
+
+    let results = mockParts.filter(part => {
+      if (category && part.category !== category) return false;
+
+      const materialComp = part.specifications?.materialComposition;
+      if (!materialComp) return false;
+
+      return checkMaterialFilters(materialComp, materialFilters);
+    });
+
+    results = results.slice(0, topK).map(part => ({
+      partId: part.partId,
+      score: 95,
+      part,
+      reason: generateMaterialReason(part.specifications.materialComposition, materialFilters),
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        results,
+        cached: false,
+        count: results.length,
+      }
+    });
+  } catch (error) {
+    console.error('[MATERIAL SEARCH ERROR]', error);
+    res.status(500).json({
+      success: false,
+      error: 'Material search failed',
+      message: error.message
+    });
+  }
+});
+
+// ==================== BATTERY HEALTH ASSESSMENT API ====================
+app.post('/api/battery-assessment', async (req, res) => {
+  try {
+    const { batteryFilters, topK = 10 } = req.body;
+
+    console.log('[BATTERY ASSESSMENT] Filters:', batteryFilters);
+
+    let results = mockParts.filter(part => {
+      if (part.category !== 'battery') return false;
+
+      if (batteryFilters) {
+        return checkBatteryFilters(part.batteryHealth, batteryFilters);
+      }
+
+      return true;
+    });
+
+    results = results.slice(0, topK).map(part => ({
+      partId: part.partId,
+      score: part.batteryHealth?.soh || 70,
+      part,
+      reason: generateBatteryReason(part.batteryHealth),
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        results,
+        cached: false,
+        count: results.length,
+      }
+    });
+  } catch (error) {
+    console.error('[BATTERY ASSESSMENT ERROR]', error);
+    res.status(500).json({
+      success: false,
+      error: 'Battery assessment failed',
+      message: error.message
+    });
   }
 });
 
@@ -187,9 +230,7 @@ app.post('/api/parts', async (req, res) => {
       updatedAt: new Date().toISOString(),
     };
 
-    // Store in memory
     mockParts.push(newPart);
-
     console.log(`[PARTS] Created part: ${partId}`);
 
     res.status(201).json({
@@ -231,193 +272,341 @@ app.get('/api/parts', async (req, res) => {
 
     parts = parts.slice(0, parseInt(limit));
 
-    res.json({
-      parts,
-      count: parts.length,
-    });
+    res.json({ parts, count: parts.length });
   } catch (error) {
     console.error('[PARTS ERROR]', error);
     res.status(500).json({ error: 'Failed to list parts', message: error.message });
   }
 });
 
-// ==================== WATCH API ====================
-app.post('/api/watch', async (req, res) => {
-  try {
-    const { buyerId, email, phone, criteria } = req.body;
-    const watchId = `watch-${Date.now()}`;
-
-    console.log(`[WATCH] Created watch: ${watchId} for buyer: ${buyerId}`);
-
-    res.status(201).json({
-      message: 'Watch created successfully',
-      watchId,
-    });
-  } catch (error) {
-    console.error('[WATCH ERROR]', error);
-    res.status(500).json({ error: 'Failed to create watch', message: error.message });
-  }
-});
-
-// ==================== PROPOSALS API ====================
-app.post('/api/proposals', async (req, res) => {
-  try {
-    const proposalData = req.body;
-    const proposalId = `proposal-${Date.now()}`;
-
-    console.log(`[PROPOSALS] Created proposal: ${proposalId}`);
-
-    res.status(201).json({
-      message: 'Proposal created successfully',
-      proposalId,
-    });
-  } catch (error) {
-    console.error('[PROPOSALS ERROR]', error);
-    res.status(500).json({ error: 'Failed to create proposal', message: error.message });
-  }
-});
-
-app.get('/api/proposals', async (req, res) => {
-  try {
-    const { companyId, status } = req.query;
-
-    console.log(`[PROPOSALS] Get proposals for company: ${companyId}`);
-
-    res.json({
-      proposals: [],
-      count: 0,
-    });
-  } catch (error) {
-    console.error('[PROPOSALS ERROR]', error);
-    res.status(500).json({ error: 'Failed to get proposals', message: error.message });
-  }
-});
-
-// ==================== SYNTHETIC DATA API ====================
-app.post('/api/synthetic', async (req, res) => {
-  try {
-    const { category, count = 1 } = req.body;
-
-    if (!category) {
-      return res.status(400).json({ error: 'Category is required' });
-    }
-
-    console.log(`[SYNTHETIC] Generating ${count} parts for category: ${category}`);
-
-    const generatedParts = [];
-
-    for (let i = 0; i < count; i++) {
-      const partId = `part-${Date.now()}-${i}`;
-      const part = generateMockPart(category, partId);
-      mockParts.push(part);
-      generatedParts.push(part);
-    }
-
-    res.status(201).json({
-      message: `Successfully generated ${count} synthetic parts`,
-      parts: generatedParts,
-    });
-  } catch (error) {
-    console.error('[SYNTHETIC ERROR]', error);
-    res.status(500).json({ error: 'Failed to generate synthetic data', message: error.message });
-  }
-});
-
 // ==================== HELPER FUNCTIONS ====================
-// Category-specific images
-const categoryImages = {
-  battery: [
-    '/image/batterypack_1.jpg',
-    '/image/batterypack_2.jpeg',
-    '/image/batterypack_3.jpg'
-  ],
-  motor: [
-    '/image/motor_1.jpg',
-    '/image/motor_2.jpg',
-    '/image/motor_3.jpg'
-  ],
-  inverter: [
-    '/image/inverter_1.png',
-    '/image/inverter_2.jpg',
-    '/image/inverter_3.png'
-  ],
-  body: [
-    '/image/car_body_1.jpg',
-    '/image/car_body_2.jpg',
-    '/image/car_body_3.png'
-  ]
-};
 
-function generateMockPart(category, partId) {
-  const manufacturers = ['Tesla', 'Hyundai', 'Kia', 'Nissan', 'BMW', 'Chevrolet'];
-  const models = ['Model S', 'Model 3', 'Ioniq 5', 'EV6', 'Leaf', 'i3', 'Bolt'];
-  const conditions = ['new', 'used', 'refurbished'];
-
-  const manufacturer = manufacturers[Math.floor(Math.random() * manufacturers.length)];
-  const model = models[Math.floor(Math.random() * models.length)];
-
-  // Get category-specific images
-  const images = categoryImages[category] || [];
-
-  // Randomly select 1-3 images from the category
-  const numImages = Math.floor(Math.random() * 3) + 1; // 1-3 images
-  const selectedImages = [];
-  const availableIndices = [0, 1, 2];
-
-  for (let i = 0; i < numImages; i++) {
-    const randomIndex = Math.floor(Math.random() * availableIndices.length);
-    const imageIndex = availableIndices[randomIndex];
-    selectedImages.push(images[imageIndex]);
-    availableIndices.splice(randomIndex, 1);
+function checkMaterialFilters(material, filters) {
+  if (filters.tensileStrengthMPa) {
+    const value = material.tensileStrengthMPa;
+    if (!value) return false;
+    if (filters.tensileStrengthMPa.min && value < filters.tensileStrengthMPa.min) return false;
+    if (filters.tensileStrengthMPa.max && value > filters.tensileStrengthMPa.max) return false;
   }
 
-  return {
-    partId,
-    name: `${manufacturer} ${model} ${category}`,
-    category,
-    manufacturer,
-    model,
-    year: 2015 + Math.floor(Math.random() * 10),
-    condition: conditions[Math.floor(Math.random() * conditions.length)],
-    price: Math.floor(Math.random() * 5000000) + 500000,
-    quantity: Math.floor(Math.random() * 10) + 1,
-    sellerId: 'local-seller',
-    description: `${category} 부품 - 로컬 테스트용 샘플 데이터`,
-    images: selectedImages,
+  if (filters.alloyNumber && material.alloyNumber !== filters.alloyNumber) {
+    return false;
+  }
+
+  if (filters.recyclability?.min && material.recyclability < filters.recyclability.min) {
+    return false;
+  }
+
+  return true;
+}
+
+function checkBatteryFilters(batteryHealth, filters) {
+  if (!batteryHealth) return false;
+
+  if (filters.soh) {
+    const soh = batteryHealth.soh;
+    if (filters.soh.min && soh < filters.soh.min) return false;
+    if (filters.soh.max && soh > filters.soh.max) return false;
+  }
+
+  if (filters.cathodeType?.length > 0) {
+    if (!filters.cathodeType.includes(batteryHealth.cathodeType)) return false;
+  }
+
+  if (filters.recommendedUse?.length > 0) {
+    if (!filters.recommendedUse.includes(batteryHealth.recommendedUse)) return false;
+  }
+
+  return true;
+}
+
+function generateMaterialReason(material, filters) {
+  const reasons = [];
+
+  if (material.alloyNumber) {
+    reasons.push(`합금 번호: ${material.alloyNumber}`);
+  }
+  if (material.tensileStrengthMPa) {
+    reasons.push(`인장강도: ${material.tensileStrengthMPa} MPa`);
+  }
+  if (material.recyclability) {
+    reasons.push(`재활용성: ${material.recyclability}%`);
+  }
+
+  return reasons.join(' | ');
+}
+
+function generateBatteryReason(batteryHealth) {
+  if (!batteryHealth) return '배터리 정보 없음';
+
+  const reasons = [];
+  reasons.push(`SOH ${batteryHealth.soh}%`);
+  reasons.push(batteryHealth.recommendedUse === 'reuse' ? '재사용 추천' : '재활용 권장');
+
+  if (batteryHealth.suitableApplications?.length > 0) {
+    reasons.push(`활용: ${batteryHealth.suitableApplications.slice(0, 2).join(', ')}`);
+  }
+
+  return reasons.join(' | ');
+}
+
+// ==================== DUMMY DATA INITIALIZATION ====================
+
+function initializeDummyData() {
+  // Battery parts with health info
+  mockParts.push({
+    partId: 'battery-001',
+    name: '현대 아이오닉5 배터리 팩',
+    category: 'battery',
+    manufacturer: '현대자동차',
+    model: '아이오닉5',
+    year: 2022,
+    condition: 'used',
+    price: 4500000,
+    quantity: 2,
+    sellerId: 'seller-001',
+    description: '2022년식 아이오닉5 배터리 팩, 주행거리 30,000km',
+    images: [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  };
+    batteryHealth: {
+      soh: 92,
+      soc: 85,
+      cycleCount: 450,
+      estimatedMileageKm: 150000,
+      cathodeType: 'NCM Ni 80%',
+      manufacturer: '현대자동차',
+      model: '아이오닉5',
+      year: 2022,
+      recommendedUse: 'reuse',
+      suitableApplications: ['EV 재사용', 'ESS', '전동킥보드'],
+      degradationRate: 2.5,
+      recyclingMethod: ['wet_metallurgy'],
+      vendorRecommendations: ['성일하이텍', 'SungEel'],
+    },
+  });
+
+  mockParts.push({
+    partId: 'battery-002',
+    name: '테슬라 Model 3 배터리 모듈',
+    category: 'battery',
+    manufacturer: 'Tesla',
+    model: 'Model 3',
+    year: 2020,
+    condition: 'used',
+    price: 1800000,
+    quantity: 5,
+    sellerId: 'seller-002',
+    description: '2020년식 Model 3 배터리 모듈, SOH 75%',
+    images: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    batteryHealth: {
+      soh: 75,
+      soc: 70,
+      cycleCount: 1200,
+      estimatedMileageKm: 80000,
+      cathodeType: 'NCA',
+      manufacturer: 'Tesla',
+      model: 'Model 3',
+      year: 2020,
+      recommendedUse: 'reuse',
+      suitableApplications: ['ESS', '전동킥보드', '소형 전동기기'],
+      degradationRate: 5.0,
+      recyclingMethod: ['wet_metallurgy', 'direct_recycling'],
+      vendorRecommendations: ['Redwood Materials', '성일하이텍'],
+    },
+  });
+
+  mockParts.push({
+    partId: 'battery-003',
+    name: '기아 EV6 배터리 팩',
+    category: 'battery',
+    manufacturer: '기아',
+    model: 'EV6',
+    year: 2023,
+    condition: 'refurbished',
+    price: 5200000,
+    quantity: 1,
+    sellerId: 'seller-003',
+    description: '2023년식 EV6 배터리 팩, 재생품',
+    images: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    batteryHealth: {
+      soh: 88,
+      soc: 90,
+      cycleCount: 200,
+      estimatedMileageKm: 180000,
+      cathodeType: 'NCM Ni 80%',
+      manufacturer: '기아',
+      model: 'EV6',
+      year: 2023,
+      recommendedUse: 'reuse',
+      suitableApplications: ['EV 재사용', 'ESS'],
+      degradationRate: 3.0,
+      recyclingMethod: ['wet_metallurgy'],
+      vendorRecommendations: ['성일하이텍'],
+    },
+  });
+
+  // Body parts with material properties
+  mockParts.push({
+    partId: 'body-chassis-001',
+    name: 'BMW i3 카본 프레임',
+    category: 'body-chassis-frame',
+    manufacturer: 'BMW',
+    model: 'i3',
+    year: 2019,
+    condition: 'used',
+    price: 1200000,
+    quantity: 1,
+    sellerId: 'seller-004',
+    description: 'BMW i3 CFRP 카본 섀시 프레임',
+    images: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    specifications: {
+      materialComposition: {
+        primary: 'CFRP',
+        secondary: ['Epoxy Resin', 'Carbon Fiber'],
+        percentage: { 'Carbon Fiber': 60, 'Epoxy': 40 },
+        tensileStrengthMPa: 3500,
+        yieldStrengthMPa: 3000,
+        elasticModulusGPa: 230,
+        elongationPercent: 1.5,
+        density: 1.6,
+        recyclability: 40,
+      },
+      dimensions: { length: 2500, width: 1500, height: 400, unit: 'mm' },
+      weight: 45,
+    },
+  });
+
+  mockParts.push({
+    partId: 'body-panel-001',
+    name: '테슬라 Model S 알루미늄 후드',
+    category: 'body-panel',
+    manufacturer: 'Tesla',
+    model: 'Model S',
+    year: 2021,
+    condition: 'used',
+    price: 450000,
+    quantity: 3,
+    sellerId: 'seller-005',
+    description: '알루미늄 6061 합금 후드 패널',
+    images: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    specifications: {
+      materialComposition: {
+        primary: 'Aluminum',
+        secondary: ['Al 6061'],
+        percentage: { Al: 97.9, Mg: 1.0, Si: 0.6, Cu: 0.28, Cr: 0.2 },
+        tensileStrengthMPa: 310,
+        yieldStrengthMPa: 276,
+        elasticModulusGPa: 68.9,
+        elongationPercent: 12,
+        hardness: 'HB 95',
+        density: 2.7,
+        meltingPoint: 582,
+        alloyNumber: '6061',
+        recyclability: 95,
+      },
+      dimensions: { length: 1400, width: 1200, height: 50, unit: 'mm' },
+      weight: 15,
+    },
+  });
+
+  mockParts.push({
+    partId: 'body-door-001',
+    name: '아우디 e-tron 알루미늄 도어',
+    category: 'body-door',
+    manufacturer: 'Audi',
+    model: 'e-tron',
+    year: 2020,
+    condition: 'used',
+    price: 680000,
+    quantity: 2,
+    sellerId: 'seller-006',
+    description: '알루미늄 5754 합금 도어 패널',
+    images: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    specifications: {
+      materialComposition: {
+        primary: 'Aluminum',
+        secondary: ['Al 5754'],
+        percentage: { Al: 95.4, Mg: 3.1, Mn: 0.5, Cr: 0.3 },
+        tensileStrengthMPa: 220,
+        yieldStrengthMPa: 80,
+        elasticModulusGPa: 70,
+        elongationPercent: 27,
+        hardness: 'HB 62',
+        density: 2.66,
+        meltingPoint: 607,
+        alloyNumber: '5754',
+        recyclability: 93,
+      },
+      dimensions: { length: 1100, width: 800, height: 60, unit: 'mm' },
+      weight: 22,
+    },
+  });
+
+  mockParts.push({
+    partId: 'body-panel-002',
+    name: '포르쉐 Taycan 알루미늄 루프',
+    category: 'body-panel',
+    manufacturer: 'Porsche',
+    model: 'Taycan',
+    year: 2022,
+    condition: 'refurbished',
+    price: 950000,
+    quantity: 1,
+    sellerId: 'seller-007',
+    description: '알루미늄 7075 고강도 루프 패널',
+    images: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    specifications: {
+      materialComposition: {
+        primary: 'Aluminum',
+        secondary: ['Al 7075'],
+        percentage: { Al: 90, Zn: 5.6, Mg: 2.5, Cu: 1.6, Cr: 0.23 },
+        tensileStrengthMPa: 572,
+        yieldStrengthMPa: 503,
+        elasticModulusGPa: 71.7,
+        elongationPercent: 11,
+        hardness: 'HB 150',
+        density: 2.81,
+        meltingPoint: 477,
+        alloyNumber: '7075',
+        recyclability: 90,
+      },
+      dimensions: { length: 1800, width: 1300, height: 40, unit: 'mm' },
+      weight: 18,
+    },
+  });
+
+  console.log(`[INIT] Loaded ${mockParts.length} dummy parts`);
+  console.log(`  - Batteries: ${mockParts.filter(p => p.category === 'battery').length}`);
+  console.log(`  - Body parts: ${mockParts.filter(p => p.category.startsWith('body-')).length}`);
 }
 
 // ==================== START SERVER ====================
+
 app.listen(PORT, () => {
-  console.log('='.repeat(50));
-  console.log(`🚀 EECAR Local API Server running on http://localhost:${PORT}`);
-  console.log('='.repeat(50));
-  console.log('📋 Available endpoints:');
-  console.log(`  - GET    /health`);
-  console.log(`  - POST   /api/search`);
-  console.log(`  - POST   /api/parts`);
-  console.log(`  - GET    /api/parts/:id`);
-  console.log(`  - GET    /api/parts?category=battery`);
-  console.log(`  - POST   /api/watch`);
-  console.log(`  - POST   /api/proposals`);
-  console.log(`  - GET    /api/proposals`);
-  console.log(`  - POST   /api/synthetic`);
-  console.log('='.repeat(50));
-  console.log('💡 Tip: Use POST /api/synthetic to generate test data');
-  console.log('='.repeat(50));
-
-  // Generate initial mock data
-  console.log('📦 Generating initial mock data...');
-  ['battery', 'motor', 'inverter', 'body'].forEach(category => {
-    for (let i = 0; i < 3; i++) {
-      const partId = `initial-${category}-${i}`;
-      mockParts.push(generateMockPart(category, partId));
-    }
-  });
-  console.log(`✅ Generated ${mockParts.length} initial parts`);
-  console.log('='.repeat(50));
+  console.log(`\n🚀 EECAR Local Server running on http://localhost:${PORT}`);
+  console.log(`📊 Health check: http://localhost:${PORT}/health`);
+  console.log(`📦 Parts loaded: ${mockParts.length}`);
+  console.log(`\nAvailable endpoints:`);
+  console.log(`  POST /api/auth/signup`);
+  console.log(`  POST /api/auth/login`);
+  console.log(`  POST /api/search`);
+  console.log(`  POST /api/material-search (NEW)`);
+  console.log(`  POST /api/battery-assessment (NEW)`);
+  console.log(`  GET  /api/parts`);
+  console.log(`  POST /api/parts`);
+  console.log(`  GET  /api/parts/:id`);
+  console.log(`\n`);
 });
-
-export default app;
