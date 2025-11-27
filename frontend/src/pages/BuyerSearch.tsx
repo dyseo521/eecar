@@ -81,7 +81,7 @@ export default function BuyerSearch() {
   const [searchMode, setSearchMode] = useState<'ai' | 'battery' | 'material'>('ai');
 
   // AI 검색 모드 토글
-  const [isAIMode, setIsAIMode] = useState(false);
+  const [isAIMode, setIsAIMode] = useState(true);
 
   // 배터리 필터
   const [batterySohMin, setBatterySohMin] = useState<number>(70);
@@ -101,7 +101,7 @@ export default function BuyerSearch() {
   const [watchKeywords, setWatchKeywords] = useState<string>('');
 
   // AI 검색
-  const { data, isLoading, error } = useQuery({
+  const { data, error } = useQuery({
     queryKey: ['search', searchParams],
     queryFn: async () => {
       if (!searchParams) return null;
@@ -122,7 +122,7 @@ export default function BuyerSearch() {
   });
 
   // 배터리 SOH 검색
-  const { data: batteryData, isLoading: isBatteryLoading, error: batteryError } = useQuery({
+  const { data: batteryData, error: batteryError } = useQuery({
     queryKey: ['battery-assessment', batterySohMin, batterySohMax, selectedCathodeTypes],
     queryFn: async () => {
       const batteryFilters: any = {
@@ -150,7 +150,7 @@ export default function BuyerSearch() {
   });
 
   // 재질 물성 검색
-  const { data: materialData, isLoading: isMaterialLoading, error: materialError } = useQuery({
+  const { data: materialData, error: materialError } = useQuery({
     queryKey: ['material-search', alloyNumber, tensileStrengthMin, recyclabilityMin, selectedCategory],
     queryFn: async () => {
       const materialFilters: any = {};
@@ -322,9 +322,6 @@ export default function BuyerSearch() {
   const currentData = searchMode === 'battery' ? batteryData :
                       searchMode === 'material' ? materialData :
                       data;
-  const currentLoading = searchMode === 'battery' ? isBatteryLoading :
-                         searchMode === 'material' ? isMaterialLoading :
-                         isLoading;
   const currentError = searchMode === 'battery' ? batteryError :
                        searchMode === 'material' ? materialError :
                        error;
