@@ -18,12 +18,33 @@ export async function callClaude(
   systemPrompt?: string,
   maxTokens: number = 1024
 ): Promise<string> {
-  const body = {
-    anthropic_version: 'bedrock-2023-05-31',
-    max_tokens: maxTokens,
-    messages,
-    ...(systemPrompt && { system: systemPrompt }),
-  };
+  // Titan 모델 여부 확인
+  const isTitanModel = MODEL_ID.includes('titan');
+
+  let body: any;
+  
+  if (isTitanModel) {
+    // Titan 형식
+    const userMessage = messages.find(m => m.role === 'user')?.content || '';
+    const prompt = systemPrompt ? `${systemPrompt}\n\n${userMessage}` : userMessage;
+    
+    body = {
+      inputText: prompt,
+      textGenerationConfig: {
+        maxTokenCount: maxTokens,
+        temperature: 0.7,
+        topP: 0.9,
+      }
+    };
+  } else {
+    // Claude 형식
+    body = {
+      anthropic_version: 'bedrock-2023-05-31',
+      max_tokens: maxTokens,
+      messages,
+      ...(systemPrompt && { system: systemPrompt }),
+    };
+  }
 
   const command = new InvokeModelCommand({
     modelId: MODEL_ID,
@@ -35,7 +56,12 @@ export async function callClaude(
   const response = await bedrockClient.send(command);
   const responseBody = JSON.parse(new TextDecoder().decode(response.body));
 
-  return responseBody.content[0].text;
+  // Titan vs Claude 응답 파싱
+  if (isTitanModel) {
+    return responseBody.results[0].outputText;
+  } else {
+    return responseBody.content[0].text;
+  }
 }
 
 /**
