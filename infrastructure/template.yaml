@@ -37,7 +37,7 @@ Resources:
       Handler: index.handler
       Description: AI-powered vector search for parts matching
       Policies:
-        - DynamoDBReadPolicy:
+        - DynamoDBCrudPolicy:
             TableName: !Ref PartsTable
         - S3ReadPolicy:
             BucketName: !Ref VectorsBucket
