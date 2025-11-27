@@ -176,11 +176,11 @@ app.post('/api/material-search', async (req, res) => {
 });
 
 // ==================== BATTERY HEALTH ASSESSMENT API ====================
-app.post('/api/battery-assessment', async (req, res) => {
+app.post('/api/battery-health', async (req, res) => {
   try {
     const { batteryFilters, topK = 10 } = req.body;
 
-    console.log('[BATTERY ASSESSMENT] Filters:', batteryFilters);
+    console.log('[BATTERY HEALTH] Filters:', batteryFilters);
 
     let results = mockParts.filter(part => {
       if (part.category !== 'battery') return false;
@@ -208,10 +208,10 @@ app.post('/api/battery-assessment', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('[BATTERY ASSESSMENT ERROR]', error);
+    console.error('[BATTERY HEALTH ERROR]', error);
     res.status(500).json({
       success: false,
-      error: 'Battery assessment failed',
+      error: 'Battery health assessment failed',
       message: error.message
     });
   }
@@ -1384,7 +1384,7 @@ app.listen(PORT, () => {
   console.log(`  POST /api/auth/login`);
   console.log(`  POST /api/search`);
   console.log(`  POST /api/material-search (NEW)`);
-  console.log(`  POST /api/battery-assessment (NEW)`);
+  console.log(`  POST /api/battery-health (NEW)`);
   console.log(`  GET  /api/parts`);
   console.log(`  POST /api/parts`);
   console.log(`  GET  /api/parts/:id`);

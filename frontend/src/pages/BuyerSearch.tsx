@@ -133,7 +133,7 @@ export default function BuyerSearch() {
         batteryFilters.cathodeType = selectedCathodeTypes;
       }
 
-      const response = await fetch('http://localhost:3001/api/battery-assessment', {
+      const response = await fetch('/api/battery-health', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ batteryFilters, topK: 20 }),
@@ -170,7 +170,7 @@ export default function BuyerSearch() {
         payload.category = categoryMap[selectedCategory] || selectedCategory;
       }
 
-      const response = await fetch('http://localhost:3001/api/material-search', {
+      const response = await fetch('/api/material-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
