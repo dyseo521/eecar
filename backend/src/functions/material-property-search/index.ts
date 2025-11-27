@@ -204,7 +204,7 @@ function calculateMatchScore(
   if (filters.tensileStrengthMPa) {
     criteriaCount++;
     const value = material.tensileStrengthMPa;
-    const ideal = (filters.tensileStrengthMPa.min || 0 + filters.tensileStrengthMPa.max || value) / 2;
+    const ideal = ((filters.tensileStrengthMPa.min || 0) + (filters.tensileStrengthMPa.max || value)) / 2;
     const deviation = Math.abs(value - ideal) / ideal;
     score -= deviation * 20;
   }
@@ -212,7 +212,7 @@ function calculateMatchScore(
   if (filters.yieldStrengthMPa) {
     criteriaCount++;
     const value = material.yieldStrengthMPa;
-    const ideal = (filters.yieldStrengthMPa.min || 0 + filters.yieldStrengthMPa.max || value) / 2;
+    const ideal = ((filters.yieldStrengthMPa.min || 0) + (filters.yieldStrengthMPa.max || value)) / 2;
     const deviation = Math.abs(value - ideal) / ideal;
     score -= deviation * 20;
   }
@@ -220,7 +220,7 @@ function calculateMatchScore(
   if (filters.elasticModulusGPa) {
     criteriaCount++;
     const value = material.elasticModulusGPa;
-    const ideal = (filters.elasticModulusGPa.min || 0 + filters.elasticModulusGPa.max || value) / 2;
+    const ideal = ((filters.elasticModulusGPa.min || 0) + (filters.elasticModulusGPa.max || value)) / 2;
     const deviation = Math.abs(value - ideal) / ideal;
     score -= deviation * 15;
   }

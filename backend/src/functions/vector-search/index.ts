@@ -26,7 +26,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     const queryHash = crypto.createHash('md5').update(query).digest('hex');
     const cachedResult = await getItem(`MATCH#${queryHash}`, 'RESULT');
 
-    if (cachedResult && Date.now() < cachedResult.TTL * 1000) {
+    if (cachedResult && cachedResult.TTL && Date.now() < cachedResult.TTL * 1000) {
       console.log('Cache hit!');
       await incrementCacheHit(queryHash);
       return {
