@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
@@ -41,28 +43,53 @@ export default function LandingPage() {
 
   return (
     <div className="landing-page">
-      {/* Hero Section with Parallax */}
-      <section className="hero" style={{ transform: `translateY(${scrollY * 0.3}px)` }}>
-        <div className="hero-content">
+      {/* Auth Header */}
+      <div className="auth-header">
+        {isAuthenticated ? (
+          <div className="auth-user-info">
+            <span className="user-greeting">안녕하세요, {user?.name}님</span>
+            <button onClick={logout} className="auth-button logout-button">
+              로그아웃
+            </button>
+          </div>
+        ) : (
+          <div className="auth-buttons">
+            <button onClick={() => navigate('/login')} className="auth-button login-button">
+              로그인
+            </button>
+            <button onClick={() => navigate('/signup')} className="auth-button signup-button">
+              회원가입
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Hero Section with Animated Gradient Background */}
+      <section className="hero">
+        {/* Animated Background Blobs */}
+        <div className="animated-background">
+          <div className="blob blob-1"></div>
+          <div className="blob blob-2"></div>
+          <div className="blob blob-3"></div>
+          <div className="blob blob-4"></div>
+          <div className="blob blob-5"></div>
+        </div>
+
+        <div className="hero-content" style={{ transform: `translateY(${scrollY * 0.2}px)` }}>
           <div className="logo">EECAR</div>
           <h1 className="hero-title">전기차 중고 부품 B2B 거래 플랫폼</h1>
           <p className="hero-subtitle">
             AI 기반 RAG 검색으로 최적의 EV 부품을 찾아보세요
           </p>
-          <div className="hero-stats">
-            <div className="stat">
-              <div className="stat-number">10K+</div>
-              <div className="stat-label">등록된 부품</div>
-            </div>
-            <div className="stat">
-              <div className="stat-number">500+</div>
-              <div className="stat-label">파트너사</div>
-            </div>
-            <div className="stat">
-              <div className="stat-number">AI</div>
-              <div className="stat-label">RAG 검색</div>
-            </div>
-          </div>
+          <button
+            className="hero-explore-button"
+            onClick={() => {
+              const entrySection = document.querySelector('.entry-section');
+              entrySection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+          >
+            자세히 보기
+          </button>
         </div>
 
         {/* Scroll Indicator */}
@@ -178,19 +205,19 @@ export default function LandingPage() {
 
             <div className="workflow-steps-wrapper">
               <div className="workflow-step animate-on-scroll">
-                <div className="step-number">①</div>
+                <div className="step-keyword">AI 검색</div>
                 <h3>AI가 부품을 찾아드립니다</h3>
                 <p>자연어로 물어보면 최적의 부품을 추천받습니다</p>
               </div>
 
               <div className="workflow-step animate-on-scroll">
-                <div className="step-number">②</div>
+                <div className="step-keyword">데이터 확인</div>
                 <h3>물성 데이터를 확인하세요</h3>
                 <p>검증된 데이터로 안전하게 비교하고 선택합니다</p>
               </div>
 
               <div className="workflow-step animate-on-scroll">
-                <div className="step-number">③</div>
+                <div className="step-keyword">거래 완료</div>
                 <h3>계약하고 거래 완료</h3>
                 <p>안전한 B2B 프로세스로 거래를 진행합니다</p>
               </div>
@@ -199,13 +226,28 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section - Toss Style */}
+      {/* Mission Banner Section */}
+      <section className="mission-banner animate-on-scroll">
+        <div className="mission-overlay">
+          <h2 className="mission-text">버려지는 부품은 없습니다.<br/>새로운 가치로 이어집니다.</h2>
+        </div>
+      </section>
+
+      {/* Bridge Section */}
+      <section className="bridge-section animate-on-scroll">
+        <div className="container">
+          <div className="bridge-content">
+            <h2 className="bridge-text">함께 만들어가는 지속 가능한 미래</h2>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section - Compact */}
       <section className="cta-section animate-on-scroll">
         <div className="container">
-          <div className="cta-content-large">
-            <h2 className="cta-title-large">지금 바로<br/>시작하세요</h2>
-            <p className="cta-subtitle">EV 부품 거래의 새로운 기준</p>
-            <div className="cta-buttons-large">
+          <div className="cta-content-compact">
+            <h2 className="cta-title-compact">지금 바로 시작하세요</h2>
+            <div className="cta-buttons-compact">
               <button className="cta-button-primary" onClick={() => navigate('/buyer')}>
                 부품 검색하기
               </button>
@@ -249,47 +291,242 @@ export default function LandingPage() {
           overflow-x: hidden;
         }
 
+        /* Auth Header */
+        .auth-header {
+          position: fixed;
+          top: 0;
+          right: 0;
+          z-index: 1000;
+          padding: 1rem 2rem;
+        }
+
+        .auth-buttons, .auth-user-info {
+          display: flex;
+          gap: 0.75rem;
+          align-items: center;
+        }
+
+        .user-greeting {
+          color: #1f2937;
+          font-weight: 600;
+          font-size: 0.9375rem;
+          background: white;
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-button {
+          padding: 0.625rem 1.25rem;
+          border: none;
+          border-radius: 8px;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .login-button {
+          background: white;
+          color: #0055f4;
+          border: 2px solid #0055f4;
+        }
+
+        .login-button:hover {
+          background: #0055f4;
+          color: white;
+        }
+
+        .signup-button {
+          background: linear-gradient(135deg, #0055f4, #0080ff);
+          color: white;
+        }
+
+        .signup-button:hover {
+          background: linear-gradient(135deg, #0040c0, #0060dd);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 85, 244, 0.3);
+        }
+
+        .logout-button {
+          background: #ef4444;
+          color: white;
+        }
+
+        .logout-button:hover {
+          background: #dc2626;
+        }
+
         .container {
           max-width: 1200px;
           margin: 0 auto;
           padding: 0 2rem;
         }
 
-        /* Hero Section */
+        /* Hero Section with Animated Gradient Mesh */
         .hero {
           min-height: 100vh;
           display: flex;
           align-items: center;
           justify-content: center;
-          background:
-            linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.6) 80%, white 100%),
-            linear-gradient(180deg, rgba(248, 250, 252, 0.75) 0%, rgba(255, 255, 255, 0.6) 100%),
-            url('/image/background.png');
-          background-size: cover;
-          background-position: center;
-          background-repeat: no-repeat;
+          background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%);
           position: relative;
+          overflow: hidden;
           z-index: 1;
         }
 
-        .hero::before {
-          content: '';
+        /* Animated Background Container */
+        .animated-background {
           position: absolute;
           top: 0;
           left: 0;
-          right: 0;
-          bottom: 0;
-          background:
-            radial-gradient(circle at 20% 50%, rgba(0, 85, 244, 0.08) 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, rgba(0, 128, 255, 0.06) 0%, transparent 50%),
-            radial-gradient(circle at 40% 20%, rgba(0, 162, 255, 0.05) 0%, transparent 50%);
-          pointer-events: none;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          z-index: 1;
+        }
+
+        /* Gradient Blobs */
+        .blob {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(5px);
+          opacity: 0.8;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+          animation-direction: alternate;
+        }
+
+        .blob-1 {
+          width: 600px;
+          height: 600px;
+          background: linear-gradient(135deg, #0055f4 0%, #0080ff 100%);
+          top: -10%;
+          left: -10%;
+          animation: float-1 25s infinite;
+        }
+
+        .blob-2 {
+          width: 500px;
+          height: 500px;
+          background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+          top: 20%;
+          right: -5%;
+          animation: float-2 28s infinite;
+        }
+
+        .blob-3 {
+          width: 550px;
+          height: 550px;
+          background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+          bottom: -10%;
+          left: 20%;
+          animation: float-3 30s infinite;
+        }
+
+        .blob-4 {
+          width: 450px;
+          height: 450px;
+          background: linear-gradient(135deg, #8b5cf6 0%, #0080ff 100%);
+          top: 40%;
+          left: 40%;
+          animation: float-4 26s infinite;
+        }
+
+        .blob-5 {
+          width: 520px;
+          height: 520px;
+          background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+          bottom: 15%;
+          right: 10%;
+          animation: float-5 32s infinite;
+        }
+
+        /* Blob Animation Keyframes */
+        @keyframes float-1 {
+          0%, 100% {
+            transform: translate(0, 0) rotate(0deg) scale(1);
+          }
+          33% {
+            transform: translate(50px, 80px) rotate(120deg) scale(1.1);
+          }
+          66% {
+            transform: translate(-30px, 40px) rotate(240deg) scale(0.95);
+          }
+        }
+
+        @keyframes float-2 {
+          0%, 100% {
+            transform: translate(0, 0) rotate(0deg) scale(1);
+          }
+          33% {
+            transform: translate(-60px, 70px) rotate(-120deg) scale(1.08);
+          }
+          66% {
+            transform: translate(40px, -50px) rotate(-240deg) scale(1.05);
+          }
+        }
+
+        @keyframes float-3 {
+          0%, 100% {
+            transform: translate(0, 0) rotate(0deg) scale(1);
+          }
+          33% {
+            transform: translate(70px, -60px) rotate(150deg) scale(1.12);
+          }
+          66% {
+            transform: translate(-50px, -30px) rotate(300deg) scale(0.98);
+          }
+        }
+
+        @keyframes float-4 {
+          0%, 100% {
+            transform: translate(0, 0) rotate(0deg) scale(1);
+          }
+          33% {
+            transform: translate(-40px, -70px) rotate(-150deg) scale(1.06);
+          }
+          66% {
+            transform: translate(60px, 50px) rotate(-300deg) scale(1.02);
+          }
+        }
+
+        @keyframes float-5 {
+          0%, 100% {
+            transform: translate(0, 0) rotate(0deg) scale(1);
+          }
+          33% {
+            transform: translate(-70px, 40px) rotate(180deg) scale(1.1);
+          }
+          66% {
+            transform: translate(50px, -60px) rotate(360deg) scale(0.96);
+          }
         }
 
         .hero-content {
           text-align: center;
           position: relative;
-          z-index: 1;
+          z-index: 10;
+          padding: 4rem 3rem;
+          border-radius: 32px;
+          background: rgba(255, 255, 255, 0.25);
+          backdrop-filter: blur(20px) saturate(150%);
+          -webkit-backdrop-filter: blur(10px) saturate(150%);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          box-shadow:
+            0 8px 32px 0 rgba(0, 85, 244, 0.1),
+            0 2px 8px 0 rgba(0, 0, 0, 0.03),
+            inset 0 1px 1px 0 rgba(255, 255, 255, 0.5);
+          max-width: 900px;
+          margin: 0 2rem;
+          transition: all 0.3s ease;
+        }
+
+        .hero-content:hover {
+          transform: translateY(-5px);
+          box-shadow:
+            0 12px 40px 0 rgba(0, 85, 244, 0.15),
+            0 4px 12px 0 rgba(0, 0, 0, 0.05);
         }
 
         .logo {
@@ -304,49 +541,43 @@ export default function LandingPage() {
         }
 
         .hero-title {
-          font-size: 2rem;
-          color: #1e293b;
-          margin-bottom: 1rem;
-          font-weight: 700;
+          font-size: 2.75rem;
+          color: white;
+          margin-bottom: 1.5rem;
+          font-weight: 800;
+          line-height: 1.3;
+          text-shadow: 0 2px 16px rgba(0, 0, 0, 0.15);
         }
 
         .hero-subtitle {
-          font-size: 1.25rem;
-          color: #64748b;
+          font-size: 1.5rem;
+          color: rgba(255, 255, 255, 0.95);
           margin-bottom: 3rem;
-          max-width: 600px;
+          line-height: 1.6;
+          max-width: 700px;
           margin-left: auto;
           margin-right: auto;
+          text-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .hero-stats {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 2rem;
-          max-width: 600px;
-          margin: 0 auto;
+        .hero-explore-button {
+          padding: 1.125rem 3rem;
+          border-radius: 50px;
+          font-size: 1.125rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          background: transparent;
+          color: white;
+          border: 2px solid white;
+          text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .stat {
-          padding: 1.5rem;
-          background: white;
-          border-radius: 16px;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-number {
-          font-size: 2rem;
-          font-weight: 800;
-          background: linear-gradient(135deg, #0055f4, #0080ff);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-          font-size: 0.875rem;
-          color: #64748b;
+        .hero-explore-button:hover {
+          background: rgba(0, 85, 244, 0.9);
+          border-color: rgba(0, 85, 244, 0.9);
+          transform: translateY(-3px);
+          box-shadow: 0 8px 24px rgba(0, 85, 244, 0.4);
         }
 
         /* Entry Section */
@@ -891,12 +1122,91 @@ export default function LandingPage() {
           font-weight: 600;
         }
 
+        /* Mission Banner Section */
+        .mission-banner {
+          width: 100%;
+          height: 400px;
+          background-image: url('/image/background_consult.webp');
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0;
+          padding: 0;
+        }
+
+        .mission-overlay {
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.35);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem;
+        }
+
+        .mission-text {
+          font-size: 3rem;
+          font-weight: 800;
+          color: white;
+          text-align: center;
+          line-height: 1.3;
+          letter-spacing: -0.02em;
+          text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+          max-width: 1000px;
+          margin: 0;
+        }
+
+        /* Bridge Section */
+        .bridge-section {
+          padding: 10rem 0 8rem 0;
+          background: white;
+        }
+
+        .bridge-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .bridge-text {
+          font-size: 3rem;
+          font-weight: 800;
+          color: #191F28;
+          text-align: center;
+          line-height: 1.35;
+          letter-spacing: -0.02em;
+          margin: 0;
+        }
+
         /* CTA Section */
         .cta-section {
-          padding: 6rem 0;
-          background: linear-gradient(135deg, #0055f4 0%, #0055f4 50%, #0080ff 100%);
+          padding: 5rem 0 8rem 0;
+          background: white;
           position: relative;
           z-index: 5;
+        }
+
+        .cta-content-compact {
+          text-align: center;
+        }
+
+        .cta-title-compact {
+          font-size: 5rem;
+          font-weight: 800;
+          margin: 0 0 2.5rem 0;
+          color: #191F28;
+          letter-spacing: -0.02em;
+        }
+
+        .cta-buttons-compact {
+          display: flex;
+          gap: 1.5rem;
+          justify-content: center;
+          align-items: center;
         }
 
         .cta-content {
@@ -967,23 +1277,27 @@ export default function LandingPage() {
           text-align: left;
         }
 
-        .step-number {
-          font-size: 3rem;
-          font-weight: 800;
-          color: #0055f4;
-          margin-bottom: 1rem;
-          line-height: 1;
+        .step-keyword {
+          display: inline-block;
+          padding: 0.625rem 1.5rem;
+          font-size: 1.125rem;
+          font-weight: 700;
+          color: white;
+          background: linear-gradient(135deg, #0055f4, #0080ff);
+          border-radius: 24px;
+          margin-bottom: 1.5rem;
+          box-shadow: 0 4px 12px rgba(0, 85, 244, 0.25);
         }
 
         .workflow-step h3 {
-          font-size: 1.375rem;
+          font-size: 1.625rem;
           font-weight: 700;
           color: #191F28;
-          margin-bottom: 0.75rem;
+          margin-bottom: 0.875rem;
         }
 
         .workflow-step p {
-          font-size: 1rem;
+          font-size: 1.125rem;
           color: #4E5968;
           line-height: 1.6;
         }
@@ -1018,35 +1332,37 @@ export default function LandingPage() {
 
         .cta-button-primary,
         .cta-button-secondary {
-          padding: 1.25rem 2.5rem;
-          border: none;
-          border-radius: 12px;
-          font-size: 1.125rem;
+          padding: 1.5rem 3.5rem;
+          border-radius: 14px;
+          font-size: 1.25rem;
           font-weight: 700;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.3s ease;
+          border: none;
+          min-width: 200px;
         }
 
         .cta-button-primary {
-          background: white;
-          color: #0055f4;
+          background: linear-gradient(135deg, #0055f4 0%, #0080ff 100%);
+          color: white;
+          box-shadow: 0 4px 20px rgba(0, 85, 244, 0.25);
         }
 
         .cta-button-secondary {
-          background: rgba(255, 255, 255, 0.15);
-          color: white;
-          border: 2px solid rgba(255, 255, 255, 0.5);
+          background: white;
+          color: #0055f4;
+          border: 2px solid #0055f4;
         }
 
-        .cta-button-primary:hover,
-        .cta-button-secondary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        .cta-button-primary:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 30px rgba(0, 85, 244, 0.4);
         }
 
         .cta-button-secondary:hover {
-          background: rgba(255, 255, 255, 0.25);
-          border-color: white;
+          background: #f0f7ff;
+          transform: translateY(-3px);
+          box-shadow: 0 8px 30px rgba(0, 85, 244, 0.2);
         }
 
         /* Scroll Indicator */
@@ -1166,21 +1482,54 @@ export default function LandingPage() {
         }
         /* Responsive */
         @media (max-width: 768px) {
+          /* Blob sizes for mobile - reduced for better mobile experience */
+          .blob-1 {
+            width: 280px;
+            height: 280px;
+          }
+
+          .blob-2 {
+            width: 250px;
+            height: 250px;
+          }
+
+          .blob-3 {
+            width: 270px;
+            height: 270px;
+          }
+
+          .blob-4 {
+            width: 230px;
+            height: 230px;
+          }
+
+          .blob-5 {
+            width: 260px;
+            height: 260px;
+          }
+
+          .hero-content {
+            padding: 2.5rem 1.5rem;
+            margin: 0 1rem;
+            border-radius: 24px;
+          }
+
           .logo {
             font-size: 3rem;
           }
 
           .hero-title {
-            font-size: 1.5rem;
+            font-size: 1.875rem;
           }
 
           .hero-subtitle {
-            font-size: 1rem;
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
           }
 
-          .hero-stats {
-            grid-template-columns: 1fr;
-            gap: 1rem;
+          .hero-explore-button {
+            padding: 1rem 2.5rem;
+            font-size: 1rem;
           }
 
           .section-title {
@@ -1248,8 +1597,49 @@ export default function LandingPage() {
             gap: 3rem;
           }
 
-          .step-number {
-            font-size: 2.5rem;
+          .step-keyword {
+            font-size: 1rem;
+            padding: 0.5rem 1.25rem;
+          }
+
+          .mission-banner {
+            height: 280px;
+          }
+
+          .mission-text {
+            font-size: 1.75rem;
+            line-height: 1.4;
+          }
+
+          .bridge-section {
+            padding: 4rem 0;
+          }
+
+          .bridge-text {
+            font-size: 2rem;
+            line-height: 1.4;
+          }
+
+          .cta-section {
+            padding: 3rem 0 5rem 0;
+          }
+
+          .cta-title-compact {
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+          }
+
+          .cta-buttons-compact {
+            flex-direction: column;
+            width: 100%;
+            gap: 1rem;
+          }
+
+          .cta-button-primary,
+          .cta-button-secondary {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            font-size: 1.125rem;
           }
 
           .cta-title-large {

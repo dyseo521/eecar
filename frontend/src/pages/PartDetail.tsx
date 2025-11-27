@@ -1,23 +1,262 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import type { Part } from '@shared/index';
+import { useAuth } from '../context/AuthContext';
 import { mockParts } from '../data/mockParts';
+
+// 카테고리별 기본 이미지
+const categoryDefaultImages: Record<string, string> = {
+  'battery': '/image/batterypack_1.jpg',
+  'motor': '/image/motor_1.jpg',
+  'inverter': '/image/inverter_1.png',
+  'body-chassis-frame': '/image/car_body_1.jpg',
+  'body-panel': '/image/car_body_2.jpg',
+  'body-door': '/image/car_body_3.png',
+  'body-window': '/image/car_body_1.jpg',
+  'body': '/image/car_body_1.jpg', // 하위 호환성
+  'charger': '/image/batterypack_1.jpg',
+  'electronics': '/image/inverter_1.png',
+  'interior': '/image/car_body_1.jpg',
+  'other': '/image/car_body_1.jpg',
+};
+
+// 이미지 URL 가져오기 헬퍼 함수
+const getPartImageUrl = (part: Part, index: number = 0): string => {
+  if (part.images && part.images.length > index && part.images[index]) {
+    return part.images[index];
+  }
+  return categoryDefaultImages[part.category] || '/image/car_body_1.jpg';
+};
+
+// Mock 데이터를 Part 타입으로 변환
+const convertMockPartToPart = (mockPart: any): Part => {
+  const categoryMap: Record<string, string> = {
+    '배터리': 'battery',
+    '모터': 'motor',
+    '인버터': 'inverter',
+    '충전기': 'charger',
+    '전장 부품': 'electronics',
+    '차체': 'body',
+    '내장재': 'interior',
+    '기타': 'other'
+  };
+
+  const categoryEng = categoryMap[mockPart.category] || 'other';
+
+  return {
+    partId: mockPart.id,
+    name: mockPart.name,
+    category: categoryEng as any,
+    manufacturer: mockPart.manufacturer,
+    model: mockPart.model,
+    year: mockPart.year,
+    condition: 'used' as any,
+    price: mockPart.price,
+    quantity: mockPart.quantity,
+    sellerId: mockPart.seller?.company || 'demo-seller',
+    description: mockPart.description,
+    images: mockPart.images,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    specifications: mockPart.specifications,
+    useCases: mockPart.useCases
+  };
+};
 
 export default function PartDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
   const [selectedImage, setSelectedImage] = useState(0);
   const [showContactModal, setShowContactModal] = useState(false);
+  const [contactTab, setContactTab] = useState<'inquiry' | 'proposal'>('inquiry'); // 탭 상태
   const [emailSubject, setEmailSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
 
-  // mockParts에서 부품 찾기
-  const part = mockParts.find(p => p.id === id);
+  // Proposal 폼 데이터
+  const [proposalData, setProposalData] = useState({
+    quantity: 1,
+    priceOffer: '',
+    message: '',
+    deliveryDate: '',
+    paymentTerms: '',
+  });
 
-  if (!part) {
+  // 백엔드 API에서 부품 데이터 가져오기 (정적 호스팅 대응: mock 데이터 fallback)
+  const { data: part, isLoading, error } = useQuery<Part>({
+    queryKey: ['part', id],
+    queryFn: async () => {
+      try {
+        const response = await fetch(`/api/parts/${id}`);
+        if (!response.ok) {
+          throw new Error('부품을 찾을 수 없습니다');
+        }
+        return response.json();
+      } catch (error) {
+        console.log('API 호출 실패, mock 데이터 사용:', error);
+        // Mock 데이터에서 partId로 검색
+        const mockPart = mockParts.find(p => p.id === id);
+        if (mockPart) {
+          return convertMockPartToPart(mockPart);
+        }
+        throw new Error('부품을 찾을 수 없습니다');
+      }
+    },
+    enabled: !!id,
+  });
+
+  // Proposal 생성 mutation - Hook은 항상 최상위에서 호출
+  const createProposalMutation = useMutation({
+    mutationFn: async (proposal: any) => {
+      const response = await fetch('/api/proposals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(proposal),
+      });
+
+      if (!response.ok) {
+        throw new Error('제안 전송에 실패했습니다');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      alert('✅ 제안이 성공적으로 전송되었습니다!');
+      setShowContactModal(false);
+      setProposalData({
+        quantity: 1,
+        priceOffer: '',
+        message: '',
+        deliveryDate: '',
+        paymentTerms: '',
+      });
+    },
+    onError: (error: Error) => {
+      alert(`❌ 제안 전송 실패: ${error.message}`);
+    },
+  });
+
+  // 이메일 템플릿 생성 - part가 있을 때만 호출
+  const generateEmailTemplate = () => {
+    if (!part) return { subject: '', body: '' };
+
+    const subject = `[EECAR] ${part.name} 구매 문의`;
+    const body = `안녕하세요,
+
+EECAR를 통해 등록하신 '${part.name}'에 관심이 있어 연락드립니다.
+
+▪️ 구매 희망 부품: ${part.name}
+▪️ 제조사: ${part.manufacturer} / 모델: ${part.model}
+▪️ 등록 가격: ${part.price.toLocaleString()}원
+▪️ 판매자 ID: ${part.sellerId}
+
+저희는 [사용 목적을 입력해주세요]을 위해 해당 부품이 필요합니다.
+
+부품의 상세 사양, 현재 상태, 그리고 거래 조건에 대해
+미팅을 통해 논의하고 싶습니다.
+
+▪️ 연락 가능한 시간: [입력해주세요]
+▪️ 희망 미팅 방식: □ 대면  □ 화상
+
+회신 기다리겠습니다.
+감사합니다.
+
+---
+EECAR 전기차 부품 거래 플랫폼
+https://eecar.com`;
+
+    return { subject, body };
+  };
+
+  const handleOpenModal = (tab: 'inquiry' | 'proposal' = 'inquiry') => {
+    if (tab === 'inquiry') {
+      const { subject, body } = generateEmailTemplate();
+      setEmailSubject(subject);
+      setEmailBody(body);
+    }
+    setContactTab(tab);
+    setShowContactModal(true);
+  };
+
+  const handleContactClick = () => {
+    // 실제 판매자 이메일이 없으므로 일반 문의로 연결
+    window.location.href = `mailto:contact@eecar.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+    setShowContactModal(false);
+  };
+
+  const handleProposal = () => {
+    if (!isAuthenticated) {
+      alert('로그인이 필요한 서비스입니다.');
+      navigate('/login');
+      return;
+    }
+
+    if (!proposalData.priceOffer) {
+      alert('제안 가격을 입력해주세요.');
+      return;
+    }
+
+    if (!part) return;
+
+    createProposalMutation.mutate({
+      fromCompanyId: user?.id || 'unknown',
+      toCompanyId: part.sellerId || 'unknown',
+      partIds: [id],
+      proposalType: 'buy',
+      quantity: proposalData.quantity,
+      priceOffer: parseFloat(proposalData.priceOffer),
+      message: proposalData.message,
+      terms: {
+        deliveryDate: proposalData.deliveryDate,
+        paymentTerms: proposalData.paymentTerms,
+      },
+    });
+  };
+
+  // 로딩 상태
+  if (isLoading) {
+    return (
+      <div className="error-page">
+        <div className="loading-spinner"></div>
+        <p>부품 정보를 불러오는 중...</p>
+        <style>{`
+          .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #0055f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          }
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          .error-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            gap: 1.5rem;
+            padding: 2rem;
+            background: #f9fafb;
+          }
+          .error-page p {
+            color: #6b7280;
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  // 에러 또는 부품 없음
+  if (error || !part) {
     return (
       <div className="error-page">
         <h2>부품을 찾을 수 없습니다</h2>
-        <p>요청하신 부품 정보가 존재하지 않습니다.</p>
+        <p>{error ? (error as Error).message : '요청하신 부품 정보가 존재하지 않습니다.'}</p>
         <button onClick={() => navigate('/buyer')}>부품 검색으로 돌아가기</button>
 
         <style>{`
@@ -61,47 +300,6 @@ export default function PartDetail() {
     );
   }
 
-  // 이메일 템플릿 생성
-  const generateEmailTemplate = () => {
-    const subject = `[EECAR] ${part.name} 구매 문의`;
-    const body = `안녕하세요, ${part.seller.company}님
-
-EECAR를 통해 등록하신 '${part.name}'에 관심이 있어 연락드립니다.
-
-▪️ 구매 희망 부품: ${part.name}
-▪️ 제조사: ${part.manufacturer} / 모델: ${part.model}
-▪️ 등록 가격: ${part.price.toLocaleString()}원
-
-저희는 [사용 목적을 입력해주세요]을 위해 해당 부품이 필요합니다.
-
-부품의 상세 사양, 현재 상태, 그리고 거래 조건에 대해
-미팅을 통해 논의하고 싶습니다.
-
-▪️ 연락 가능한 시간: [입력해주세요]
-▪️ 희망 미팅 방식: □ 대면  □ 화상
-
-회신 기다리겠습니다.
-감사합니다.
-
----
-EECAR 전기차 부품 거래 플랫폼
-https://eecar.com`;
-
-    return { subject, body };
-  };
-
-  const handleOpenModal = () => {
-    const { subject, body } = generateEmailTemplate();
-    setEmailSubject(subject);
-    setEmailBody(body);
-    setShowContactModal(true);
-  };
-
-  const handleContactClick = () => {
-    window.location.href = `mailto:${part.seller.contact}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
-    setShowContactModal(false);
-  };
-
   return (
     <div className="part-detail-page">
       {/* 헤더 */}
@@ -119,10 +317,13 @@ https://eecar.com`;
           <div className="image-gallery">
             <div className="main-image">
               <img
-                src={part.images?.[selectedImage] || part.image}
+                src={getPartImageUrl(part, selectedImage)}
                 alt={part.name}
                 onError={(e) => {
-                  e.currentTarget.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect fill="%23f3f4f6" width="400" height="300"/><text x="50%" y="50%" text-anchor="middle" fill="%239ca3af" font-size="16">이미지 없음</text></svg>';
+                  const defaultImg = categoryDefaultImages[part.category] || '/image/car_body_1.jpg';
+                  if (e.currentTarget.src !== window.location.origin + defaultImg) {
+                    e.currentTarget.src = defaultImg;
+                  }
                 }}
               />
               {part.quantity && (
@@ -138,7 +339,14 @@ https://eecar.com`;
                     className={`thumbnail ${selectedImage === idx ? 'active' : ''}`}
                     onClick={() => setSelectedImage(idx)}
                   >
-                    <img src={img} alt={`${part.name} ${idx + 1}`} />
+                    <img
+                      src={img}
+                      alt={`${part.name} ${idx + 1}`}
+                      onError={(e) => {
+                        const defaultImg = categoryDefaultImages[part.category] || '/image/car_body_1.jpg';
+                        e.currentTarget.src = defaultImg;
+                      }}
+                    />
                   </div>
                 ))}
               </div>
@@ -155,22 +363,22 @@ https://eecar.com`;
 
             {/* 주요 스펙 */}
             <div className="key-specs">
-              {part.capacity && (
+              {part.specifications?.electricalProps?.capacity && (
                 <div className="spec-item">
                   <span className="spec-label">용량</span>
-                  <span className="spec-value">{part.capacity}</span>
+                  <span className="spec-value">{part.specifications.electricalProps.capacity}Ah</span>
                 </div>
               )}
-              {part.power && (
+              {part.specifications?.electricalProps?.power && (
                 <div className="spec-item">
                   <span className="spec-label">출력</span>
-                  <span className="spec-value">{part.power}</span>
+                  <span className="spec-value">{part.specifications.electricalProps.power}W</span>
                 </div>
               )}
-              {part.type && (
+              {part.specifications?.electricalProps?.voltage && (
                 <div className="spec-item">
-                  <span className="spec-label">타입</span>
-                  <span className="spec-value">{part.type}</span>
+                  <span className="spec-label">전압</span>
+                  <span className="spec-value">{part.specifications.electricalProps.voltage}V</span>
                 </div>
               )}
               <div className="spec-item">
@@ -194,12 +402,19 @@ https://eecar.com`;
           <section className="specifications-section">
             <h3>상세 사양</h3>
             <div className="specs-grid">
-              {Object.entries(part.specifications).map(([key, value]) => (
-                <div key={key} className="spec-row">
-                  <span className="spec-key">{key}</span>
-                  <span className="spec-val">{value as string}</span>
-                </div>
-              ))}
+              {Object.entries(part.specifications).map(([key, value]) => {
+                // 객체인 경우 적절히 처리
+                const displayValue = typeof value === 'object' && value !== null
+                  ? JSON.stringify(value, null, 2)
+                  : String(value);
+
+                return (
+                  <div key={key} className="spec-row">
+                    <span className="spec-key">{key}</span>
+                    <span className="spec-val" style={{ whiteSpace: 'pre-wrap' }}>{displayValue}</span>
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}
@@ -223,85 +438,171 @@ https://eecar.com`;
         )}
 
         {/* 판매자 정보 */}
-        {part.seller && (
-          <section className="seller-section">
-            <h3>판매자 정보</h3>
-            <div className="seller-card">
-              <div className="seller-info">
-                <div className="seller-name">{part.seller.company}</div>
-                <div className="seller-location">📍 {part.seller.location}</div>
-              </div>
-              <div className="seller-contact">
-                <div className="contact-item">
-                  <span className="label">이메일</span>
-                  <span className="value">{part.seller.contact}</span>
-                </div>
-                <div className="contact-item">
-                  <span className="label">전화</span>
-                  <span className="value">{part.seller.phone}</span>
-                </div>
+        <section className="seller-section">
+          <h3>판매자 정보</h3>
+          <div className="seller-card">
+            <div className="seller-info">
+              <div className="seller-name">판매자 ID: {part.sellerId}</div>
+              <div className="seller-note">
+                💡 판매자와 직접 연락하려면 아래 '구매 문의하기' 버튼을 클릭하세요.
               </div>
             </div>
-          </section>
-        )}
+          </div>
+        </section>
       </main>
 
       {/* 하단 고정 버튼 */}
       <div className="fixed-bottom">
-        <button className="contact-button" onClick={handleOpenModal}>
-          구매 문의하기
+        <button className="contact-button" onClick={() => handleOpenModal('inquiry')}>
+          문의하기
         </button>
       </div>
 
-      {/* 문의하기 모달 */}
+      {/* 통합 문의/제안 모달 */}
       {showContactModal && (
         <div className="modal-overlay" onClick={() => setShowContactModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>구매 문의하기</h3>
+              <h3>판매자 문의하기</h3>
               <button className="close-button" onClick={() => setShowContactModal(false)}>
                 ✕
               </button>
             </div>
 
+            {/* 탭 전환 */}
+            <div className="modal-tabs">
+              <button
+                className={`tab-button ${contactTab === 'inquiry' ? 'active' : ''}`}
+                onClick={() => setContactTab('inquiry')}
+              >
+                일반 문의
+              </button>
+              <button
+                className={`tab-button ${contactTab === 'proposal' ? 'active' : ''}`}
+                onClick={() => setContactTab('proposal')}
+              >
+                구매 제안
+              </button>
+            </div>
+
             <div className="modal-body">
-              <p className="modal-description">
-                판매자에게 아래 양식으로 이메일이 발송됩니다.<br/>
-                필요한 내용을 수정한 후 전송해주세요.
-              </p>
+              {contactTab === 'inquiry' ? (
+                // 일반 문의 탭
+                <>
+                  <p className="modal-description">
+                    판매자에게 아래 양식으로 이메일이 발송됩니다.<br/>
+                    필요한 내용을 수정한 후 전송해주세요.
+                  </p>
 
-              <div className="email-preview">
-                <div className="preview-label">받는 사람</div>
-                <div className="preview-value">{part.seller.company} ({part.seller.contact})</div>
+                  <div className="email-preview">
+                    <div className="preview-label">받는 사람</div>
+                    <div className="preview-value">EECAR 고객센터 (contact@eecar.com)</div>
 
-                <div className="preview-label">제목</div>
-                <input
-                  type="text"
-                  className="email-subject-input"
-                  value={emailSubject}
-                  onChange={(e) => setEmailSubject(e.target.value)}
-                />
+                    <div className="preview-label">제목</div>
+                    <input
+                      type="text"
+                      className="email-subject-input"
+                      value={emailSubject}
+                      onChange={(e) => setEmailSubject(e.target.value)}
+                    />
 
-                <div className="preview-label">내용</div>
-                <textarea
-                  className="email-body-input"
-                  value={emailBody}
-                  onChange={(e) => setEmailBody(e.target.value)}
-                  rows={15}
-                />
-              </div>
+                    <div className="preview-label">내용</div>
+                    <textarea
+                      className="email-body-input"
+                      value={emailBody}
+                      onChange={(e) => setEmailBody(e.target.value)}
+                      rows={15}
+                    />
+                  </div>
 
-              <div className="modal-tip">
-                💡 [사용 목적], [연락 가능한 시간], [희망 미팅 방식]을 입력한 후 전송해주세요.
-              </div>
+                  <div className="modal-tip">
+                    💡 [사용 목적], [연락 가능한 시간], [희망 미팅 방식]을 입력한 후 전송해주세요.
+                  </div>
+                </>
+              ) : (
+                // 구매 제안 탭
+                <>
+                  <p className="modal-description">
+                    판매자에게 구매 제안을 보냅니다. 조건을 입력하고 전송하세요.
+                  </p>
+
+                  <div className="proposal-part-info">
+                    <strong>{part.name}</strong>
+                    <span>현재 가격: {part.price.toLocaleString()}원</span>
+                  </div>
+
+                  <div className="form-group">
+                    <label>수량 *</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={proposalData.quantity}
+                      onChange={(e) => setProposalData({ ...proposalData, quantity: parseInt(e.target.value) })}
+                      className="form-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>제안 가격 (원) *</label>
+                    <input
+                      type="number"
+                      placeholder="예: 14000000"
+                      value={proposalData.priceOffer}
+                      onChange={(e) => setProposalData({ ...proposalData, priceOffer: e.target.value })}
+                      className="form-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>희망 납기일</label>
+                    <input
+                      type="date"
+                      value={proposalData.deliveryDate}
+                      onChange={(e) => setProposalData({ ...proposalData, deliveryDate: e.target.value })}
+                      className="form-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>결제 조건</label>
+                    <input
+                      type="text"
+                      placeholder="예: 계약금 30%, 잔금 70%"
+                      value={proposalData.paymentTerms}
+                      onChange={(e) => setProposalData({ ...proposalData, paymentTerms: e.target.value })}
+                      className="form-input"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>추가 메시지</label>
+                    <textarea
+                      rows={4}
+                      placeholder="제안에 대한 추가 설명을 입력하세요"
+                      value={proposalData.message}
+                      onChange={(e) => setProposalData({ ...proposalData, message: e.target.value })}
+                      className="form-textarea"
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="modal-footer">
-              <button className="cancel-button" onClick={() => setShowContactModal(false)}>
+              <button
+                className="cancel-button"
+                onClick={() => setShowContactModal(false)}
+              >
                 취소
               </button>
-              <button className="send-button" onClick={handleContactClick}>
-                메일로 문의하기
+              <button
+                className="send-button"
+                onClick={contactTab === 'inquiry' ? handleContactClick : handleProposal}
+                disabled={contactTab === 'proposal' && createProposalMutation.isPending}
+              >
+                {contactTab === 'inquiry'
+                  ? '메일로 문의하기'
+                  : createProposalMutation.isPending ? '전송 중...' : '제안 전송'}
               </button>
             </div>
           </div>
@@ -621,6 +922,17 @@ https://eecar.com`;
           font-size: 0.875rem;
         }
 
+        .seller-note {
+          margin-top: 0.75rem;
+          padding: 0.875rem;
+          background: #fef3c7;
+          border-left: 4px solid #f59e0b;
+          border-radius: 6px;
+          color: #92400e;
+          font-size: 0.875rem;
+          line-height: 1.5;
+        }
+
         .seller-contact {
           display: grid;
           gap: 0.75rem;
@@ -673,6 +985,8 @@ https://eecar.com`;
 
         .contact-button:hover {
           background: #0040c0;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 85, 244, 0.3);
         }
 
         /* 모달 */
@@ -735,6 +1049,39 @@ https://eecar.com`;
           color: #1f2937;
         }
 
+        /* 탭 */
+        .modal-tabs {
+          display: flex;
+          gap: 0;
+          border-bottom: 2px solid #e5e7eb;
+          background: #f9fafb;
+        }
+
+        .tab-button {
+          flex: 1;
+          padding: 1rem;
+          background: transparent;
+          border: none;
+          border-bottom: 3px solid transparent;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          color: #6b7280;
+          cursor: pointer;
+          transition: all 0.2s;
+          margin-bottom: -2px;
+        }
+
+        .tab-button:hover {
+          color: #374151;
+          background: rgba(0, 85, 244, 0.05);
+        }
+
+        .tab-button.active {
+          color: #0055f4;
+          border-bottom-color: #0055f4;
+          background: white;
+        }
+
         .modal-body {
           padding: 1.5rem;
         }
@@ -744,6 +1091,76 @@ https://eecar.com`;
           color: #6b7280;
           font-size: 0.9375rem;
           line-height: 1.6;
+        }
+
+        /* Proposal 폼 스타일 */
+        .proposal-part-info {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem;
+          background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+          border-left: 4px solid #10b981;
+          border-radius: 8px;
+          margin-bottom: 1.5rem;
+        }
+
+        .proposal-part-info strong {
+          color: #1f2937;
+          font-size: 1rem;
+          font-weight: 700;
+        }
+
+        .proposal-part-info span {
+          color: #059669;
+          font-size: 0.9375rem;
+          font-weight: 600;
+        }
+
+        .form-group {
+          margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+          display: block;
+          margin-bottom: 0.5rem;
+          color: #374151;
+          font-weight: 600;
+          font-size: 0.875rem;
+        }
+
+        .form-input {
+          width: 100%;
+          padding: 0.75rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 8px;
+          font-size: 0.9375rem;
+          font-family: inherit;
+          transition: all 0.2s;
+        }
+
+        .form-input:focus {
+          outline: none;
+          border-color: #0055f4;
+          box-shadow: 0 0 0 3px rgba(0, 85, 244, 0.1);
+        }
+
+        .form-textarea {
+          width: 100%;
+          padding: 0.875rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 8px;
+          font-size: 0.9375rem;
+          font-family: inherit;
+          line-height: 1.6;
+          resize: vertical;
+          transition: all 0.2s;
+        }
+
+        .form-textarea:focus {
+          outline: none;
+          border-color: #0055f4;
+          box-shadow: 0 0 0 3px rgba(0, 85, 244, 0.1);
         }
 
         .email-preview {
@@ -863,8 +1280,13 @@ https://eecar.com`;
           color: white;
         }
 
-        .send-button:hover {
+        .send-button:hover:not(:disabled) {
           background: #0040c0;
+        }
+
+        .send-button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
         }
 
         /* 반응형 */

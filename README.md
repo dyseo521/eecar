@@ -9,7 +9,17 @@ EECAR는 1세대 전기차(2010년대 초반)의 수명 종료에 따라 증가�
 ### 주요 기능
 
 - **AI 기반 검색**: RAG(Retrieval-Augmented Generation)를 활용한 자연어 부품 검색
-- **물성 데이터베이스**: 모델별, 부품별 검증된 물성 데이터 통합 관리
+  - AI/기본 검색 모드 토글로 전환 가능
+  - 기본 AI 모드로 설정되어 즉시 사용 가능
+- **배터리 SOH 평가**: 70% 기준 재사용/재활용 자동 판단
+  - 17개 차종 데이터 기반 (현대 아이오닉, 테슬라 Model S, BMW i3 등)
+  - 6가지 양극재 타입 지원 (NCM Ni 33/60/80%, NCA, LFP, LMO)
+- **재질 물성 검색**: 알루미늄 합금 기반 고급 검색
+  - 합금 번호 검색 (6061, 7075, 5754)
+  - 인장 강도, 재활용률 등 물성 필터링
+- **세분화된 차체 카테고리**:
+  - 샤시/프레임, 외판/패널, 도어, 창/유리로 구분
+  - 재질별 상세 스펙 제공
 - **스마트 알림**: 원하는 부품 등록 시 자동 알림
 - **B2B 매칭**: 기업 간 계약 제안 및 협상 지원
 - **자동 규성 검증**: 부품 등록 시 규성 준수 여부 자동 확인
@@ -121,13 +131,28 @@ cd ../shared && npm run build
 
 ### 로컬 개발
 
-#### 프론트엔드 실행
+#### 모든 서비스 통합 실행 (권장)
 ```bash
-npm run dev:frontend
-# http://localhost:3000
+# Docker + 백엔드 + 프론트엔드 동시 실행
+npm run dev:all
 ```
 
-#### 백엔드 로컬 테스트 (SAM Local)
+이 명령은 다음을 자동으로 실행합니다:
+- **Docker Compose**: DynamoDB Local (포트 8000), LocalStack (포트 4566)
+- **로컬 백엔드 서버**: Express 서버 (포트 3001)
+  - 35개 사전 로드된 부품 데이터 (배터리 10개, 모터 6개, 인버터 6개, 차체 13개)
+  - 배터리 SOH 평가 및 재질 물성 검색 API 지원
+  - 인증 엔드포인트 (`/api/auth/signup`, `/api/auth/login`)
+- **프론트엔드 개발 서버**: Vite (포트 3000)
+
+#### 개별 서비스 실행
+```bash
+npm run docker:up         # Docker 서비스만 시작
+npm run dev:local         # 백엔드 로컬 서버만 실행
+npm run dev:frontend      # 프론트엔드만 실행
+```
+
+#### SAM Local 테스트 (선택사항)
 ```bash
 cd infrastructure
 sam build
@@ -160,9 +185,44 @@ aws s3 sync dist/ s3://your-frontend-bucket/
 aws cloudfront create-invalidation --distribution-id YOUR_DIST_ID --paths "/*"
 ```
 
+### 정적 호스팅 (백엔드 불필요)
+
+프론트엔드만으로 완전한 기능 테스트가 가능합니다. 백엔드 없이도 35개 부품 데이터로 플랫폼의 모든 UI/UX를 체험할 수 있습니다.
+
+```bash
+cd frontend
+npm run build
+# dist/ 폴더를 Vercel, Netlify, GitHub Pages, Cloudflare Pages에 배포
+```
+
+**지원 기능**:
+- 35개 부품 브라우징 (배터리 10개, 모터 6개, 인버터 6개, 차체 13개)
+- 부품 상세 페이지 (배터리 SOH, 재질 물성 포함)
+- 카테고리 및 가격 필터링
+- AI/기본 검색 모드 전환
+- 세분화된 차체 카테고리 (샤시/프레임, 외판/패널, 도어, 창/유리)
+
+**제한 사항**:
+- AI 기반 벡터 검색 (Bedrock 필요)
+- 실시간 알림 (SNS 필요)
+- 계약 제안 생성
+
+**배포 예시 (Vercel)**:
+```bash
+cd frontend
+npm install -g vercel
+vercel
+```
+
 ### 초기 데이터 생성
 
-합성 데이터를 생성하여 테스트:
+**로컬 개발**: 35개 부품 데이터가 사전 로드되어 있어 즉시 테스트 가능합니다.
+- 배터리 10개 (다양한 SOH, 양극재 타입)
+- 모터 6개
+- 인버터 6개
+- 차체 부품 13개 (샤시, 패널, 도어, 윈도우)
+
+**AWS 배포 환경**: 합성 데이터 생성 API를 통해 추가 데이터 생성:
 
 ```bash
 curl -X POST https://your-api-url/api/synthetic \

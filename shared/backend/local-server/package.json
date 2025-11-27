@@ -1,0 +1,18 @@
+{
+  "name": "eecar-local-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Local development server for EECAR",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "@aws-sdk/client-dynamodb": "^3.400.0",
+    "@aws-sdk/lib-dynamodb": "^3.400.0",
+    "eecar-shared": "file:../../shared"
+  }
+}
