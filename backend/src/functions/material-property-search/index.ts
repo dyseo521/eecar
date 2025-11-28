@@ -6,8 +6,8 @@ import {
   SearchResponse,
   SearchResult,
   AdvancedMaterialFilters,
-  ApiResponse,
 } from 'eecar-shared';
+import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
 
 const dynamodb = new DynamoDBClient({
   region: process.env.AWS_REGION || 'us-east-1',
@@ -32,14 +32,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     };
 
     if (!materialFilters) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          success: false,
-          error: 'materialFilters is required',
-        } as ApiResponse),
-      };
+      return errorResponse('materialFilters is required', undefined, 400, event);
     }
 
     // Scan DynamoDB for parts with material specifications
@@ -97,25 +90,15 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       count: matchedParts.length,
     };
 
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        success: true,
-        data: searchResponse,
-      } as ApiResponse<SearchResponse>),
-    };
+    return successResponse({ success: true, data: searchResponse }, 200, event);
   } catch (error) {
     console.error('Material property search error:', error);
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        success: false,
-        error: 'Failed to search by material properties',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      } as ApiResponse),
-    };
+    return errorResponse(
+      'Failed to search by material properties',
+      error instanceof Error ? error.message : 'Unknown error',
+      500,
+      event
+    );
   }
 };
 

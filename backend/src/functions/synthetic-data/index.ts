@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { callClaude, generateEmbedding, preparePartText } from '/opt/nodejs/utils/bedrock.js';
 import { uploadVector, updateVectorsManifest } from '/opt/nodejs/utils/s3.js';
 import { putItem } from '/opt/nodejs/utils/dynamodb.js';
+import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
 
 /**
  * Synthetic Data Lambda Function
@@ -14,17 +15,11 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     const { category, count = 1, template } = body;
 
     if (!category) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Category is required' }),
-      };
+      return errorResponse('Category is required', undefined, 400, event);
     }
 
     if (count > 10) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Maximum 10 parts per request' }),
-      };
+      return errorResponse('Maximum 10 parts per request', undefined, 400, event);
     }
 
     console.log(`Generating ${count} synthetic parts for category: ${category}`);
@@ -39,19 +34,13 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       console.log(`Generated part ${i + 1}/${count}: ${partId}`);
     }
 
-    return {
-      statusCode: 201,
-      body: JSON.stringify({
-        message: `Successfully generated ${count} synthetic parts`,
-        parts: generatedParts,
-      }),
-    };
+    return successResponse({
+      message: `Successfully generated ${count} synthetic parts`,
+      parts: generatedParts,
+    }, 201, event);
   } catch (error: any) {
     console.error('Error in synthetic-data:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error', message: error.message }),
-    };
+    return errorResponse('Internal server error', error.message, 500, event);
   }
 }
 

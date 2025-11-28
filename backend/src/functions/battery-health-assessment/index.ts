@@ -7,8 +7,8 @@ import {
   BatteryFilters,
   SearchResponse,
   SearchResult,
-  ApiResponse,
 } from 'eecar-shared';
+import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
 
 const dynamodb = new DynamoDBClient({
   region: process.env.AWS_REGION || 'us-east-1',
@@ -88,25 +88,15 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       count: batteryParts.length,
     };
 
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        success: true,
-        data: searchResponse,
-      } as ApiResponse<SearchResponse>),
-    };
+    return successResponse({ success: true, data: searchResponse }, 200, event);
   } catch (error) {
     console.error('Battery health assessment error:', error);
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        success: false,
-        error: 'Failed to assess battery health',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      } as ApiResponse),
-    };
+    return errorResponse(
+      'Failed to assess battery health',
+      error instanceof Error ? error.message : 'Unknown error',
+      500,
+      event
+    );
   }
 };
 

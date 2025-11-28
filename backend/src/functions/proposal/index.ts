@@ -2,6 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { v4 as uuidv4 } from 'uuid';
 import { putItem, queryGSI1 } from '/opt/nodejs/utils/dynamodb.js';
+import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
 
 const snsClient = new SNSClient({});
 const SNS_TOPIC_ARN = process.env.SNS_TOPIC_ARN!;
@@ -20,16 +21,10 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return await getProposals(event);
     }
 
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+    return errorResponse('Method not allowed', undefined, 405, event);
   } catch (error: any) {
     console.error('Error in proposal:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error', message: error.message }),
-    };
+    return errorResponse('Internal server error', error.message, 500, event);
   }
 }
 
@@ -51,12 +46,12 @@ async function createProposal(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
   // Validation
   if (!fromCompanyId || !toCompanyId || !partIds || !proposalType) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        error: 'Missing required fields: fromCompanyId, toCompanyId, partIds, proposalType',
-      }),
-    };
+    return errorResponse(
+      'Missing required fields: fromCompanyId, toCompanyId, partIds, proposalType',
+      undefined,
+      400,
+      event
+    );
   }
 
   const proposalId = uuidv4();
@@ -85,13 +80,10 @@ async function createProposal(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   // Send notification
   await sendProposalNotification(toCompanyId, proposalType, partIds);
 
-  return {
-    statusCode: 201,
-    body: JSON.stringify({
-      message: 'Proposal created successfully',
-      proposalId,
-    }),
-  };
+  return successResponse({
+    message: 'Proposal created successfully',
+    proposalId,
+  }, 201, event);
 }
 
 /**
@@ -101,10 +93,7 @@ async function getProposals(event: APIGatewayProxyEvent): Promise<APIGatewayProx
   const { companyId, status } = event.queryStringParameters || {};
 
   if (!companyId) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'companyId is required' }),
-    };
+    return errorResponse('companyId is required', undefined, 400, event);
   }
 
   const skPrefix = status ? `STATUS#${status}#` : undefined;
@@ -118,13 +107,10 @@ async function getProposals(event: APIGatewayProxyEvent): Promise<APIGatewayProx
     };
   });
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      proposals: results,
-      count: results.length,
-    }),
-  };
+  return successResponse({
+    proposals: results,
+    count: results.length,
+  }, 200, event);
 }
 
 /**

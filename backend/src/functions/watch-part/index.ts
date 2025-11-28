@@ -2,6 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { v4 as uuidv4 } from 'uuid';
 import { putItem, queryGSI1 } from '/opt/nodejs/utils/dynamodb.js';
+import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
 
 const snsClient = new SNSClient({});
 const SNS_TOPIC_ARN = process.env.SNS_TOPIC_ARN!;
@@ -17,17 +18,11 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     // Validation
     if (!buyerId || !criteria) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Missing required fields: buyerId, criteria' }),
-      };
+      return errorResponse('Missing required fields: buyerId, criteria', undefined, 400, event);
     }
 
     if (!email && !phone) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'At least one contact method (email or phone) is required' }),
-      };
+      return errorResponse('At least one contact method (email or phone) is required', undefined, 400, event);
     }
 
     const watchId = uuidv4();
@@ -52,19 +47,13 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     // Send confirmation
     await sendWatchConfirmation(email, criteria);
 
-    return {
-      statusCode: 201,
-      body: JSON.stringify({
-        message: 'Watch created successfully',
-        watchId,
-      }),
-    };
+    return successResponse({
+      message: 'Watch created successfully',
+      watchId,
+    }, 201, event);
   } catch (error: any) {
     console.error('Error in watch-part:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error', message: error.message }),
-    };
+    return errorResponse('Internal server error', error.message, 500, event);
   }
 }
 

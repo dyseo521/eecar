@@ -60,7 +60,8 @@ Resources:
             - Effect: Allow
               Action:
                 - bedrock:InvokeModel
-              Resource: '*'
+                - bedrock:InvokeModelWithResponseStream
+              Resource: 'arn:aws:bedrock:us-east-1::foundation-model/*'
       Events:
         Search:
           Type: Api
@@ -88,6 +89,10 @@ Resources:
             - Effect: Allow
               Action:
                 - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+              Resource: 'arn:aws:bedrock:us-east-1::foundation-model/*'
+            - Effect: Allow
+              Action:
                 - lambda:InvokeFunction
               Resource: '*'
       Environment:
@@ -118,7 +123,8 @@ Resources:
             - Effect: Allow
               Action:
                 - bedrock:InvokeModel
-              Resource: '*'
+                - bedrock:InvokeModelWithResponseStream
+              Resource: 'arn:aws:bedrock:us-east-1::foundation-model/*'
 
   GetPartsFunction:
     Type: AWS::Serverless::Function
@@ -211,10 +217,9 @@ Resources:
         - Statement:
             - Effect: Allow
               Action:
-                - bedrock:InvokeModel            
-                - aws-marketplace:ViewSubscriptions   
-                - aws-marketplace:Subscribe 
-              Resource: '*'
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+              Resource: 'arn:aws:bedrock:us-east-1::foundation-model/*'
       Events:
         GenerateData:
           Type: Api

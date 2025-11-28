@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { generateEmbedding, preparePartText } from '/opt/nodejs/utils/bedrock.js';
 import { uploadVector, updateVectorsManifest } from '/opt/nodejs/utils/s3.js';
 import { putItem } from '/opt/nodejs/utils/dynamodb.js';
+import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
 
 const lambdaClient = new LambdaClient({});
 
@@ -32,10 +33,12 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     // Validation
     if (!name || !category || !manufacturer || !price) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Missing required fields: name, category, manufacturer, price' }),
-      };
+      return errorResponse(
+        'Missing required fields: name, category, manufacturer, price',
+        undefined,
+        400,
+        event
+      );
     }
 
     const partId = uuidv4();
@@ -145,19 +148,13 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       // Don't fail the registration if compliance check fails
     }
 
-    return {
-      statusCode: 201,
-      body: JSON.stringify({
-        message: 'Part registered successfully',
-        partId,
-        metadata: partMetadata,
-      }),
-    };
+    return successResponse({
+      message: 'Part registered successfully',
+      partId,
+      metadata: partMetadata,
+    }, 201, event);
   } catch (error: any) {
     console.error('Error in part registration:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error', message: error.message }),
-    };
+    return errorResponse('Internal server error', error.message, 500, event);
   }
 }

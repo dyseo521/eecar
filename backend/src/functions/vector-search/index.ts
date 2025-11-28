@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { generateEmbedding, findTopKSimilar, callClaude } from '/opt/nodejs/utils/bedrock.js';
 import { getVector, listVectorKeys } from '/opt/nodejs/utils/s3.js';
 import { getItem, putItem, queryGSI1, batchGetItems } from '/opt/nodejs/utils/dynamodb.js';
+import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
 
 /**
  * Vector Search Lambda Function
@@ -14,10 +15,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     const { query, filters, topK = 10 } = body;
 
     if (!query) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Query is required' }),
-      };
+      return errorResponse('Query is required', undefined, 400, event);
     }
 
     console.log('Processing search query:', query);
@@ -29,13 +27,10 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     if (cachedResult && cachedResult.TTL && Date.now() < cachedResult.TTL * 1000) {
       console.log('Cache hit!');
       await incrementCacheHit(queryHash);
-      return {
-        statusCode: 200,
-        body: JSON.stringify({
-          results: cachedResult.matchedParts,
-          cached: true,
-        }),
-      };
+      return successResponse({
+        results: cachedResult.matchedParts,
+        cached: true,
+      }, 200, event);
     }
 
     // Step 2: Generate query embedding
@@ -89,19 +84,13 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       GSI1SK: `HIT_COUNT#${1}`,
     });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        results: filteredResults,
-        cached: false,
-      }),
-    };
+    return successResponse({
+      results: filteredResults,
+      cached: false,
+    }, 200, event);
   } catch (error: any) {
     console.error('Error in vector search:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error', message: error.message }),
-    };
+    return errorResponse('Internal server error', error.message, 500, event);
   }
 }
 
