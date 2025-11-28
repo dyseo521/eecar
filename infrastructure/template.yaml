@@ -266,6 +266,28 @@ Resources:
             Path: /api/material-search
             Method: POST
 
+  ContactInquiryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/dist/functions/contact-inquiry/
+      Handler: index.handler
+      Description: Handle general contact inquiries and send notifications via SNS
+      Layers:
+        - !Ref EECARUtilsLayer
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - sns:Publish
+              Resource: !Ref NotificationTopic
+      Events:
+        ContactInquiry:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EECARApi
+            Path: /api/contact
+            Method: POST
+
   # DynamoDB Table (Single-table design for cost optimization)
   PartsTable:
     Type: AWS::DynamoDB::Table

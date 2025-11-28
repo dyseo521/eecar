@@ -75,6 +75,11 @@ export default function PartDetail() {
   const [emailSubject, setEmailSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
 
+  // Contact inquiry 폼 데이터
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [isSubmittingContact, setIsSubmittingContact] = useState(false);
+
   // Proposal 폼 데이터
   const [proposalData, setProposalData] = useState({
     quantity: 1,
@@ -180,10 +185,52 @@ https://eecar.com`;
     setShowContactModal(true);
   };
 
-  const handleContactClick = () => {
-    // 실제 판매자 이메일이 없으므로 일반 문의로 연결
-    window.location.href = `mailto:contact@eecar.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
-    setShowContactModal(false);
+  const handleContactClick = async () => {
+    // Validation
+    if (!contactName || !contactEmail || !emailSubject || !emailBody) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(contactEmail)) {
+      alert('유효한 이메일 주소를 입력해주세요.');
+      return;
+    }
+
+    setIsSubmittingContact(true);
+
+    try {
+      const response = await fetch(getApiUrl('contact'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: contactName,
+          email: contactEmail,
+          subject: emailSubject,
+          message: emailBody,
+          partId: part?.partId,
+          partName: part?.name,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('문의 전송에 실패했습니다');
+      }
+
+      alert('문의가 성공적으로 접수되었습니다. 빠른 시일 내에 답변 드리겠습니다.');
+      setShowContactModal(false);
+      // Reset form
+      setContactName('');
+      setContactEmail('');
+      setEmailSubject('');
+      setEmailBody('');
+    } catch (error) {
+      console.error('Contact inquiry error:', error);
+      alert('문의 전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setIsSubmittingContact(false);
+    }
   };
 
   const handleProposal = () => {
@@ -491,13 +538,31 @@ https://eecar.com`;
                 // 일반 문의 탭
                 <>
                   <p className="modal-description">
-                    판매자에게 아래 양식으로 이메일이 발송됩니다.<br/>
-                    필요한 내용을 수정한 후 전송해주세요.
+                    EECAR 고객센터로 문의가 전송됩니다.<br/>
+                    아래 정보를 입력해주세요.
                   </p>
 
                   <div className="email-preview">
+                    <div className="preview-label">이름</div>
+                    <input
+                      type="text"
+                      className="email-subject-input"
+                      placeholder="홍길동"
+                      value={contactName}
+                      onChange={(e) => setContactName(e.target.value)}
+                    />
+
+                    <div className="preview-label">이메일</div>
+                    <input
+                      type="email"
+                      className="email-subject-input"
+                      placeholder="example@email.com"
+                      value={contactEmail}
+                      onChange={(e) => setContactEmail(e.target.value)}
+                    />
+
                     <div className="preview-label">받는 사람</div>
-                    <div className="preview-value">EECAR 고객센터 (contact@eecar.com)</div>
+                    <div className="preview-value">EECAR 고객센터 (inha2025vip@gmail.com)</div>
 
                     <div className="preview-label">제목</div>
                     <input
@@ -599,10 +664,13 @@ https://eecar.com`;
               <button
                 className="send-button"
                 onClick={contactTab === 'inquiry' ? handleContactClick : handleProposal}
-                disabled={contactTab === 'proposal' && createProposalMutation.isPending}
+                disabled={
+                  (contactTab === 'inquiry' && isSubmittingContact) ||
+                  (contactTab === 'proposal' && createProposalMutation.isPending)
+                }
               >
                 {contactTab === 'inquiry'
-                  ? '메일로 문의하기'
+                  ? isSubmittingContact ? '전송 중...' : '문의하기'
                   : createProposalMutation.isPending ? '전송 중...' : '제안 전송'}
               </button>
             </div>

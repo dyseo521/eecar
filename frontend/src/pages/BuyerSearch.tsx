@@ -711,14 +711,16 @@ export default function BuyerSearch() {
                       className={`part-card-ai ${isEliteMatch ? 'elite-match' : isTopMatch ? 'top-match' : ''}`}
                       onClick={() => navigate(`/parts/${result.partId}`)}
                     >
-                      {isEliteMatch && <div className="elite-badge">✨ 최고 매칭</div>}
+                      {isEliteMatch && <div className="elite-badge">✨ 최적 매칭</div>}
                       <div className={`ai-score-badge ${isEliteMatch ? 'elite' : isTopMatch ? 'high' : ''}`}>
                         정확도 {accuracy.toFixed(0)}%
                       </div>
                       <div className="part-info">
                         <h4>{result.part.name}</h4>
                         <p className="manufacturer">{result.part.manufacturer} · {result.part.model}</p>
-                        <p className="price">{result.part.price?.toLocaleString()}원</p>
+                        <p className={`price ${isEliteMatch ? 'price-elite' : isTopMatch ? 'price-high' : ''}`}>
+                          {result.part.price?.toLocaleString()}원
+                        </p>
                         <p className="ai-reason">{result.reason}</p>
                       </div>
                     </div>
@@ -1672,16 +1674,28 @@ export default function BuyerSearch() {
 
         .elite-badge {
           position: absolute;
-          top: -14px;
-          left: 12px;
+          top: -16px;
+          left: 50%;
+          transform: translateX(-50%);
           background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
           color: white;
-          padding: 0.4rem 0.75rem;
-          border-radius: 8px;
-          font-size: 0.75rem;
-          font-weight: 700;
-          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+          padding: 0.5rem 1.25rem;
+          border-radius: 12px;
+          font-size: 0.875rem;
+          font-weight: 800;
+          box-shadow: 0 6px 16px rgba(245, 158, 11, 0.5);
           letter-spacing: 0.5px;
+          z-index: 10;
+          animation: badgeFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes badgeFloat {
+          0%, 100% {
+            transform: translateX(-50%) translateY(0);
+          }
+          50% {
+            transform: translateX(-50%) translateY(-3px);
+          }
         }
 
         .ai-score-badge.elite {
@@ -1703,6 +1717,19 @@ export default function BuyerSearch() {
         .ai-score-badge.high {
           background: linear-gradient(135deg, #10b981 0%, #059669 100%);
           box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        /* 엘리트/상위 매칭 가격 색상 */
+        .part-card-ai .price-elite {
+          color: #d97706;
+          font-weight: 800;
+          text-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+        }
+
+        .part-card-ai .price-high {
+          color: #059669;
+          font-weight: 800;
+          text-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
         }
 
         /* 오른쪽 예시 사이드바 (축소) */

@@ -113,14 +113,14 @@ async function enrichWithAI(
     if (!part) return null;
 
     // Generate explanation using Claude
-    const prompt = `사용자가 "${query}"를 검색했습니다.
-다음 부품이 매칭되었습니다:
+    const prompt = `다음 부품이 "${query}" 검색 니즈에 적합한 이유를 한 문장으로 간단히 설명해주세요:
+
 - 부품명: ${part.name}
 - 카테고리: ${part.category}
 - 제조사: ${part.manufacturer}
 - 설명: ${part.description}
 
-이 부품이 사용자의 니즈에 맞는 이유를 한 문장으로 간단히 설명해주세요.`;
+설명에는 검색어를 언급하지 말고, 부품의 특징과 적합한 이유만 간결하게 작성해주세요.`;
 
     try {
       const explanation = await callClaude([{ role: 'user', content: prompt }], undefined, 150);
