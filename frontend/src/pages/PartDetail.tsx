@@ -68,7 +68,7 @@ const convertMockPartToPart = (mockPart: any): Part => {
 export default function PartDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
   const [selectedImage, setSelectedImage] = useState(0);
   const [showContactModal, setShowContactModal] = useState(false);
   const [contactTab, setContactTab] = useState<'inquiry' | 'proposal'>('inquiry'); // 탭 상태
@@ -234,12 +234,6 @@ https://eecar.com`;
   };
 
   const handleProposal = () => {
-    if (!isAuthenticated) {
-      alert('로그인이 필요한 서비스입니다.');
-      navigate('/login');
-      return;
-    }
-
     if (!proposalData.priceOffer) {
       alert('제안 가격을 입력해주세요.');
       return;

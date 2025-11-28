@@ -673,12 +673,12 @@ export default function BuyerSearch() {
           {/* AI 검색 로딩 */}
           {isSearching && (
             <div className="ai-search-loading">
-              <div className="loading-spinner">
-                <div className="spinner-ring"></div>
-                <div className="spinner-ring"></div>
-                <div className="spinner-ring"></div>
-              </div>
               <div className="loading-text-container">
+                <div className="loading-spinner">
+                  <div className="spinner-ring"></div>
+                  <div className="spinner-ring"></div>
+                  <div className="spinner-ring"></div>
+                </div>
                 <h3>AI 검색 중</h3>
                 <p className="loading-step">벡터 임베딩 생성 중...</p>
                 <p className="loading-step">유사도 분석 중...</p>
@@ -694,7 +694,7 @@ export default function BuyerSearch() {
                 <h2>
                   {searchMode === 'battery' ? '배터리 SOH 검색 결과' :
                    searchMode === 'material' ? '재질 물성 검색 결과' :
-                   'AI 검색 결과'} ({currentData.count}개)
+                   'AI 검색 결과'}
                 </h2>
                 {currentData.cached && <span className="cached-badge">⚡ 캐시됨</span>}
               </div>
@@ -704,14 +704,14 @@ export default function BuyerSearch() {
                   const accuracy = result.score * 100;
                   const isTopMatch = accuracy >= 80;
                   const isEliteMatch = index < 3 && accuracy >= 85;
+                  const isTopResult = index === 0;
 
                   return (
                     <div
                       key={result.partId}
-                      className={`part-card-ai ${isEliteMatch ? 'elite-match' : isTopMatch ? 'top-match' : ''}`}
+                      className={`part-card-ai ${isEliteMatch ? 'elite-match' : isTopMatch ? 'top-match' : ''} ${isTopResult ? 'top-result-float' : ''}`}
                       onClick={() => navigate(`/parts/${result.partId}`)}
                     >
-                      {isEliteMatch && <div className="elite-badge">✨ 최적 매칭</div>}
                       <div className={`ai-score-badge ${isEliteMatch ? 'elite' : isTopMatch ? 'high' : ''}`}>
                         정확도 {accuracy.toFixed(0)}%
                       </div>
@@ -1552,18 +1552,36 @@ export default function BuyerSearch() {
 
         /* AI 검색 로딩 애니메이션 */
         .ai-search-loading {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.7);
+          backdrop-filter: blur(8px);
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 4rem 2rem;
           gap: 2rem;
+          z-index: 1000;
+          animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
 
         .loading-spinner {
           position: relative;
-          width: 100px;
-          height: 100px;
+          width: 80px;
+          height: 80px;
+          margin: 0 auto 1.5rem auto;
         }
 
         .spinner-ring {
@@ -1610,11 +1628,15 @@ export default function BuyerSearch() {
 
         .loading-text-container {
           text-align: center;
+          background: white;
+          padding: 2rem 3rem;
+          border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
         .loading-text-container h3 {
-          margin: 0 0 1rem 0;
-          font-size: 1.5rem;
+          margin: 0 0 1.5rem 0;
+          font-size: 1.75rem;
           font-weight: 700;
           background: linear-gradient(135deg, #0055f4, #0080ff);
           -webkit-background-clip: text;
@@ -1672,29 +1694,17 @@ export default function BuyerSearch() {
           }
         }
 
-        .elite-badge {
-          position: absolute;
-          top: -16px;
-          left: 50%;
-          transform: translateX(-50%);
-          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-          color: white;
-          padding: 0.5rem 1.25rem;
-          border-radius: 12px;
-          font-size: 0.875rem;
-          font-weight: 800;
-          box-shadow: 0 6px 16px rgba(245, 158, 11, 0.5);
-          letter-spacing: 0.5px;
-          z-index: 10;
-          animation: badgeFloat 3s ease-in-out infinite;
+        /* Top result floating animation */
+        .part-card-ai.top-result-float {
+          animation: cardFloat 3s ease-in-out infinite;
         }
 
-        @keyframes badgeFloat {
+        @keyframes cardFloat {
           0%, 100% {
-            transform: translateX(-50%) translateY(0);
+            transform: translateY(0);
           }
           50% {
-            transform: translateX(-50%) translateY(-3px);
+            transform: translateY(-4px);
           }
         }
 
