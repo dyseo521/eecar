@@ -65,7 +65,12 @@ async function listParts(params: any, event: APIGatewayProxyEvent): Promise<APIG
     parts = await queryGSI1(`CATEGORY#${category}`, 'CREATED_AT#', parseInt(limit));
   } else {
     // Scan for all METADATA records (no category filter)
-    parts = await scanTable('SK = :sk', { ':sk': 'METADATA' }, parseInt(limit));
+    // Note: DynamoDB Scan Limit is the number of items scanned (before filtering),
+    // not the number of results returned. Since each part has ~4-5 items
+    // (METADATA, SPEC, VECTOR, USAGE#), we need to scan 4-5x more items.
+    // limit * 5 ensures we get enough METADATA records.
+    const scanLimit = parseInt(limit) * 5;
+    parts = await scanTable('SK = :sk', { ':sk': 'METADATA' }, scanLimit);
   }
 
   // Filter to only metadata records and format
