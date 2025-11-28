@@ -102,7 +102,7 @@ export default function BuyerSearch() {
   const [watchKeywords, setWatchKeywords] = useState<string>('');
 
   // AI 검색
-  const { data, error } = useQuery({
+  const { data, error, isLoading: isSearching } = useQuery({
     queryKey: ['search', searchParams],
     queryFn: async () => {
       if (!searchParams) return null;
@@ -670,8 +670,25 @@ export default function BuyerSearch() {
             </div>
           )}
 
+          {/* AI 검색 로딩 */}
+          {isSearching && (
+            <div className="ai-search-loading">
+              <div className="loading-spinner">
+                <div className="spinner-ring"></div>
+                <div className="spinner-ring"></div>
+                <div className="spinner-ring"></div>
+              </div>
+              <div className="loading-text-container">
+                <h3>AI 검색 중</h3>
+                <p className="loading-step">벡터 임베딩 생성 중...</p>
+                <p className="loading-step">유사도 분석 중...</p>
+                <p className="loading-step">최적 매칭 부품 선정 중...</p>
+              </div>
+            </div>
+          )}
+
           {/* 고급 검색 결과 */}
-          {currentData && (
+          {currentData && !isSearching && (
             <section className="ai-results">
               <div className="results-header">
                 <h2>
@@ -683,23 +700,30 @@ export default function BuyerSearch() {
               </div>
 
               <div className="parts-grid">
-                {currentData.results.map((result) => (
-                  <div
-                    key={result.partId}
-                    className="part-card-ai"
-                    onClick={() => navigate(`/parts/${result.partId}`)}
-                  >
-                    <div className="ai-score-badge">
-                      정확도 {Math.min(100, result.score).toFixed(0)}%
+                {currentData.results.map((result, index) => {
+                  const accuracy = result.score * 100;
+                  const isTopMatch = accuracy >= 80;
+                  const isEliteMatch = index < 3 && accuracy >= 85;
+
+                  return (
+                    <div
+                      key={result.partId}
+                      className={`part-card-ai ${isEliteMatch ? 'elite-match' : isTopMatch ? 'top-match' : ''}`}
+                      onClick={() => navigate(`/parts/${result.partId}`)}
+                    >
+                      {isEliteMatch && <div className="elite-badge">✨ 최고 매칭</div>}
+                      <div className={`ai-score-badge ${isEliteMatch ? 'elite' : isTopMatch ? 'high' : ''}`}>
+                        정확도 {accuracy.toFixed(0)}%
+                      </div>
+                      <div className="part-info">
+                        <h4>{result.part.name}</h4>
+                        <p className="manufacturer">{result.part.manufacturer} · {result.part.model}</p>
+                        <p className="price">{result.part.price?.toLocaleString()}원</p>
+                        <p className="ai-reason">{result.reason}</p>
+                      </div>
                     </div>
-                    <div className="part-info">
-                      <h4>{result.part.name}</h4>
-                      <p className="manufacturer">{result.part.manufacturer} · {result.part.model}</p>
-                      <p className="price">{result.part.price?.toLocaleString()}원</p>
-                      <p className="ai-reason">{result.reason}</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </section>
           )}
@@ -1522,6 +1546,163 @@ export default function BuyerSearch() {
           color: #374151;
           font-size: 0.875rem;
           line-height: 1.5;
+        }
+
+        /* AI 검색 로딩 애니메이션 */
+        .ai-search-loading {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 4rem 2rem;
+          gap: 2rem;
+        }
+
+        .loading-spinner {
+          position: relative;
+          width: 100px;
+          height: 100px;
+        }
+
+        .spinner-ring {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border: 4px solid transparent;
+          border-top-color: #0055f4;
+          border-radius: 50%;
+          animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        }
+
+        .spinner-ring:nth-child(1) {
+          animation-delay: -0.45s;
+          border-top-color: #0055f4;
+        }
+
+        .spinner-ring:nth-child(2) {
+          animation-delay: -0.3s;
+          border-top-color: #0080ff;
+          width: 80%;
+          height: 80%;
+          top: 10%;
+          left: 10%;
+        }
+
+        .spinner-ring:nth-child(3) {
+          animation-delay: -0.15s;
+          border-top-color: #00aaff;
+          width: 60%;
+          height: 60%;
+          top: 20%;
+          left: 20%;
+        }
+
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
+        .loading-text-container {
+          text-align: center;
+        }
+
+        .loading-text-container h3 {
+          margin: 0 0 1rem 0;
+          font-size: 1.5rem;
+          font-weight: 700;
+          background: linear-gradient(135deg, #0055f4, #0080ff);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .loading-step {
+          margin: 0.5rem 0;
+          color: #6b7280;
+          font-size: 0.875rem;
+          animation: fadeInOut 2s ease-in-out infinite;
+        }
+
+        .loading-step:nth-child(2) {
+          animation-delay: 0.3s;
+        }
+
+        .loading-step:nth-child(3) {
+          animation-delay: 0.6s;
+        }
+
+        .loading-step:nth-child(4) {
+          animation-delay: 0.9s;
+        }
+
+        @keyframes fadeInOut {
+          0%, 100% {
+            opacity: 0.3;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+
+        /* 엘리트 매칭 (상위 3개, 85%+) */
+        .part-card-ai.elite-match {
+          border: 2px solid #f59e0b;
+          background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+          box-shadow: 0 8px 16px rgba(245, 158, 11, 0.2);
+          animation: elitePulse 2s ease-in-out infinite;
+        }
+
+        .part-card-ai.elite-match:hover {
+          transform: translateY(-6px) scale(1.01);
+          box-shadow: 0 16px 32px rgba(245, 158, 11, 0.3);
+        }
+
+        @keyframes elitePulse {
+          0%, 100% {
+            box-shadow: 0 8px 16px rgba(245, 158, 11, 0.2);
+          }
+          50% {
+            box-shadow: 0 12px 24px rgba(245, 158, 11, 0.35);
+          }
+        }
+
+        .elite-badge {
+          position: absolute;
+          top: -14px;
+          left: 12px;
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          color: white;
+          padding: 0.4rem 0.75rem;
+          border-radius: 8px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+          letter-spacing: 0.5px;
+        }
+
+        .ai-score-badge.elite {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+          transform: scale(1.1);
+        }
+
+        /* 상위 매칭 (80%+) */
+        .part-card-ai.top-match {
+          border-color: #10b981;
+          background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        }
+
+        .part-card-ai.top-match:hover {
+          box-shadow: 0 12px 24px rgba(16, 185, 129, 0.2);
+        }
+
+        .ai-score-badge.high {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
         }
 
         /* 오른쪽 예시 사이드바 (축소) */

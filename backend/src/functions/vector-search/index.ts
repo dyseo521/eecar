@@ -37,18 +37,21 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     console.log('Generating query embedding...');
     const queryEmbedding = await generateEmbedding(query);
 
-    // Step 3: Load all part vectors from S3
+    // Step 3: Load all part vectors from S3 (parallelized for performance)
     console.log('Loading part vectors...');
     const vectorKeys = await listVectorKeys('parts/');
-    const vectors: Array<{ id: string; vector: number[] }> = [];
 
-    for (const key of vectorKeys) {
+    const vectorPromises = vectorKeys.map(async (key) => {
       const vector = await getVector(key);
       if (vector) {
         const partId = key.split('/')[1].replace('.json', '');
-        vectors.push({ id: partId, vector });
+        return { id: partId, vector };
       }
-    }
+      return null;
+    });
+
+    const vectorResults = await Promise.all(vectorPromises);
+    const vectors = vectorResults.filter((v): v is { id: string; vector: number[] } => v !== null);
 
     console.log(`Loaded ${vectors.length} part vectors`);
 
@@ -104,11 +107,10 @@ async function enrichWithAI(
 ): Promise<any[]> {
   const partsMap = new Map(parts.map(p => [p.PK.split('#')[1], p]));
 
-  const enriched = [];
-
-  for (const match of matches) {
+  // Parallelize Claude calls for better performance
+  const enrichmentPromises = matches.map(async (match) => {
     const part = partsMap.get(match.id);
-    if (!part) continue;
+    if (!part) return null;
 
     // Generate explanation using Claude
     const prompt = `사용자가 "${query}"를 검색했습니다.
@@ -123,7 +125,7 @@ async function enrichWithAI(
     try {
       const explanation = await callClaude([{ role: 'user', content: prompt }], undefined, 150);
 
-      enriched.push({
+      return {
         partId: match.id,
         score: match.score,
         part: {
@@ -136,10 +138,10 @@ async function enrichWithAI(
           images: part.images || [],
         },
         reason: explanation.trim(),
-      });
+      };
     } catch (error) {
       console.error(`Failed to generate explanation for part ${match.id}:`, error);
-      enriched.push({
+      return {
         partId: match.id,
         score: match.score,
         part: {
@@ -152,11 +154,12 @@ async function enrichWithAI(
           images: part.images || [],
         },
         reason: '유사도 기반 매칭',
-      });
+      };
     }
-  }
+  });
 
-  return enriched;
+  const enrichmentResults = await Promise.all(enrichmentPromises);
+  return enrichmentResults.filter((r): r is NonNullable<typeof r> => r !== null);
 }
 
 /**
