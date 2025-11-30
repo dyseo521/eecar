@@ -337,9 +337,9 @@ export default function BuyerSearch() {
     // 기본 모드에서 검색어가 있을 경우 필터링
     if (!isAIMode && query.trim()) {
       const searchTerm = query.toLowerCase();
-      const nameMatch = part.name.toLowerCase().includes(searchTerm);
-      const manufacturerMatch = part.manufacturer.toLowerCase().includes(searchTerm);
-      const modelMatch = part.model.toLowerCase().includes(searchTerm);
+      const nameMatch = (part.name || '').toLowerCase().includes(searchTerm);
+      const manufacturerMatch = (part.manufacturer || '').toLowerCase().includes(searchTerm);
+      const modelMatch = (part.model || '').toLowerCase().includes(searchTerm);
       const textMatch = nameMatch || manufacturerMatch || modelMatch;
       return priceMatch && textMatch;
     }
