@@ -1,0 +1,77 @@
+name: Deploy Frontend to S3 + CloudFront
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - 'shared/**'
+  workflow_dispatch: # Manual trigger
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to AWS S3 + CloudFront
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://${{ secrets.CLOUDFRONT_DISTRIBUTION_DOMAIN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm run install:all
+
+      - name: Build shared types
+        run: cd shared && npm run build
+
+      - name: Build frontend
+        run: npm run build:frontend
+        env:
+          VITE_API_URL: https://6o4futufni.execute-api.ap-northeast-2.amazonaws.com/prod
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Sync to S3 bucket
+        run: |
+          aws s3 sync frontend/dist/ s3://${{ secrets.S3_FRONTEND_BUCKET }}/ \
+            --delete \
+            --cache-control "public, max-age=31536000, immutable" \
+            --exclude "index.html" \
+            --exclude "*.map"
+
+          # index.html with no-cache
+          aws s3 cp frontend/dist/index.html s3://${{ secrets.S3_FRONTEND_BUCKET }}/index.html \
+            --cache-control "public, max-age=0, must-revalidate" \
+            --content-type "text/html"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+      - name: Deployment Summary
+        run: |
+          echo "### Frontend Deployment Summary :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Frontend deployed to S3" >> $GITHUB_STEP_SUMMARY
+          echo "🌐 S3 Bucket: \`${{ secrets.S3_FRONTEND_BUCKET }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "⚡ CloudFront Distribution: \`${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "🔄 Cache invalidated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**URL**: https://${{ secrets.CLOUDFRONT_DISTRIBUTION_DOMAIN }}" >> $GITHUB_STEP_SUMMARY

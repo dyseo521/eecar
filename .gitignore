@@ -52,3 +52,4 @@ CLAUDE.md
 #dev
 .playwright-mcp/
 .claude/
+.github/AWS_OIDC_SETUP.md

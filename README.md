@@ -192,6 +192,106 @@ sam deploy
 - 배포 후 Bedrock 모델 활성화 필수
 - 프론트엔드 `.env` 파일 설정 필요
 
+## CI/CD 파이프라인
+
+EECAR는 GitHub Actions를 활용한 완전 자동화된 CI/CD 파이프라인을 지원합니다.
+
+### 워크플로우 개요
+
+#### 1. **Test and Lint** (`test-and-lint.yml`)
+- **트리거**: PR 생성, main/develop 브랜치 Push
+- **역할**: 코드 품질 자동 검증
+- **실행 내용**:
+  - TypeScript 타입 체크 (Frontend, Backend)
+  - ESLint 실행
+  - Jest 테스트 실행
+  - 빌드 검증
+
+#### 2. **Build Frontend** (`build-frontend.yml`)
+- **트리거**: PR 생성, main/develop 브랜치 Push (frontend/** 또는 shared/** 변경 시)
+- **역할**: 프론트엔드 빌드 검증
+- **실행 내용**:
+  - Shared 타입 빌드
+  - Frontend 빌드
+  - Artifact 업로드 (7일 보관)
+
+#### 3. **Deploy Frontend** (`deploy-frontend.yml`)
+- **트리거**: main 브랜치 Push
+- **역할**: S3 + CloudFront 자동 배포
+- **실행 내용**:
+  - 프론트엔드 빌드
+  - S3 버킷 동기화
+  - CloudFront 캐시 무효화
+  - 배포 완료 알림
+
+#### 4. **Deploy Backend** (`deploy-backend.yml`)
+- **트리거**: Release 태그 생성 (`v*.*.*`)
+- **역할**: Lambda 함수 자동 배포
+- **실행 내용**:
+  - Shared + Backend 빌드
+  - SAM 빌드 및 배포
+  - CloudFormation 스택 업데이트
+  - API Gateway 엔드포인트 출력
+
+### 배포 워크플로우
+
+#### 일반 개발 프로세스
+```bash
+# 1. Feature 브랜치에서 작업
+git checkout -b feature/new-feature
+
+# 2. 코드 작성 및 커밋
+git add .
+git commit -m "feat: Add new feature"
+
+# 3. PR 생성
+git push origin feature/new-feature
+# → GitHub에서 PR 생성
+# → test-and-lint.yml 자동 실행
+
+# 4. Main에 Merge
+# → deploy-frontend.yml 자동 실행 (프론트엔드 배포)
+```
+
+#### 프로덕션 릴리스
+```bash
+# 1. Main 브랜치에서 릴리스 태그 생성
+git checkout main
+git pull origin main
+
+# 2. 버전 태그 생성
+git tag v1.0.0
+git push origin v1.0.0
+
+# 3. 자동 배포 시작
+# → deploy-backend.yml 자동 실행
+# → Lambda 함수 업데이트
+# → API Gateway 엔드포인트 갱신
+```
+
+### AWS OIDC 설정
+
+CI/CD 파이프라인은 AWS OIDC (OpenID Connect)를 사용하여 보안을 강화합니다.
+
+**설정 가이드**: [`.github/AWS_OIDC_SETUP.md`](.github/AWS_OIDC_SETUP.md)
+
+**필수 GitHub Secrets**:
+```
+AWS_ROLE_ARN                    # IAM Role ARN (OIDC)
+AWS_REGION                      # ap-northeast-2
+S3_FRONTEND_BUCKET              # S3 버킷 이름
+CLOUDFRONT_DISTRIBUTION_ID      # CloudFront Distribution ID
+CLOUDFRONT_DISTRIBUTION_DOMAIN  # CloudFront 도메인
+```
+
+### 주요 이점
+
+- ✅ **자동화된 테스트**: PR마다 자동으로 품질 검증
+- ✅ **빠른 배포**: main 브랜치 merge 시 즉시 프론트엔드 배포
+- ✅ **안전한 릴리스**: 태그 기반으로 백엔드 배포 제어
+- ✅ **보안 강화**: OIDC 사용으로 AWS 키 관리 불필요
+- ✅ **가시성**: GitHub Actions UI에서 배포 상태 실시간 확인
+
 ### 정적 호스팅 (백엔드 불필요)
 
 프론트엔드만으로 완전한 기능 테스트가 가능합니다. 백엔드 없이도 35개 부품 데이터로 플랫폼의 모든 UI/UX를 체험할 수 있습니다.

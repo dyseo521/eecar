@@ -1,0 +1,98 @@
+name: Deploy Backend (AWS SAM)
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # Trigger on version tags (e.g., v1.0.0, v1.2.3)
+  workflow_dispatch: # Manual trigger
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy Lambda Functions via SAM
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Setup Python (for SAM CLI)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install AWS SAM CLI
+        run: |
+          pip install aws-sam-cli
+
+      - name: Verify SAM installation
+        run: sam --version
+
+      - name: Install dependencies
+        run: npm run install:all
+
+      - name: Build shared types
+        run: cd shared && npm run build
+
+      - name: Build backend
+        run: cd backend && npm run build:all
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: SAM Build
+        run: |
+          cd infrastructure
+          sam build --use-container
+
+      - name: SAM Deploy
+        run: |
+          cd infrastructure
+          sam deploy \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --stack-name eecar-stack \
+            --capabilities CAPABILITY_IAM \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Get API Gateway URL
+        id: api-url
+        run: |
+          API_URL=$(aws cloudformation describe-stacks \
+            --stack-name eecar-stack \
+            --region ${{ secrets.AWS_REGION }} \
+            --query 'Stacks[0].Outputs[?OutputKey==`ApiEndpoint`].OutputValue' \
+            --output text)
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+
+      - name: Deployment Summary
+        run: |
+          echo "### Backend Deployment Summary :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Lambda functions deployed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "📦 Stack: \`eecar-stack\`" >> $GITHUB_STEP_SUMMARY
+          echo "🌍 Region: \`${{ secrets.AWS_REGION }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 API Gateway URL: \`${{ steps.api-url.outputs.api_url }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "🎉 Backend deployment completed successfully!"
+          echo "Version: ${{ github.ref_name }}"
+          echo "API Endpoint: ${{ steps.api-url.outputs.api_url }}"

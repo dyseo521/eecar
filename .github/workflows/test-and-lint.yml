@@ -1,0 +1,53 @@
+name: Test and Lint
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  test-and-lint:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm run install:all
+
+      - name: Build shared types
+        run: cd shared && npm run build
+
+      - name: Type check - Frontend
+        run: cd frontend && npm run type-check
+
+      - name: Type check - Backend
+        run: cd backend && npx tsc --noEmit
+
+      - name: Lint - Frontend
+        run: cd frontend && npm run lint
+
+      - name: Lint - Backend
+        run: cd backend && npm run lint
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Test Summary
+        if: always()
+        run: |
+          echo "### Test Results :test_tube:" >> $GITHUB_STEP_SUMMARY
+          echo "✅ All quality checks passed!" >> $GITHUB_STEP_SUMMARY

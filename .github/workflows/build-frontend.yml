@@ -1,0 +1,54 @@
+name: Build Frontend
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'frontend/**'
+      - 'shared/**'
+      - '.github/workflows/build-frontend.yml'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'frontend/**'
+      - 'shared/**'
+
+jobs:
+  build:
+    name: Build Frontend Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm run install:all
+
+      - name: Build shared types
+        run: cd shared && npm run build
+
+      - name: Build frontend
+        run: npm run build:frontend
+        env:
+          VITE_API_URL: https://6o4futufni.execute-api.ap-northeast-2.amazonaws.com/prod
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist/
+          retention-days: 7
+
+      - name: Build Summary
+        run: |
+          echo "### Frontend Build Summary :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Frontend built successfully" >> $GITHUB_STEP_SUMMARY
+          echo "📦 Artifact uploaded: \`frontend-dist\`" >> $GITHUB_STEP_SUMMARY
+          echo "⏱️ Retention: 7 days" >> $GITHUB_STEP_SUMMARY
