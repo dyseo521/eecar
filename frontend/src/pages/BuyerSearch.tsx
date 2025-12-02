@@ -739,7 +739,23 @@ export default function BuyerSearch() {
               </div>
 
               {isPartsLoading ? (
-                <div className="loading-message">부품 목록을 불러오는 중...</div>
+                <div className="parts-grid">
+                  {[...Array(6)].map((_, index) => (
+                    <div key={index} className="part-card-skeleton">
+                      <div className="skeleton-image"></div>
+                      <div className="skeleton-info">
+                        <div className="skeleton-line skeleton-title"></div>
+                        <div className="skeleton-line skeleton-manufacturer"></div>
+                        <div className="skeleton-line skeleton-price"></div>
+                        <div className="skeleton-tags">
+                          <div className="skeleton-tag"></div>
+                          <div className="skeleton-tag"></div>
+                          <div className="skeleton-tag"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               ) : filteredParts.length === 0 ? (
                 <div className="empty-message">
                   <p>등록된 부품이 없습니다.</p>
@@ -2307,6 +2323,89 @@ export default function BuyerSearch() {
           border-color: #9ca3af;
           transform: translateY(-1px);
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 스켈레톤 UI */
+        .part-card-skeleton {
+          background: white;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .skeleton-image {
+          width: 100%;
+          height: 200px;
+          background: linear-gradient(
+            90deg,
+            #f0f0f0 25%,
+            #e0e0e0 50%,
+            #f0f0f0 75%
+          );
+          background-size: 200% 100%;
+          animation: shimmer 1.5s infinite;
+        }
+
+        .skeleton-info {
+          padding: 1rem;
+        }
+
+        .skeleton-line {
+          height: 16px;
+          background: linear-gradient(
+            90deg,
+            #f0f0f0 25%,
+            #e0e0e0 50%,
+            #f0f0f0 75%
+          );
+          background-size: 200% 100%;
+          border-radius: 4px;
+          margin-bottom: 0.75rem;
+          animation: shimmer 1.5s infinite;
+        }
+
+        .skeleton-title {
+          width: 80%;
+          height: 20px;
+        }
+
+        .skeleton-manufacturer {
+          width: 60%;
+          height: 14px;
+        }
+
+        .skeleton-price {
+          width: 40%;
+          height: 18px;
+        }
+
+        .skeleton-tags {
+          display: flex;
+          gap: 0.5rem;
+          margin-top: 0.5rem;
+        }
+
+        .skeleton-tag {
+          width: 60px;
+          height: 24px;
+          background: linear-gradient(
+            90deg,
+            #f0f0f0 25%,
+            #e0e0e0 50%,
+            #f0f0f0 75%
+          );
+          background-size: 200% 100%;
+          border-radius: 12px;
+          animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+          0% {
+            background-position: -200% 0;
+          }
+          100% {
+            background-position: 200% 0;
+          }
         }
       `}</style>
     </div>
