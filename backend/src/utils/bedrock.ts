@@ -1,9 +1,12 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 
-const bedrockClient = new BedrockRuntimeClient({ region: 'us-east-1' });
+// Bedrock 서울 리전 사용 (2024년 10월부터 지원)
+const bedrockClient = new BedrockRuntimeClient({
+  region: 'ap-northeast-2'  
+});
 
 const MODEL_ID = process.env.BEDROCK_MODEL_ID || 'anthropic.claude-3-haiku-20240307-v1:0';
-const EMBEDDING_MODEL_ID = 'amazon.titan-embed-text-v1';
+const EMBEDDING_MODEL_ID = 'amazon.titan-embed-text-v2:0';  // Titan Embeddings G2 (서울 지원)
 
 interface ClaudeMessage {
   role: 'user' | 'assistant';
