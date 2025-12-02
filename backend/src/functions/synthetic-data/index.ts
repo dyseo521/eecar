@@ -201,7 +201,7 @@ async function savePart(partData: any): Promise<string> {
     PK: `PART#${partId}`,
     SK: 'VECTOR',
     s3Key: vectorKey,
-    embeddingModel: 'amazon.titan-embed-text-v1',
+    embeddingModel: 'amazon.titan-embed-text-v2:0',
     dimension: embedding.length,
     createdAt: timestamp,
   });
