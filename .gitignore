@@ -46,6 +46,8 @@ coverage/
 tmp/
 temp/
 
+data/
+
 # Project documentation
 CLAUDE.md
 회의자료.md

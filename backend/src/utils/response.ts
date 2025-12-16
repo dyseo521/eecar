@@ -9,6 +9,7 @@ const ALLOWED_ORIGINS = [
   'http://localhost:3002',
   'http://localhost:3003',
   'http://dyseo521-eecar-demo-web-service-12234628.s3-website.ap-northeast-2.amazonaws.com',
+  'https://d1kv6iduk9u0pi.cloudfront.net',
   // Add your CloudFront or custom domain here when deployed
 ];
 

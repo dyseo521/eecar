@@ -61,7 +61,7 @@ Resources:
               Action:
                 - bedrock:InvokeModel
                 - bedrock:InvokeModelWithResponseStream
-              Resource: 'arn:aws:bedrock:us-east-1::foundation-model/*'
+              Resource: 'arn:aws:bedrock:ap-northeast-2::foundation-model/*'
       Events:
         Search:
           Type: Api
@@ -90,7 +90,7 @@ Resources:
               Action:
                 - bedrock:InvokeModel
                 - bedrock:InvokeModelWithResponseStream
-              Resource: 'arn:aws:bedrock:us-east-1::foundation-model/*'
+              Resource: 'arn:aws:bedrock:ap-northeast-2::foundation-model/*'
             - Effect: Allow
               Action:
                 - lambda:InvokeFunction
@@ -124,7 +124,7 @@ Resources:
               Action:
                 - bedrock:InvokeModel
                 - bedrock:InvokeModelWithResponseStream
-              Resource: 'arn:aws:bedrock:us-east-1::foundation-model/*'
+              Resource: 'arn:aws:bedrock:ap-northeast-2::foundation-model/*'
 
   GetPartsFunction:
     Type: AWS::Serverless::Function
@@ -219,7 +219,7 @@ Resources:
               Action:
                 - bedrock:InvokeModel
                 - bedrock:InvokeModelWithResponseStream
-              Resource: 'arn:aws:bedrock:us-east-1::foundation-model/*'
+              Resource: 'arn:aws:bedrock:ap-northeast-2::foundation-model/*'
       Events:
         GenerateData:
           Type: Api
