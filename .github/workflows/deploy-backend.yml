@@ -75,7 +75,7 @@ jobs:
       - name: SAM Build
         run: |
           cd infrastructure
-          sam build --use-container
+          sam build
 
       - name: SAM Deploy
         run: |
