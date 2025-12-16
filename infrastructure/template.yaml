@@ -288,6 +288,35 @@ Resources:
             Path: /api/contact
             Method: POST
 
+  SlackNotificationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/dist/functions/slack-notification/
+      Handler: index.handler
+      Description: Send Lambda errors to Slack via CloudWatch Logs Subscription
+      MemorySize: 256
+      Timeout: 10
+      Layers:
+        - !Ref EECARUtilsLayer
+      Environment:
+        Variables:
+          SLACK_WEBHOOK_SSM_PARAM: /eecar/slack/webhook-url
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PartsTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/eecar/slack/webhook-url'
+        - Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+
   # DynamoDB Table (Single-table design for cost optimization)
   PartsTable:
     Type: AWS::DynamoDB::Table
@@ -394,6 +423,200 @@ Resources:
     Properties:
       LogGroupName: !Sub '/aws/lambda/${ComplianceCheckFunction}'
       RetentionInDays: 7
+
+  SlackNotificationLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${SlackNotificationFunction}'
+      RetentionInDays: 7
+
+  # Note: Other Log Groups already exist (auto-created by Lambda)
+  # GetParts, WatchPart, Proposal, SyntheticData, BatteryHealth, MaterialProperty, ContactInquiry
+
+  # Lambda Invoke Permissions for CloudWatch Logs (Must be created before Subscription Filters)
+  SlackNotificationInvokePermissionVectorSearch:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SlackNotificationFunction
+      Action: lambda:InvokeFunction
+      Principal: logs.amazonaws.com
+      SourceArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${VectorSearchFunction}:*'
+
+  SlackNotificationInvokePermissionPartRegistration:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SlackNotificationFunction
+      Action: lambda:InvokeFunction
+      Principal: logs.amazonaws.com
+      SourceArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${PartRegistrationFunction}:*'
+
+  SlackNotificationInvokePermissionComplianceCheck:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SlackNotificationFunction
+      Action: lambda:InvokeFunction
+      Principal: logs.amazonaws.com
+      SourceArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ComplianceCheckFunction}:*'
+
+  SlackNotificationInvokePermissionGetParts:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SlackNotificationFunction
+      Action: lambda:InvokeFunction
+      Principal: logs.amazonaws.com
+      SourceArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${GetPartsFunction}:*'
+
+  SlackNotificationInvokePermissionWatchPart:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SlackNotificationFunction
+      Action: lambda:InvokeFunction
+      Principal: logs.amazonaws.com
+      SourceArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${WatchPartFunction}:*'
+
+  SlackNotificationInvokePermissionProposal:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SlackNotificationFunction
+      Action: lambda:InvokeFunction
+      Principal: logs.amazonaws.com
+      SourceArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProposalFunction}:*'
+
+  SlackNotificationInvokePermissionSyntheticData:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SlackNotificationFunction
+      Action: lambda:InvokeFunction
+      Principal: logs.amazonaws.com
+      SourceArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${SyntheticDataFunction}:*'
+
+  SlackNotificationInvokePermissionBatteryHealth:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SlackNotificationFunction
+      Action: lambda:InvokeFunction
+      Principal: logs.amazonaws.com
+      SourceArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${BatteryHealthAssessmentFunction}:*'
+
+  SlackNotificationInvokePermissionMaterialProperty:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SlackNotificationFunction
+      Action: lambda:InvokeFunction
+      Principal: logs.amazonaws.com
+      SourceArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${MaterialPropertySearchFunction}:*'
+
+  SlackNotificationInvokePermissionContactInquiry:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SlackNotificationFunction
+      Action: lambda:InvokeFunction
+      Principal: logs.amazonaws.com
+      SourceArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ContactInquiryFunction}:*'
+
+  # CloudWatch Logs Subscription Filters (Depend on Permissions)
+  VectorSearchLogSubscription:
+    Type: AWS::Logs::SubscriptionFilter
+    DependsOn:
+      - VectorSearchLogGroup
+      - SlackNotificationFunction
+      - SlackNotificationInvokePermissionVectorSearch
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${VectorSearchFunction}'
+      FilterPattern: '?ERROR ?Exception ?Timeout ?"Task timed out"'
+      DestinationArn: !GetAtt SlackNotificationFunction.Arn
+
+  PartRegistrationLogSubscription:
+    Type: AWS::Logs::SubscriptionFilter
+    DependsOn:
+      - PartRegistrationLogGroup
+      - SlackNotificationFunction
+      - SlackNotificationInvokePermissionPartRegistration
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${PartRegistrationFunction}'
+      FilterPattern: '?ERROR ?Exception ?Timeout ?"Task timed out"'
+      DestinationArn: !GetAtt SlackNotificationFunction.Arn
+
+  ComplianceCheckLogSubscription:
+    Type: AWS::Logs::SubscriptionFilter
+    DependsOn:
+      - ComplianceCheckLogGroup
+      - SlackNotificationFunction
+      - SlackNotificationInvokePermissionComplianceCheck
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ComplianceCheckFunction}'
+      FilterPattern: '?ERROR ?Exception ?Timeout ?"Task timed out"'
+      DestinationArn: !GetAtt SlackNotificationFunction.Arn
+
+  GetPartsLogSubscription:
+    Type: AWS::Logs::SubscriptionFilter
+    DependsOn:
+      - SlackNotificationFunction
+      - SlackNotificationInvokePermissionGetParts
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${GetPartsFunction}'
+      FilterPattern: '?ERROR ?Exception ?Timeout ?"Task timed out"'
+      DestinationArn: !GetAtt SlackNotificationFunction.Arn
+
+  WatchPartLogSubscription:
+    Type: AWS::Logs::SubscriptionFilter
+    DependsOn:
+      - SlackNotificationFunction
+      - SlackNotificationInvokePermissionWatchPart
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${WatchPartFunction}'
+      FilterPattern: '?ERROR ?Exception ?Timeout ?"Task timed out"'
+      DestinationArn: !GetAtt SlackNotificationFunction.Arn
+
+  ProposalLogSubscription:
+    Type: AWS::Logs::SubscriptionFilter
+    DependsOn:
+      - SlackNotificationFunction
+      - SlackNotificationInvokePermissionProposal
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ProposalFunction}'
+      FilterPattern: '?ERROR ?Exception ?Timeout ?"Task timed out"'
+      DestinationArn: !GetAtt SlackNotificationFunction.Arn
+
+  SyntheticDataLogSubscription:
+    Type: AWS::Logs::SubscriptionFilter
+    DependsOn:
+      - SlackNotificationFunction
+      - SlackNotificationInvokePermissionSyntheticData
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${SyntheticDataFunction}'
+      FilterPattern: '?ERROR ?Exception ?Timeout ?"Task timed out"'
+      DestinationArn: !GetAtt SlackNotificationFunction.Arn
+
+  BatteryHealthLogSubscription:
+    Type: AWS::Logs::SubscriptionFilter
+    DependsOn:
+      - SlackNotificationFunction
+      - SlackNotificationInvokePermissionBatteryHealth
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${BatteryHealthAssessmentFunction}'
+      FilterPattern: '?ERROR ?Exception ?Timeout ?"Task timed out"'
+      DestinationArn: !GetAtt SlackNotificationFunction.Arn
+
+  MaterialPropertyLogSubscription:
+    Type: AWS::Logs::SubscriptionFilter
+    DependsOn:
+      - SlackNotificationFunction
+      - SlackNotificationInvokePermissionMaterialProperty
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${MaterialPropertySearchFunction}'
+      FilterPattern: '?ERROR ?Exception ?Timeout ?"Task timed out"'
+      DestinationArn: !GetAtt SlackNotificationFunction.Arn
+
+  ContactInquiryLogSubscription:
+    Type: AWS::Logs::SubscriptionFilter
+    DependsOn:
+      - SlackNotificationFunction
+      - SlackNotificationInvokePermissionContactInquiry
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ContactInquiryFunction}'
+      FilterPattern: '?ERROR ?Exception ?Timeout ?"Task timed out"'
+      DestinationArn: !GetAtt SlackNotificationFunction.Arn
 
 Outputs:
   ApiEndpoint:
