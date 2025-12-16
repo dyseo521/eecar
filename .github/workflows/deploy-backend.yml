@@ -21,6 +21,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Notify Slack - Deployment Started
+        run: |
+          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "attachments": [{
+                "color": "warning",
+                "title": "🚀 EECAR Backend 배포 시작",
+                "fields": [
+                  {"title": "배포자", "value": "${{ github.actor }}", "short": true},
+                  {"title": "브랜치/태그", "value": "${{ github.ref_name }}", "short": true},
+                  {"title": "커밋", "value": "`${{ github.sha }}`", "short": false}
+                ],
+                "footer": "GitHub Actions",
+                "ts": '"$(date +%s)"'
+              }]
+            }'
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -90,9 +108,41 @@ jobs:
           echo "**Tag**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
 
-      - name: Notify deployment success
+      - name: Notify Slack - Deployment Success
         if: success()
         run: |
-          echo "🎉 Backend deployment completed successfully!"
-          echo "Version: ${{ github.ref_name }}"
-          echo "API Endpoint: ${{ steps.api-url.outputs.api_url }}"
+          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "attachments": [{
+                "color": "good",
+                "title": "✅ EECAR Backend 배포 완료",
+                "fields": [
+                  {"title": "버전", "value": "${{ github.ref_name }}", "short": true},
+                  {"title": "배포 시간", "value": "'"$(date '+%Y-%m-%d %H:%M:%S KST')"'", "short": true},
+                  {"title": "API 엔드포인트", "value": "${{ steps.api-url.outputs.api_url }}", "short": false}
+                ],
+                "footer": "GitHub Actions",
+                "ts": '"$(date +%s)"'
+              }]
+            }'
+
+      - name: Notify Slack - Deployment Failed
+        if: failure()
+        run: |
+          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "attachments": [{
+                "color": "danger",
+                "title": "❌ EECAR Backend 배포 실패",
+                "fields": [
+                  {"title": "버전", "value": "${{ github.ref_name }}", "short": true},
+                  {"title": "배포자", "value": "${{ github.actor }}", "short": true},
+                  {"title": "에러", "value": "SAM 배포 중 오류 발생", "short": false},
+                  {"title": "Actions 로그", "value": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}", "short": false}
+                ],
+                "footer": "GitHub Actions",
+                "ts": '"$(date +%s)"'
+              }]
+            }'
