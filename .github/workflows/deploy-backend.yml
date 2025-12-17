@@ -85,7 +85,9 @@ jobs:
             --no-fail-on-empty-changeset \
             --stack-name eecar-stack \
             --capabilities CAPABILITY_IAM \
-            --region ${{ secrets.AWS_REGION }}
+            --region ${{ secrets.AWS_REGION }} \
+            --s3-bucket ${{ secrets.SAM_S3_BUCKET }} \
+            --s3-prefix eecar-stack
 
       - name: Get API Gateway URL
         id: api-url
