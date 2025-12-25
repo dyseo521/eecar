@@ -245,6 +245,13 @@ Resources:
                 - bedrock:InvokeModel
                 - bedrock:InvokeModelWithResponseStream
               Resource: 'arn:aws:bedrock:ap-northeast-2::foundation-model/*'
+            # S3 Vectors permissions for synthetic data upload
+            - Effect: Allow
+              Action:
+                - s3vectors:PutVectors
+              Resource:
+                - 'arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628'
+                - 'arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/parts-vectors'
       Events:
         GenerateData:
           Type: Api
