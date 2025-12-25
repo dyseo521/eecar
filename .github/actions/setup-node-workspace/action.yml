@@ -1,0 +1,50 @@
+name: 'Setup Node Workspace'
+description: 'Setup Node.js environment, install dependencies, and build shared types'
+
+inputs:
+  node-version:
+    description: 'Node.js version to use'
+    required: false
+    default: '20.x'
+  skip-shared-build:
+    description: 'Skip building shared types'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'npm'
+
+    - name: Install root dependencies
+      run: npm ci
+      shell: bash
+
+    - name: Install workspace dependencies
+      run: npm run install:all
+      shell: bash
+      continue-on-error: true
+
+    - name: Install frontend dependencies
+      run: cd frontend && npm ci
+      shell: bash
+      continue-on-error: true
+
+    - name: Install backend dependencies
+      run: cd backend && npm ci
+      shell: bash
+      continue-on-error: true
+
+    - name: Install shared dependencies
+      run: cd shared && npm ci
+      shell: bash
+      continue-on-error: true
+
+    - name: Build shared types
+      if: ${{ inputs.skip-shared-build != 'true' }}
+      run: cd shared && npm run build
+      shell: bash

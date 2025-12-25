@@ -1,0 +1,78 @@
+name: 'Slack Notify'
+description: 'Send deployment notification to Slack'
+
+inputs:
+  status:
+    description: 'Deployment status: started | success | failure'
+    required: true
+  environment:
+    description: 'Deployment environment: staging | production'
+    required: true
+  webhook-url:
+    description: 'Slack webhook URL'
+    required: true
+  message:
+    description: 'Custom message to include'
+    required: false
+    default: ''
+  repository:
+    description: 'Repository name'
+    required: false
+    default: ${{ github.repository }}
+  run-id:
+    description: 'GitHub Actions run ID'
+    required: false
+    default: ${{ github.run_id }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Send Slack notification
+      run: |
+        # Set emoji and color based on status
+        case "${{ inputs.status }}" in
+          "success")
+            EMOJI=":white_check_mark:"
+            COLOR="good"
+            STATUS_TEXT="completed successfully"
+            ;;
+          "failure")
+            EMOJI=":x:"
+            COLOR="danger"
+            STATUS_TEXT="failed"
+            ;;
+          "started")
+            EMOJI=":rocket:"
+            COLOR="#439FE0"
+            STATUS_TEXT="started"
+            ;;
+          *)
+            EMOJI=":information_source:"
+            COLOR="#808080"
+            STATUS_TEXT="${{ inputs.status }}"
+            ;;
+        esac
+
+        # Build message
+        TITLE="${EMOJI} [${{ inputs.environment }}] Deployment ${STATUS_TEXT}"
+
+        # Add custom message if provided
+        if [ -n "${{ inputs.message }}" ]; then
+          BODY="${{ inputs.message }}"
+        else
+          BODY="Repository: ${{ inputs.repository }}\nRun: <https://github.com/${{ inputs.repository }}/actions/runs/${{ inputs.run-id }}|View Details>"
+        fi
+
+        # Send to Slack
+        curl -X POST "${{ inputs.webhook-url }}" \
+          -H 'Content-type: application/json' \
+          -d "{
+            \"attachments\": [{
+              \"color\": \"${COLOR}\",
+              \"title\": \"${TITLE}\",
+              \"text\": \"${BODY}\",
+              \"footer\": \"GitHub Actions\",
+              \"ts\": $(date +%s)
+            }]
+          }"
+      shell: bash
