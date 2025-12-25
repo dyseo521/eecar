@@ -1,10 +1,10 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { getItem, queryByPK, queryGSI1, scanTable } from '/opt/nodejs/utils/dynamodb.js';
+import { getItem, queryByPK, queryGSI1WithPagination, scanTableWithPagination } from '/opt/nodejs/utils/dynamodb.js';
 import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
 
 /**
  * Get Parts Lambda Function
- * Retrieve part information by ID or list parts
+ * Retrieve part information by ID or list parts with pagination
  */
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
@@ -15,7 +15,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return await getPartById(pathParameters.id, event);
     }
 
-    // List parts (with filters)
+    // List parts (with pagination and filters)
     return await listParts(queryStringParameters || {}, event);
   } catch (error: any) {
     console.error('Error in get-parts:', error);
@@ -53,28 +53,41 @@ async function getPartById(partId: string, event: APIGatewayProxyEvent): Promise
 }
 
 /**
- * List parts with filters
+ * List parts with pagination and filters
+ * Supports cursor-based pagination for infinite scroll
  */
 async function listParts(params: any, event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  const { category, limit = 50 } = params;
+  const { category, limit = 20, cursor } = params;
+  const parsedLimit = parseInt(limit);
 
-  let parts = [];
-
-  if (category) {
-    // Query by category using GSI
-    parts = await queryGSI1(`CATEGORY#${category}`, 'CREATED_AT#', parseInt(limit));
-  } else {
-    // Scan for all METADATA records (no category filter)
-    // Note: DynamoDB Scan Limit is the number of items scanned (before filtering),
-    // not the number of results returned. Since each part has ~4-5 items
-    // (METADATA, SPEC, VECTOR, USAGE#), we need to scan 4-5x more items.
-    // limit * 5 ensures we get enough METADATA records.
-    const scanLimit = parseInt(limit) * 5;
-    parts = await scanTable('SK = :sk', { ':sk': 'METADATA' }, scanLimit);
+  // Decode cursor if provided
+  let exclusiveStartKey: Record<string, any> | undefined;
+  if (cursor) {
+    try {
+      exclusiveStartKey = JSON.parse(Buffer.from(cursor, 'base64').toString('utf-8'));
+    } catch {
+      return errorResponse('Invalid cursor', undefined, 400, event);
+    }
   }
 
-  // Filter to only metadata records and format
-  const metadata = parts.map(p => {
+  let result;
+
+  if (category) {
+    // Query by category using GSI with pagination (newest first)
+    result = await queryGSI1WithPagination(
+      `CATEGORY#${category}`,
+      'CREATED_AT#',
+      parsedLimit,
+      exclusiveStartKey,
+      false // ScanIndexForward = false for descending order
+    );
+  } else {
+    // Scan for all METADATA records with pagination
+    result = await scanTableWithPagination(parsedLimit, exclusiveStartKey);
+  }
+
+  // Format the response
+  const metadata = result.items.map(p => {
     const { PK, SK, GSI1PK, GSI1SK, ...data } = p;
     return {
       partId: PK.split('#')[1],
@@ -82,8 +95,14 @@ async function listParts(params: any, event: APIGatewayProxyEvent): Promise<APIG
     };
   });
 
+  // Encode next cursor
+  const nextCursor = result.lastKey
+    ? Buffer.from(JSON.stringify(result.lastKey)).toString('base64')
+    : null;
+
   return successResponse({
     parts: metadata,
     count: metadata.length,
+    nextCursor,
   }, 200, event);
 }

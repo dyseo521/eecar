@@ -379,17 +379,32 @@ app.get('/api/parts/:id', async (req, res) => {
 
 app.get('/api/parts', async (req, res) => {
   try {
-    const { category, limit = 20 } = req.query;
+    const { category, limit = 20, cursor } = req.query;
+    const parsedLimit = parseInt(limit);
 
-    let parts = mockParts;
+    let parts = [...mockParts];
 
-    if (category) {
+    // Filter by category if specified
+    if (category && category !== 'all') {
       parts = parts.filter(p => p.category === category);
     }
 
-    parts = parts.slice(0, parseInt(limit));
+    // Sort by createdAt descending (newest first)
+    parts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    res.json({ parts, count: parts.length });
+    // Apply cursor-based pagination
+    const startIdx = cursor ? parseInt(cursor) : 0;
+    const endIdx = startIdx + parsedLimit;
+    const paginatedParts = parts.slice(startIdx, endIdx);
+
+    // Calculate next cursor
+    const nextCursor = endIdx < parts.length ? String(endIdx) : null;
+
+    res.json({
+      parts: paginatedParts,
+      count: paginatedParts.length,
+      nextCursor,
+    });
   } catch (error) {
     console.error('[PARTS ERROR]', error);
     res.status(500).json({ error: 'Failed to list parts', message: error.message });

@@ -142,3 +142,72 @@ export async function scanTable(filterExpression?: string, expressionAttributeVa
   const response = await ddbDocClient.send(command);
   return response.Items as DynamoDBItem[] || [];
 }
+
+export interface PaginatedResult {
+  items: DynamoDBItem[];
+  lastKey: Record<string, any> | null;
+}
+
+/**
+ * Query GSI1 with pagination support
+ * Returns items in descending order (newest first) by default
+ */
+export async function queryGSI1WithPagination(
+  gsi1pk: string,
+  gsi1skPrefix: string,
+  limit: number,
+  exclusiveStartKey?: Record<string, any>,
+  scanIndexForward: boolean = false // false = descending (newest first)
+): Promise<PaginatedResult> {
+  const command = new QueryCommand({
+    TableName: TABLE_NAME,
+    IndexName: 'GSI1',
+    KeyConditionExpression: gsi1skPrefix
+      ? 'GSI1PK = :gsi1pk AND begins_with(GSI1SK, :gsi1sk)'
+      : 'GSI1PK = :gsi1pk',
+    ExpressionAttributeValues: gsi1skPrefix
+      ? { ':gsi1pk': gsi1pk, ':gsi1sk': gsi1skPrefix }
+      : { ':gsi1pk': gsi1pk },
+    Limit: limit,
+    ScanIndexForward: scanIndexForward,
+    ...(exclusiveStartKey && { ExclusiveStartKey: exclusiveStartKey }),
+  });
+
+  const response = await ddbDocClient.send(command);
+  return {
+    items: response.Items as DynamoDBItem[] || [],
+    lastKey: response.LastEvaluatedKey || null,
+  };
+}
+
+/**
+ * Scan table with pagination support
+ * Returns METADATA items only, sorted by createdAt descending
+ */
+export async function scanTableWithPagination(
+  limit: number,
+  exclusiveStartKey?: Record<string, any>
+): Promise<PaginatedResult> {
+  const command = new ScanCommand({
+    TableName: TABLE_NAME,
+    FilterExpression: 'SK = :sk',
+    ExpressionAttributeValues: { ':sk': 'METADATA' },
+    Limit: limit * 5, // Scan more to account for filtering
+    ...(exclusiveStartKey && { ExclusiveStartKey: exclusiveStartKey }),
+  });
+
+  const response = await ddbDocClient.send(command);
+  const items = response.Items as DynamoDBItem[] || [];
+
+  // Sort by createdAt descending
+  items.sort((a, b) => {
+    const dateA = new Date(a.createdAt || 0).getTime();
+    const dateB = new Date(b.createdAt || 0).getTime();
+    return dateB - dateA;
+  });
+
+  return {
+    items: items.slice(0, limit),
+    lastKey: response.LastEvaluatedKey || null,
+  };
+}
