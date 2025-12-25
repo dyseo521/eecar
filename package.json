@@ -21,6 +21,11 @@
     "build:backend": "cd backend && npm run build",
     "deploy": "cd infrastructure && sam build && sam deploy",
     "test": "npm run test --workspaces",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "test:e2e": "npx playwright test",
+    "test:e2e:ui": "npx playwright test --ui",
+    "test:e2e:headed": "npx playwright test --headed",
     "local:setup": "npm run docker:up && sleep 5 && echo 'Local services ready!'"
   },
   "keywords": [
