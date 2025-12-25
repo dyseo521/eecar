@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import { useInView } from 'react-intersection-observer';
 import type { SearchRequest, SearchResponse, Part, WatchCriteria } from '@shared/index';
 import { mockParts } from '../data/mockParts';
 import { getApiUrl } from '../config';
+import { getRelativeTime } from '../utils/relativeTime';
 
 // 카테고리 매핑 (한글 -> 영문)
 const categoryMap: Record<string, string> = {
@@ -187,49 +189,73 @@ export default function BuyerSearch() {
     enabled: searchMode === 'material' && !!searchParams && (!!alloyNumber || tensileStrengthMin !== '' || recyclabilityMin !== ''),
   });
 
-  // 부품 목록 조회 (카테고리별)
-  const { data: partsData, isLoading: isPartsLoading } = useQuery({
+  // 부품 목록 조회 (무한 스크롤 + 카테고리별)
+  const {
+    data: partsData,
+    isLoading: isPartsLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ['parts', selectedCategory],
-    queryFn: async () => {
+    queryFn: async ({ pageParam }) => {
       try {
-        // 전체 카테고리인 경우 카테고리 필터 없이 모든 부품 조회
-        let url: string;
-        if (selectedCategory !== 'all') {
-          const category = categoryMap[selectedCategory] || selectedCategory;
-          url = getApiUrl(`parts?category=${category}&limit=50`);
-        } else {
-          url = getApiUrl('parts?limit=50');
-        }
+        const category = selectedCategory !== 'all'
+          ? categoryMap[selectedCategory] || selectedCategory
+          : undefined;
 
-        const response = await fetch(url);
+        const params = new URLSearchParams({
+          limit: '20',
+          ...(category && { category }),
+          ...(pageParam && { cursor: pageParam }),
+        });
+
+        const response = await fetch(getApiUrl(`parts?${params}`));
 
         if (!response.ok) {
           throw new Error('부품 목록을 불러오는데 실패했습니다');
         }
 
-        return response.json() as Promise<{ parts: Part[]; count: number }>;
+        return response.json() as Promise<{ parts: Part[]; count: number; nextCursor: string | null }>;
       } catch (error) {
         // API 호출 실패 시 mock 데이터 사용 (정적 호스팅 대응)
         console.log('API 호출 실패, mock 데이터 사용:', error);
 
-        // mockParts를 Part 타입으로 변환
         const convertedParts = mockParts.map(convertMockPartToPart);
-
-        // 카테고리 필터링
         let filteredParts = convertedParts;
         if (selectedCategory !== 'all') {
           const category = categoryMap[selectedCategory] || selectedCategory;
           filteredParts = convertedParts.filter(part => part.category === category);
         }
 
+        // Sort by createdAt descending
+        filteredParts.sort((a, b) =>
+          new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+        );
+
         return {
           parts: filteredParts,
-          count: filteredParts.length
+          count: filteredParts.length,
+          nextCursor: null,
         };
       }
     },
-    enabled: !searchParams, // AI 검색 중이 아닐 때만 실행
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: undefined as string | undefined,
+    enabled: !searchParams,
   });
+
+  // Intersection Observer for infinite scroll
+  const { ref: loadMoreRef, inView } = useInView({ rootMargin: '100px' });
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Flatten all pages into single array
+  const allParts = partsData?.pages.flatMap(page => page.parts) ?? [];
 
   // Watch 생성 mutation
   const createWatchMutation = useMutation({
@@ -329,8 +355,16 @@ export default function BuyerSearch() {
                        searchMode === 'material' ? materialError :
                        error;
 
+  // AI 검색 결과 더보기 상태
+  const [aiDisplayLimit, setAiDisplayLimit] = useState(6);
+
+  // AI 검색 초기화 시 리셋
+  useEffect(() => {
+    setAiDisplayLimit(6);
+  }, [searchParams]);
+
   // 가격 및 검색어 필터링된 부품 목록
-  const filteredParts = partsData?.parts.filter(part => {
+  const filteredParts = allParts.filter(part => {
     // 가격 필터
     const priceMatch = part.price >= priceRange[0] && part.price <= priceRange[1];
 
@@ -345,7 +379,16 @@ export default function BuyerSearch() {
     }
 
     return priceMatch;
-  }) || [];
+  });
+
+  // AI 검색 결과 표시 제한
+  const displayedAiResults = currentData?.results?.slice(0, aiDisplayLimit) || [];
+  const hasMoreAiResults = (currentData?.results?.length || 0) > aiDisplayLimit;
+  const remainingAiCount = (currentData?.results?.length || 0) - aiDisplayLimit;
+
+  const loadMoreAiResults = () => {
+    setAiDisplayLimit(prev => prev + 6);
+  };
 
   const categories = ['all', '배터리', '모터', '인버터', '충전기', '전장 부품', '차체-섀시/프레임', '차체-패널', '차체-도어', '차체-창/유리', '내장재', '기타'];
 
@@ -687,7 +730,7 @@ export default function BuyerSearch() {
             </div>
           )}
 
-          {/* 고급 검색 결과 */}
+          {/* 고급 검색 결과 - 통일된 카드 UI */}
           {currentData && !isSearching && (
             <section className="ai-results">
               <div className="results-header">
@@ -696,49 +739,68 @@ export default function BuyerSearch() {
                    searchMode === 'material' ? '재질 물성 검색 결과' :
                    'AI 검색 결과'}
                 </h2>
-                {currentData.cached && <span className="cached-badge">⚡ 캐시됨</span>}
+                {currentData.cached && <span className="cached-badge">캐시됨</span>}
               </div>
 
               <div className="parts-grid">
-                {currentData.results.map((result, index) => {
+                {displayedAiResults.map((result) => {
                   const accuracy = result.score * 100;
-                  const isTopMatch = accuracy >= 80;
-                  const isEliteMatch = index < 3 && accuracy >= 85;
-                  const isTopResult = index === 0;
+                  const isEliteMatch = accuracy >= 85;
+                  const part = result.part as Part;
 
                   return (
                     <div
                       key={result.partId}
-                      className={`part-card-ai ${isEliteMatch ? 'elite-match' : isTopMatch ? 'top-match' : ''} ${isTopResult ? 'top-result-float' : ''}`}
+                      className={`part-card ${isEliteMatch ? 'elite-match' : ''}`}
                       onClick={() => navigate(`/parts/${result.partId}`)}
                     >
-                      <div className={`ai-score-badge ${isEliteMatch ? 'elite' : isTopMatch ? 'high' : ''}`}>
-                        정확도 {accuracy.toFixed(0)}%
+                      <div className="part-image">
+                        <img
+                          src={getPartImageUrl(part)}
+                          alt={part.name}
+                          onError={(e) => {
+                            const defaultImg = categoryDefaultImages[part.category] || '/image/car_body_1.jpg';
+                            if (e.currentTarget.src !== window.location.origin + defaultImg) {
+                              e.currentTarget.src = defaultImg;
+                            }
+                          }}
+                        />
+                        <div className={`accuracy-badge ${isEliteMatch ? 'elite' : ''}`}>
+                          {accuracy.toFixed(0)}% 일치
+                        </div>
+                        <div className="quantity-badge">{part.quantity}개 재고</div>
                       </div>
                       <div className="part-info">
-                        <h4>{result.part.name}</h4>
-                        <p className="manufacturer">{result.part.manufacturer} · {result.part.model}</p>
-                        <p className={`price ${isEliteMatch ? 'price-elite' : isTopMatch ? 'price-high' : ''}`}>
-                          {result.part.price?.toLocaleString()}원
-                        </p>
-                        <p className="ai-reason">{result.reason}</p>
+                        <h4>{part.name}</h4>
+                        <p className="manufacturer">{part.manufacturer} · {part.model}</p>
+                        <p className="price">{part.price?.toLocaleString()}원</p>
+                        {result.reason && (
+                          <p className="ai-reason-compact">{result.reason}</p>
+                        )}
+                        <div className="spec-tags">
+                          <span className="spec-tag">{part.category}</span>
+                          <span className="year-tag">{part.year}년식</span>
+                        </div>
                       </div>
                     </div>
                   );
                 })}
               </div>
+
+              {/* 더보기 버튼 */}
+              {hasMoreAiResults && (
+                <button className="load-more-btn" onClick={loadMoreAiResults}>
+                  더 많은 결과 보기 ({remainingAiCount}개)
+                </button>
+              )}
             </section>
           )}
 
           {/* 기본 부품 목록 */}
           {!currentData && (
             <>
-              <div className="parts-header">
-                <h2>등록된 부품 ({filteredParts.length}개)</h2>
-                {isPartsLoading && <span className="loading-text">로딩 중...</span>}
-              </div>
-
-              {isPartsLoading ? (
+              {/* 초기 로딩 스켈레톤 */}
+              {isPartsLoading && filteredParts.length === 0 ? (
                 <div className="parts-grid">
                   {[...Array(6)].map((_, index) => (
                     <div key={index} className="part-card-skeleton">
@@ -758,44 +820,69 @@ export default function BuyerSearch() {
                 </div>
               ) : filteredParts.length === 0 ? (
                 <div className="empty-message">
-                  <p>등록된 부품이 없습니다.</p>
-                  <p className="empty-hint">다른 카테고리를 선택해보세요.</p>
+                  <p>검색 결과가 없습니다.</p>
+                  <p className="empty-hint">다른 카테고리를 선택하거나 검색어를 변경해보세요.</p>
                 </div>
               ) : (
-                <div className="parts-grid">
-                  {filteredParts.map((part) => (
-                    <div
-                      key={part.partId}
-                      className="part-card"
-                      onClick={() => navigate(`/parts/${part.partId}`)}
-                    >
-                      <div className="part-image">
-                        <img
-                          src={getPartImageUrl(part)}
-                          alt={part.name}
-                          onError={(e) => {
-                            // 카테고리별 기본 이미지로 재시도
-                            const defaultImg = categoryDefaultImages[part.category] || '/image/car_body_1.jpg';
-                            if (e.currentTarget.src !== window.location.origin + defaultImg) {
-                              e.currentTarget.src = defaultImg;
-                            }
-                          }}
-                        />
-                        <div className="quantity-badge">{part.quantity}개 재고</div>
-                      </div>
-                      <div className="part-info">
-                        <h4>{part.name}</h4>
-                        <p className="manufacturer">{part.manufacturer} · {part.model}</p>
-                        <p className="price">{part.price.toLocaleString()}원</p>
-                        <div className="spec-tags">
-                          <span className="spec-tag">{part.category}</span>
-                          <span className="year-tag">{part.year}년식</span>
-                          <span className="condition-tag">{part.condition}</span>
+                <>
+                  <div className="parts-grid">
+                    {filteredParts.map((part) => (
+                      <div
+                        key={part.partId}
+                        className="part-card"
+                        onClick={() => navigate(`/parts/${part.partId}`)}
+                      >
+                        <div className="part-image">
+                          <img
+                            src={getPartImageUrl(part)}
+                            alt={part.name}
+                            onError={(e) => {
+                              const defaultImg = categoryDefaultImages[part.category] || '/image/car_body_1.jpg';
+                              if (e.currentTarget.src !== window.location.origin + defaultImg) {
+                                e.currentTarget.src = defaultImg;
+                              }
+                            }}
+                          />
+                          {part.createdAt && (
+                            <div className="time-badge">{getRelativeTime(part.createdAt)}</div>
+                          )}
+                          <div className="quantity-badge">{part.quantity}개 재고</div>
+                        </div>
+                        <div className="part-info">
+                          <h4>{part.name}</h4>
+                          <p className="manufacturer">{part.manufacturer} · {part.model}</p>
+                          <p className="price">{part.price.toLocaleString()}원</p>
+                          <div className="spec-tags">
+                            <span className="spec-tag">{part.category}</span>
+                            <span className="year-tag">{part.year}년식</span>
+                            <span className="condition-tag">{part.condition}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+
+                  {/* 무한 스크롤 로딩 트리거 */}
+                  <div ref={loadMoreRef} className="load-more-trigger">
+                    {isFetchingNextPage && (
+                      <div className="parts-grid loading-more">
+                        {[...Array(3)].map((_, index) => (
+                          <div key={index} className="part-card-skeleton">
+                            <div className="skeleton-image"></div>
+                            <div className="skeleton-info">
+                              <div className="skeleton-line skeleton-title"></div>
+                              <div className="skeleton-line skeleton-manufacturer"></div>
+                              <div className="skeleton-line skeleton-price"></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {!hasNextPage && filteredParts.length > 0 && (
+                      <p className="no-more-parts">모든 부품을 불러왔습니다</p>
+                    )}
+                  </div>
+                </>
               )}
             </>
           )}
@@ -1451,6 +1538,92 @@ export default function BuyerSearch() {
           border-radius: 6px;
           font-size: 0.75rem;
           font-weight: 600;
+        }
+
+        /* 상대 시간 배지 */
+        .time-badge {
+          position: absolute;
+          top: 8px;
+          left: 8px;
+          background: rgba(0, 0, 0, 0.7);
+          color: white;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-size: 0.75rem;
+        }
+
+        /* AI 정확도 배지 */
+        .accuracy-badge {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 0.375rem 0.625rem;
+          border-radius: 12px;
+          font-size: 0.8125rem;
+          font-weight: 600;
+        }
+
+        .accuracy-badge.elite {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        /* 엘리트 매치 카드 강조 */
+        .part-card.elite-match {
+          border: 2px solid #f59e0b;
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+        }
+
+        .part-card.elite-match:hover {
+          box-shadow: 0 12px 24px rgba(245, 158, 11, 0.25);
+        }
+
+        /* AI 추천 이유 - 컴팩트 */
+        .ai-reason-compact {
+          margin: 0 0 0.5rem 0;
+          font-size: 0.8125rem;
+          color: #6b7280;
+          line-height: 1.4;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        /* 더보기 버튼 */
+        .load-more-btn {
+          display: block;
+          margin: 1.5rem auto;
+          padding: 0.75rem 2rem;
+          background: #f8f9fa;
+          border: 1px solid #dee2e6;
+          border-radius: 8px;
+          font-size: 0.9375rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .load-more-btn:hover {
+          background: #e9ecef;
+          border-color: #adb5bd;
+        }
+
+        /* 무한 스크롤 트리거 */
+        .load-more-trigger {
+          margin-top: 1rem;
+        }
+
+        .no-more-parts {
+          text-align: center;
+          color: #9ca3af;
+          font-size: 0.875rem;
+          padding: 1rem 0;
+        }
+
+        .loading-more {
+          opacity: 0.7;
         }
 
         .part-card .part-info {
