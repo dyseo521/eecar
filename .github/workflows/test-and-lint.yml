@@ -37,13 +37,6 @@ jobs:
       - name: Type check - Backend
         run: cd backend && npx tsc --noEmit
 
-      # Lint 단계 제거 (ESLint 설정 파일 없음)
-      # - name: Lint - Frontend
-      #   run: cd frontend && npm run lint
-
-      # - name: Lint - Backend
-      #   run: cd backend && npm run lint
-
       # Test 단계 제거 (테스트 파일 없음)
       # - name: Run tests
       #   run: npm run test
