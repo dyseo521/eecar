@@ -56,11 +56,11 @@ async function uploadToS3Vectors(
         key: partId,
         data: { float32: embedding },
         metadata: {
-          name: { stringValue: metadata.name },
-          category: { stringValue: metadata.category },
-          manufacturer: { stringValue: metadata.manufacturer },
-          price: { numberValue: metadata.price },
-          condition: { stringValue: metadata.condition || 'used' }
+          name: metadata.name,
+          category: metadata.category,
+          manufacturer: metadata.manufacturer,
+          price: String(metadata.price),
+          condition: metadata.condition || 'used'
         }
       }]
     });
