@@ -1605,25 +1605,6 @@ export default function BuyerSearch() {
           transform: translateY(-6px);
         }
 
-        /* AI 마크 (스파클 이모지) */
-        .part-card.ai-result::before {
-          content: "✨";
-          position: absolute;
-          top: -10px;
-          left: 12px;
-          background: linear-gradient(135deg, #0055f4, #0080ff);
-          color: white;
-          width: 26px;
-          height: 26px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 13px;
-          box-shadow: 0 3px 10px rgba(0, 85, 244, 0.4);
-          z-index: 10;
-        }
-
         /* 상위 1위 - 최대 강조 */
         .part-card.ai-result.top-1 {
           animation: floatTop 3s ease-in-out infinite;
