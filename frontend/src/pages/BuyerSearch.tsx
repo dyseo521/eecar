@@ -733,25 +733,32 @@ export default function BuyerSearch() {
           {/* 고급 검색 결과 - 통일된 카드 UI */}
           {currentData && !isSearching && (
             <section className="ai-results">
-              <div className="results-header">
-                <h2>
-                  {searchMode === 'battery' ? '배터리 SOH 검색 결과' :
-                   searchMode === 'material' ? '재질 물성 검색 결과' :
-                   'AI 검색 결과'}
-                </h2>
-                {currentData.cached && <span className="cached-badge">캐시됨</span>}
-              </div>
+              {/* 배터리/재질 검색은 헤더 표시, AI 검색은 카드 스타일로만 구분 */}
+              {searchMode !== 'ai' && (
+                <div className="results-header">
+                  <h2>
+                    {searchMode === 'battery' ? '배터리 SOH 검색 결과' :
+                     searchMode === 'material' ? '재질 물성 검색 결과' :
+                     'AI 검색 결과'}
+                  </h2>
+                  {currentData.cached && <span className="cached-badge">캐시됨</span>}
+                </div>
+              )}
 
               <div className="parts-grid">
-                {displayedAiResults.map((result) => {
+                {displayedAiResults.map((result, index) => {
                   const accuracy = result.score * 100;
                   const isEliteMatch = accuracy >= 85;
+                  const isTop1 = index === 0;
+                  const isTop3 = index < 3;
                   const part = result.part as Part;
 
                   return (
                     <div
                       key={result.partId}
-                      className={`part-card ${isEliteMatch ? 'elite-match' : ''}`}
+                      className={`part-card ai-result
+                        ${isEliteMatch ? 'elite-match' : ''}
+                        ${isTop1 ? 'top-1' : isTop3 ? 'top-3' : ''}`}
                       onClick={() => navigate(`/parts/${result.partId}`)}
                     >
                       <div className="part-image">
@@ -1552,32 +1559,128 @@ export default function BuyerSearch() {
           font-size: 0.75rem;
         }
 
-        /* AI 정확도 배지 */
+        /* AI 정확도 배지 - 서비스 블루 */
         .accuracy-badge {
           position: absolute;
           top: 8px;
           right: 8px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #0055f4 0%, #0080ff 100%);
           color: white;
-          padding: 0.375rem 0.625rem;
-          border-radius: 12px;
+          padding: 0.375rem 0.75rem;
+          border-radius: 20px;
           font-size: 0.8125rem;
-          font-weight: 600;
+          font-weight: 700;
+          box-shadow: 0 4px 12px rgba(0, 85, 244, 0.35);
+          z-index: 5;
         }
 
         .accuracy-badge.elite {
-          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+          background: linear-gradient(135deg, #00a2ff 0%, #0055f4 100%);
+          box-shadow: 0 4px 16px rgba(0, 128, 255, 0.5);
+          animation: badgePulse 2s ease-in-out infinite;
         }
 
-        /* 엘리트 매치 카드 강조 */
-        .part-card.elite-match {
-          border: 2px solid #f59e0b;
-          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+        @keyframes badgePulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.08); }
         }
 
-        .part-card.elite-match:hover {
-          box-shadow: 0 12px 24px rgba(245, 158, 11, 0.25);
+        /* ========== AI 검색 결과 카드 스타일 ========== */
+
+        /* AI 검색 결과 카드 - 그라데이션 테두리로 구분 */
+        .part-card.ai-result {
+          position: relative;
+          border: 2px solid transparent;
+          background:
+            linear-gradient(white, white) padding-box,
+            linear-gradient(135deg, rgba(0, 85, 244, 0.3), rgba(0, 162, 255, 0.15)) border-box;
+          transition: all 0.3s ease;
+        }
+
+        .part-card.ai-result:hover {
+          background:
+            linear-gradient(white, white) padding-box,
+            linear-gradient(135deg, #0055f4, #00a2ff) border-box;
+          box-shadow: 0 12px 32px rgba(0, 85, 244, 0.2);
+          transform: translateY(-6px);
+        }
+
+        /* AI 마크 (스파클 이모지) */
+        .part-card.ai-result::before {
+          content: "✨";
+          position: absolute;
+          top: -10px;
+          left: 12px;
+          background: linear-gradient(135deg, #0055f4, #0080ff);
+          color: white;
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          box-shadow: 0 3px 10px rgba(0, 85, 244, 0.4);
+          z-index: 10;
+        }
+
+        /* 상위 1위 - 최대 강조 */
+        .part-card.ai-result.top-1 {
+          animation: floatTop 3s ease-in-out infinite;
+          background:
+            linear-gradient(to bottom, #f0f7ff, white) padding-box,
+            linear-gradient(135deg, #0055f4, #00a2ff, #0055f4) border-box;
+          border-width: 3px;
+          box-shadow: 0 8px 32px rgba(0, 85, 244, 0.25);
+        }
+
+        @keyframes floatTop {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+
+        /* 상위 2-3위 - 미세 플로팅 */
+        .part-card.ai-result.top-3:not(.top-1) {
+          animation: floatSubtle 4s ease-in-out infinite;
+          box-shadow: 0 4px 16px rgba(0, 85, 244, 0.15);
+        }
+
+        @keyframes floatSubtle {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+
+        /* 엘리트 매치 (85%+) - 블루 글로우 */
+        .part-card.ai-result.elite-match {
+          background:
+            linear-gradient(to bottom, #f0f7ff, white) padding-box,
+            linear-gradient(135deg, #0055f4, #00a2ff, #0055f4) border-box;
+          border-width: 3px;
+          animation: eliteGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes eliteGlow {
+          0%, 100% {
+            box-shadow: 0 8px 24px rgba(0, 85, 244, 0.2);
+          }
+          50% {
+            box-shadow: 0 12px 40px rgba(0, 85, 244, 0.35);
+          }
+        }
+
+        /* 호버 시 애니메이션 일시 중지 */
+        .part-card.ai-result:hover {
+          animation-play-state: paused;
+        }
+
+        /* 기존 elite-match (비AI) 호환 */
+        .part-card.elite-match:not(.ai-result) {
+          border: 2px solid #0055f4;
+          box-shadow: 0 4px 12px rgba(0, 85, 244, 0.15);
+        }
+
+        .part-card.elite-match:not(.ai-result):hover {
+          box-shadow: 0 12px 24px rgba(0, 85, 244, 0.25);
         }
 
         /* AI 추천 이유 - 컴팩트 */
