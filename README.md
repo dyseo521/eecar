@@ -9,7 +9,7 @@ EECAR는 1세대 전기차(2010년대 초반)의 수명 종료에 따라 증가�
 ### 프로젝트 통계
 
 - **코드베이스**: 10,000+ LOC
-- **Lambda 함수**: 11개 (서버리스 아키텍처)
+- **Lambda 함수**: 12개 (서버리스 아키텍처)
 - **부품 카테고리**: 11개 (배터리, 모터, 인버터, 차체 부품 등)
 - **로컬 테스트 데이터**: 35개 부품
 - **배포 리전**: AWS ap-northeast-2 (서울)
@@ -47,6 +47,14 @@ EECAR는 1세대 전기차(2010년대 초반)의 수명 종료에 따라 증가�
   - CloudWatch Logs → Lambda → Slack 연동
   - Request ID, 함수명, 에러 메시지 자동 추출
   - 5분 중복 제거 (DynamoDB TTL)
+- **자동이 2.0 AI DevOps 어시스턴트**: Slack 기반 운영 지원 봇
+  - `/자동이 상태` - Lambda 함수 상태/에러율 실시간 조회
+  - `/자동이 분석 <에러>` - AI 기반 에러 원인 분석 및 해결책 제시
+  - `@자동이 멘션` - 자연어 대화로 운영 질문 (ReAct 패턴)
+  - S3 Vectors 장기 기억으로 해결 사례 학습
+- **분산 추적 및 모니터링**: X-Ray + CloudWatch Dashboard
+  - Lambda/API Gateway 전 구간 X-Ray 추적
+  - 통합 CloudWatch Dashboard (에러율, 지연시간, 호출수)
 
 ## 기술 스택
 
@@ -80,6 +88,10 @@ EECAR는 1세대 전기차(2010년대 초반)의 수명 종료에 따라 증가�
 - **SNS**: 알림 시스템 (이메일: inha2025vip@gmail.com)
 - **CloudFront**: CDN (프론트엔드 배포)
 - **CloudWatch Logs**: Lambda 로그 및 에러 모니터링 (7일 보관)
+- **X-Ray**: 분산 추적 (Lambda, API Gateway 전 구간)
+- **CloudWatch Dashboard**: 통합 모니터링 대시보드
+- **S3 Vectors**: 벡터 저장소 (parts-vectors, jadong-memories, eecar-codebase)
+- **Bedrock Knowledge Base**: 코드베이스 RAG 검색 (자동이 2.0용)
 
 ### AI/ML
 - Amazon Bedrock Claude (Haiku for cost optimization)
@@ -114,7 +126,8 @@ eecar/
 │   │   │   ├── material-property-search/   # 재질 물성 검색
 │   │   │   ├── contact-inquiry/            # 일반 문의 처리
 │   │   │   ├── hybrid-search/              # 벡터+재질 복합 검색
-│   │   │   └── slack-notification/         # Lambda 에러 모니터링
+│   │   │   ├── slack-notification/         # Lambda 에러 모니터링 (v1)
+│   │   │   └── slack-agent/                # 자동이 2.0 AI DevOps 어시스턴트
 │   │   ├── utils/       # Lambda Layer 공통 유틸리티
 │   │   │   ├── dynamodb.ts  # DynamoDB CRUD
 │   │   │   ├── s3.ts        # S3 벡터/문서 관리
@@ -464,6 +477,7 @@ curl -X POST https://your-api-url/api/synthetic \
 - `POST /api/material-search` - 재질 물성 검색
 - `POST /api/hybrid-search` - 벡터 + 재질 복합 검색
 - `POST /api/contact` - 일반 문의 (SNS 이메일 발송)
+- `POST /api/slack/events` - Slack 이벤트 (자동이 2.0)
 
 ## 아키텍처
 
