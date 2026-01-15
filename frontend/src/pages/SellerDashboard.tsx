@@ -103,6 +103,17 @@ export default function SellerDashboard() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Cleanup blob URLs on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      imageUrls.forEach(url => {
+        if (url && url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, [imageUrls]);
+
   // 부품 등록 mutation
   const registerPartMutation = useMutation({
     mutationFn: async (partData: any) => {
