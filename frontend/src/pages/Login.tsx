@@ -29,7 +29,11 @@ export default function Login() {
 
   return (
     <div className="login-page">
-      <button className="back-to-home" onClick={() => navigate('/')}>
+      <button
+        className="back-to-home"
+        onClick={() => navigate('/')}
+        aria-label="홈으로 돌아가기"
+      >
         ← 홈으로
       </button>
       <div className="login-container">
@@ -39,7 +43,7 @@ export default function Login() {
           <p className="subtitle">전기차 중고 부품 B2B 거래 플랫폼</p>
 
           {error && (
-            <div className="error-message">
+            <div className="error-message" role="alert" aria-live="assertive">
               {error}
             </div>
           )}
@@ -215,6 +219,18 @@ export default function Login() {
         .submit-button:disabled {
           opacity: 0.6;
           cursor: not-allowed;
+        }
+
+        /* Focus visible for keyboard navigation */
+        .submit-button:focus-visible,
+        .back-to-home:focus-visible {
+          outline: 3px solid #0055f4;
+          outline-offset: 2px;
+        }
+
+        .form-group input:focus-visible {
+          outline: 3px solid #0055f4;
+          outline-offset: 1px;
         }
 
         .link-section {

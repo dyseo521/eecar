@@ -53,7 +53,11 @@ export default function Signup() {
 
   return (
     <div className="signup-page">
-      <button className="back-to-home" onClick={() => navigate('/')}>
+      <button
+        className="back-to-home"
+        onClick={() => navigate('/')}
+        aria-label="홈으로 돌아가기"
+      >
         ← 홈으로
       </button>
       <div className="signup-container">
@@ -63,7 +67,7 @@ export default function Signup() {
           <p className="subtitle">EECAR에 오신 것을 환영합니다</p>
 
           {error && (
-            <div className="error-message">
+            <div className="error-message" role="alert" aria-live="assertive">
               {error}
             </div>
           )}
@@ -119,15 +123,17 @@ export default function Signup() {
 
             <div className="form-group">
               <div className="checkbox-group">
-                <label className="checkbox-label">
+                <label className="checkbox-label" htmlFor="isSeller">
                   <input
+                    id="isSeller"
                     type="checkbox"
                     checked={isSeller}
                     onChange={(e) => setIsSeller(e.target.checked)}
+                    aria-describedby="seller-hint"
                   />
                   <span> 💼 판매자로도 활동하기</span>
                 </label>
-                <p className="checkbox-hint">
+                <p id="seller-hint" className="checkbox-hint">
                   부품을 판매하려면 체크해주세요
                 </p>
               </div>
@@ -353,6 +359,23 @@ export default function Signup() {
         .submit-button:disabled {
           opacity: 0.6;
           cursor: not-allowed;
+        }
+
+        /* Focus visible for keyboard navigation */
+        .submit-button:focus-visible,
+        .back-to-home:focus-visible {
+          outline: 3px solid #0055f4;
+          outline-offset: 2px;
+        }
+
+        .form-group input:focus-visible {
+          outline: 3px solid #0055f4;
+          outline-offset: 1px;
+        }
+
+        .checkbox-label input:focus-visible {
+          outline: 3px solid #0055f4;
+          outline-offset: 2px;
         }
 
         .link-section {
