@@ -21,17 +21,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm run install:all
-
-      - name: Build shared types
-        run: cd shared && npm run build
+      - name: Setup Node.js workspace
+        uses: ./.github/actions/setup-node-workspace
 
       - name: Build frontend
         run: npm run build:frontend
@@ -53,23 +44,19 @@ jobs:
       name: production
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Notify Slack - Deployment Started
-        run: |
-          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
-            -H 'Content-Type: application/json' \
-            -d '{
-              "attachments": [{
-                "color": "warning",
-                "title": "🚀 EECAR Frontend 배포 시작",
-                "fields": [
-                  {"title": "배포자", "value": "${{ github.actor }}", "short": true},
-                  {"title": "브랜치", "value": "${{ github.ref_name }}", "short": true},
-                  {"title": "커밋", "value": "`${{ github.sha }}`", "short": false}
-                ],
-                "footer": "GitHub Actions",
-                "ts": '"$(date +%s)"'
-              }]
-            }'
+        uses: ./.github/actions/slack-notify
+        with:
+          status: started
+          environment: production
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          message: |
+            배포자: ${{ github.actor }}
+            브랜치: ${{ github.ref_name }}
+            커밋: ${{ github.sha }}
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -115,39 +102,23 @@ jobs:
 
       - name: Notify Slack - Deployment Success
         if: success()
-        run: |
-          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
-            -H 'Content-Type: application/json' \
-            -d '{
-              "attachments": [{
-                "color": "good",
-                "title": "✅ EECAR Frontend 배포 완료",
-                "fields": [
-                  {"title": "브랜치", "value": "${{ github.ref_name }}", "short": true},
-                  {"title": "배포 시간", "value": "'"$(date '+%Y-%m-%d %H:%M:%S KST')"'", "short": true},
-                  {"title": "CloudFront URL", "value": "https://${{ secrets.CLOUDFRONT_DISTRIBUTION_DOMAIN }}", "short": false}
-                ],
-                "footer": "GitHub Actions",
-                "ts": '"$(date +%s)"'
-              }]
-            }'
+        uses: ./.github/actions/slack-notify
+        with:
+          status: success
+          environment: production
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          message: |
+            브랜치: ${{ github.ref_name }}
+            CloudFront URL: https://${{ secrets.CLOUDFRONT_DISTRIBUTION_DOMAIN }}
 
       - name: Notify Slack - Deployment Failed
         if: failure()
-        run: |
-          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
-            -H 'Content-Type: application/json' \
-            -d '{
-              "attachments": [{
-                "color": "danger",
-                "title": "❌ EECAR Frontend 배포 실패",
-                "fields": [
-                  {"title": "브랜치", "value": "${{ github.ref_name }}", "short": true},
-                  {"title": "배포자", "value": "${{ github.actor }}", "short": true},
-                  {"title": "에러", "value": "S3 또는 CloudFront 배포 중 오류 발생", "short": false},
-                  {"title": "Actions 로그", "value": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}", "short": false}
-                ],
-                "footer": "GitHub Actions",
-                "ts": '"$(date +%s)"'
-              }]
-            }'
+        uses: ./.github/actions/slack-notify
+        with:
+          status: failure
+          environment: production
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          message: |
+            브랜치: ${{ github.ref_name }}
+            배포자: ${{ github.actor }}
+            에러: S3 또는 CloudFront 배포 중 오류 발생

@@ -40,7 +40,7 @@ jobs:
         uses: ./.github/actions/setup-node-workspace
 
       - name: Run frontend tests
-        run: cd frontend && npm test -- --coverage
+        run: cd frontend && npm test -- --coverage --ci
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
@@ -66,6 +66,22 @@ jobs:
 
       - name: Type check backend
         run: cd backend && npx tsc --noEmit
+
+  # Lint checking
+  lint:
+    name: Lint Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js workspace
+        uses: ./.github/actions/setup-node-workspace
+
+      - name: Lint frontend
+        run: cd frontend && npm run lint
+
+      - name: Lint backend
+        run: cd backend && npm run lint
 
   # E2E tests (only on master)
   e2e:
@@ -121,7 +137,7 @@ jobs:
   # Summary job
   test-summary:
     name: Test Summary
-    needs: [backend-unit, frontend-unit, type-check]
+    needs: [backend-unit, frontend-unit, type-check, lint]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -134,8 +150,9 @@ jobs:
           echo "| Backend Tests | ${{ needs.backend-unit.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Frontend Tests | ${{ needs.frontend-unit.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Type Check | ${{ needs.type-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint Check | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
 
-          if [ "${{ needs.backend-unit.result }}" = "failure" ] || [ "${{ needs.frontend-unit.result }}" = "failure" ] || [ "${{ needs.type-check.result }}" = "failure" ]; then
+          if [ "${{ needs.backend-unit.result }}" = "failure" ] || [ "${{ needs.frontend-unit.result }}" = "failure" ] || [ "${{ needs.type-check.result }}" = "failure" ] || [ "${{ needs.lint.result }}" = "failure" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "❌ Some tests failed!" >> $GITHUB_STEP_SUMMARY
             exit 1
