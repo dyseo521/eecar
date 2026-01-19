@@ -1,7 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { http, HttpResponse } from 'msw';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { server } from '../mocks/server';
 import { AuthProvider, useAuth } from '../../src/context/AuthContext';
 

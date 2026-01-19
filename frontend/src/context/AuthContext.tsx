@@ -46,28 +46,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    try {
-      const response = await fetch(getApiUrl('auth/login'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+    const response = await fetch(getApiUrl('auth/login'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || '로그인에 실패했습니다');
-      }
-
-      const data = await response.json();
-
-      setToken(data.token);
-      setUser(data.user);
-
-      localStorage.setItem('eecar_token', data.token);
-      localStorage.setItem('eecar_user', JSON.stringify(data.user));
-    } catch (error) {
-      throw error;
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || '로그인에 실패했습니다');
     }
+
+    const data = await response.json();
+
+    setToken(data.token);
+    setUser(data.user);
+
+    localStorage.setItem('eecar_token', data.token);
+    localStorage.setItem('eecar_user', JSON.stringify(data.user));
   }, []);
 
   const signup = useCallback(async (
@@ -77,28 +73,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     role: 'buyer' | 'seller',
     companyName?: string
   ) => {
-    try {
-      const response = await fetch(getApiUrl('auth/signup'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name, role, companyName }),
-      });
+    const response = await fetch(getApiUrl('auth/signup'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, name, role, companyName }),
+    });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || '회원가입에 실패했습니다');
-      }
-
-      const data = await response.json();
-
-      setToken(data.token);
-      setUser(data.user);
-
-      localStorage.setItem('eecar_token', data.token);
-      localStorage.setItem('eecar_user', JSON.stringify(data.user));
-    } catch (error) {
-      throw error;
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || '회원가입에 실패했습니다');
     }
+
+    const data = await response.json();
+
+    setToken(data.token);
+    setUser(data.user);
+
+    localStorage.setItem('eecar_token', data.token);
+    localStorage.setItem('eecar_user', JSON.stringify(data.user));
   }, []);
 
   const logout = useCallback(() => {
