@@ -3,7 +3,7 @@
  * /자동이 [명령어] [옵션]
  */
 
-import { SlackEvent, SlackBlock, LambdaStatus, LogEntry } from '../types.js';
+import { SlackEvent, SlackBlock } from '../types.js';
 import { getLambdaStatus, getRecentLogs } from '../tools/cloudwatch.js';
 import { analyzeError } from '../tools/analyze-error.js';
 import { recallMemory } from '../tools/memory.js';

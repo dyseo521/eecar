@@ -228,14 +228,14 @@ function parseAnalysisResponse(text: string): {
   const solutionsText = solutionsMatch?.[1] || '';
   const solutions = solutionsText
     .split(/\n/)
-    .map((s) => s.replace(/^[\d\.\-\*]+\s*/, '').trim())
+    .map((s) => s.replace(/^[\d.\-*]+\s*/, '').trim())
     .filter((s) => s.length > 10);
 
   // 관련 파일 추출
   const codeMatch = text.match(/관련[^:]*:\s*([\s\S]+?)(?=예방|$)/i);
   const relatedCode = codeMatch?.[1]
     ?.split(/\n/)
-    .map((s) => s.replace(/^[\-\*]+\s*/, '').trim())
+    .map((s) => s.replace(/^[-*]+\s*/, '').trim())
     .filter((s) => s.length > 0);
 
   return {

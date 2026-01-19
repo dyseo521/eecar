@@ -3,7 +3,7 @@
  * 버튼 클릭, 모달 제출 등 처리
  */
 
-import { SlackEvent, SlackBlock } from '../types.js';
+import { SlackEvent } from '../types.js';
 import { getBotToken } from '../slack-verifier.js';
 import { saveMemory } from '../tools/memory.js';
 
@@ -238,13 +238,14 @@ async function handleViewSubmission(
   const callbackId = payload.view?.callback_id;
 
   switch (callbackId) {
-    case 'resolution_modal':
+    case 'resolution_modal': {
       // 해결 방법 입력 모달
       const resolution =
         payload.view?.state?.values?.resolution_block?.resolution_input?.value;
       console.log('Resolution submitted:', resolution);
       // TODO: 기억에 저장
       return { response_action: 'clear' };
+    }
 
     default:
       return { ok: true };

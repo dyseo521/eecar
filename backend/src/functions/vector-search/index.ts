@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import crypto from 'crypto';
 import { generateEmbedding, findTopKSimilar, callClaude } from '/opt/nodejs/utils/bedrock.js';
 import { getVector, listVectorKeys } from '/opt/nodejs/utils/s3.js';
-import { getItem, putItem, queryGSI1, batchGetItems } from '/opt/nodejs/utils/dynamodb.js';
+import { getItem, putItem, batchGetItems } from '/opt/nodejs/utils/dynamodb.js';
 import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
 import { hybridSearch, preparePartForBM25 } from '/opt/nodejs/utils/search.js';
 
@@ -333,8 +333,9 @@ interface HybridMatch {
 /**
  * Re-rank top candidates using Claude for more precise relevance scoring
  * This provides a second-pass ranking with deeper semantic understanding
+ * (현재 미사용 - throttling 방지를 위해 hybridSearch 결과 직접 사용)
  */
-async function rerankWithClaude(
+async function _rerankWithClaude(
   query: string,
   candidates: HybridMatch[],
   parts: Map<string, any>,
@@ -486,8 +487,9 @@ JSON 배열:`;
 
 /**
  * Enrich matches with AI-generated explanations (parallel - may cause throttling)
+ * (현재 미사용 - throttling 방지를 위해 enrichWithAISequential 사용)
  */
-async function enrichWithAI(
+async function _enrichWithAI(
   query: string,
   matches: HybridMatch[],
   parts: any[]

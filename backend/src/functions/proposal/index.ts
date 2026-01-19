@@ -99,8 +99,9 @@ async function getProposals(event: APIGatewayProxyEvent): Promise<APIGatewayProx
   const skPrefix = status ? `STATUS#${status}#` : undefined;
   const proposals = await queryGSI1(`COMPANY#${companyId}`, skPrefix, 50);
 
+  // DynamoDB 내부 키들은 응답에서 제외
   const results = proposals.map(p => {
-    const { PK, SK, GSI1PK, GSI1SK, ...data } = p;
+    const { PK, SK: _SK, GSI1PK: _GSI1PK, GSI1SK: _GSI1SK, ...data } = p;
     return {
       proposalId: PK.split('#')[1],
       ...data,

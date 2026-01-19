@@ -14,7 +14,7 @@ import {
   GetVectorsCommand,
   DeleteVectorsCommand,
 } from '@aws-sdk/client-s3vectors';
-import { Memory, MemoryResult } from '../types.js';
+import { MemoryResult } from '../types.js';
 
 // S3 Vectors 설정
 const VECTOR_BUCKET = process.env.S3_VECTORS_BUCKET || 'eecar-vectors-index-12234628';

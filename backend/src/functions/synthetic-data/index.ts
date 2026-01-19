@@ -5,14 +5,8 @@ import { uploadVector, updateVectorsManifest } from '/opt/nodejs/utils/s3.js';
 import { putItem } from '/opt/nodejs/utils/dynamodb.js';
 import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
 import {
-  MANUFACTURERS,
-  VEHICLE_MODELS,
-  CONDITIONS,
-  MATERIALS,
-  CATHODE_TYPES,
   randomChoice,
   randomInt,
-  weightedRandomChoice,
   getRandomImages,
   getRandomManufacturer,
   getRandomVehicleModel,

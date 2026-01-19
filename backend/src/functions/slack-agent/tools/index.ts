@@ -150,42 +150,47 @@ export async function executeTool(
 
   try {
     switch (toolName) {
-      case 'analyze_error':
+      case 'analyze_error': {
         const analysis = await analyzeError({
           errorMessage: String(input.errorMessage || ''),
           functionName: String(input.functionName || 'Unknown'),
           stackTrace: input.stackTrace ? String(input.stackTrace) : undefined,
         });
         return { success: true, data: analysis };
+      }
 
-      case 'get_logs':
+      case 'get_logs': {
         const logs = await getRecentLogs(
           String(input.functionName),
           Number(input.minutes) || 30,
           (input.filter as 'ERROR' | 'WARN' | 'INFO' | 'ALL') || 'ERROR'
         );
         return { success: true, data: logs };
+      }
 
-      case 'get_function_status':
+      case 'get_function_status': {
         const status = await getLambdaStatus(String(input.functionName || ''));
         return { success: true, data: status };
+      }
 
-      case 'get_error_summary':
+      case 'get_error_summary': {
         const summary = await getErrorSummary(
           String(input.functionName),
           Number(input.hours) || 24
         );
         return { success: true, data: summary };
+      }
 
-      case 'recall_memory':
+      case 'recall_memory': {
         const memories = await recallMemory({
           query: String(input.query),
           functionName: input.functionName ? String(input.functionName) : undefined,
           topK: Number(input.topK) || 5,
         });
         return { success: true, data: memories };
+      }
 
-      case 'save_memory':
+      case 'save_memory': {
         const saved = await saveMemory({
           errorType: String(input.errorType),
           functionName: String(input.functionName),
@@ -195,6 +200,7 @@ export async function executeTool(
             : undefined,
         });
         return { success: saved, data: { saved } };
+      }
 
       default:
         return { success: false, error: `Unknown tool: ${toolName}` };

@@ -176,7 +176,6 @@ function calculateMatchScore(
   filters: AdvancedMaterialFilters
 ): number {
   let score = 100;
-  let criteriaCount = 0;
 
   // Exact alloy match gets high score
   if (filters.alloyNumber && material.alloyNumber === filters.alloyNumber) {
@@ -185,7 +184,6 @@ function calculateMatchScore(
 
   // Calculate score based on how close to ideal range
   if (filters.tensileStrengthMPa) {
-    criteriaCount++;
     const value = material.tensileStrengthMPa;
     const ideal = ((filters.tensileStrengthMPa.min || 0) + (filters.tensileStrengthMPa.max || value)) / 2;
     const deviation = Math.abs(value - ideal) / ideal;
@@ -193,7 +191,6 @@ function calculateMatchScore(
   }
 
   if (filters.yieldStrengthMPa) {
-    criteriaCount++;
     const value = material.yieldStrengthMPa;
     const ideal = ((filters.yieldStrengthMPa.min || 0) + (filters.yieldStrengthMPa.max || value)) / 2;
     const deviation = Math.abs(value - ideal) / ideal;
@@ -201,7 +198,6 @@ function calculateMatchScore(
   }
 
   if (filters.elasticModulusGPa) {
-    criteriaCount++;
     const value = material.elasticModulusGPa;
     const ideal = ((filters.elasticModulusGPa.min || 0) + (filters.elasticModulusGPa.max || value)) / 2;
     const deviation = Math.abs(value - ideal) / ideal;

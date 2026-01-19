@@ -36,8 +36,7 @@ function termFrequency(term: string, docTokens: string[]): number {
  */
 function inverseDocumentFrequency(
   term: string,
-  allDocTokens: string[][],
-  avgDocLength: number
+  allDocTokens: string[][]
 ): number {
   const docsWithTerm = allDocTokens.filter(tokens => tokens.includes(term)).length;
   const N = allDocTokens.length;
@@ -69,7 +68,7 @@ export function bm25Score(
 
   for (const term of queryTokens) {
     const tf = termFrequency(term, docTokens);
-    const idf = inverseDocumentFrequency(term, allDocTokens, avgDocLength);
+    const idf = inverseDocumentFrequency(term, allDocTokens);
 
     // BM25 formula
     const tfNormalized = (tf * (k1 + 1)) / (tf + k1 * (1 - b + b * (docLength / avgDocLength)));

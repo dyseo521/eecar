@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { getItem, queryByPK, queryGSI1WithPagination, queryAllMetadataWithPagination } from '/opt/nodejs/utils/dynamodb.js';
+import { queryByPK, queryGSI1WithPagination, queryAllMetadataWithPagination } from '/opt/nodejs/utils/dynamodb.js';
 import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
 
 /**
@@ -46,7 +46,8 @@ async function getPartById(partId: string, event: APIGatewayProxyEvent): Promise
     specifications: spec || null,
     vector: vector || null,
     useCases: useCases.map(uc => {
-      const { PK, SK, ...data } = uc;
+      // PK, SK는 내부 키이므로 응답에서 제외
+      const { PK: _PK, SK: _SK, ...data } = uc;
       return data;
     }),
   }, 200, event);
@@ -87,8 +88,9 @@ async function listParts(params: any, event: APIGatewayProxyEvent): Promise<APIG
   }
 
   // Format the response
+  // DynamoDB 내부 키들은 응답에서 제외
   const metadata = result.items.map(p => {
-    const { PK, SK, GSI1PK, GSI1SK, GSI2PK, GSI2SK, ...data } = p;
+    const { PK, SK: _SK, GSI1PK: _GSI1PK, GSI1SK: _GSI1SK, GSI2PK: _GSI2PK, GSI2SK: _GSI2SK, ...data } = p;
     return {
       partId: PK.split('#')[1],
       ...data,

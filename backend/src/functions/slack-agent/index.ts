@@ -4,11 +4,11 @@
  */
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
-import { verifySlackRequest, getBotToken } from './slack-verifier.js';
+import { verifySlackRequest } from './slack-verifier.js';
 import { handleSlashCommand } from './handlers/slash-command.js';
 import { handleAppMention } from './handlers/app-mention.js';
 import { handleInteraction } from './handlers/interaction.js';
-import { SlackEvent, SlackResponse } from './types.js';
+import { SlackEvent } from './types.js';
 
 /**
  * Slack 재시도 요청 감지
@@ -62,7 +62,7 @@ export const handler: APIGatewayProxyHandler = async (event): Promise<APIGateway
 
       // Interactive Component (payload 필드 있음)
       if (params.has('payload')) {
-        const payload = JSON.parse(params.get('payload') || '{}');
+        // payload 파싱은 handleInteraction에서 수행
         slackEvent = { type: 'interactive', payload: params.get('payload') || '' };
       } else {
         // Slash Command
