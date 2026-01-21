@@ -58,7 +58,9 @@ CLAUDE.md
 회의자료.md
 #dev
 .playwright-mcp/
-.claude/
+# Claude Code (skills는 커밋, 나머지는 제외)
+.claude/*
+!.claude/skills/
 .github/AWS_OIDC_SETUP.md
 
 # Private job application documents (not for public repo)
