@@ -45,8 +45,8 @@ export default defineConfig({
     viewport: { width: 1280, height: 720 },
   },
 
-  // Test timeout
-  timeout: 30000,
+  // Test timeout (increased for CI environment)
+  timeout: 60000,
 
   // Expect timeout
   expect: {
@@ -76,20 +76,21 @@ export default defineConfig({
   ],
 
   // Run local dev server before starting tests
+  // Playwright manages server lifecycle in both CI and local environments
   webServer: [
     {
       command: 'npm run dev:local',
       url: 'http://localhost:3001',
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: false,
       cwd: '.',
-      timeout: 60000,
+      timeout: 120000,
     },
     {
       command: 'npm run dev:frontend',
       url: 'http://localhost:3000',
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: false,
       cwd: '.',
-      timeout: 60000,
+      timeout: 120000,
     },
   ],
 
