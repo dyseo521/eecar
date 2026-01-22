@@ -73,9 +73,10 @@ EECAR는 1세대 전기차(2010년대 초반)의 수명 종료에 따라 증가�
 - AWS SAM (IaC)
 
 ### DevOps
-- GitHub Actions (4개 워크플로우)
+- GitHub Actions (6개 워크플로우)
 - AWS OIDC (무-키 인증)
 - Slack 알림 (배포, 에러 모니터링)
+- Playwright E2E 테스트
 
 ## 프로젝트 구조
 
@@ -158,10 +159,12 @@ npm run deploy
 
 | 워크플로우 | 트리거 | 역할 |
 |-----------|--------|------|
-| test-and-lint | PR, master/develop push | 타입 체크, ESLint, 빌드 검증 |
+| test-pipeline | PR, master/develop push | 유닛 테스트, 타입 체크, ESLint, E2E 테스트 |
 | build-frontend | PR, frontend/** 변경 | 프론트엔드 빌드 검증 |
 | deploy-frontend | master push | S3 + CloudFront 배포 |
 | deploy-backend | v*.*.* 태그 | SAM 배포, Lambda 업데이트 |
+| deploy-api-docs | schemas/types 변경 | OpenAPI 자동 생성 + GitHub Pages 배포 |
+| security-scan | PR + 주간 스케줄 | 의존성 취약점 검사 |
 
 ### 배포 프로세스
 
@@ -189,7 +192,7 @@ git push origin v1.0.0
 | /api/contact | POST | 일반 문의 |
 | /api/slack/events | POST | Slack 이벤트 (자동이 2.0) |
 
-자세한 API 문서는 [API.md](docs/API.md) 참조.
+**API 문서 (Swagger UI)**: https://dyseo521.github.io/inha-vip-project2025/
 
 ## 아키텍처
 
@@ -225,7 +228,7 @@ CloudWatch Logs → Subscription Filter → Lambda (v1: push)
 
 | 문서 | 설명 |
 |------|------|
-| [API.md](docs/API.md) | API 엔드포인트 상세 |
+| [API 문서 (Swagger UI)](https://dyseo521.github.io/inha-vip-project2025/) | API 엔드포인트 상세 (자동 생성) |
 | [DYNAMODB_SCHEMA.md](docs/DYNAMODB_SCHEMA.md) | DynamoDB 스키마 설계 |
 | [DEVELOPMENT.md](docs/DEVELOPMENT.md) | 개발 가이드 (Lambda 추가, 타입 수정) |
 | [LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md) | 로컬 개발 환경 설정 |
