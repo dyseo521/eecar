@@ -80,7 +80,7 @@ export default defineConfig({
   webServer: [
     {
       command: 'npm run dev:local',
-      url: 'http://localhost:3001',
+      url: 'http://localhost:3001/health',
       reuseExistingServer: false,
       cwd: '.',
       timeout: 120000,
