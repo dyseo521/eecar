@@ -181,7 +181,7 @@ npm run docs:serve
 # http://localhost:8080 접속
 
 # 또는 GitHub Pages에서 확인
-# https://dyseo521.github.io/inha-vip-project2025/
+# https://dyseo521.github.io/eecar/
 ```
 
 Swagger UI 기능:
