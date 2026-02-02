@@ -4,7 +4,7 @@
 
 import { Tool, ToolResult } from '../types.js';
 import { analyzeError } from './analyze-error.js';
-import { getLambdaStatus, getRecentLogs, getErrorSummary } from './cloudwatch.js';
+import { getLambdaStatus, getRecentLogs, getErrorSummary, getAllLambdaStatuses } from './cloudwatch.js';
 import { recallMemory, saveMemory } from './memory.js';
 
 /**
@@ -63,9 +63,14 @@ export const TOOLS: Tool[] = [
       properties: {
         functionName: {
           type: 'string',
-          description: 'Lambda 함수명 (없으면 전체)',
+          description: 'Lambda 함수명 (필수). 모든 함수를 조회하려면 "all"을 입력',
+        },
+        days: {
+          type: 'number',
+          description: '조회 기간 (일, 기본 1일, 최대 30일)',
         },
       },
+      required: ['functionName'],
     },
   },
   {
@@ -169,8 +174,18 @@ export async function executeTool(
       }
 
       case 'get_function_status': {
-        const status = await getLambdaStatus(String(input.functionName || ''));
-        return { success: true, data: status };
+        const functionName = String(input.functionName);
+        const days = Math.min(Number(input.days) || 1, 30); // 최대 30일 제한
+
+        if (functionName === 'all') {
+          // 모든 함수 조회
+          const statuses = await getAllLambdaStatuses(days);
+          return { success: true, data: statuses };
+        } else {
+          // 단일 함수 조회
+          const status = await getLambdaStatus(functionName, days);
+          return { success: true, data: status };
+        }
       }
 
       case 'get_error_summary': {

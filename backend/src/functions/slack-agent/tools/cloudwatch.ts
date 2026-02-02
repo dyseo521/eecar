@@ -67,13 +67,21 @@ async function resolveActualFunctionName(shortName: string): Promise<string> {
 
 /**
  * Lambda 함수 상태 조회
+ * @param functionName 함수명 (짧은 이름)
+ * @param days 조회 기간 (일, 기본 1일, 최대 30일)
  */
-export async function getLambdaStatus(functionName: string): Promise<LambdaStatus> {
+export async function getLambdaStatus(
+  functionName: string,
+  days: number = 1
+): Promise<LambdaStatus> {
   const fullFunctionName = await resolveActualFunctionName(functionName);
   const endTime = new Date();
-  const startTime = new Date(endTime.getTime() - 60 * 60 * 1000); // 1시간 전
+  // days 파라미터에 따라 조회 기간 설정
+  const startTime = new Date(endTime.getTime() - days * 24 * 60 * 60 * 1000);
+  // Period: 1일 이하면 1시간 단위, 초과면 1일 단위 (CloudWatch 최대 1440 datapoints)
+  const period = days <= 1 ? 3600 : 86400;
 
-  console.log(`Getting status for ${functionName} -> ${fullFunctionName}`);
+  console.log(`Getting status for ${functionName} -> ${fullFunctionName} (${days} days, period: ${period}s)`);
 
   try {
     // 호출 횟수
@@ -84,7 +92,7 @@ export async function getLambdaStatus(functionName: string): Promise<LambdaStatu
         Dimensions: [{ Name: 'FunctionName', Value: fullFunctionName }],
         StartTime: startTime,
         EndTime: endTime,
-        Period: 3600,
+        Period: period,
         Statistics: ['Sum'],
       })
     );
@@ -97,7 +105,7 @@ export async function getLambdaStatus(functionName: string): Promise<LambdaStatu
         Dimensions: [{ Name: 'FunctionName', Value: fullFunctionName }],
         StartTime: startTime,
         EndTime: endTime,
-        Period: 3600,
+        Period: period,
         Statistics: ['Sum'],
       })
     );
@@ -110,16 +118,27 @@ export async function getLambdaStatus(functionName: string): Promise<LambdaStatu
         Dimensions: [{ Name: 'FunctionName', Value: fullFunctionName }],
         StartTime: startTime,
         EndTime: endTime,
-        Period: 3600,
+        Period: period,
         Statistics: ['Average'],
       })
     );
 
-    const invocations =
-      invocationsResult.Datapoints?.[0]?.Sum || 0;
-    const errors = errorsResult.Datapoints?.[0]?.Sum || 0;
+    // 여러 데이터 포인트의 합계/평균 계산
+    const invocations = (invocationsResult.Datapoints || []).reduce(
+      (sum, dp) => sum + (dp.Sum || 0),
+      0
+    );
+    const errors = (errorsResult.Datapoints || []).reduce(
+      (sum, dp) => sum + (dp.Sum || 0),
+      0
+    );
+    // 평균은 모든 데이터 포인트의 평균을 다시 평균
+    const durationDatapoints = durationResult.Datapoints || [];
     const avgDuration =
-      durationResult.Datapoints?.[0]?.Average || 0;
+      durationDatapoints.length > 0
+        ? durationDatapoints.reduce((sum, dp) => sum + (dp.Average || 0), 0) /
+          durationDatapoints.length
+        : 0;
 
     // 마지막 에러 메시지 조회
     let lastError: { message: string; timestamp: string } | undefined;
@@ -312,4 +331,38 @@ function detectLogLevel(message: string): 'ERROR' | 'WARN' | 'INFO' {
  */
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * 모든 Lambda 함수 상태 조회 (요약 형식)
+ * @param days 조회 기간 (일, 기본 1일, 최대 30일)
+ */
+export async function getAllLambdaStatuses(
+  days: number = 1
+): Promise<{
+  totalFunctions: number;
+  totalInvocations: number;
+  totalErrors: number;
+  functions: { name: string; invocations: number; errors: number; errorRate: number }[];
+}> {
+  await loadFunctionNameCache();
+
+  const statuses: LambdaStatus[] = [];
+  for (const shortName of functionNameCache.keys()) {
+    const status = await getLambdaStatus(shortName, days);
+    statuses.push(status);
+  }
+
+  // 요약 형식으로 반환 (observation 500자 제한 대응)
+  return {
+    totalFunctions: statuses.length,
+    totalInvocations: statuses.reduce((sum, s) => sum + s.invocations, 0),
+    totalErrors: statuses.reduce((sum, s) => sum + s.errors, 0),
+    functions: statuses.map((s) => ({
+      name: s.functionName,
+      invocations: s.invocations,
+      errors: s.errors,
+      errorRate: s.errorRate,
+    })),
+  };
 }
