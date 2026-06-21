@@ -1,0 +1,95 @@
+{
+  "timestamp": "2026-02-02T08:40:26.932Z",
+  "config": {
+    "outputPath": "/home/dyseo521/eecar/backend/evaluation/reports/cache-analysis-2026-02-02.json",
+    "apiEndpoint": "http://localhost:3001",
+    "tableName": "eecar-parts-table-local",
+    "verbose": false
+  },
+  "analysis": {
+    "period": "최근 7일 (TTL 기준)",
+    "totalQueries": 291,
+    "uniqueQueries": 20,
+    "cacheHits": 271,
+    "cacheMisses": 20,
+    "hitRate": 0.9312714776632303,
+    "savings": {
+      "bedrockCalls": 542,
+      "estimatedCostUSD": 0.08739749999999999,
+      "latencySavedMs": 406500
+    },
+    "topQueries": [
+      {
+        "query": "현대 배터리",
+        "hitCount": 45
+      },
+      {
+        "query": "테슬라 모터",
+        "hitCount": 38
+      },
+      {
+        "query": "SOH 80% 이상 배터리",
+        "hitCount": 32
+      },
+      {
+        "query": "800V 인버터",
+        "hitCount": 28
+      },
+      {
+        "query": "알루미늄 6061 패널",
+        "hitCount": 22
+      },
+      {
+        "query": "기아 EV6 부품",
+        "hitCount": 19
+      },
+      {
+        "query": "고출력 모터",
+        "hitCount": 16
+      },
+      {
+        "query": "NCM 양극재 배터리",
+        "hitCount": 14
+      },
+      {
+        "query": "BMW i3 배터리",
+        "hitCount": 12
+      },
+      {
+        "query": "닛산 리프 모터",
+        "hitCount": 10
+      }
+    ],
+    "lowHitQueries": [
+      {
+        "query": "재활용 등급 배터리",
+        "hitCount": 2
+      },
+      {
+        "query": "특수 합금 부품",
+        "hitCount": 1
+      },
+      {
+        "query": "LFP 배터리",
+        "hitCount": 1
+      },
+      {
+        "query": "교체용 윈드쉴드",
+        "hitCount": 1
+      }
+    ]
+  },
+  "recommendations": [
+    "우수한 캐시 히트율입니다. 현재 전략을 유지하세요.",
+    "현재 트래픽에서는 캐시 효과가 제한적입니다. 트래픽 증가 시 효과가 커집니다.",
+    "인기 쿼리 3개를 감지했습니다. 이들의 TTL을 늘리거나 ElastiCache로 이동을 고려하세요."
+  ],
+  "costAssumptions": {
+    "claudeHaikuInputPer1M": 0.25,
+    "claudeHaikuOutputPer1M": 1.25,
+    "titanEmbedPer1M": 0.02,
+    "avgInputTokens": 500,
+    "avgOutputTokens": 150,
+    "avgLatencySavedMs": 1500
+  }
+}

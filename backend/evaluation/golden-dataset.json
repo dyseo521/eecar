@@ -1,0 +1,464 @@
+{
+  "version": "1.0.0",
+  "createdAt": "2024-01-15",
+  "description": "EECAR RAG 검색 품질 평가용 Golden Dataset - 30개 테스트 쿼리",
+
+  "queries": [
+    {
+      "id": "q001",
+      "query": "SOH 80% 이상 고용량 배터리",
+      "category": "battery",
+      "expectedRelevantParts": [
+        { "partId": "battery-007", "relevanceScore": 3, "reason": "SOH 88%, 85kWh 고용량 Tesla Model S 배터리" },
+        { "partId": "battery-001", "relevanceScore": 2, "reason": "아이오닉5 배터리, 고용량 예상" },
+        { "partId": "battery-003", "relevanceScore": 2, "reason": "EV6 배터리, 고용량 예상" }
+      ],
+      "irrelevantParts": [
+        { "partId": "battery-004", "reason": "SOH 65%, 조건 미달" },
+        { "partId": "battery-006", "reason": "SOH 68%, 조건 미달" },
+        { "partId": "motor-001", "reason": "카테고리 불일치" }
+      ],
+      "difficulty": "easy",
+      "queryType": "mixed"
+    },
+    {
+      "id": "q002",
+      "query": "알루미늄 6061 고강도 바디 패널",
+      "expectedRelevantParts": [
+        { "partId": "body-panel-001", "relevanceScore": 3, "reason": "Al 6061 테슬라 Model S 후드" },
+        { "partId": "body-chassis-003", "relevanceScore": 3, "reason": "Al 6061 아우디 ASF 프레임" },
+        { "partId": "body-panel-004", "relevanceScore": 3, "reason": "Al 6061 BMW i4 트렁크" },
+        { "partId": "body-door-002", "relevanceScore": 3, "reason": "Al 6061 테슬라 Model 3 도어" }
+      ],
+      "irrelevantParts": [
+        { "partId": "body-panel-002", "reason": "Al 7075 합금, 다른 합금" },
+        { "partId": "body-door-001", "reason": "Al 5754 합금, 다른 합금" }
+      ],
+      "difficulty": "medium",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q003",
+      "query": "테슬라 모델3 호환 인버터",
+      "category": "inverter",
+      "expectedRelevantParts": [
+        { "partId": "inverter-003", "relevanceScore": 3, "reason": "테슬라 Model 3 전용 인버터" }
+      ],
+      "irrelevantParts": [
+        { "partId": "inverter-001", "reason": "현대 아이오닉5 인버터" },
+        { "partId": "inverter-002", "reason": "기아 EV6 인버터" },
+        { "partId": "motor-003", "reason": "모터 카테고리" }
+      ],
+      "difficulty": "hard",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q004",
+      "query": "150kW 이상 고출력 모터",
+      "category": "motor",
+      "expectedRelevantParts": [
+        { "partId": "motor-002", "relevanceScore": 3, "reason": "168kW 기아 EV6 모터" },
+        { "partId": "motor-006", "relevanceScore": 3, "reason": "150kW 현대 코나 모터" },
+        { "partId": "motor-003", "relevanceScore": 2, "reason": "147kW Tesla 모터, 근접" }
+      ],
+      "irrelevantParts": [
+        { "partId": "motor-001", "reason": "88kW, 조건 미달" },
+        { "partId": "motor-004", "reason": "110kW, 조건 미달" }
+      ],
+      "difficulty": "medium",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q005",
+      "query": "ESS 전환용 배터리",
+      "category": "battery",
+      "expectedRelevantParts": [
+        { "partId": "battery-004", "relevanceScore": 3, "reason": "SOH 65% ESS 전환용 추천" },
+        { "partId": "battery-006", "relevanceScore": 2, "reason": "SOH 68% 낮은 SOH 배터리" },
+        { "partId": "battery-010", "relevanceScore": 2, "reason": "SOH 71% ESS 가능" }
+      ],
+      "irrelevantParts": [
+        { "partId": "battery-007", "reason": "SOH 88% 재사용 추천" },
+        { "partId": "inverter-001", "reason": "카테고리 불일치" }
+      ],
+      "difficulty": "medium",
+      "queryType": "semantic"
+    },
+    {
+      "id": "q006",
+      "query": "카본 파이버 경량 프레임",
+      "expectedRelevantParts": [
+        { "partId": "body-chassis-001", "relevanceScore": 3, "reason": "BMW i3 CFRP 카본 섀시 프레임" }
+      ],
+      "irrelevantParts": [
+        { "partId": "body-chassis-002", "reason": "알루미늄 서브프레임" },
+        { "partId": "body-chassis-003", "reason": "알루미늄 스페이스 프레임" }
+      ],
+      "difficulty": "easy",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q007",
+      "query": "800V 초고속 충전 인버터",
+      "category": "inverter",
+      "expectedRelevantParts": [
+        { "partId": "inverter-001", "relevanceScore": 3, "reason": "현대 아이오닉5 800V SiC 인버터" },
+        { "partId": "inverter-002", "relevanceScore": 3, "reason": "기아 EV6 800V 초고속충전 대응" }
+      ],
+      "irrelevantParts": [
+        { "partId": "inverter-003", "reason": "400V 인버터" },
+        { "partId": "inverter-004", "reason": "360V 인버터" }
+      ],
+      "difficulty": "easy",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q008",
+      "query": "NCM 양극재 배터리",
+      "category": "battery",
+      "expectedRelevantParts": [
+        { "partId": "battery-005", "relevanceScore": 3, "reason": "NCM Ni 60% BMW i3 배터리" },
+        { "partId": "battery-008", "relevanceScore": 3, "reason": "NCM Ni 60% 르노 조에 배터리" },
+        { "partId": "battery-010", "relevanceScore": 3, "reason": "NCM Ni 60% VW e-Golf 배터리" },
+        { "partId": "battery-009", "relevanceScore": 3, "reason": "NCM Ni 33% 기아 쏘울 배터리" }
+      ],
+      "irrelevantParts": [
+        { "partId": "battery-004", "reason": "LMO 양극재" },
+        { "partId": "battery-007", "reason": "NCA 양극재" }
+      ],
+      "difficulty": "medium",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q009",
+      "query": "현대 기아 전기차 모터",
+      "category": "motor",
+      "expectedRelevantParts": [
+        { "partId": "motor-001", "relevanceScore": 3, "reason": "현대 아이오닉 Electric 모터" },
+        { "partId": "motor-002", "relevanceScore": 3, "reason": "기아 EV6 모터" },
+        { "partId": "motor-006", "relevanceScore": 3, "reason": "현대 코나 Electric 모터" }
+      ],
+      "irrelevantParts": [
+        { "partId": "motor-003", "reason": "Tesla 제조사" },
+        { "partId": "motor-004", "reason": "Nissan 제조사" }
+      ],
+      "difficulty": "easy",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q010",
+      "query": "재활용률 90% 이상 알루미늄 부품",
+      "expectedRelevantParts": [
+        { "partId": "body-panel-001", "relevanceScore": 3, "reason": "Al 6061 재활용률 95%" },
+        { "partId": "body-chassis-003", "relevanceScore": 3, "reason": "Al 6061 재활용률 95%" },
+        { "partId": "body-panel-004", "relevanceScore": 3, "reason": "Al 6061 재활용률 95%" },
+        { "partId": "body-door-001", "relevanceScore": 3, "reason": "Al 5754 재활용률 93%" },
+        { "partId": "body-panel-002", "relevanceScore": 3, "reason": "Al 7075 재활용률 90%" }
+      ],
+      "irrelevantParts": [
+        { "partId": "body-chassis-001", "reason": "CFRP 재활용률 40%" }
+      ],
+      "difficulty": "hard",
+      "queryType": "mixed"
+    },
+    {
+      "id": "q011",
+      "query": "고효율 PMSM 모터",
+      "category": "motor",
+      "expectedRelevantParts": [
+        { "partId": "motor-002", "relevanceScore": 3, "reason": "효율 95.8% 기아 EV6 PMSM" },
+        { "partId": "motor-006", "relevanceScore": 3, "reason": "효율 95.2% 현대 코나 PMSM" },
+        { "partId": "motor-001", "relevanceScore": 2, "reason": "효율 94.5% 현대 아이오닉 PMSM" },
+        { "partId": "motor-004", "relevanceScore": 2, "reason": "효율 94% 닛산 리프 PMSM" }
+      ],
+      "irrelevantParts": [
+        { "partId": "motor-003", "reason": "유도 모터, PMSM 아님" }
+      ],
+      "difficulty": "medium",
+      "queryType": "semantic"
+    },
+    {
+      "id": "q012",
+      "query": "테슬라 외장 부품",
+      "expectedRelevantParts": [
+        { "partId": "body-panel-001", "relevanceScore": 3, "reason": "테슬라 Model S 후드" },
+        { "partId": "body-chassis-002", "relevanceScore": 3, "reason": "테슬라 Model S 서브프레임" },
+        { "partId": "body-door-002", "relevanceScore": 3, "reason": "테슬라 Model 3 도어" },
+        { "partId": "body-window-001", "relevanceScore": 2, "reason": "테슬라 Model 3 윈드쉴드" },
+        { "partId": "body-window-002", "relevanceScore": 2, "reason": "테슬라 Model Y 선루프" }
+      ],
+      "irrelevantParts": [
+        { "partId": "battery-002", "reason": "배터리 카테고리" },
+        { "partId": "motor-003", "reason": "모터 카테고리" }
+      ],
+      "difficulty": "medium",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q013",
+      "query": "500만원 이하 대용량 배터리",
+      "category": "battery",
+      "expectedRelevantParts": [
+        { "partId": "battery-001", "relevanceScore": 3, "reason": "450만원 아이오닉5 배터리" },
+        { "partId": "battery-008", "relevanceScore": 2, "reason": "420만원 르노 조에 배터리" },
+        { "partId": "battery-006", "relevanceScore": 1, "reason": "380만원 쉐보레 스파크" }
+      ],
+      "irrelevantParts": [
+        { "partId": "battery-007", "reason": "1450만원 초과" },
+        { "partId": "battery-009", "reason": "680만원 초과" }
+      ],
+      "difficulty": "hard",
+      "queryType": "mixed"
+    },
+    {
+      "id": "q014",
+      "query": "인장강도 500MPa 이상 고강도 패널",
+      "expectedRelevantParts": [
+        { "partId": "body-panel-002", "relevanceScore": 3, "reason": "Al 7075 인장강도 572MPa" },
+        { "partId": "body-chassis-002", "relevanceScore": 3, "reason": "Al 7075 인장강도 572MPa" },
+        { "partId": "body-chassis-001", "relevanceScore": 3, "reason": "CFRP 인장강도 3500MPa" }
+      ],
+      "irrelevantParts": [
+        { "partId": "body-panel-001", "reason": "Al 6061 인장강도 310MPa" },
+        { "partId": "body-door-001", "reason": "Al 5754 인장강도 220MPa" }
+      ],
+      "difficulty": "hard",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q015",
+      "query": "2022년 이후 신차 모터",
+      "category": "motor",
+      "expectedRelevantParts": [
+        { "partId": "motor-002", "relevanceScore": 3, "reason": "2022년식 기아 EV6 모터" }
+      ],
+      "irrelevantParts": [
+        { "partId": "motor-001", "reason": "2016년식" },
+        { "partId": "motor-003", "reason": "2019년식" }
+      ],
+      "difficulty": "easy",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q016",
+      "query": "LFP 안전한 배터리",
+      "category": "battery",
+      "expectedRelevantParts": [],
+      "irrelevantParts": [
+        { "partId": "battery-004", "reason": "LMO 양극재" },
+        { "partId": "battery-007", "reason": "NCA 양극재" }
+      ],
+      "difficulty": "hard",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q017",
+      "query": "수냉식 냉각 전력계통 부품",
+      "expectedRelevantParts": [
+        { "partId": "motor-001", "relevanceScore": 2, "reason": "수냉 냉각 모터" },
+        { "partId": "motor-002", "relevanceScore": 2, "reason": "수냉 냉각 모터" },
+        { "partId": "inverter-001", "relevanceScore": 2, "reason": "수냉 냉각 인버터" },
+        { "partId": "inverter-002", "relevanceScore": 2, "reason": "수냉 냉각 인버터" }
+      ],
+      "difficulty": "medium",
+      "queryType": "semantic"
+    },
+    {
+      "id": "q018",
+      "query": "재사용 가능한 배터리",
+      "category": "battery",
+      "expectedRelevantParts": [
+        { "partId": "battery-007", "relevanceScore": 3, "reason": "SOH 88% 재사용 최적" },
+        { "partId": "battery-008", "relevanceScore": 2, "reason": "SOH 78% 재사용 가능" },
+        { "partId": "battery-005", "relevanceScore": 2, "reason": "SOH 72% 재사용 가능" }
+      ],
+      "irrelevantParts": [
+        { "partId": "battery-004", "reason": "SOH 65% ESS 전환 권장" }
+      ],
+      "difficulty": "easy",
+      "queryType": "semantic"
+    },
+    {
+      "id": "q019",
+      "query": "닛산 리프 부품",
+      "expectedRelevantParts": [
+        { "partId": "battery-004", "relevanceScore": 3, "reason": "닛산 리프 배터리 팩" },
+        { "partId": "motor-004", "relevanceScore": 3, "reason": "닛산 리프 모터" },
+        { "partId": "inverter-004", "relevanceScore": 3, "reason": "닛산 리프 인버터" }
+      ],
+      "irrelevantParts": [
+        { "partId": "battery-001", "reason": "현대 아이오닉5" },
+        { "partId": "motor-001", "reason": "현대 아이오닉" }
+      ],
+      "difficulty": "easy",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q020",
+      "query": "350Nm 이상 고토크 모터",
+      "category": "motor",
+      "expectedRelevantParts": [
+        { "partId": "motor-006", "relevanceScore": 3, "reason": "395Nm 현대 코나 모터" },
+        { "partId": "motor-003", "relevanceScore": 3, "reason": "375Nm Tesla 모터" },
+        { "partId": "motor-002", "relevanceScore": 3, "reason": "350Nm 기아 EV6 모터" }
+      ],
+      "irrelevantParts": [
+        { "partId": "motor-001", "reason": "295Nm 미달" },
+        { "partId": "motor-005", "reason": "250Nm 미달" }
+      ],
+      "difficulty": "medium",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q021",
+      "query": "파노라마 선루프 유리",
+      "expectedRelevantParts": [
+        { "partId": "body-window-002", "relevanceScore": 3, "reason": "Tesla Model Y 파노라마 선루프" }
+      ],
+      "irrelevantParts": [
+        { "partId": "body-window-001", "reason": "프론트 윈드쉴드" },
+        { "partId": "body-window-003", "reason": "프론트 윈드쉴드" }
+      ],
+      "difficulty": "easy",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q022",
+      "query": "효율 97% 이상 SiC 인버터",
+      "category": "inverter",
+      "expectedRelevantParts": [
+        { "partId": "inverter-001", "relevanceScore": 3, "reason": "효율 97.8% SiC 800V" },
+        { "partId": "inverter-002", "relevanceScore": 3, "reason": "효율 98.2%" }
+      ],
+      "irrelevantParts": [
+        { "partId": "inverter-003", "reason": "효율 96.9%" },
+        { "partId": "inverter-004", "reason": "효율 95.5%" }
+      ],
+      "difficulty": "hard",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q023",
+      "query": "BMW 전기차 배터리 모터",
+      "expectedRelevantParts": [
+        { "partId": "battery-005", "relevanceScore": 3, "reason": "BMW i3 배터리" },
+        { "partId": "motor-005", "relevanceScore": 3, "reason": "BMW i3 모터" },
+        { "partId": "inverter-005", "relevanceScore": 2, "reason": "BMW i3 인버터" },
+        { "partId": "body-chassis-001", "relevanceScore": 1, "reason": "BMW i3 프레임" }
+      ],
+      "irrelevantParts": [
+        { "partId": "battery-001", "reason": "현대 제조사" },
+        { "partId": "motor-001", "reason": "현대 제조사" }
+      ],
+      "difficulty": "medium",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q024",
+      "query": "가볍고 튼튼한 차체 부품",
+      "expectedRelevantParts": [
+        { "partId": "body-chassis-001", "relevanceScore": 3, "reason": "CFRP 카본 45kg, 고강도" },
+        { "partId": "body-panel-002", "relevanceScore": 3, "reason": "Al 7075 고강도, 18kg" },
+        { "partId": "body-panel-001", "relevanceScore": 2, "reason": "알루미늄 경량 15kg" }
+      ],
+      "difficulty": "hard",
+      "queryType": "semantic"
+    },
+    {
+      "id": "q025",
+      "query": "NCA 양극재 장거리 주행 배터리",
+      "category": "battery",
+      "expectedRelevantParts": [
+        { "partId": "battery-007", "relevanceScore": 3, "reason": "NCA 양극재, 213,000km 예측" }
+      ],
+      "irrelevantParts": [
+        { "partId": "battery-005", "reason": "NCM 양극재" },
+        { "partId": "battery-004", "reason": "LMO 양극재" }
+      ],
+      "difficulty": "medium",
+      "queryType": "mixed"
+    },
+    {
+      "id": "q026",
+      "query": "도어 패널 교체용 부품",
+      "expectedRelevantParts": [
+        { "partId": "body-door-001", "relevanceScore": 3, "reason": "아우디 e-tron 도어" },
+        { "partId": "body-door-002", "relevanceScore": 3, "reason": "테슬라 Model 3 도어" },
+        { "partId": "body-door-003", "relevanceScore": 3, "reason": "기아 EV6 도어" }
+      ],
+      "irrelevantParts": [
+        { "partId": "body-panel-001", "reason": "후드 패널" },
+        { "partId": "body-panel-002", "reason": "루프 패널" }
+      ],
+      "difficulty": "easy",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q027",
+      "query": "폭스바겐 ID 플랫폼 호환",
+      "expectedRelevantParts": [
+        { "partId": "battery-010", "relevanceScore": 2, "reason": "VW e-Golf 배터리" },
+        { "partId": "inverter-006", "relevanceScore": 3, "reason": "VW ID.4 MEB 인버터" }
+      ],
+      "irrelevantParts": [
+        { "partId": "inverter-001", "reason": "현대 E-GMP 플랫폼" },
+        { "partId": "battery-001", "reason": "현대 E-GMP 플랫폼" }
+      ],
+      "difficulty": "hard",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q028",
+      "query": "저렴한 재활용 등급 배터리",
+      "category": "battery",
+      "expectedRelevantParts": [
+        { "partId": "battery-002", "relevanceScore": 3, "reason": "180만원 SOH 75% Tesla" },
+        { "partId": "battery-004", "relevanceScore": 3, "reason": "320만원 SOH 65% 재활용 등급" },
+        { "partId": "battery-006", "relevanceScore": 2, "reason": "380만원 SOH 68%" }
+      ],
+      "irrelevantParts": [
+        { "partId": "battery-007", "reason": "1450만원 고가" },
+        { "partId": "battery-009", "reason": "680만원 중가" }
+      ],
+      "difficulty": "medium",
+      "queryType": "semantic"
+    },
+    {
+      "id": "q029",
+      "query": "UV 차단 강화유리 윈드쉴드",
+      "expectedRelevantParts": [
+        { "partId": "body-window-001", "relevanceScore": 3, "reason": "UV 차단 코팅 윈드쉴드" },
+        { "partId": "body-window-003", "relevanceScore": 3, "reason": "UV/IR 차단 코팅 윈드쉴드" }
+      ],
+      "irrelevantParts": [
+        { "partId": "body-window-002", "reason": "선루프, 윈드쉴드 아님" }
+      ],
+      "difficulty": "easy",
+      "queryType": "keyword"
+    },
+    {
+      "id": "q030",
+      "query": "신품 상태 부품",
+      "expectedRelevantParts": [
+        { "partId": "inverter-002", "relevanceScore": 3, "reason": "신품 인버터" },
+        { "partId": "body-door-003", "relevanceScore": 3, "reason": "신품 도어" },
+        { "partId": "body-window-003", "relevanceScore": 3, "reason": "신품 윈드쉴드" }
+      ],
+      "difficulty": "medium",
+      "queryType": "keyword"
+    }
+  ],
+
+  "metadata": {
+    "totalQueries": 30,
+    "byDifficulty": { "easy": 10, "medium": 12, "hard": 8 },
+    "byQueryType": { "semantic": 6, "keyword": 18, "mixed": 6 },
+    "byCategory": {
+      "battery": 8,
+      "motor": 5,
+      "inverter": 4,
+      "body": 0,
+      "mixed": 13
+    }
+  }
+}
