@@ -1,7 +1,14 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { v4 as uuidv4 } from 'uuid';
-import { generateEmbedding, preparePartText } from '/opt/nodejs/utils/bedrock.js';
+import { generateEmbedding } from '/opt/nodejs/utils/bedrock.js';
+import {
+  buildEmbeddingText,
+  buildSearchText,
+  SEARCH_DOC_VERSION_ATTRIBUTE,
+  SEARCH_DOCUMENT_VERSION,
+  SEARCH_TEXT_ATTRIBUTE,
+} from '/opt/nodejs/utils/search-document.js';
 import { uploadVector, updateVectorsManifest } from '/opt/nodejs/utils/s3.js';
 import { putItem } from '/opt/nodejs/utils/dynamodb.js';
 import { successResponse, errorResponse, parseJsonBody } from '/opt/nodejs/utils/response.js';
@@ -80,6 +87,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       images,
       specifications,
       useCases,
+      batteryHealth,
     } = body;
 
     // Validation
@@ -94,6 +102,23 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     const partId = uuidv4();
     const timestamp = new Date().toISOString();
+
+    // 검색 문서는 사양·배터리 상태·활용 사례까지 포함한 전체 레코드로 한 번 만든다.
+    // 검색 시점에는 METADATA만 읽으므로, 여기서 만든 searchText를 METADATA에 함께 저장한다 (C-21)
+    const searchRecord = {
+      name,
+      category,
+      manufacturer,
+      model,
+      year: year || new Date().getFullYear(),
+      condition: condition || 'used',
+      price,
+      quantity: quantity || 1,
+      description,
+      specifications,
+      useCases,
+      batteryHealth,
+    };
 
     console.log('Registering new part:', partId);
 
@@ -112,6 +137,9 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       sellerId: sellerId || 'system',
       description: description || '',
       images: images || [],
+      ...(batteryHealth ? { batteryHealth } : {}),
+      [SEARCH_TEXT_ATTRIBUTE]: buildSearchText(searchRecord),
+      [SEARCH_DOC_VERSION_ATTRIBUTE]: SEARCH_DOCUMENT_VERSION,
       createdAt: timestamp,
       updatedAt: timestamp,
       GSI1PK: `CATEGORY#${category}`,
@@ -148,17 +176,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     // Step 4: Generate embedding
     console.log('Generating embedding...');
-    const partText = preparePartText({
-      name,
-      category,
-      manufacturer,
-      model,
-      description,
-      specifications,
-      useCases,
-    });
-
-    const embedding = await generateEmbedding(partText);
+    const embedding = await generateEmbedding(buildEmbeddingText(searchRecord));
 
     // Step 5: Upload vector to S3 (legacy JSON format for rollback)
     const vectorKey = `parts/${partId}.json`;
@@ -187,7 +205,8 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       PK: `PART#${partId}`,
       SK: 'VECTOR',
       s3Key: vectorKey,
-      embeddingModel: 'amazon.titan-embed-text-v1',
+      embeddingModel: 'amazon.titan-embed-text-v2:0',
+      searchDocVersion: SEARCH_DOCUMENT_VERSION,
       dimension: embedding.length,
       createdAt: timestamp,
     });
