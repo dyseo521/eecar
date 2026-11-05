@@ -17,7 +17,7 @@ import { findAliasGroups, MAKER_ALIASES, VEHICLE_ALIASES } from './search-vocabu
 import { extractSearchAttributes, SearchAttributes } from './search-attributes.js';
 
 /** 검색 문서 정의가 바뀌면 올린다. 저장된 searchText·임베딩이 어느 정의로 만들어졌는지 구분한다 */
-export const SEARCH_DOCUMENT_VERSION = 3; // 3: searchAttributes 추가 (A-27)
+export const SEARCH_DOCUMENT_VERSION = 4; // 3: searchAttributes 추가 (A-27), 4: searchAttributes.vehicles (E-27)
 
 /** 저장된 searchText가 현재 정의로 만들어졌는지 확인할 때 쓰는 METADATA 속성 이름 */
 export const SEARCH_TEXT_ATTRIBUTE = 'searchText';

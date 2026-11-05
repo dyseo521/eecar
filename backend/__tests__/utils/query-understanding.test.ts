@@ -3,6 +3,7 @@ import {
   parseQuery,
   rerankByConstraints,
   scopeConstraints,
+  summarizeCheck,
 } from '../../src/utils/query-understanding.js';
 
 describe('parseQuery', () => {
@@ -152,5 +153,14 @@ describe('parse options (E-27)', () => {
   it('scopes to vehicle constraints', () => {
     const c = parseQuery('아이오닉5 60kWh 이상 배터리', { vehicles: true });
     expect(scopeConstraints(c, 'vehicle')).toEqual({ categories: [], numeric: [], conditions: [], vehicles: ['아이오닉5'] });
+  });
+});
+
+describe('summarizeCheck', () => {
+  it('states mismatches first, then matches, and a neutral default', () => {
+    expect(summarizeCheck({ matched: ['카테고리'], mismatched: ['용량 17.6kWh'] })).toBe('조건 불일치: 용량 17.6kWh (일치: 카테고리)');
+    expect(summarizeCheck({ matched: [], mismatched: ['카테고리'] })).toBe('조건 불일치: 카테고리');
+    expect(summarizeCheck({ matched: ['카테고리', '용량 72kWh'], mismatched: [] })).toBe('조건 일치: 카테고리, 용량 72kWh');
+    expect(summarizeCheck({ matched: [], mismatched: [] })).toBe('검색어와 내용이 비슷한 부품');
   });
 });

@@ -102,6 +102,13 @@ Resources:
             RestApiId: !Ref EECARApi
             Path: /api/search
             Method: POST
+        # 결과 설명은 검색 응답과 분리해 나중에 받는다 (C-08, DECISION_LOG A-30)
+        SearchExplain:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EECARApi
+            Path: /api/search/explain
+            Method: POST
 
   PartRegistrationFunction:
     Type: AWS::Serverless::Function

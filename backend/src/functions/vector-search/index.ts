@@ -8,7 +8,7 @@ import { CANDIDATES_PER_RETRIEVER } from '/opt/nodejs/utils/search.js';
 import { getSearchIndex, partIdOf } from '/opt/nodejs/utils/search-index.js';
 import { SEARCH_DOCUMENT_VERSION, searchAttributesOf } from '/opt/nodejs/utils/search-document.js';
 import { bm25Candidates, rankCandidates, RankedResult } from '/opt/nodejs/utils/search-ranking.js';
-import { parseQuery } from '/opt/nodejs/utils/query-understanding.js';
+import { checkConstraints, parseSearchQuery, summarizeCheck } from '/opt/nodejs/utils/query-understanding.js';
 import {
   averageEmbeddings,
   expandSearchQuery,
@@ -52,20 +52,36 @@ function recordSearch(cached: boolean, resultCount: number, timings: Record<stri
 }
 
 /** 검색 파이프라인 정의가 바뀌면 올린다. 캐시 키에 들어가므로 배포 직후 이전 파이프라인의 결과가 나가지 않는다 */
-export const SEARCH_PIPELINE_VERSION = `rank-v3.doc-v${SEARCH_DOCUMENT_VERSION}`;
+export const SEARCH_PIPELINE_VERSION = `rank-v4.doc-v${SEARCH_DOCUMENT_VERSION}`;
 
 /**
  * 결과 캐시 키. 이전에는 질의 문자열만 써서 필터·topK가 다른 요청에 같은 결과를 돌려줬다 (C-04).
  */
-export function searchCacheKey(query: string, filters: Record<string, unknown> | undefined, topK: number): string {
+export function searchCacheKey(
+  query: string,
+  filters: Record<string, unknown> | undefined,
+  topK: number,
+  explain = true
+): string {
   const canonicalFilters = filters
     ? Object.fromEntries(Object.keys(filters).sort().map(key => [key, filters[key]]))
     : null;
   return crypto
     .createHash('md5')
-    .update(JSON.stringify({ q: query, f: canonicalFilters, k: topK, v: SEARCH_PIPELINE_VERSION }))
+    .update(JSON.stringify({ q: query, f: canonicalFilters, k: topK, e: explain, v: SEARCH_PIPELINE_VERSION }))
     .digest('hex');
 }
+
+/** 결과 설명 캐시 키: 질의와 부품 목록 (순서 무관) */
+export function explainCacheKey(query: string, partIds: string[]): string {
+  return crypto
+    .createHash('md5')
+    .update(JSON.stringify({ q: query, ids: [...partIds].sort(), v: SEARCH_PIPELINE_VERSION }))
+    .digest('hex');
+}
+
+/** 한 번에 설명을 만드는 최대 부품 수 (검색 topK 기본값의 2배) */
+const MAX_EXPLAIN_PARTS = 20;
 
 // Feature flags for gradual rollout
 const USE_S3_VECTORS = process.env.USE_S3_VECTORS === 'true';
@@ -243,6 +259,9 @@ async function timed<T>(timings: Record<string, number>, name: string, fn: () =>
  * 벡터와 BM25는 서로의 후보에 의존하지 않는다 (DECISION_LOG E-23).
  */
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  if ((event.resource ?? event.path ?? '').endsWith('/explain')) {
+    return explainHandler(event);
+  }
   const started = Date.now();
   const timings: Record<string, number> = {};
   try {
@@ -251,7 +270,8 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return parsed.response;
     }
     const body = parsed.body;
-    const { query, filters, topK = 10 } = body;
+    // explain=false: LLM 설명 없이 바로 응답하고, 설명은 /api/search/explain으로 따로 받는다 (C-08, A-30)
+    const { query, filters, topK = 10, explain = true } = body;
 
     if (!query) {
       return errorResponse('Query is required', undefined, 400, event);
@@ -260,7 +280,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     console.log('Processing search query:', query);
 
     // Step 1: Check cache
-    const queryHash = searchCacheKey(query, filters, topK);
+    const queryHash = searchCacheKey(query, filters, topK, explain);
     const cachedResult = await getItem(`MATCH#${queryHash}`, 'RESULT');
 
     if (cachedResult && cachedResult.TTL && Date.now() < cachedResult.TTL * 1000) {
@@ -302,7 +322,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     // Step 7: 결합 + 질의 조건(카테고리·수치) 재정렬 (E-23, E-25)
     const rankStarted = Date.now();
-    const constraints = parseQuery(query);
+    const constraints = parseSearchQuery(query);
     const ranked = rankCandidates(query, vectorMatches, bm25Matches, id => {
       const item = partsMap.get(id);
       return index.attributes.get(id) ?? (item ? searchAttributesOf(item) : undefined);
@@ -317,7 +337,9 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     const parts = topMatches.map(m => partsMap.get(m.id));
 
     // Step 9: 결과 설명 (단일 프롬프트, 조건 확인 결과를 근거로 준다)
-    const filteredResults = await timed(timings, 'ExplanationMs', () => enrichWithAISequential(query, topMatches, parts));
+    const filteredResults = explain
+      ? await timed(timings, 'ExplanationMs', () => enrichWithAISequential(query, topMatches, parts))
+      : buildResults(topMatches, parts, null);
 
     // Step 10: Cache the results (7 days TTL)
     const ttl = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60;
@@ -455,8 +477,15 @@ async function enrichWithAISequential(
   const started = Date.now();
   const { explanations, fallback } = await generateExplanations(query, items, generateWithClaude);
   recordLlmCall('Explanation', Date.now() - started, fallback);
+  return buildResults(present, parts, explanations);
+}
 
-  // Build results with explanations
+/**
+ * 응답 결과를 만든다. explanations가 null이면 조건 확인 요약을 설명 자리에 넣는다 (LLM 없이 즉시 응답)
+ */
+function buildResults(matches: RankedResult[], parts: any[], explanations: string[] | null): any[] {
+  const partsMap = new Map(parts.filter(Boolean).map(p => [p.PK.split('#')[1], p]));
+  const present = matches.filter(match => partsMap.has(match.id));
   return present.map((match, index) => {
     const part = partsMap.get(match.id);
 
@@ -482,9 +511,74 @@ async function enrichWithAISequential(
         quantity: part.quantity,
         images: part.images || [],
       },
-      reason: explanations[index] || FALLBACK_REASON,
+      reason: explanations ? explanations[index] || FALLBACK_REASON : summarizeCheck(match.constraints),
+      reasonSource: explanations ? 'ai' : 'rules',
     };
   });
+}
+
+/**
+ * POST /api/search/explain { query, partIds } → { explanations: { [partId]: 설명 } }
+ * 검색 응답과 분리해, 결과를 먼저 보여 주고 설명은 나중에 채운다 (C-08: 설명이 응답 시간의 83%였다)
+ */
+async function explainHandler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  try {
+    const parsed = parseJsonBody(event);
+    if (!parsed.ok) return parsed.response;
+    const { query, partIds } = parsed.body;
+    if (!query || !Array.isArray(partIds) || partIds.length === 0 || partIds.some(id => typeof id !== 'string')) {
+      return errorResponse('query and partIds are required', undefined, 400, event);
+    }
+    const ids = [...new Set(partIds as string[])].slice(0, MAX_EXPLAIN_PARTS);
+
+    const key = explainCacheKey(query, ids);
+    const cached = await getItem(`MATCH#${key}`, 'EXPLAIN');
+    if (cached && cached.TTL && Date.now() < cached.TTL * 1000) {
+      return successResponse({ explanations: cached.explanations, cached: true }, 200, event);
+    }
+
+    const { index } = await getSearchIndex();
+    const items = new Map<string, DynamoDBItem>();
+    const missing: Array<{ pk: string; sk: string }> = [];
+    for (const id of ids) {
+      const item = index.parts.get(id);
+      if (item) items.set(id, item);
+      else missing.push({ pk: `PART#${id}`, sk: 'METADATA' });
+    }
+    if (missing.length > 0) {
+      for (const item of await batchGetItems(missing)) items.set(partIdOf(item), item);
+    }
+
+    const constraints = parseSearchQuery(query);
+    const present = ids.filter(id => items.has(id));
+    const prompts = present.map(id => {
+      const part = items.get(id)!;
+      const check = checkConstraints(index.attributes.get(id) ?? searchAttributesOf(part), constraints);
+      return { id, name: part.name, manufacturer: part.manufacturer, category: part.category,
+        matched: check.matched, mismatched: check.mismatched };
+    });
+    const started = Date.now();
+    const { explanations, fallback } = await generateExplanations(query, prompts, generateWithClaude);
+    recordLlmCall('Explanation', Date.now() - started, fallback);
+    const byId = Object.fromEntries(present.map((id, i) => [id, explanations[i] || FALLBACK_REASON]));
+
+    if (!fallback) {
+      await putItem({
+        PK: `MATCH#${key}`,
+        SK: 'EXPLAIN',
+        query,
+        partIds: ids,
+        explanations: byId,
+        pipelineVersion: SEARCH_PIPELINE_VERSION,
+        createdAt: new Date().toISOString(),
+        TTL: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60,
+      });
+    }
+    return successResponse({ explanations: byId, cached: false }, 200, event);
+  } catch (error: any) {
+    console.error('Error in search explanation:', error);
+    return errorResponse('Internal server error', error.message, 500, event);
+  }
 }
 
 /**

@@ -13,7 +13,7 @@ import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { Readable } from 'stream';
 import { sdkStreamMixin } from '@aws-sdk/util-stream-node';
-import { handler, matchesFilters, searchCacheKey } from '../../src/functions/vector-search/index.js';
+import { explainCacheKey, handler, matchesFilters, searchCacheKey } from '../../src/functions/vector-search/index.js';
 import { resetSearchIndexCache } from '../../src/utils/search-index.js';
 
 const docMock = mockClient(DynamoDBDocumentClient);
@@ -34,9 +34,14 @@ const indexed = [
 ];
 const vectors: Record<string, number[]> = { a: [1, 0], b: [0.2, 0.98], c: [0.9, 0.1], d: [0.95, 0.05] };
 
-function event(payload: unknown): APIGatewayProxyEvent {
-  return { body: JSON.stringify(payload), headers: {} } as unknown as APIGatewayProxyEvent;
+function event(payload: unknown, path = '/api/search'): APIGatewayProxyEvent {
+  return { body: JSON.stringify(payload), headers: {}, path, resource: path } as unknown as APIGatewayProxyEvent;
 }
+
+const results = (res: { body: string }) => {
+  const parsed = JSON.parse(res.body);
+  return (parsed.data?.results ?? parsed.results) as any[];
+};
 
 describe('vector-search handler', () => {
   beforeEach(() => {
@@ -92,6 +97,46 @@ describe('vector-search handler', () => {
     const res = await handler(event({}));
     expect(res.statusCode).toBe(400);
   });
+
+  it('answers without calling Claude when explain is false and puts the condition summary in the reason', async () => {
+    const res = await handler(event({ query: '아이오닉5 배터리', topK: 2, explain: false }));
+    const items = results(res);
+    expect(items.length).toBeGreaterThan(0);
+    expect(items[0]).toMatchObject({ reasonSource: 'rules', reason: '조건 일치: 카테고리, 차종' });
+    expect(items[0].conditions).toEqual({ matched: ['카테고리', '차종'], mismatched: [] });
+    // 임베딩 호출만 있고 Claude 호출은 없다
+    const claudeCalls = bedrockMock.commandCalls(InvokeModelCommand).filter(c => !String(c.args[0].input.modelId).includes('titan'));
+    expect(claudeCalls).toHaveLength(0);
+  });
+
+  it('explains given parts separately and caches successful explanations', async () => {
+    bedrockMock.on(InvokeModelCommand).callsFake(input => {
+      if (String(input.modelId).includes('titan-embed')) {
+        return { body: new TextEncoder().encode(JSON.stringify({ embedding: [1, 0] })) };
+      }
+      const text = JSON.stringify(['카테고리 일치, 아이오닉5 배터리 팩', '모터라서 조건 불일치']);
+      return { body: new TextEncoder().encode(JSON.stringify({ content: [{ type: 'text', text }] })) };
+    });
+    const res = await handler(event({ query: '아이오닉5 배터리', partIds: ['a', 'b'] }, '/api/search/explain'));
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body).explanations).toEqual({ a: '카테고리 일치, 아이오닉5 배터리 팩', b: '모터라서 조건 불일치' });
+    const put = docMock.commandCalls(PutCommand).find(c => c.args[0].input.Item?.SK === 'EXPLAIN');
+    expect(put?.args[0].input.Item?.PK).toBe(`MATCH#${explainCacheKey('아이오닉5 배터리', ['b', 'a'])}`);
+  });
+
+  it('returns cached explanations without calling Claude', async () => {
+    docMock.on(GetCommand).resolves({ Item: { explanations: { a: '캐시된 설명' }, TTL: Math.floor(Date.now() / 1000) + 60 } });
+    const res = await handler(event({ query: '배터리', partIds: ['a'] }, '/api/search/explain'));
+    expect(JSON.parse(res.body)).toEqual({ explanations: { a: '캐시된 설명' }, cached: true });
+  });
+
+  it('does not cache fallback explanations and validates the request', async () => {
+    const res = await handler(event({ query: '배터리', partIds: ['a'] }, '/api/search/explain'));
+    expect(res.statusCode).toBe(200);
+    expect(docMock.commandCalls(PutCommand).filter(c => c.args[0].input.Item?.SK === 'EXPLAIN')).toHaveLength(0);
+    expect((await handler(event({ query: '배터리' }, '/api/search/explain'))).statusCode).toBe(400);
+    expect((await handler(event({ query: '배터리', partIds: [1] }, '/api/search/explain'))).statusCode).toBe(400);
+  });
 });
 
 describe('searchCacheKey', () => {
@@ -100,6 +145,7 @@ describe('searchCacheKey', () => {
     expect(searchCacheKey('배터리', { category: 'battery' }, 10)).not.toBe(base);
     expect(searchCacheKey('배터리', undefined, 5)).not.toBe(base);
     expect(searchCacheKey('배터리', { a: 1, b: 2 }, 10)).toBe(searchCacheKey('배터리', { b: 2, a: 1 }, 10));
+    expect(searchCacheKey('배터리', undefined, 10, false)).not.toBe(base);
   });
 });
 
