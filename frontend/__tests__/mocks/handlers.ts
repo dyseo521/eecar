@@ -94,6 +94,15 @@ export const handlers = [
     return HttpResponse.json(part);
   }),
 
+  // POST /api/search/explain - 검색 결과 설명 (검색 응답과 분리)
+  http.post('*/api/search/explain', async ({ request }) => {
+    const body = await request.json() as { query: string; partIds: string[] };
+    return HttpResponse.json({
+      explanations: Object.fromEntries(body.partIds.map(id => [id, `${body.query}: ${id} 설명`])),
+      cached: false,
+    });
+  }),
+
   // POST /api/search - Search parts
   http.post('*/api/search', async ({ request }) => {
     const body = await request.json() as { query?: string; filters?: { category?: string } };
