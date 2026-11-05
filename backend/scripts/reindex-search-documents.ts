@@ -6,7 +6,7 @@
  *   S3_VECTORS_BUCKET=eecar-vectors-index-12234628 npx tsx scripts/reindex-search-documents.ts [--apply]
  *
  * 1. 전체 부품을 SPEC·BATTERY_HEALTH·USAGE까지 합쳐 읽는다.
- * 2. buildSearchText로 searchText를 만들어 METADATA에 저장한다. 검색 시점 BM25는 METADATA만 읽으므로,
+ * 2. buildSearchText로 searchText를, extractSearchAttributes로 비교용 속성을 만들어 METADATA에 저장한다. 검색 시점 BM25는 METADATA만 읽으므로,
  *    이 단계 전에는 SPEC에 있는 사양이 BM25에 보이지 않았다.
  * 3. buildEmbeddingText로 임베딩을 다시 만들어 S3 JSON 벡터와 S3 Vectors 색인을 갱신한다.
  *
@@ -65,6 +65,7 @@ async function main(): Promise<void> {
     buildSearchText,
     SEARCH_DOCUMENT_VERSION,
   } = await import('../src/utils/search-document.js');
+  const { extractSearchAttributes } = await import('../src/utils/search-attributes.js');
 
   const parts = await loadPartsWithDetails({ details: ['SPEC', 'BATTERY_HEALTH'] });
   const s3Keys = S3_VECTORS_BUCKET ? await listS3VectorKeys() : new Set<string>();
@@ -115,7 +116,11 @@ async function main(): Promise<void> {
         }],
       }));
     }
-    await updateItem(pk, 'METADATA', { searchText, searchDocVersion: SEARCH_DOCUMENT_VERSION });
+    await updateItem(pk, 'METADATA', {
+      searchText,
+      searchAttributes: extractSearchAttributes(record),
+      searchDocVersion: SEARCH_DOCUMENT_VERSION,
+    });
     await updateItem(pk, 'VECTOR', {
       embeddingModel: 'amazon.titan-embed-text-v2:0',
       searchDocVersion: SEARCH_DOCUMENT_VERSION,
