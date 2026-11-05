@@ -83,6 +83,25 @@ jobs:
       - name: Lint backend
         run: cd backend && npm run lint
 
+  # Search quality (offline): dataset integrity + regression gate on production search code
+  search-eval:
+    name: Search Eval
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js workspace
+        uses: ./.github/actions/setup-node-workspace
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Eval unit tests
+        run: cd eval && uv run pytest -q
+
+      - name: Search quality regression gate (BM25)
+        run: cd eval && uv run python -m eecar_eval.gate --system bm25
+
   # E2E tests (only on master)
   e2e:
     name: E2E Tests
@@ -122,7 +141,7 @@ jobs:
   # Summary job
   test-summary:
     name: Test Summary
-    needs: [backend-unit, frontend-unit, type-check, lint, e2e]
+    needs: [backend-unit, frontend-unit, type-check, lint, search-eval, e2e]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -136,9 +155,10 @@ jobs:
           echo "| Frontend Tests | ${{ needs.frontend-unit.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Type Check | ${{ needs.type-check.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Lint Check | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Search Eval | ${{ needs.search-eval.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| E2E Tests | ${{ needs.e2e.result }} |" >> $GITHUB_STEP_SUMMARY
 
-          if [ "${{ needs.backend-unit.result }}" = "failure" ] || [ "${{ needs.frontend-unit.result }}" = "failure" ] || [ "${{ needs.type-check.result }}" = "failure" ] || [ "${{ needs.lint.result }}" = "failure" ] || [ "${{ needs.e2e.result }}" = "failure" ]; then
+          if [ "${{ needs.backend-unit.result }}" = "failure" ] || [ "${{ needs.frontend-unit.result }}" = "failure" ] || [ "${{ needs.type-check.result }}" = "failure" ] || [ "${{ needs.lint.result }}" = "failure" ] || [ "${{ needs.search-eval.result }}" = "failure" ] || [ "${{ needs.e2e.result }}" = "failure" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "❌ Some tests failed!" >> $GITHUB_STEP_SUMMARY
             exit 1
