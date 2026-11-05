@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { generateEmbedding, findTopKSimilar, callClaude } from '/opt/nodejs/utils/bedrock.js';
 import { getVector, listVectorKeys } from '/opt/nodejs/utils/s3.js';
 import { getItem, putItem, batchGetItems } from '/opt/nodejs/utils/dynamodb.js';
-import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
+import { successResponse, errorResponse, parseJsonBody } from '/opt/nodejs/utils/response.js';
 import { hybridSearch, preparePartForBM25 } from '/opt/nodejs/utils/search.js';
 
 // Feature flags for gradual rollout
@@ -207,7 +207,11 @@ async function generateMultiQueryEmbedding(queries: string[]): Promise<number[]>
  */
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    const body = JSON.parse(event.body || '{}');
+    const parsed = parseJsonBody(event);
+    if (!parsed.ok) {
+      return parsed.response;
+    }
+    const body = parsed.body;
     const { query, filters, topK = 10 } = body;
 
     if (!query) {

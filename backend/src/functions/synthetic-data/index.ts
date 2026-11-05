@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { callClaude, generateEmbedding, preparePartText } from '/opt/nodejs/utils/bedrock.js';
 import { uploadVector, updateVectorsManifest } from '/opt/nodejs/utils/s3.js';
 import { putItem } from '/opt/nodejs/utils/dynamodb.js';
-import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
+import { successResponse, errorResponse, parseJsonBody } from '/opt/nodejs/utils/response.js';
 import {
   randomChoice,
   randomInt,
@@ -73,7 +73,11 @@ async function uploadToS3Vectors(
  */
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    const body = JSON.parse(event.body || '{}');
+    const parsed = parseJsonBody(event);
+    if (!parsed.ok) {
+      return parsed.response;
+    }
+    const body = parsed.body;
     const { category, count = 1, template, useClaudeEnhancement = true } = body;
 
     if (!category) {
