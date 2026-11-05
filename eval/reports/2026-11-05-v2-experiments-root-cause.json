@@ -1,0 +1,5435 @@
+{
+  "meta": {
+    "date": "2026-11-05",
+    "commit": "42fa856",
+    "baseline": "prod-ws-a0.7-c20",
+    "dataset": "v2",
+    "grid": "root-cause",
+    "dev_queries": 177,
+    "test_queries": 174,
+    "configs": 96
+  },
+  "split": {
+    "d208": "dev",
+    "d247": "test",
+    "d064": "dev",
+    "d180": "test",
+    "d140": "dev",
+    "d108": "test",
+    "d151": "dev",
+    "d154": "test",
+    "d105": "dev",
+    "d084": "test",
+    "d225": "dev",
+    "d096": "test",
+    "d132": "dev",
+    "d117": "test",
+    "d243": "dev",
+    "d166": "test",
+    "d078": "dev",
+    "d110": "test",
+    "d260": "dev",
+    "d118": "test",
+    "d123": "dev",
+    "d233": "test",
+    "d024": "dev",
+    "d251": "test",
+    "d074": "dev",
+    "d147": "test",
+    "d055": "dev",
+    "d218": "test",
+    "d092": "dev",
+    "d202": "test",
+    "d134": "dev",
+    "d081": "test",
+    "d210": "dev",
+    "d073": "test",
+    "d120": "dev",
+    "d138": "test",
+    "d246": "dev",
+    "d209": "test",
+    "d008": "dev",
+    "d145": "test",
+    "d259": "dev",
+    "d162": "test",
+    "d211": "dev",
+    "d030": "test",
+    "d196": "dev",
+    "d255": "test",
+    "d220": "dev",
+    "d240": "test",
+    "d175": "dev",
+    "d048": "test",
+    "d188": "dev",
+    "d127": "test",
+    "d148": "dev",
+    "d129": "test",
+    "d106": "dev",
+    "d022": "test",
+    "d152": "dev",
+    "d181": "test",
+    "d169": "dev",
+    "d213": "test",
+    "d234": "dev",
+    "d248": "test",
+    "d198": "dev",
+    "d049": "test",
+    "d095": "dev",
+    "d176": "test",
+    "d159": "dev",
+    "d192": "test",
+    "d139": "dev",
+    "d135": "test",
+    "d116": "dev",
+    "d157": "test",
+    "d017": "dev",
+    "d015": "test",
+    "d214": "dev",
+    "d257": "test",
+    "d250": "dev",
+    "d103": "test",
+    "d115": "dev",
+    "d053": "test",
+    "d197": "dev",
+    "d161": "test",
+    "d113": "dev",
+    "d215": "test",
+    "d249": "dev",
+    "d099": "test",
+    "d184": "dev",
+    "d042": "test",
+    "d063": "dev",
+    "d236": "test",
+    "d155": "dev",
+    "d051": "test",
+    "d107": "dev",
+    "d164": "test",
+    "d150": "dev",
+    "d130": "test",
+    "d258": "dev",
+    "d235": "test",
+    "d023": "dev",
+    "d122": "test",
+    "d253": "dev",
+    "d036": "test",
+    "d052": "dev",
+    "d086": "test",
+    "d242": "dev",
+    "d104": "test",
+    "d141": "dev",
+    "d007": "test",
+    "d126": "dev",
+    "d128": "test",
+    "d021": "dev",
+    "d100": "test",
+    "d231": "dev",
+    "d028": "test",
+    "d153": "dev",
+    "d187": "test",
+    "d142": "dev",
+    "d171": "test",
+    "d163": "dev",
+    "d013": "test",
+    "d194": "dev",
+    "d168": "test",
+    "d241": "dev",
+    "d223": "test",
+    "d245": "dev",
+    "d205": "test",
+    "d244": "dev",
+    "d111": "test",
+    "d165": "dev",
+    "d200": "test",
+    "d045": "dev",
+    "d167": "test",
+    "d204": "dev",
+    "d193": "test",
+    "d207": "dev",
+    "d199": "test",
+    "d191": "dev",
+    "d149": "test",
+    "d085": "dev",
+    "d178": "test",
+    "d221": "dev",
+    "d133": "test",
+    "d080": "dev",
+    "d143": "test",
+    "d121": "dev",
+    "d146": "test",
+    "d170": "dev",
+    "d222": "test",
+    "d144": "dev",
+    "d256": "test",
+    "d158": "dev",
+    "d125": "test",
+    "d203": "dev",
+    "d087": "test",
+    "d156": "dev",
+    "d097": "test",
+    "d035": "dev",
+    "d076": "test",
+    "d005": "dev",
+    "d025": "test",
+    "d082": "dev",
+    "d047": "test",
+    "d034": "dev",
+    "d012": "test",
+    "d029": "dev",
+    "d072": "test",
+    "d226": "dev",
+    "d039": "test",
+    "d019": "dev",
+    "d160": "test",
+    "d119": "dev",
+    "d009": "test",
+    "d217": "dev",
+    "d228": "test",
+    "d227": "dev",
+    "d043": "test",
+    "d040": "dev",
+    "d027": "test",
+    "d050": "dev",
+    "d001": "test",
+    "d219": "dev",
+    "d066": "test",
+    "d046": "dev",
+    "d079": "test",
+    "d112": "dev",
+    "d054": "test",
+    "d232": "dev",
+    "d098": "test",
+    "d038": "dev",
+    "d006": "test",
+    "d237": "dev",
+    "d068": "test",
+    "d014": "dev",
+    "d136": "test",
+    "d044": "dev",
+    "d070": "test",
+    "d238": "dev",
+    "d067": "test",
+    "d002": "dev",
+    "d010": "test",
+    "d056": "dev",
+    "d230": "test",
+    "d031": "dev",
+    "d077": "test",
+    "d075": "dev",
+    "d186": "test",
+    "d190": "dev",
+    "d109": "test",
+    "d065": "dev",
+    "d185": "test",
+    "d011": "dev",
+    "d124": "test",
+    "d060": "dev",
+    "d102": "test",
+    "d071": "dev",
+    "d037": "test",
+    "d216": "dev",
+    "d229": "test",
+    "d033": "dev",
+    "d089": "test",
+    "d131": "dev",
+    "d195": "test",
+    "d239": "dev",
+    "d201": "test",
+    "d058": "dev",
+    "d177": "test",
+    "d252": "dev",
+    "d057": "test",
+    "d173": "dev",
+    "d212": "test",
+    "d183": "dev",
+    "d179": "test",
+    "d094": "dev",
+    "d026": "test",
+    "d101": "dev",
+    "d083": "test",
+    "d088": "dev",
+    "d093": "test",
+    "d206": "dev",
+    "d059": "test",
+    "d016": "dev",
+    "d182": "test",
+    "d061": "dev",
+    "d041": "test",
+    "d090": "dev",
+    "d114": "test",
+    "d224": "dev",
+    "d069": "test",
+    "d174": "dev",
+    "d003": "test",
+    "d032": "dev",
+    "d004": "test",
+    "d172": "dev",
+    "d091": "test",
+    "d137": "dev",
+    "d062": "test",
+    "d189": "dev",
+    "d254": "test",
+    "d018": "dev",
+    "d020": "test",
+    "q024": "dev",
+    "q038": "test",
+    "q037": "dev",
+    "q031": "test",
+    "q052": "dev",
+    "q028": "test",
+    "q007": "dev",
+    "q061": "test",
+    "q079": "dev",
+    "q009": "test",
+    "q040": "dev",
+    "q006": "test",
+    "q047": "dev",
+    "q005": "test",
+    "q069": "dev",
+    "q004": "test",
+    "q084": "dev",
+    "q071": "test",
+    "q056": "dev",
+    "q003": "test",
+    "q039": "dev",
+    "q074": "test",
+    "q050": "dev",
+    "q077": "test",
+    "q032": "dev",
+    "q041": "test",
+    "q030": "dev",
+    "q055": "test",
+    "q063": "dev",
+    "q062": "test",
+    "q072": "dev",
+    "q045": "test",
+    "q015": "dev",
+    "q058": "test",
+    "q089": "dev",
+    "q023": "test",
+    "q087": "dev",
+    "q001": "test",
+    "q065": "dev",
+    "q042": "test",
+    "q090": "dev",
+    "q054": "test",
+    "q066": "dev",
+    "q049": "test",
+    "q008": "dev",
+    "q051": "test",
+    "q002": "dev",
+    "q082": "test",
+    "q029": "dev",
+    "q013": "test",
+    "q011": "dev",
+    "q012": "test",
+    "q080": "dev",
+    "q044": "dev",
+    "q091": "test",
+    "q048": "dev",
+    "q019": "test",
+    "q010": "dev",
+    "q016": "test",
+    "q086": "dev",
+    "q078": "test",
+    "q075": "dev",
+    "q057": "test",
+    "q053": "dev",
+    "q020": "test",
+    "q033": "dev",
+    "q018": "test",
+    "q083": "dev",
+    "q025": "test",
+    "q036": "dev",
+    "q081": "dev",
+    "q026": "test",
+    "q085": "dev",
+    "q088": "test",
+    "q064": "dev",
+    "q070": "test",
+    "q017": "dev",
+    "q068": "test",
+    "q073": "dev",
+    "q059": "test",
+    "q035": "dev",
+    "q046": "test",
+    "q076": "dev",
+    "q021": "test",
+    "q022": "dev",
+    "q014": "test",
+    "q060": "dev",
+    "q034": "test",
+    "q067": "dev",
+    "q043": "test",
+    "q027": "dev"
+  },
+  "rows": [
+    {
+      "family": "A.prod-alpha",
+      "name": "prod-ws-a0.7-c20",
+      "retrieval": "prod",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 20,
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6914,
+        "recall@10": 0.7039,
+        "mrr@10": 0.7569,
+        "p@5": 0.4226,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7004,
+        "recall@10": 0.7109,
+        "mrr@10": 0.7733,
+        "p@5": 0.4264,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.7922,
+          "recall@10": 0.8214,
+          "mrr@10": 0.8171,
+          "p@5": 0.4514,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5755,
+          "recall@10": 0.5495,
+          "mrr@10": 0.6807,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5193,
+          "recall@10": 0.5188,
+          "mrr@10": 0.6598,
+          "p@5": 0.385,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "A.prod-alpha",
+      "name": "prod-ws-a0.9-c20",
+      "retrieval": "prod",
+      "fusion": "weighted",
+      "alpha": 0.9,
+      "candidates": 20,
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7197,
+        "recall@10": 0.727,
+        "mrr@10": 0.8112,
+        "p@5": 0.4226,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7259,
+        "recall@10": 0.7231,
+        "mrr@10": 0.8267,
+        "p@5": 0.4276,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8337,
+          "recall@10": 0.8492,
+          "mrr@10": 0.8854,
+          "p@5": 0.4552,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5981,
+          "recall@10": 0.5621,
+          "mrr@10": 0.7712,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5179,
+          "recall@10": 0.5384,
+          "mrr@10": 0.6486,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "G.doc-vector",
+      "name": "doc-legacy-vector",
+      "retrieval": "full",
+      "fusion": "vector",
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6853,
+        "recall@10": 0.7016,
+        "mrr@10": 0.7648,
+        "p@5": 0.4,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6901,
+        "recall@10": 0.7001,
+        "mrr@10": 0.7888,
+        "p@5": 0.3954,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.822,
+          "recall@10": 0.8382,
+          "mrr@10": 0.8894,
+          "p@5": 0.4343,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5285,
+          "recall@10": 0.4999,
+          "mrr@10": 0.6615,
+          "p@5": 0.3563,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4519,
+          "recall@10": 0.5043,
+          "mrr@10": 0.5202,
+          "p@5": 0.345,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "G.doc-bm25",
+      "name": "doc-legacy-bm25",
+      "retrieval": "full",
+      "fusion": "bm25",
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.5962,
+        "recall@10": 0.612,
+        "mrr@10": 0.6504,
+        "p@5": 0.3627,
+        "zero_result": 0.0226
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6001,
+        "recall@10": 0.6241,
+        "mrr@10": 0.6468,
+        "p@5": 0.3632,
+        "zero_result": 0.0057
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.6606,
+          "recall@10": 0.709,
+          "mrr@10": 0.6785,
+          "p@5": 0.3657,
+          "zero_result": 0.0095
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.4942,
+          "recall@10": 0.4474,
+          "mrr@10": 0.6083,
+          "p@5": 0.3375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5089,
+          "recall@10": 0.4889,
+          "mrr@10": 0.6104,
+          "p@5": 0.375,
+          "zero_result": 0.075
+        }
+      }
+    },
+    {
+      "family": "G.doc-prod",
+      "name": "doc-legacy-prod-a0.7-c20",
+      "retrieval": "prod",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 20,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6914,
+        "recall@10": 0.7039,
+        "mrr@10": 0.7569,
+        "p@5": 0.4226,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7004,
+        "recall@10": 0.7109,
+        "mrr@10": 0.7733,
+        "p@5": 0.4264,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.7922,
+          "recall@10": 0.8214,
+          "mrr@10": 0.8171,
+          "p@5": 0.4514,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5755,
+          "recall@10": 0.5495,
+          "mrr@10": 0.6807,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5193,
+          "recall@10": 0.5188,
+          "mrr@10": 0.6598,
+          "p@5": 0.385,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-legacy",
+      "name": "doc-legacy-full-a0.5",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7216,
+        "recall@10": 0.7362,
+        "mrr@10": 0.7899,
+        "p@5": 0.4282,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7141,
+        "recall@10": 0.7265,
+        "mrr@10": 0.7795,
+        "p@5": 0.4345,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8204,
+          "recall@10": 0.8426,
+          "mrr@10": 0.8528,
+          "p@5": 0.4476,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6009,
+          "recall@10": 0.5842,
+          "mrr@10": 0.7125,
+          "p@5": 0.4,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5588,
+          "recall@10": 0.5785,
+          "mrr@10": 0.6866,
+          "p@5": 0.4,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-legacy",
+      "name": "doc-legacy-full-a0.6",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7343,
+        "recall@10": 0.7341,
+        "mrr@10": 0.8112,
+        "p@5": 0.4305,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7334,
+        "recall@10": 0.7328,
+        "mrr@10": 0.8144,
+        "p@5": 0.431,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8364,
+          "recall@10": 0.8433,
+          "mrr@10": 0.8791,
+          "p@5": 0.4533,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.608,
+          "recall@10": 0.5633,
+          "mrr@10": 0.7458,
+          "p@5": 0.3937,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5672,
+          "recall@10": 0.5842,
+          "mrr@10": 0.6851,
+          "p@5": 0.4,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-legacy",
+      "name": "doc-legacy-full-a0.7",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7345,
+        "recall@10": 0.7296,
+        "mrr@10": 0.8116,
+        "p@5": 0.4362,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7415,
+        "recall@10": 0.737,
+        "mrr@10": 0.8263,
+        "p@5": 0.4368,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8435,
+          "recall@10": 0.851,
+          "mrr@10": 0.8841,
+          "p@5": 0.4571,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.596,
+          "recall@10": 0.5452,
+          "mrr@10": 0.7451,
+          "p@5": 0.3937,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5593,
+          "recall@10": 0.5584,
+          "mrr@10": 0.6744,
+          "p@5": 0.415,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-legacy",
+      "name": "doc-legacy-full-a0.8",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.738,
+        "recall@10": 0.7433,
+        "mrr@10": 0.8213,
+        "p@5": 0.4362,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7356,
+        "recall@10": 0.7345,
+        "mrr@10": 0.8297,
+        "p@5": 0.4287,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8534,
+          "recall@10": 0.8612,
+          "mrr@10": 0.9076,
+          "p@5": 0.461,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5855,
+          "recall@10": 0.5468,
+          "mrr@10": 0.7344,
+          "p@5": 0.3813,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5571,
+          "recall@10": 0.5911,
+          "mrr@10": 0.6643,
+          "p@5": 0.415,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-legacy",
+      "name": "doc-legacy-full-a0.9",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.9,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7188,
+        "recall@10": 0.7317,
+        "mrr@10": 0.8051,
+        "p@5": 0.4215,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7171,
+        "recall@10": 0.7173,
+        "mrr@10": 0.8161,
+        "p@5": 0.4184,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8439,
+          "recall@10": 0.8597,
+          "mrr@10": 0.9068,
+          "p@5": 0.4514,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5682,
+          "recall@10": 0.5088,
+          "mrr@10": 0.7243,
+          "p@5": 0.3563,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5111,
+          "recall@10": 0.5738,
+          "mrr@10": 0.6029,
+          "p@5": 0.395,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n20-a0.5",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "candidates": 20,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7127,
+        "recall@10": 0.7267,
+        "mrr@10": 0.803,
+        "p@5": 0.4147,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7078,
+        "recall@10": 0.7233,
+        "mrr@10": 0.8032,
+        "p@5": 0.4092,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.808,
+          "recall@10": 0.8387,
+          "mrr@10": 0.8643,
+          "p@5": 0.4381,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5815,
+          "recall@10": 0.5263,
+          "mrr@10": 0.7554,
+          "p@5": 0.3688,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5676,
+          "recall@10": 0.5931,
+          "mrr@10": 0.68,
+          "p@5": 0.39,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n20-a0.6",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "candidates": 20,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7136,
+        "recall@10": 0.7303,
+        "mrr@10": 0.7982,
+        "p@5": 0.4271,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.713,
+        "recall@10": 0.717,
+        "mrr@10": 0.8184,
+        "p@5": 0.4149,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8244,
+          "recall@10": 0.8449,
+          "mrr@10": 0.8822,
+          "p@5": 0.4533,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5753,
+          "recall@10": 0.5369,
+          "mrr@10": 0.7293,
+          "p@5": 0.3813,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5333,
+          "recall@10": 0.5844,
+          "mrr@10": 0.6328,
+          "p@5": 0.395,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n20-a0.7",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 20,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7156,
+        "recall@10": 0.7348,
+        "mrr@10": 0.8042,
+        "p@5": 0.4181,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7123,
+        "recall@10": 0.7214,
+        "mrr@10": 0.8135,
+        "p@5": 0.4126,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8279,
+          "recall@10": 0.8528,
+          "mrr@10": 0.8863,
+          "p@5": 0.4514,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5777,
+          "recall@10": 0.5326,
+          "mrr@10": 0.7502,
+          "p@5": 0.3625,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5309,
+          "recall@10": 0.5868,
+          "mrr@10": 0.6317,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n20-a0.8",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "candidates": 20,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7088,
+        "recall@10": 0.7194,
+        "mrr@10": 0.8026,
+        "p@5": 0.4147,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7057,
+        "recall@10": 0.7098,
+        "mrr@10": 0.8112,
+        "p@5": 0.4046,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8312,
+          "recall@10": 0.8499,
+          "mrr@10": 0.8932,
+          "p@5": 0.4438,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5641,
+          "recall@10": 0.5042,
+          "mrr@10": 0.7419,
+          "p@5": 0.3688,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5033,
+          "recall@10": 0.5488,
+          "mrr@10": 0.6136,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n20-a0.9",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.9,
+      "candidates": 20,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7005,
+        "recall@10": 0.7144,
+        "mrr@10": 0.7877,
+        "p@5": 0.4045,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6972,
+        "recall@10": 0.7012,
+        "mrr@10": 0.7981,
+        "p@5": 0.4011,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8295,
+          "recall@10": 0.8477,
+          "mrr@10": 0.8926,
+          "p@5": 0.4381,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5535,
+          "recall@10": 0.5016,
+          "mrr@10": 0.7133,
+          "p@5": 0.35,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4792,
+          "recall@10": 0.5349,
+          "mrr@10": 0.5717,
+          "p@5": 0.36,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n50-a0.5",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "candidates": 50,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7225,
+        "recall@10": 0.7305,
+        "mrr@10": 0.8022,
+        "p@5": 0.4316,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7135,
+        "recall@10": 0.7208,
+        "mrr@10": 0.8018,
+        "p@5": 0.4207,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8201,
+          "recall@10": 0.8493,
+          "mrr@10": 0.8624,
+          "p@5": 0.4533,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5966,
+          "recall@10": 0.5532,
+          "mrr@10": 0.7378,
+          "p@5": 0.3937,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.567,
+          "recall@10": 0.5603,
+          "mrr@10": 0.6958,
+          "p@5": 0.405,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n50-a0.6",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "candidates": 50,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.73,
+        "recall@10": 0.7375,
+        "mrr@10": 0.806,
+        "p@5": 0.4305,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7211,
+        "recall@10": 0.7209,
+        "mrr@10": 0.8149,
+        "p@5": 0.4276,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8397,
+          "recall@10": 0.8564,
+          "mrr@10": 0.8838,
+          "p@5": 0.4552,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6035,
+          "recall@10": 0.5634,
+          "mrr@10": 0.7414,
+          "p@5": 0.3813,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5435,
+          "recall@10": 0.5648,
+          "mrr@10": 0.6536,
+          "p@5": 0.405,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n50-a0.7",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 50,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7248,
+        "recall@10": 0.7346,
+        "mrr@10": 0.8103,
+        "p@5": 0.4328,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7228,
+        "recall@10": 0.7231,
+        "mrr@10": 0.8215,
+        "p@5": 0.423,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8379,
+          "recall@10": 0.8484,
+          "mrr@10": 0.8997,
+          "p@5": 0.4552,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5864,
+          "recall@10": 0.5484,
+          "mrr@10": 0.7151,
+          "p@5": 0.3875,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5389,
+          "recall@10": 0.5848,
+          "mrr@10": 0.6517,
+          "p@5": 0.41,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n50-a0.8",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "candidates": 50,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7185,
+        "recall@10": 0.7309,
+        "mrr@10": 0.8049,
+        "p@5": 0.4237,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7179,
+        "recall@10": 0.7189,
+        "mrr@10": 0.8195,
+        "p@5": 0.4126,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8375,
+          "recall@10": 0.8558,
+          "mrr@10": 0.8963,
+          "p@5": 0.4533,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5876,
+          "recall@10": 0.5458,
+          "mrr@10": 0.7422,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5108,
+          "recall@10": 0.5513,
+          "mrr@10": 0.6152,
+          "p@5": 0.385,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n50-a0.9",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.9,
+      "candidates": 50,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7101,
+        "recall@10": 0.7237,
+        "mrr@10": 0.7975,
+        "p@5": 0.4147,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7022,
+        "recall@10": 0.7085,
+        "mrr@10": 0.802,
+        "p@5": 0.408,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8377,
+          "recall@10": 0.8515,
+          "mrr@10": 0.9045,
+          "p@5": 0.4457,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5733,
+          "recall@10": 0.5276,
+          "mrr@10": 0.7297,
+          "p@5": 0.3625,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4847,
+          "recall@10": 0.5452,
+          "mrr@10": 0.5711,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n100-a0.5",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "candidates": 100,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7252,
+        "recall@10": 0.7412,
+        "mrr@10": 0.797,
+        "p@5": 0.4316,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7104,
+        "recall@10": 0.7234,
+        "mrr@10": 0.7857,
+        "p@5": 0.4253,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8212,
+          "recall@10": 0.8548,
+          "mrr@10": 0.8537,
+          "p@5": 0.4571,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5965,
+          "recall@10": 0.5587,
+          "mrr@10": 0.7315,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5761,
+          "recall@10": 0.5891,
+          "mrr@10": 0.7008,
+          "p@5": 0.41,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n100-a0.6",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "candidates": 100,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7364,
+        "recall@10": 0.7359,
+        "mrr@10": 0.8141,
+        "p@5": 0.4339,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7245,
+        "recall@10": 0.728,
+        "mrr@10": 0.811,
+        "p@5": 0.4287,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8397,
+          "recall@10": 0.8572,
+          "mrr@10": 0.8798,
+          "p@5": 0.4571,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6053,
+          "recall@10": 0.5542,
+          "mrr@10": 0.7513,
+          "p@5": 0.3875,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5702,
+          "recall@10": 0.5629,
+          "mrr@10": 0.6917,
+          "p@5": 0.41,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n100-a0.7",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 100,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7348,
+        "recall@10": 0.7437,
+        "mrr@10": 0.8118,
+        "p@5": 0.435,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7315,
+        "recall@10": 0.7318,
+        "mrr@10": 0.8212,
+        "p@5": 0.431,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8456,
+          "recall@10": 0.8596,
+          "mrr@10": 0.8902,
+          "p@5": 0.461,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5982,
+          "recall@10": 0.5557,
+          "mrr@10": 0.7391,
+          "p@5": 0.3813,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5533,
+          "recall@10": 0.5898,
+          "mrr@10": 0.6644,
+          "p@5": 0.41,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n100-a0.8",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "candidates": 100,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7291,
+        "recall@10": 0.7457,
+        "mrr@10": 0.818,
+        "p@5": 0.435,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7247,
+        "recall@10": 0.7253,
+        "mrr@10": 0.8274,
+        "p@5": 0.4241,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8442,
+          "recall@10": 0.8631,
+          "mrr@10": 0.9054,
+          "p@5": 0.4571,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5947,
+          "recall@10": 0.5674,
+          "mrr@10": 0.7432,
+          "p@5": 0.3875,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5346,
+          "recall@10": 0.5798,
+          "mrr@10": 0.6484,
+          "p@5": 0.415,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-legacy",
+      "name": "doc-legacy-union-n100-a0.9",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.9,
+      "candidates": 100,
+      "doc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7153,
+        "recall@10": 0.7269,
+        "mrr@10": 0.8025,
+        "p@5": 0.4169,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7093,
+        "recall@10": 0.7123,
+        "mrr@10": 0.8079,
+        "p@5": 0.4126,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8414,
+          "recall@10": 0.8543,
+          "mrr@10": 0.9069,
+          "p@5": 0.4476,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5816,
+          "recall@10": 0.5314,
+          "mrr@10": 0.751,
+          "p@5": 0.3625,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4914,
+          "recall@10": 0.5488,
+          "mrr@10": 0.5698,
+          "p@5": 0.38,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "G.doc-vector",
+      "name": "doc-v2-noalias-vector",
+      "retrieval": "full",
+      "fusion": "vector",
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6651,
+        "recall@10": 0.6877,
+        "mrr@10": 0.7459,
+        "p@5": 0.3718,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6669,
+        "recall@10": 0.6851,
+        "mrr@10": 0.7408,
+        "p@5": 0.3736,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.7913,
+          "recall@10": 0.8062,
+          "mrr@10": 0.8674,
+          "p@5": 0.4038,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.505,
+          "recall@10": 0.5194,
+          "mrr@10": 0.6001,
+          "p@5": 0.3,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4619,
+          "recall@10": 0.5113,
+          "mrr@10": 0.5438,
+          "p@5": 0.345,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "G.doc-bm25",
+      "name": "doc-v2-noalias-bm25",
+      "retrieval": "full",
+      "fusion": "bm25",
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6393,
+        "recall@10": 0.6346,
+        "mrr@10": 0.688,
+        "p@5": 0.3989,
+        "zero_result": 0.0113
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6491,
+        "recall@10": 0.6611,
+        "mrr@10": 0.6879,
+        "p@5": 0.4,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.6978,
+          "recall@10": 0.7144,
+          "mrr@10": 0.7146,
+          "p@5": 0.3924,
+          "zero_result": 0.0095
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5329,
+          "recall@10": 0.4769,
+          "mrr@10": 0.6591,
+          "p@5": 0.3937,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5708,
+          "recall@10": 0.5514,
+          "mrr@10": 0.6412,
+          "p@5": 0.42,
+          "zero_result": 0.025
+        }
+      }
+    },
+    {
+      "family": "G.doc-prod",
+      "name": "doc-v2-noalias-prod-a0.7-c20",
+      "retrieval": "prod",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 20,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7065,
+        "recall@10": 0.7283,
+        "mrr@10": 0.7699,
+        "p@5": 0.435,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7046,
+        "recall@10": 0.7081,
+        "mrr@10": 0.7907,
+        "p@5": 0.4276,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.7995,
+          "recall@10": 0.8332,
+          "mrr@10": 0.8435,
+          "p@5": 0.44,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5974,
+          "recall@10": 0.5784,
+          "mrr@10": 0.6964,
+          "p@5": 0.4188,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5496,
+          "recall@10": 0.5728,
+          "mrr@10": 0.6355,
+          "p@5": 0.435,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-v2-noalias",
+      "name": "doc-v2-noalias-full-a0.5",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.733,
+        "recall@10": 0.7508,
+        "mrr@10": 0.7846,
+        "p@5": 0.4395,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7359,
+        "recall@10": 0.7501,
+        "mrr@10": 0.7934,
+        "p@5": 0.4471,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8251,
+          "recall@10": 0.8619,
+          "mrr@10": 0.8528,
+          "p@5": 0.4476,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6099,
+          "recall@10": 0.5945,
+          "mrr@10": 0.7141,
+          "p@5": 0.4062,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.59,
+          "recall@10": 0.5841,
+          "mrr@10": 0.6622,
+          "p@5": 0.445,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-v2-noalias",
+      "name": "doc-v2-noalias-full-a0.6",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7484,
+        "recall@10": 0.7502,
+        "mrr@10": 0.8042,
+        "p@5": 0.4497,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7507,
+        "recall@10": 0.7547,
+        "mrr@10": 0.8216,
+        "p@5": 0.4471,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.841,
+          "recall@10": 0.8598,
+          "mrr@10": 0.8744,
+          "p@5": 0.459,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6235,
+          "recall@10": 0.5851,
+          "mrr@10": 0.7402,
+          "p@5": 0.4062,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.605,
+          "recall@10": 0.5946,
+          "mrr@10": 0.6712,
+          "p@5": 0.46,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-v2-noalias",
+      "name": "doc-v2-noalias-full-a0.7",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.741,
+        "recall@10": 0.7522,
+        "mrr@10": 0.7962,
+        "p@5": 0.4497,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7461,
+        "recall@10": 0.7473,
+        "mrr@10": 0.8249,
+        "p@5": 0.4448,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8385,
+          "recall@10": 0.8493,
+          "mrr@10": 0.8714,
+          "p@5": 0.4629,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6059,
+          "recall@10": 0.5775,
+          "mrr@10": 0.7235,
+          "p@5": 0.3875,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5931,
+          "recall@10": 0.6371,
+          "mrr@10": 0.6568,
+          "p@5": 0.465,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-v2-noalias",
+      "name": "doc-v2-noalias-full-a0.8",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7273,
+        "recall@10": 0.7439,
+        "mrr@10": 0.7931,
+        "p@5": 0.4328,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7309,
+        "recall@10": 0.7278,
+        "mrr@10": 0.825,
+        "p@5": 0.4276,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8366,
+          "recall@10": 0.85,
+          "mrr@10": 0.8852,
+          "p@5": 0.4514,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5774,
+          "recall@10": 0.554,
+          "mrr@10": 0.6805,
+          "p@5": 0.3688,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5603,
+          "recall@10": 0.6173,
+          "mrr@10": 0.6411,
+          "p@5": 0.435,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-v2-noalias",
+      "name": "doc-v2-noalias-full-a0.9",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.9,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7023,
+        "recall@10": 0.7133,
+        "mrr@10": 0.7769,
+        "p@5": 0.4056,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6943,
+        "recall@10": 0.7048,
+        "mrr@10": 0.7789,
+        "p@5": 0.4023,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8225,
+          "recall@10": 0.8225,
+          "mrr@10": 0.89,
+          "p@5": 0.4324,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5489,
+          "recall@10": 0.54,
+          "mrr@10": 0.6467,
+          "p@5": 0.3375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5095,
+          "recall@10": 0.5652,
+          "mrr@10": 0.584,
+          "p@5": 0.39,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n20-a0.5",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "candidates": 20,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7136,
+        "recall@10": 0.7391,
+        "mrr@10": 0.7797,
+        "p@5": 0.426,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7209,
+        "recall@10": 0.7362,
+        "mrr@10": 0.7968,
+        "p@5": 0.4241,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8138,
+          "recall@10": 0.8456,
+          "mrr@10": 0.8638,
+          "p@5": 0.4495,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5633,
+          "recall@10": 0.5442,
+          "mrr@10": 0.6973,
+          "p@5": 0.35,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5707,
+          "recall@10": 0.6153,
+          "mrr@10": 0.6248,
+          "p@5": 0.425,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n20-a0.6",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "candidates": 20,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7069,
+        "recall@10": 0.7314,
+        "mrr@10": 0.7744,
+        "p@5": 0.4136,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7115,
+        "recall@10": 0.7309,
+        "mrr@10": 0.792,
+        "p@5": 0.4092,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8225,
+          "recall@10": 0.8423,
+          "mrr@10": 0.8749,
+          "p@5": 0.4419,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5419,
+          "recall@10": 0.5289,
+          "mrr@10": 0.6727,
+          "p@5": 0.3438,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5354,
+          "recall@10": 0.6022,
+          "mrr@10": 0.592,
+          "p@5": 0.395,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n20-a0.7",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 20,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6939,
+        "recall@10": 0.7247,
+        "mrr@10": 0.7626,
+        "p@5": 0.3977,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7061,
+        "recall@10": 0.731,
+        "mrr@10": 0.7876,
+        "p@5": 0.3977,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8099,
+          "recall@10": 0.8309,
+          "mrr@10": 0.8662,
+          "p@5": 0.4286,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.541,
+          "recall@10": 0.5521,
+          "mrr@10": 0.6416,
+          "p@5": 0.3312,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5117,
+          "recall@10": 0.584,
+          "mrr@10": 0.5874,
+          "p@5": 0.37,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n20-a0.8",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "candidates": 20,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6876,
+        "recall@10": 0.7122,
+        "mrr@10": 0.7667,
+        "p@5": 0.3887,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6855,
+        "recall@10": 0.7026,
+        "mrr@10": 0.7668,
+        "p@5": 0.3885,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8105,
+          "recall@10": 0.8235,
+          "mrr@10": 0.8773,
+          "p@5": 0.421,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.535,
+          "recall@10": 0.5473,
+          "mrr@10": 0.6417,
+          "p@5": 0.3125,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4869,
+          "recall@10": 0.5517,
+          "mrr@10": 0.5761,
+          "p@5": 0.365,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n20-a0.9",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.9,
+      "candidates": 20,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6754,
+        "recall@10": 0.693,
+        "mrr@10": 0.7573,
+        "p@5": 0.3819,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6744,
+        "recall@10": 0.6886,
+        "mrr@10": 0.754,
+        "p@5": 0.3816,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8001,
+          "recall@10": 0.8047,
+          "mrr@10": 0.8712,
+          "p@5": 0.4152,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5123,
+          "recall@10": 0.5194,
+          "mrr@10": 0.6239,
+          "p@5": 0.3063,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4786,
+          "recall@10": 0.5388,
+          "mrr@10": 0.5651,
+          "p@5": 0.355,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n50-a0.5",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "candidates": 50,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.723,
+        "recall@10": 0.7362,
+        "mrr@10": 0.7867,
+        "p@5": 0.4362,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7214,
+        "recall@10": 0.7369,
+        "mrr@10": 0.7916,
+        "p@5": 0.4287,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8167,
+          "recall@10": 0.8511,
+          "mrr@10": 0.8571,
+          "p@5": 0.4514,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5888,
+          "recall@10": 0.5626,
+          "mrr@10": 0.7038,
+          "p@5": 0.3875,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5844,
+          "recall@10": 0.5735,
+          "mrr@10": 0.6679,
+          "p@5": 0.435,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n50-a0.6",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "candidates": 50,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7249,
+        "recall@10": 0.744,
+        "mrr@10": 0.7952,
+        "p@5": 0.4249,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7278,
+        "recall@10": 0.7286,
+        "mrr@10": 0.8146,
+        "p@5": 0.4264,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8275,
+          "recall@10": 0.8484,
+          "mrr@10": 0.877,
+          "p@5": 0.4438,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5975,
+          "recall@10": 0.57,
+          "mrr@10": 0.7269,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5574,
+          "recall@10": 0.6089,
+          "mrr@10": 0.6353,
+          "p@5": 0.415,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n50-a0.7",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 50,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.704,
+        "recall@10": 0.7266,
+        "mrr@10": 0.7744,
+        "p@5": 0.4192,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7146,
+        "recall@10": 0.7217,
+        "mrr@10": 0.8009,
+        "p@5": 0.4103,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8166,
+          "recall@10": 0.8365,
+          "mrr@10": 0.8678,
+          "p@5": 0.4438,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5541,
+          "recall@10": 0.5356,
+          "mrr@10": 0.674,
+          "p@5": 0.3438,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5285,
+          "recall@10": 0.5909,
+          "mrr@10": 0.6097,
+          "p@5": 0.415,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n50-a0.8",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "candidates": 50,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6967,
+        "recall@10": 0.7111,
+        "mrr@10": 0.7752,
+        "p@5": 0.4023,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6944,
+        "recall@10": 0.7119,
+        "mrr@10": 0.7737,
+        "p@5": 0.3977,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8148,
+          "recall@10": 0.8203,
+          "mrr@10": 0.8797,
+          "p@5": 0.4324,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5554,
+          "recall@10": 0.54,
+          "mrr@10": 0.6803,
+          "p@5": 0.3375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4999,
+          "recall@10": 0.5612,
+          "mrr@10": 0.577,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n50-a0.9",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.9,
+      "candidates": 50,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6835,
+        "recall@10": 0.6995,
+        "mrr@10": 0.7626,
+        "p@5": 0.3876,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6735,
+        "recall@10": 0.6867,
+        "mrr@10": 0.7487,
+        "p@5": 0.3874,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8057,
+          "recall@10": 0.8113,
+          "mrr@10": 0.8721,
+          "p@5": 0.421,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5349,
+          "recall@10": 0.532,
+          "mrr@10": 0.6525,
+          "p@5": 0.3188,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4819,
+          "recall@10": 0.5402,
+          "mrr@10": 0.563,
+          "p@5": 0.355,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n100-a0.5",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "candidates": 100,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7332,
+        "recall@10": 0.742,
+        "mrr@10": 0.7964,
+        "p@5": 0.4418,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7289,
+        "recall@10": 0.748,
+        "mrr@10": 0.7866,
+        "p@5": 0.4379,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8244,
+          "recall@10": 0.8523,
+          "mrr@10": 0.8554,
+          "p@5": 0.4552,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6097,
+          "recall@10": 0.5818,
+          "mrr@10": 0.7448,
+          "p@5": 0.4,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5927,
+          "recall@10": 0.5806,
+          "mrr@10": 0.6828,
+          "p@5": 0.44,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n100-a0.6",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "candidates": 100,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.74,
+        "recall@10": 0.7485,
+        "mrr@10": 0.8045,
+        "p@5": 0.4463,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7364,
+        "recall@10": 0.7403,
+        "mrr@10": 0.8159,
+        "p@5": 0.4333,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8316,
+          "recall@10": 0.8485,
+          "mrr@10": 0.873,
+          "p@5": 0.461,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6098,
+          "recall@10": 0.5715,
+          "mrr@10": 0.7318,
+          "p@5": 0.3875,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6035,
+          "recall@10": 0.6278,
+          "mrr@10": 0.6827,
+          "p@5": 0.455,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n100-a0.7",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 100,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7251,
+        "recall@10": 0.7417,
+        "mrr@10": 0.7939,
+        "p@5": 0.4339,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7261,
+        "recall@10": 0.7291,
+        "mrr@10": 0.8167,
+        "p@5": 0.4253,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8312,
+          "recall@10": 0.8471,
+          "mrr@10": 0.8833,
+          "p@5": 0.4533,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5745,
+          "recall@10": 0.5507,
+          "mrr@10": 0.6844,
+          "p@5": 0.3688,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5669,
+          "recall@10": 0.6178,
+          "mrr@10": 0.6469,
+          "p@5": 0.435,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n100-a0.8",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "candidates": 100,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.704,
+        "recall@10": 0.7181,
+        "mrr@10": 0.7799,
+        "p@5": 0.4136,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7072,
+        "recall@10": 0.7216,
+        "mrr@10": 0.7887,
+        "p@5": 0.4069,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8226,
+          "recall@10": 0.8326,
+          "mrr@10": 0.8813,
+          "p@5": 0.44,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5601,
+          "recall@10": 0.5341,
+          "mrr@10": 0.7047,
+          "p@5": 0.35,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5078,
+          "recall@10": 0.5646,
+          "mrr@10": 0.574,
+          "p@5": 0.395,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2-noalias",
+      "name": "doc-v2-noalias-union-n100-a0.9",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.9,
+      "candidates": 100,
+      "doc": "v2-noalias",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6869,
+        "recall@10": 0.703,
+        "mrr@10": 0.7639,
+        "p@5": 0.391,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6783,
+        "recall@10": 0.6893,
+        "mrr@10": 0.7562,
+        "p@5": 0.3908,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8079,
+          "recall@10": 0.8145,
+          "mrr@10": 0.8723,
+          "p@5": 0.421,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5393,
+          "recall@10": 0.5376,
+          "mrr@10": 0.6428,
+          "p@5": 0.325,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4874,
+          "recall@10": 0.5427,
+          "mrr@10": 0.5761,
+          "p@5": 0.365,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "G.doc-vector",
+      "name": "doc-v2-vector",
+      "retrieval": "full",
+      "fusion": "vector",
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6773,
+        "recall@10": 0.7031,
+        "mrr@10": 0.7577,
+        "p@5": 0.3797,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6614,
+        "recall@10": 0.6773,
+        "mrr@10": 0.7336,
+        "p@5": 0.3747,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8089,
+          "recall@10": 0.8183,
+          "mrr@10": 0.8825,
+          "p@5": 0.4171,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5095,
+          "recall@10": 0.5327,
+          "mrr@10": 0.6224,
+          "p@5": 0.325,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4662,
+          "recall@10": 0.5372,
+          "mrr@10": 0.5384,
+          "p@5": 0.325,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "G.doc-bm25",
+      "name": "doc-v2-bm25",
+      "retrieval": "full",
+      "fusion": "bm25",
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7237,
+        "recall@10": 0.7486,
+        "mrr@10": 0.7725,
+        "p@5": 0.4294,
+        "zero_result": 0.0113
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7377,
+        "recall@10": 0.7479,
+        "mrr@10": 0.7897,
+        "p@5": 0.4391,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8205,
+          "recall@10": 0.8636,
+          "mrr@10": 0.8453,
+          "p@5": 0.4305,
+          "zero_result": 0.0095
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5687,
+          "recall@10": 0.5459,
+          "mrr@10": 0.6956,
+          "p@5": 0.4,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5937,
+          "recall@10": 0.6089,
+          "mrr@10": 0.6432,
+          "p@5": 0.45,
+          "zero_result": 0.025
+        }
+      }
+    },
+    {
+      "family": "G.doc-prod",
+      "name": "doc-v2-prod-a0.7-c20",
+      "retrieval": "prod",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 20,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7489,
+        "recall@10": 0.7583,
+        "mrr@10": 0.8261,
+        "p@5": 0.4452,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.749,
+        "recall@10": 0.7212,
+        "mrr@10": 0.8481,
+        "p@5": 0.4379,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8523,
+          "recall@10": 0.8667,
+          "mrr@10": 0.9079,
+          "p@5": 0.4495,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6297,
+          "recall@10": 0.5848,
+          "mrr@10": 0.763,
+          "p@5": 0.4438,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5727,
+          "recall@10": 0.6125,
+          "mrr@10": 0.6617,
+          "p@5": 0.435,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-v2",
+      "name": "doc-v2-full-a0.5",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.773,
+        "recall@10": 0.7946,
+        "mrr@10": 0.8237,
+        "p@5": 0.4554,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7748,
+        "recall@10": 0.7704,
+        "mrr@10": 0.8575,
+        "p@5": 0.4609,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8706,
+          "recall@10": 0.9083,
+          "mrr@10": 0.9,
+          "p@5": 0.4705,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6486,
+          "recall@10": 0.6216,
+          "mrr@10": 0.7446,
+          "p@5": 0.425,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6161,
+          "recall@10": 0.6345,
+          "mrr@10": 0.6867,
+          "p@5": 0.44,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-v2",
+      "name": "doc-v2-full-a0.6",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7816,
+        "recall@10": 0.7994,
+        "mrr@10": 0.8346,
+        "p@5": 0.4701,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7782,
+        "recall@10": 0.7773,
+        "mrr@10": 0.8557,
+        "p@5": 0.4598,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8847,
+          "recall@10": 0.9095,
+          "mrr@10": 0.9175,
+          "p@5": 0.4838,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6346,
+          "recall@10": 0.6109,
+          "mrr@10": 0.7394,
+          "p@5": 0.4375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6286,
+          "recall@10": 0.6609,
+          "mrr@10": 0.6931,
+          "p@5": 0.46,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-v2",
+      "name": "doc-v2-full-a0.7",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7713,
+        "recall@10": 0.8006,
+        "mrr@10": 0.8282,
+        "p@5": 0.4599,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7698,
+        "recall@10": 0.765,
+        "mrr@10": 0.8516,
+        "p@5": 0.4437,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8798,
+          "recall@10": 0.9057,
+          "mrr@10": 0.924,
+          "p@5": 0.48,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6182,
+          "recall@10": 0.6046,
+          "mrr@10": 0.7107,
+          "p@5": 0.4062,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6089,
+          "recall@10": 0.6814,
+          "mrr@10": 0.6705,
+          "p@5": 0.45,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-v2",
+      "name": "doc-v2-full-a0.8",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7461,
+        "recall@10": 0.7824,
+        "mrr@10": 0.8127,
+        "p@5": 0.4373,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7394,
+        "recall@10": 0.7404,
+        "mrr@10": 0.8193,
+        "p@5": 0.4276,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8646,
+          "recall@10": 0.8904,
+          "mrr@10": 0.9193,
+          "p@5": 0.4629,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5855,
+          "recall@10": 0.5798,
+          "mrr@10": 0.7055,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5635,
+          "recall@10": 0.6607,
+          "mrr@10": 0.6186,
+          "p@5": 0.42,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "H.full-convex-v2",
+      "name": "doc-v2-full-a0.9",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.9,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.714,
+        "recall@10": 0.7464,
+        "mrr@10": 0.7932,
+        "p@5": 0.4079,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7,
+        "recall@10": 0.7086,
+        "mrr@10": 0.7709,
+        "p@5": 0.4011,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8389,
+          "recall@10": 0.8591,
+          "mrr@10": 0.9074,
+          "p@5": 0.4343,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5541,
+          "recall@10": 0.5577,
+          "mrr@10": 0.6743,
+          "p@5": 0.3688,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.514,
+          "recall@10": 0.6014,
+          "mrr@10": 0.5888,
+          "p@5": 0.37,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n20-a0.5",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "candidates": 20,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7515,
+        "recall@10": 0.7763,
+        "mrr@10": 0.8225,
+        "p@5": 0.4328,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7526,
+        "recall@10": 0.7596,
+        "mrr@10": 0.8301,
+        "p@5": 0.4333,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8621,
+          "recall@10": 0.8933,
+          "mrr@10": 0.9098,
+          "p@5": 0.4629,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5813,
+          "recall@10": 0.5512,
+          "mrr@10": 0.7371,
+          "p@5": 0.3563,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5974,
+          "recall@10": 0.6494,
+          "mrr@10": 0.6619,
+          "p@5": 0.415,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n20-a0.6",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "candidates": 20,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.737,
+        "recall@10": 0.7714,
+        "mrr@10": 0.8036,
+        "p@5": 0.4226,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7402,
+        "recall@10": 0.7559,
+        "mrr@10": 0.8121,
+        "p@5": 0.423,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8557,
+          "recall@10": 0.8884,
+          "mrr@10": 0.9023,
+          "p@5": 0.4552,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.572,
+          "recall@10": 0.5627,
+          "mrr@10": 0.718,
+          "p@5": 0.3563,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5572,
+          "recall@10": 0.6311,
+          "mrr@10": 0.6132,
+          "p@5": 0.39,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n20-a0.7",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 20,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7289,
+        "recall@10": 0.7698,
+        "mrr@10": 0.8016,
+        "p@5": 0.4068,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7242,
+        "recall@10": 0.7379,
+        "mrr@10": 0.7931,
+        "p@5": 0.3989,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8492,
+          "recall@10": 0.8795,
+          "mrr@10": 0.903,
+          "p@5": 0.4381,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5679,
+          "recall@10": 0.5687,
+          "mrr@10": 0.7068,
+          "p@5": 0.3563,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5418,
+          "recall@10": 0.643,
+          "mrr@10": 0.6116,
+          "p@5": 0.365,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n20-a0.8",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "candidates": 20,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7098,
+        "recall@10": 0.7534,
+        "mrr@10": 0.7826,
+        "p@5": 0.3989,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6974,
+        "recall@10": 0.7033,
+        "mrr@10": 0.7659,
+        "p@5": 0.3897,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8382,
+          "recall@10": 0.8676,
+          "mrr@10": 0.8964,
+          "p@5": 0.4305,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5367,
+          "recall@10": 0.5466,
+          "mrr@10": 0.6548,
+          "p@5": 0.35,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.511,
+          "recall@10": 0.6193,
+          "mrr@10": 0.5862,
+          "p@5": 0.355,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n20-a0.9",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.9,
+      "candidates": 20,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6935,
+        "recall@10": 0.7236,
+        "mrr@10": 0.7719,
+        "p@5": 0.391,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6743,
+        "recall@10": 0.6843,
+        "mrr@10": 0.7424,
+        "p@5": 0.3816,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8221,
+          "recall@10": 0.8401,
+          "mrr@10": 0.8895,
+          "p@5": 0.4229,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5273,
+          "recall@10": 0.5393,
+          "mrr@10": 0.6407,
+          "p@5": 0.3375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.489,
+          "recall@10": 0.5653,
+          "mrr@10": 0.5682,
+          "p@5": 0.35,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n50-a0.5",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "candidates": 50,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7686,
+        "recall@10": 0.7899,
+        "mrr@10": 0.8336,
+        "p@5": 0.4565,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.759,
+        "recall@10": 0.7591,
+        "mrr@10": 0.84,
+        "p@5": 0.4368,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8693,
+          "recall@10": 0.902,
+          "mrr@10": 0.9113,
+          "p@5": 0.4724,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6304,
+          "recall@10": 0.6056,
+          "mrr@10": 0.7357,
+          "p@5": 0.425,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6148,
+          "recall@10": 0.6432,
+          "mrr@10": 0.7079,
+          "p@5": 0.44,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n50-a0.6",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "candidates": 50,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7535,
+        "recall@10": 0.7822,
+        "mrr@10": 0.8332,
+        "p@5": 0.4418,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.748,
+        "recall@10": 0.7494,
+        "mrr@10": 0.8273,
+        "p@5": 0.4264,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8671,
+          "recall@10": 0.8955,
+          "mrr@10": 0.924,
+          "p@5": 0.4629,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6098,
+          "recall@10": 0.5819,
+          "mrr@10": 0.7448,
+          "p@5": 0.4062,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5703,
+          "recall@10": 0.6451,
+          "mrr@10": 0.6653,
+          "p@5": 0.415,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n50-a0.7",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 50,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7325,
+        "recall@10": 0.7676,
+        "mrr@10": 0.8059,
+        "p@5": 0.4215,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.727,
+        "recall@10": 0.726,
+        "mrr@10": 0.807,
+        "p@5": 0.4023,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8507,
+          "recall@10": 0.8777,
+          "mrr@10": 0.9082,
+          "p@5": 0.4495,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5776,
+          "recall@10": 0.565,
+          "mrr@10": 0.721,
+          "p@5": 0.3688,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5461,
+          "recall@10": 0.6408,
+          "mrr@10": 0.6052,
+          "p@5": 0.39,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n50-a0.8",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "candidates": 50,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7163,
+        "recall@10": 0.7518,
+        "mrr@10": 0.7915,
+        "p@5": 0.4056,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7009,
+        "recall@10": 0.7061,
+        "mrr@10": 0.7701,
+        "p@5": 0.3954,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8422,
+          "recall@10": 0.8678,
+          "mrr@10": 0.9019,
+          "p@5": 0.4362,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5619,
+          "recall@10": 0.5653,
+          "mrr@10": 0.6915,
+          "p@5": 0.3625,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5093,
+          "recall@10": 0.5965,
+          "mrr@10": 0.5816,
+          "p@5": 0.36,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n50-a0.9",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.9,
+      "candidates": 50,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6986,
+        "recall@10": 0.7333,
+        "mrr@10": 0.7782,
+        "p@5": 0.3898,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6829,
+        "recall@10": 0.6921,
+        "mrr@10": 0.7494,
+        "p@5": 0.3851,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8271,
+          "recall@10": 0.8468,
+          "mrr@10": 0.8914,
+          "p@5": 0.4229,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.531,
+          "recall@10": 0.5411,
+          "mrr@10": 0.6514,
+          "p@5": 0.3375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4954,
+          "recall@10": 0.5893,
+          "mrr@10": 0.5826,
+          "p@5": 0.345,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n100-a0.5",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "candidates": 100,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7734,
+        "recall@10": 0.7927,
+        "mrr@10": 0.8302,
+        "p@5": 0.4576,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7686,
+        "recall@10": 0.7677,
+        "mrr@10": 0.8496,
+        "p@5": 0.4517,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8733,
+          "recall@10": 0.905,
+          "mrr@10": 0.9016,
+          "p@5": 0.4762,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6322,
+          "recall@10": 0.5953,
+          "mrr@10": 0.7461,
+          "p@5": 0.4188,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6242,
+          "recall@10": 0.6557,
+          "mrr@10": 0.71,
+          "p@5": 0.44,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n100-a0.6",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "candidates": 100,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7702,
+        "recall@10": 0.7945,
+        "mrr@10": 0.8287,
+        "p@5": 0.461,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7603,
+        "recall@10": 0.7591,
+        "mrr@10": 0.8433,
+        "p@5": 0.4414,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8732,
+          "recall@10": 0.8993,
+          "mrr@10": 0.9129,
+          "p@5": 0.4762,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6252,
+          "recall@10": 0.6026,
+          "mrr@10": 0.7123,
+          "p@5": 0.425,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.616,
+          "recall@10": 0.673,
+          "mrr@10": 0.7009,
+          "p@5": 0.45,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n100-a0.7",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 100,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7512,
+        "recall@10": 0.7817,
+        "mrr@10": 0.8194,
+        "p@5": 0.4407,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7443,
+        "recall@10": 0.7392,
+        "mrr@10": 0.8299,
+        "p@5": 0.4195,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8637,
+          "recall@10": 0.8881,
+          "mrr@10": 0.9193,
+          "p@5": 0.4629,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6094,
+          "recall@10": 0.5863,
+          "mrr@10": 0.7298,
+          "p@5": 0.3937,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5695,
+          "recall@10": 0.6585,
+          "mrr@10": 0.629,
+          "p@5": 0.42,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n100-a0.8",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "candidates": 100,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7275,
+        "recall@10": 0.7668,
+        "mrr@10": 0.7979,
+        "p@5": 0.4181,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7132,
+        "recall@10": 0.7174,
+        "mrr@10": 0.7888,
+        "p@5": 0.4069,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.85,
+          "recall@10": 0.8777,
+          "mrr@10": 0.903,
+          "p@5": 0.4476,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5702,
+          "recall@10": 0.5636,
+          "mrr@10": 0.709,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5317,
+          "recall@10": 0.6385,
+          "mrr@10": 0.5932,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "I.union-v2",
+      "name": "doc-v2-union-n100-a0.9",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.9,
+      "candidates": 100,
+      "doc": "v2",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7037,
+        "recall@10": 0.739,
+        "mrr@10": 0.7822,
+        "p@5": 0.3977,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.6854,
+        "recall@10": 0.6938,
+        "mrr@10": 0.751,
+        "p@5": 0.3897,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8304,
+          "recall@10": 0.8519,
+          "mrr@10": 0.8921,
+          "p@5": 0.4267,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5437,
+          "recall@10": 0.5526,
+          "mrr@10": 0.6679,
+          "p@5": 0.3563,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4992,
+          "recall@10": 0.5918,
+          "mrr@10": 0.5853,
+          "p@5": 0.355,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "G.doc-vector",
+      "name": "doc-v2-notrade-vector",
+      "retrieval": "full",
+      "fusion": "vector",
+      "doc": "v2-notrade",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.6861,
+        "recall@10": 0.7162,
+        "mrr@10": 0.7587,
+        "p@5": 0.3921,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.686,
+        "recall@10": 0.7058,
+        "mrr@10": 0.737,
+        "p@5": 0.3782,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.824,
+          "recall@10": 0.8463,
+          "mrr@10": 0.8886,
+          "p@5": 0.4324,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5118,
+          "recall@10": 0.5204,
+          "mrr@10": 0.6319,
+          "p@5": 0.3188,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.4635,
+          "recall@10": 0.5315,
+          "mrr@10": 0.5192,
+          "p@5": 0.345,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "J.mixed-bm25v2-veclegacy",
+      "name": "mix-bm25v2-veclegacy-full-a0.5",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "bm25Doc": "v2",
+      "vecDoc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7782,
+        "recall@10": 0.7879,
+        "mrr@10": 0.8417,
+        "p@5": 0.4588,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.772,
+        "recall@10": 0.7594,
+        "mrr@10": 0.8524,
+        "p@5": 0.4655,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8838,
+          "recall@10": 0.91,
+          "mrr@10": 0.914,
+          "p@5": 0.4724,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6413,
+          "recall@10": 0.5843,
+          "mrr@10": 0.8089,
+          "p@5": 0.4313,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6104,
+          "recall@10": 0.6305,
+          "mrr@10": 0.6781,
+          "p@5": 0.445,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-veclegacy",
+      "name": "mix-bm25v2-veclegacy-union-n50-a0.5",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "candidates": 50,
+      "bm25Doc": "v2",
+      "vecDoc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7724,
+        "recall@10": 0.7851,
+        "mrr@10": 0.8392,
+        "p@5": 0.4565,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7601,
+        "recall@10": 0.755,
+        "mrr@10": 0.858,
+        "p@5": 0.4483,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8772,
+          "recall@10": 0.9027,
+          "mrr@10": 0.9139,
+          "p@5": 0.4667,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6328,
+          "recall@10": 0.5837,
+          "mrr@10": 0.7849,
+          "p@5": 0.4188,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6089,
+          "recall@10": 0.6377,
+          "mrr@10": 0.6867,
+          "p@5": 0.46,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-veclegacy",
+      "name": "mix-bm25v2-veclegacy-union-n100-a0.5",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "candidates": 100,
+      "bm25Doc": "v2",
+      "vecDoc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7776,
+        "recall@10": 0.7838,
+        "mrr@10": 0.8419,
+        "p@5": 0.4644,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.764,
+        "recall@10": 0.7592,
+        "mrr@10": 0.8468,
+        "p@5": 0.4552,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8842,
+          "recall@10": 0.9062,
+          "mrr@10": 0.9142,
+          "p@5": 0.4743,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6389,
+          "recall@10": 0.5814,
+          "mrr@10": 0.8083,
+          "p@5": 0.4313,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6086,
+          "recall@10": 0.6242,
+          "mrr@10": 0.679,
+          "p@5": 0.465,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "J.mixed-bm25v2-veclegacy",
+      "name": "mix-bm25v2-veclegacy-full-a0.6",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "bm25Doc": "v2",
+      "vecDoc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7784,
+        "recall@10": 0.786,
+        "mrr@10": 0.8396,
+        "p@5": 0.4599,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7757,
+        "recall@10": 0.7638,
+        "mrr@10": 0.8668,
+        "p@5": 0.4667,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8852,
+          "recall@10": 0.9079,
+          "mrr@10": 0.9168,
+          "p@5": 0.4781,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6326,
+          "recall@10": 0.5803,
+          "mrr@10": 0.7849,
+          "p@5": 0.4125,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6147,
+          "recall@10": 0.6308,
+          "mrr@10": 0.681,
+          "p@5": 0.45,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-veclegacy",
+      "name": "mix-bm25v2-veclegacy-union-n50-a0.6",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "candidates": 50,
+      "bm25Doc": "v2",
+      "vecDoc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7634,
+        "recall@10": 0.7805,
+        "mrr@10": 0.8384,
+        "p@5": 0.4588,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7549,
+        "recall@10": 0.7452,
+        "mrr@10": 0.8488,
+        "p@5": 0.4437,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8772,
+          "recall@10": 0.9025,
+          "mrr@10": 0.9146,
+          "p@5": 0.4743,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6196,
+          "recall@10": 0.5719,
+          "mrr@10": 0.8042,
+          "p@5": 0.4188,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5796,
+          "recall@10": 0.6269,
+          "mrr@10": 0.6657,
+          "p@5": 0.45,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-veclegacy",
+      "name": "mix-bm25v2-veclegacy-union-n100-a0.6",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "candidates": 100,
+      "bm25Doc": "v2",
+      "vecDoc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7786,
+        "recall@10": 0.7879,
+        "mrr@10": 0.8457,
+        "p@5": 0.4667,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7656,
+        "recall@10": 0.7557,
+        "mrr@10": 0.8629,
+        "p@5": 0.4517,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8833,
+          "recall@10": 0.9058,
+          "mrr@10": 0.9194,
+          "p@5": 0.4762,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6362,
+          "recall@10": 0.5802,
+          "mrr@10": 0.8031,
+          "p@5": 0.425,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6175,
+          "recall@10": 0.6448,
+          "mrr@10": 0.6863,
+          "p@5": 0.475,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "J.mixed-bm25v2-veclegacy",
+      "name": "mix-bm25v2-veclegacy-full-a0.7",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "bm25Doc": "v2",
+      "vecDoc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7738,
+        "recall@10": 0.7852,
+        "mrr@10": 0.8462,
+        "p@5": 0.4633,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7667,
+        "recall@10": 0.7605,
+        "mrr@10": 0.858,
+        "p@5": 0.4575,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8819,
+          "recall@10": 0.9054,
+          "mrr@10": 0.921,
+          "p@5": 0.4762,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6086,
+          "recall@10": 0.5545,
+          "mrr@10": 0.7969,
+          "p@5": 0.3937,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6222,
+          "recall@10": 0.6542,
+          "mrr@10": 0.6894,
+          "p@5": 0.485,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-veclegacy",
+      "name": "mix-bm25v2-veclegacy-union-n50-a0.7",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 50,
+      "bm25Doc": "v2",
+      "vecDoc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7517,
+        "recall@10": 0.7614,
+        "mrr@10": 0.8389,
+        "p@5": 0.4418,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7448,
+        "recall@10": 0.7398,
+        "mrr@10": 0.8401,
+        "p@5": 0.4287,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8722,
+          "recall@10": 0.8778,
+          "mrr@10": 0.9317,
+          "p@5": 0.4705,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5926,
+          "recall@10": 0.5499,
+          "mrr@10": 0.7628,
+          "p@5": 0.3688,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5625,
+          "recall@10": 0.6248,
+          "mrr@10": 0.6559,
+          "p@5": 0.425,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-veclegacy",
+      "name": "mix-bm25v2-veclegacy-union-n100-a0.7",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 100,
+      "bm25Doc": "v2",
+      "vecDoc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7658,
+        "recall@10": 0.7749,
+        "mrr@10": 0.8462,
+        "p@5": 0.452,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7535,
+        "recall@10": 0.7481,
+        "mrr@10": 0.8487,
+        "p@5": 0.4437,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8794,
+          "recall@10": 0.8884,
+          "mrr@10": 0.9319,
+          "p@5": 0.4724,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6165,
+          "recall@10": 0.5719,
+          "mrr@10": 0.7953,
+          "p@5": 0.3937,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.587,
+          "recall@10": 0.6392,
+          "mrr@10": 0.6619,
+          "p@5": 0.445,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "J.mixed-bm25v2-veclegacy",
+      "name": "mix-bm25v2-veclegacy-full-a0.8",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "bm25Doc": "v2",
+      "vecDoc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7611,
+        "recall@10": 0.7685,
+        "mrr@10": 0.8467,
+        "p@5": 0.4531,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.756,
+        "recall@10": 0.7513,
+        "mrr@10": 0.8399,
+        "p@5": 0.4414,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8797,
+          "recall@10": 0.885,
+          "mrr@10": 0.9351,
+          "p@5": 0.4743,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5937,
+          "recall@10": 0.5477,
+          "mrr@10": 0.7714,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5837,
+          "recall@10": 0.6392,
+          "mrr@10": 0.675,
+          "p@5": 0.46,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-veclegacy",
+      "name": "mix-bm25v2-veclegacy-union-n50-a0.8",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "candidates": 50,
+      "bm25Doc": "v2",
+      "vecDoc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.736,
+        "recall@10": 0.7443,
+        "mrr@10": 0.8206,
+        "p@5": 0.4328,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7306,
+        "recall@10": 0.7255,
+        "mrr@10": 0.8255,
+        "p@5": 0.423,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8591,
+          "recall@10": 0.8719,
+          "mrr@10": 0.9095,
+          "p@5": 0.4629,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5924,
+          "recall@10": 0.5488,
+          "mrr@10": 0.7659,
+          "p@5": 0.3813,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5277,
+          "recall@10": 0.5657,
+          "mrr@10": 0.6308,
+          "p@5": 0.395,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-veclegacy",
+      "name": "mix-bm25v2-veclegacy-union-n100-a0.8",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "candidates": 100,
+      "bm25Doc": "v2",
+      "vecDoc": "legacy",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7472,
+        "recall@10": 0.7611,
+        "mrr@10": 0.8335,
+        "p@5": 0.4384,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.741,
+        "recall@10": 0.7294,
+        "mrr@10": 0.8422,
+        "p@5": 0.4333,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8657,
+          "recall@10": 0.8744,
+          "mrr@10": 0.9254,
+          "p@5": 0.4667,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5959,
+          "recall@10": 0.5629,
+          "mrr@10": 0.7544,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5571,
+          "recall@10": 0.6223,
+          "mrr@10": 0.6556,
+          "p@5": 0.415,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "J.mixed-bm25v2-vecv2-notrade",
+      "name": "mix-bm25v2-vecv2-notrade-full-a0.5",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "bm25Doc": "v2",
+      "vecDoc": "v2-notrade",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7757,
+        "recall@10": 0.7896,
+        "mrr@10": 0.8297,
+        "p@5": 0.4621,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7825,
+        "recall@10": 0.7687,
+        "mrr@10": 0.8598,
+        "p@5": 0.469,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8787,
+          "recall@10": 0.9068,
+          "mrr@10": 0.9079,
+          "p@5": 0.4819,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6413,
+          "recall@10": 0.6151,
+          "mrr@10": 0.7358,
+          "p@5": 0.4125,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6128,
+          "recall@10": 0.6214,
+          "mrr@10": 0.6994,
+          "p@5": 0.45,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-vecv2-notrade",
+      "name": "mix-bm25v2-vecv2-notrade-union-n50-a0.5",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "candidates": 50,
+      "bm25Doc": "v2",
+      "vecDoc": "v2-notrade",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.773,
+        "recall@10": 0.7946,
+        "mrr@10": 0.8348,
+        "p@5": 0.4554,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7706,
+        "recall@10": 0.7638,
+        "mrr@10": 0.8398,
+        "p@5": 0.4575,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8798,
+          "recall@10": 0.9058,
+          "mrr@10": 0.9197,
+          "p@5": 0.4762,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6225,
+          "recall@10": 0.5994,
+          "mrr@10": 0.724,
+          "p@5": 0.4062,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6129,
+          "recall@10": 0.6588,
+          "mrr@10": 0.7008,
+          "p@5": 0.44,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-vecv2-notrade",
+      "name": "mix-bm25v2-vecv2-notrade-union-n100-a0.5",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.5,
+      "candidates": 100,
+      "bm25Doc": "v2",
+      "vecDoc": "v2-notrade",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.777,
+        "recall@10": 0.7906,
+        "mrr@10": 0.8367,
+        "p@5": 0.4633,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7755,
+        "recall@10": 0.7656,
+        "mrr@10": 0.8462,
+        "p@5": 0.4609,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.882,
+          "recall@10": 0.9036,
+          "mrr@10": 0.9149,
+          "p@5": 0.4857,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6344,
+          "recall@10": 0.6041,
+          "mrr@10": 0.7508,
+          "p@5": 0.4125,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6154,
+          "recall@10": 0.6432,
+          "mrr@10": 0.7002,
+          "p@5": 0.445,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "J.mixed-bm25v2-vecv2-notrade",
+      "name": "mix-bm25v2-vecv2-notrade-full-a0.6",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "bm25Doc": "v2",
+      "vecDoc": "v2-notrade",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7838,
+        "recall@10": 0.799,
+        "mrr@10": 0.833,
+        "p@5": 0.4655,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7895,
+        "recall@10": 0.7756,
+        "mrr@10": 0.8632,
+        "p@5": 0.477,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8922,
+          "recall@10": 0.9127,
+          "mrr@10": 0.926,
+          "p@5": 0.4895,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6314,
+          "recall@10": 0.6107,
+          "mrr@10": 0.7125,
+          "p@5": 0.4062,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6211,
+          "recall@10": 0.6512,
+          "mrr@10": 0.6853,
+          "p@5": 0.45,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-vecv2-notrade",
+      "name": "mix-bm25v2-vecv2-notrade-union-n50-a0.6",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "candidates": 50,
+      "bm25Doc": "v2",
+      "vecDoc": "v2-notrade",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7538,
+        "recall@10": 0.7831,
+        "mrr@10": 0.8149,
+        "p@5": 0.4475,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7724,
+        "recall@10": 0.7629,
+        "mrr@10": 0.8517,
+        "p@5": 0.4425,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8719,
+          "recall@10": 0.8983,
+          "mrr@10": 0.9071,
+          "p@5": 0.4762,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6024,
+          "recall@10": 0.5831,
+          "mrr@10": 0.7076,
+          "p@5": 0.3813,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5652,
+          "recall@10": 0.6408,
+          "mrr@10": 0.6584,
+          "p@5": 0.425,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-vecv2-notrade",
+      "name": "mix-bm25v2-vecv2-notrade-union-n100-a0.6",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.6,
+      "candidates": 100,
+      "bm25Doc": "v2",
+      "vecDoc": "v2-notrade",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7745,
+        "recall@10": 0.7971,
+        "mrr@10": 0.8294,
+        "p@5": 0.4621,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7782,
+        "recall@10": 0.7659,
+        "mrr@10": 0.8575,
+        "p@5": 0.4609,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8839,
+          "recall@10": 0.9087,
+          "mrr@10": 0.9162,
+          "p@5": 0.4838,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6215,
+          "recall@10": 0.596,
+          "mrr@10": 0.7188,
+          "p@5": 0.4,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.6097,
+          "recall@10": 0.6651,
+          "mrr@10": 0.6902,
+          "p@5": 0.455,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "J.mixed-bm25v2-vecv2-notrade",
+      "name": "mix-bm25v2-vecv2-notrade-full-a0.7",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "bm25Doc": "v2",
+      "vecDoc": "v2-notrade",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.773,
+        "recall@10": 0.7985,
+        "mrr@10": 0.8249,
+        "p@5": 0.4554,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7842,
+        "recall@10": 0.7724,
+        "mrr@10": 0.8556,
+        "p@5": 0.4644,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.885,
+          "recall@10": 0.9097,
+          "mrr@10": 0.9162,
+          "p@5": 0.4819,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6151,
+          "recall@10": 0.5868,
+          "mrr@10": 0.7274,
+          "p@5": 0.3813,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.605,
+          "recall@10": 0.6759,
+          "mrr@10": 0.6634,
+          "p@5": 0.445,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-vecv2-notrade",
+      "name": "mix-bm25v2-vecv2-notrade-union-n50-a0.7",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 50,
+      "bm25Doc": "v2",
+      "vecDoc": "v2-notrade",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7413,
+        "recall@10": 0.7689,
+        "mrr@10": 0.8045,
+        "p@5": 0.4395,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7454,
+        "recall@10": 0.7531,
+        "mrr@10": 0.8081,
+        "p@5": 0.4241,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8668,
+          "recall@10": 0.8896,
+          "mrr@10": 0.9123,
+          "p@5": 0.4743,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5846,
+          "recall@10": 0.5659,
+          "mrr@10": 0.7063,
+          "p@5": 0.3688,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5372,
+          "recall@10": 0.6147,
+          "mrr@10": 0.6001,
+          "p@5": 0.405,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-vecv2-notrade",
+      "name": "mix-bm25v2-vecv2-notrade-union-n100-a0.7",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.7,
+      "candidates": 100,
+      "bm25Doc": "v2",
+      "vecDoc": "v2-notrade",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7558,
+        "recall@10": 0.7865,
+        "mrr@10": 0.8116,
+        "p@5": 0.4497,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7631,
+        "recall@10": 0.7611,
+        "mrr@10": 0.8344,
+        "p@5": 0.4414,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8736,
+          "recall@10": 0.8989,
+          "mrr@10": 0.9092,
+          "p@5": 0.4781,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.6086,
+          "recall@10": 0.5856,
+          "mrr@10": 0.7224,
+          "p@5": 0.3937,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5644,
+          "recall@10": 0.6523,
+          "mrr@10": 0.6267,
+          "p@5": 0.42,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "J.mixed-bm25v2-vecv2-notrade",
+      "name": "mix-bm25v2-vecv2-notrade-full-a0.8",
+      "retrieval": "full",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "bm25Doc": "v2",
+      "vecDoc": "v2-notrade",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7521,
+        "recall@10": 0.7778,
+        "mrr@10": 0.8108,
+        "p@5": 0.4475,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7595,
+        "recall@10": 0.7593,
+        "mrr@10": 0.8301,
+        "p@5": 0.4425,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8781,
+          "recall@10": 0.901,
+          "mrr@10": 0.9184,
+          "p@5": 0.4762,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5909,
+          "recall@10": 0.5681,
+          "mrr@10": 0.7277,
+          "p@5": 0.375,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5503,
+          "recall@10": 0.6221,
+          "mrr@10": 0.595,
+          "p@5": 0.43,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-vecv2-notrade",
+      "name": "mix-bm25v2-vecv2-notrade-union-n50-a0.8",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "candidates": 50,
+      "bm25Doc": "v2",
+      "vecDoc": "v2-notrade",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7242,
+        "recall@10": 0.7514,
+        "mrr@10": 0.7847,
+        "p@5": 0.4192,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7268,
+        "recall@10": 0.7345,
+        "mrr@10": 0.7807,
+        "p@5": 0.4057,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8585,
+          "recall@10": 0.8802,
+          "mrr@10": 0.9072,
+          "p@5": 0.459,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5518,
+          "recall@10": 0.5575,
+          "mrr@10": 0.6472,
+          "p@5": 0.3312,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.5096,
+          "recall@10": 0.5685,
+          "mrr@10": 0.5729,
+          "p@5": 0.385,
+          "zero_result": 0.0
+        }
+      }
+    },
+    {
+      "family": "K.mixed-union-vecv2-notrade",
+      "name": "mix-bm25v2-vecv2-notrade-union-n100-a0.8",
+      "retrieval": "union",
+      "fusion": "weighted",
+      "alpha": 0.8,
+      "candidates": 100,
+      "bm25Doc": "v2",
+      "vecDoc": "v2-notrade",
+      "dev": {
+        "queries": 177,
+        "ndcg@10": 0.7359,
+        "recall@10": 0.7652,
+        "mrr@10": 0.7909,
+        "p@5": 0.4316,
+        "zero_result": 0.0
+      },
+      "test": {
+        "queries": 174,
+        "ndcg@10": 0.7378,
+        "recall@10": 0.7448,
+        "mrr@10": 0.8005,
+        "p@5": 0.4172,
+        "zero_result": 0.0
+      },
+      "dev_by_type": {
+        "qtype=keyword": {
+          "queries": 105,
+          "ndcg@10": 0.8658,
+          "recall@10": 0.885,
+          "mrr@10": 0.9118,
+          "p@5": 0.4705,
+          "zero_result": 0.0
+        },
+        "qtype=mixed": {
+          "queries": 32,
+          "ndcg@10": 0.5648,
+          "recall@10": 0.5686,
+          "mrr@10": 0.6509,
+          "p@5": 0.35,
+          "zero_result": 0.0
+        },
+        "qtype=semantic": {
+          "queries": 40,
+          "ndcg@10": 0.532,
+          "recall@10": 0.6081,
+          "mrr@10": 0.5854,
+          "p@5": 0.395,
+          "zero_result": 0.0
+        }
+      }
+    }
+  ],
+  "best_by_family": {
+    "A.prod-alpha": "prod-ws-a0.9-c20",
+    "G.doc-vector": "doc-v2-notrade-vector",
+    "G.doc-bm25": "doc-v2-bm25",
+    "G.doc-prod": "doc-v2-prod-a0.7-c20",
+    "H.full-convex-legacy": "doc-legacy-full-a0.8",
+    "I.union-legacy": "doc-legacy-union-n100-a0.6",
+    "H.full-convex-v2-noalias": "doc-v2-noalias-full-a0.6",
+    "I.union-v2-noalias": "doc-v2-noalias-union-n100-a0.6",
+    "H.full-convex-v2": "doc-v2-full-a0.6",
+    "I.union-v2": "doc-v2-union-n100-a0.5",
+    "J.mixed-bm25v2-veclegacy": "mix-bm25v2-veclegacy-full-a0.6",
+    "K.mixed-union-veclegacy": "mix-bm25v2-veclegacy-union-n100-a0.6",
+    "J.mixed-bm25v2-vecv2-notrade": "mix-bm25v2-vecv2-notrade-full-a0.6",
+    "K.mixed-union-vecv2-notrade": "mix-bm25v2-vecv2-notrade-union-n100-a0.5"
+  },
+  "overall_best": "mix-bm25v2-vecv2-notrade-full-a0.6",
+  "test_confirmation": {
+    "prod-ws-a0.9-c20": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.7258936685172858,
+      "delta": 0.025459711785068305,
+      "ci_low": 0.011199016929060873,
+      "ci_high": 0.04025484882232187,
+      "p_value": 9.999000099990002e-05,
+      "wins": 56,
+      "losses": 33,
+      "ties": 85,
+      "n": 174
+    },
+    "doc-v2-notrade-vector": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.6860371419671697,
+      "delta": -0.01439681476504774,
+      "ci_low": -0.04815483100630548,
+      "ci_high": 0.017818112924862035,
+      "p_value": 0.40215978402159785,
+      "wins": 67,
+      "losses": 70,
+      "ties": 37,
+      "n": 174
+    },
+    "doc-v2-bm25": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.7376675168424734,
+      "delta": 0.037233560110256046,
+      "ci_low": 0.0015364045348817304,
+      "ci_high": 0.07415324020124149,
+      "p_value": 0.04459554044595541,
+      "wins": 69,
+      "losses": 64,
+      "ties": 41,
+      "n": 174
+    },
+    "doc-v2-prod-a0.7-c20": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.7489943006933449,
+      "delta": 0.048560343961127496,
+      "ci_low": 0.02192372408041433,
+      "ci_high": 0.07515794658765199,
+      "p_value": 0.00039996000399960006,
+      "wins": 72,
+      "losses": 49,
+      "ties": 53,
+      "n": 174
+    },
+    "doc-legacy-full-a0.8": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.735632481217067,
+      "delta": 0.03519852448484968,
+      "ci_low": 0.016894188293175547,
+      "ci_high": 0.053630167568260924,
+      "p_value": 0.00019998000199980003,
+      "wins": 68,
+      "losses": 46,
+      "ties": 60,
+      "n": 174
+    },
+    "doc-legacy-union-n100-a0.6": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.7245102443994659,
+      "delta": 0.02407628766724843,
+      "ci_low": 0.00626801682255899,
+      "ci_high": 0.04270864236340547,
+      "p_value": 0.010998900109989001,
+      "wins": 61,
+      "losses": 42,
+      "ties": 71,
+      "n": 174
+    },
+    "doc-v2-noalias-full-a0.6": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.7507355416360018,
+      "delta": 0.05030158490378425,
+      "ci_low": 0.025911478386829005,
+      "ci_high": 0.07674386775731853,
+      "p_value": 9.999000099990002e-05,
+      "wins": 75,
+      "losses": 45,
+      "ties": 54,
+      "n": 174
+    },
+    "doc-v2-noalias-union-n100-a0.6": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.7364120281039475,
+      "delta": 0.03597807137173003,
+      "ci_low": 0.010192013583793872,
+      "ci_high": 0.06226005059008218,
+      "p_value": 0.008599140085991401,
+      "wins": 69,
+      "losses": 54,
+      "ties": 51,
+      "n": 174
+    },
+    "doc-v2-full-a0.6": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.7782400774563709,
+      "delta": 0.07780612072415345,
+      "ci_low": 0.05209567185296122,
+      "ci_high": 0.1061717814114642,
+      "p_value": 9.999000099990002e-05,
+      "wins": 91,
+      "losses": 36,
+      "ties": 47,
+      "n": 174
+    },
+    "doc-v2-union-n100-a0.5": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.7686470602924176,
+      "delta": 0.0682131035602001,
+      "ci_low": 0.04114691978936102,
+      "ci_high": 0.09759541009447771,
+      "p_value": 9.999000099990002e-05,
+      "wins": 88,
+      "losses": 39,
+      "ties": 47,
+      "n": 174
+    },
+    "mix-bm25v2-veclegacy-full-a0.6": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.7756682059297686,
+      "delta": 0.07523424919755108,
+      "ci_low": 0.049954392625951936,
+      "ci_high": 0.10198109303323459,
+      "p_value": 9.999000099990002e-05,
+      "wins": 82,
+      "losses": 39,
+      "ties": 53,
+      "n": 174
+    },
+    "mix-bm25v2-veclegacy-union-n100-a0.6": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.7655869779372803,
+      "delta": 0.06515302120506279,
+      "ci_low": 0.04093447367233223,
+      "ci_high": 0.0902600933925371,
+      "p_value": 9.999000099990002e-05,
+      "wins": 81,
+      "losses": 39,
+      "ties": 54,
+      "n": 174
+    },
+    "mix-bm25v2-vecv2-notrade-full-a0.6": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.78952815865959,
+      "delta": 0.08909420192737254,
+      "ci_low": 0.0626867082788102,
+      "ci_high": 0.11795791416159197,
+      "p_value": 9.999000099990002e-05,
+      "wins": 91,
+      "losses": 35,
+      "ties": 48,
+      "n": 174
+    },
+    "mix-bm25v2-vecv2-notrade-union-n100-a0.5": {
+      "mean_a": 0.7004339567322174,
+      "mean_b": 0.7754563337120749,
+      "delta": 0.07502237697985745,
+      "ci_low": 0.047251956971578295,
+      "ci_high": 0.10512875767184629,
+      "p_value": 9.999000099990002e-05,
+      "wins": 87,
+      "losses": 39,
+      "ties": 48,
+      "n": 174
+    }
+  }
+}
