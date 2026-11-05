@@ -1,65 +1,40 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import { DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
-import { unmarshall } from '@aws-sdk/util-dynamodb';
-import {
+import type {
   Part,
   SearchResponse,
   SearchResult,
   AdvancedMaterialFilters,
 } from 'eecar-shared';
-import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
-
-const dynamodb = new DynamoDBClient({
-  region: process.env.AWS_REGION || 'us-east-1',
-  ...(process.env.DYNAMODB_ENDPOINT && {
-    endpoint: process.env.DYNAMODB_ENDPOINT,
-  }),
-});
-
-const PARTS_TABLE = process.env.PARTS_TABLE_NAME || 'eecar-parts-table-local';
+import { successResponse, errorResponse, parseJsonBody } from '/opt/nodejs/utils/response.js';
+import { loadPartsWithDetails } from '/opt/nodejs/utils/parts.js';
 
 /**
  * Lambda handler for material property-based search
  * Searches parts based on advanced material specifications
  */
 export const handler: APIGatewayProxyHandler = async (event) => {
+  const parsed = parseJsonBody<{
+    materialFilters?: AdvancedMaterialFilters;
+    category?: string;
+    topK?: number;
+  }>(event);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+  const { materialFilters, category, topK = 10 } = parsed.body;
+
+  if (!materialFilters) {
+    return errorResponse('materialFilters is required', undefined, 400, event);
+  }
+
   try {
-    const body = JSON.parse(event.body || '{}');
-    const { materialFilters, category, topK = 10 } = body as {
-      materialFilters?: AdvancedMaterialFilters;
-      category?: string;
-      topK?: number;
-    };
+    // Material composition lives on the SPEC item, not on METADATA, so join it in
+    const parts = await loadPartsWithDetails({ category, details: ['SPEC'] });
 
-    if (!materialFilters) {
-      return errorResponse('materialFilters is required', undefined, 400, event);
-    }
-
-    // Scan DynamoDB for parts with material specifications
-    const scanCommand = new ScanCommand({
-      TableName: PARTS_TABLE,
-    });
-
-    const response = await dynamodb.send(scanCommand);
-    const allItems = response.Items?.map((item) => unmarshall(item)) || [];
-
-    // Filter parts based on material properties
-    const matchedParts = allItems
+    const matchedParts = parts
       .filter((item) => {
-        // Only process PART#*#METADATA items
-        if (!item.PK?.startsWith('PART#') || !item.SK?.endsWith('#METADATA')) {
-          return false;
-        }
-
-        const part = item as Part;
-
-        // Apply category filter if provided
-        if (category && part.category !== category) {
-          return false;
-        }
-
         // Check if part has material specifications
-        const materialComp = part.specifications?.materialComposition;
+        const materialComp = (item as unknown as Part).specifications?.materialComposition;
         if (!materialComp) {
           return false;
         }
@@ -68,7 +43,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         return checkMaterialFilters(materialComp, materialFilters);
       })
       .map((item) => {
-        const part = item as Part;
+        const part = item as unknown as Part;
         const materialComp = part.specifications?.materialComposition;
 
         // Calculate match score based on how well it matches filters
