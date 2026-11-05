@@ -1,6 +1,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { v4 as uuidv4 } from 'uuid';
-import { callClaude, generateEmbedding, preparePartText } from '/opt/nodejs/utils/bedrock.js';
+import { callClaude, generateEmbedding } from '/opt/nodejs/utils/bedrock.js';
+import {
+  buildEmbeddingText,
+  buildSearchText,
+  SEARCH_DOC_VERSION_ATTRIBUTE,
+  SEARCH_DOCUMENT_VERSION,
+  SEARCH_TEXT_ATTRIBUTE,
+} from '/opt/nodejs/utils/search-document.js';
 import { uploadVector, updateVectorsManifest } from '/opt/nodejs/utils/s3.js';
 import { putItem } from '/opt/nodejs/utils/dynamodb.js';
 import { successResponse, errorResponse, parseJsonBody } from '/opt/nodejs/utils/response.js';
@@ -176,6 +183,11 @@ async function generateSyntheticPart(
   // 배터리 카테고리인 경우 batteryHealth 추가
   if (category === 'battery') {
     partData.batteryHealth = generateBatteryHealth();
+    // 상태와 SOH를 따로 뽑아 "신품인데 SOH 60%" 같은 모순이 생겼다 (운영 배터리 66개 중 11개).
+    // SOH 80% 미만이면 신품·최상 등급을 쓰지 않는다
+    if (partData.batteryHealth.soh < 80 && ['new', 'like-new', 'excellent'].includes(partData.condition)) {
+      partData.condition = 'used';
+    }
     // 배터리 상태에 따른 가격 추가 조정
     if (partData.batteryHealth.soh < 70) {
       partData.price = Math.round(partData.price * 0.6);
@@ -384,6 +396,10 @@ async function savePart(partData: any): Promise<string> {
     metadata.batteryHealth = partData.batteryHealth;
   }
 
+  // 검색 문서 (사양 포함 전체 레코드로 만들어 METADATA에 저장, C-21)
+  metadata[SEARCH_TEXT_ATTRIBUTE] = buildSearchText(partData);
+  metadata[SEARCH_DOC_VERSION_ATTRIBUTE] = SEARCH_DOCUMENT_VERSION;
+
   await putItem(metadata);
 
   // Save specifications
@@ -408,8 +424,7 @@ async function savePart(partData: any): Promise<string> {
   }
 
   // Generate and save embedding
-  const partText = preparePartText(partData);
-  const embedding = await generateEmbedding(partText);
+  const embedding = await generateEmbedding(buildEmbeddingText(partData));
 
   // 레거시 S3 JSON 저장 (백업)
   const vectorKey = `parts/${partId}.json`;
