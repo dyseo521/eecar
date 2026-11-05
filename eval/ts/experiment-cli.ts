@@ -8,17 +8,23 @@
  *              full  : 벡터와 BM25를 전체 코퍼스에서 각각 검색한 뒤 결합 → 상위 100개
  *   fusion     weighted : α·정규화(벡터) + (1-α)·정규화(BM25)   (prod는 프로덕션 hybridScore 그대로)
  *              rrf      : Σ 1/(k + rank)                          (Cormack et al., SIGIR 2009)
+ *              union : 벡터 상위 N개와 BM25 상위 N개를 각각 그 목록 안에서 min-max 정규화한 뒤 α 결합.
+ *                      목록에 없는 쪽 점수는 0. S3 Vectors가 상위 K개만 돌려주는 프로덕션에서 구현할 수 있는 형태
  *   tokenizer  ws | bigram | ws+bigram   (ws = 프로덕션 tokenize)
  *   idf        false면 IDF를 1로 고정 (가설 검증용 변형)
+ *   doc        legacy | v2 | v2-noalias  문서 텍스트 정의 (BM25 텍스트와 문서 임베딩 모두)
+ *              legacy = preparePartForBM25 + preparePartText 임베딩, v2 = buildSearchText (search-document.ts)
+ *   bm25Doc / vecDoc  doc을 BM25 쪽 / 벡터 쪽만 따로 바꿀 때
  *
- * BM25는 질의 수 × 구성 수만큼 반복하므로 문서 빈도를 미리 계산한 구현을 쓴다.
- * 점수식(k1=1.5, b=0.75, idf=ln((N-df+0.5)/(df+0.5)+1))은 프로덕션 bm25Score와 같고,
- * 실행할 때마다 ws 토크나이저 결과를 프로덕션 calculateBM25Scores·hybridSearch와 대조해 다르면 중단한다.
+ * BM25는 프로덕션 Bm25Index, union 결합은 프로덕션 fuseRankedLists를 그대로 쓴다.
+ * 실행할 때마다 Bm25Index 점수를 calculateBM25Scores와, prod 구성을 이전 프로덕션 hybridSearch와 대조해 다르면 중단한다.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import {
+  Bm25Index,
   calculateBM25Scores,
+  fuseRankedLists,
   hybridScore,
   hybridSearch,
   normalizeBM25Scores,
@@ -26,18 +32,23 @@ import {
   tokenize,
 } from '../../backend/src/utils/search.js';
 import { cosineSimilarity } from '../../backend/src/utils/bedrock.js';
+import { buildSearchText } from '../../backend/src/utils/search-document.js';
 
 type Tokenizer = 'ws' | 'bigram' | 'ws+bigram';
+type DocText = 'legacy' | 'v2' | 'v2-noalias' | 'v2-notrade';
 
 interface Config {
   name: string;
-  retrieval: 'prod' | 'full';
+  retrieval: 'prod' | 'full' | 'union';
   fusion: 'weighted' | 'rrf' | 'bm25' | 'vector';
   alpha?: number;
   rrfK?: number;
   candidates?: number;
   tokenizer?: Tokenizer;
   idf?: boolean;
+  doc?: DocText;
+  bm25Doc?: DocText;
+  vecDoc?: DocText;
 }
 
 interface Ranked {
@@ -45,8 +56,6 @@ interface Ranked {
   score: number;
 }
 
-const K1 = 1.5;
-const B = 0.75;
 const PROD_TOP_K = 10;
 const FULL_TOP_N = 100;
 const HANGUL = /[가-힣]/;
@@ -78,45 +87,6 @@ const TOKENIZERS: Record<Tokenizer, (text: string) => string[]> = {
     }),
 };
 
-/** 문서 집합에 대한 BM25 색인 (프로덕션 bm25Score와 같은 식) */
-class Bm25Index {
-  private readonly df = new Map<string, number>();
-  private readonly tf: Array<Map<string, number>>;
-  private readonly lengths: number[];
-  private readonly avgLength: number;
-
-  constructor(private readonly docTokens: string[][], private readonly useIdf = true) {
-    this.tf = docTokens.map(tokens => {
-      const counts = new Map<string, number>();
-      for (const t of tokens) counts.set(t, (counts.get(t) ?? 0) + 1);
-      for (const t of counts.keys()) this.df.set(t, (this.df.get(t) ?? 0) + 1);
-      return counts;
-    });
-    this.lengths = docTokens.map(t => t.length);
-    this.avgLength = this.lengths.reduce((a, b) => a + b, 0) / docTokens.length;
-  }
-
-  private idf(term: string): number {
-    if (!this.useIdf) return 1;
-    const n = this.docTokens.length;
-    const df = this.df.get(term) ?? 0;
-    return Math.log((n - df + 0.5) / (df + 0.5) + 1);
-  }
-
-  scores(queryTokens: string[]): number[] {
-    const idfs = queryTokens.map(t => this.idf(t));
-    return this.tf.map((counts, i) => {
-      let score = 0;
-      queryTokens.forEach((term, j) => {
-        const tf = counts.get(term) ?? 0;
-        const norm = (tf * (K1 + 1)) / (tf + K1 * (1 - B + B * (this.lengths[i] / this.avgLength)));
-        score += idfs[j] * norm;
-      });
-      return score;
-    });
-  }
-}
-
 function minMax(values: number[]): number[] {
   const max = Math.max(...values);
   const min = Math.min(...values);
@@ -137,20 +107,39 @@ function main(): void {
   const parts = readJsonl<{ part: Record<string, unknown> & { partId: string } }>(join(dataset, 'corpus.jsonl')).map(r => r.part);
   const queries = readJsonl<{ id: string; text: string }>(join(dataset, 'queries.jsonl'));
   const cache = JSON.parse(readFileSync(join(dataset, 'embeddings/titan-embed-text-v2.json'), 'utf-8'));
-  const texts = parts.map(p => preparePartForBM25(p));
   const ids = parts.map(p => p.partId);
 
-  // 질의 x 문서 코사인 유사도 (프로덕션 cosineSimilarity)
-  const cosine = queries.map(q => parts.map(p => cosineSimilarity(cache.queries[q.id], cache.docs[p.partId])));
+  const TEXT_BUILDERS: Record<DocText, (part: any) => string> = {
+    legacy: preparePartForBM25,
+    v2: part => buildSearchText(part),
+    'v2-noalias': part => buildSearchText(part, { aliases: false }),
+    'v2-notrade': part => buildSearchText(part, { trade: false }),
+  };
+  const textsBy = new Map<DocText, string[]>();
+  const textsFor = (doc: DocText): string[] => {
+    if (!textsBy.has(doc)) textsBy.set(doc, parts.map(p => TEXT_BUILDERS[doc](p)));
+    return textsBy.get(doc)!;
+  };
+  const texts = textsFor('legacy');
+
+  // 질의 x 문서 코사인 유사도 (프로덕션 cosineSimilarity). 문서 정의별 임베딩 캐시는 build-embeddings --doc-text로 만든다
+  const cosineBy = new Map<DocText, number[][]>();
+  const cosineFor = (doc: DocText): number[][] => {
+    if (!cosineBy.has(doc)) {
+      const docs = doc === 'legacy'
+        ? cache.docs
+        : JSON.parse(readFileSync(join(dataset, `embeddings/titan-embed-text-v2.doc-${doc}.json`), 'utf-8')).docs;
+      cosineBy.set(doc, queries.map(q => parts.map(p => cosineSimilarity(cache.queries[q.id], docs[p.partId]))));
+    }
+    return cosineBy.get(doc)!;
+  };
 
   // 토크나이저·IDF 조합별 전체 코퍼스 BM25 점수
-  const docTokensBy = new Map<Tokenizer, string[][]>();
   const fullBm25 = new Map<string, number[][]>();
-  const fullBm25For = (tok: Tokenizer, useIdf: boolean): number[][] => {
-    const key = `${tok}|${useIdf}`;
+  const fullBm25For = (tok: Tokenizer, useIdf: boolean, doc: DocText = 'legacy'): number[][] => {
+    const key = `${tok}|${useIdf}|${doc}`;
     if (!fullBm25.has(key)) {
-      if (!docTokensBy.has(tok)) docTokensBy.set(tok, texts.map(t => TOKENIZERS[tok](t)));
-      const index = new Bm25Index(docTokensBy.get(tok)!, useIdf);
+      const index = new Bm25Index(ids, textsFor(doc).map(t => TOKENIZERS[tok](t)), useIdf);
       fullBm25.set(key, queries.map(q => index.scores(TOKENIZERS[tok](q.text))));
     }
     return fullBm25.get(key)!;
@@ -171,6 +160,10 @@ function main(): void {
     queries.map((q, qi) => {
       const tok = config.tokenizer ?? 'ws';
       const useIdf = config.idf ?? true;
+      const bm25Doc = config.bm25Doc ?? config.doc ?? 'legacy';
+      const vecDoc = config.vecDoc ?? config.doc ?? 'legacy';
+      const cosine = cosineFor(vecDoc);
+      const docTexts = textsFor(bm25Doc);
 
       if (config.retrieval === 'prod') {
         const n = config.candidates ?? PROD_TOP_K * 2;
@@ -179,7 +172,7 @@ function main(): void {
           .map((score, i) => ({ id: ids[i], score, i }))
           .sort((a, b) => b.score - a.score)
           .slice(0, n);
-        const index = new Bm25Index(candidates.map(c => TOKENIZERS[tok](texts[c.i])), useIdf);
+        const index = new Bm25Index(candidates.map(c => c.id), candidates.map(c => TOKENIZERS[tok](docTexts[c.i])), useIdf);
         const bm25 = normalizeBM25Scores(
           index.scores(TOKENIZERS[tok](q.text)).map((s, j) => ({ id: candidates[j].id, bm25Score: s }))
         );
@@ -189,7 +182,7 @@ function main(): void {
           .slice(0, PROD_TOP_K);
 
         // ws·IDF·후보 20개 구성은 프로덕션 hybridSearch와 순위가 같아야 한다
-        if (tok === 'ws' && useIdf && n === PROD_TOP_K * 2) {
+        if (tok === 'ws' && useIdf && n === PROD_TOP_K * 2 && bm25Doc === 'legacy') {
           const expected = hybridSearch(
             candidates.map(c => ({ id: c.id, score: c.score })),
             candidates.map(c => ({ id: c.id, text: texts[c.i] })),
@@ -203,9 +196,20 @@ function main(): void {
         return fused;
       }
 
-      const bm25 = fullBm25For(tok, useIdf)[qi];
+      const bm25 = fullBm25For(tok, useIdf, bm25Doc)[qi];
       const vec = cosine[qi];
       let scores: number[];
+      if (config.retrieval === 'union') {
+        // 프로덕션 vector-search와 같은 형태: 각 검색기 상위 N개 → fuseRankedLists
+        const n = config.candidates ?? 50;
+        const top = (values: number[], keep: (i: number) => boolean) =>
+          values.map((score, i) => ({ id: ids[i], score, i })).filter(h => keep(h.i))
+            .sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : 1)).slice(0, n)
+            .map(({ id, score }) => ({ id, score }));
+        return fuseRankedLists(top(vec, () => true), top(bm25, i => bm25[i] > 0), config.alpha ?? 0.5)
+          .slice(0, FULL_TOP_N)
+          .map(h => ({ partId: h.id, score: h.score }));
+      }
       if (config.fusion === 'bm25') {
         scores = bm25;
       } else if (config.fusion === 'vector') {

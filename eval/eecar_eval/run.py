@@ -4,7 +4,8 @@
     uv run python -m eecar_eval.run --system prod-hybrid      # 임베딩 캐시 필요
     uv run python -m eecar_eval.run --run-file run.jsonl --label my-system
 
-리포트: eval/reports/<날짜>-<dataset>-<system>.{json,md}
+리포트: eval/reports/<날짜>-<dataset>-<system>[-<tag>].{json,md}
+--tag: 같은 날 검색 코드를 바꿔 다시 잴 때 이전 리포트를 덮어쓰지 않도록 붙이는 이름
 """
 
 from __future__ import annotations
@@ -23,7 +24,7 @@ from .metrics import mean, query_metrics
 
 EVAL_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = EVAL_DIR.parent
-SYSTEMS = ("bm25", "vector", "prod-hybrid")
+SYSTEMS = ("bm25", "vector", "prod-hybrid", "legacy-hybrid")
 # v2 질의에만 있는 분류 필드. 있으면 이 기준으로도 지표를 나눠 집계한다
 OPTIONAL_GROUP_FIELDS = ("source", "segment", "form")
 METRICS = ("ndcg@10", "recall@10", "mrr@10", "p@5", "zero_result")
@@ -107,6 +108,7 @@ def main() -> None:
     parser.add_argument("--system", choices=SYSTEMS)
     parser.add_argument("--run-file", type=Path, help="이미 만들어진 run JSONL을 평가 (예: staging HTTP 실행 결과)")
     parser.add_argument("--label", help="리포트에 쓸 시스템 이름 (--run-file과 함께 사용)")
+    parser.add_argument("--tag", help="리포트 파일 이름 끝에 붙일 이름 (예: fusion-v2)")
     args = parser.parse_args()
     if not args.system and not args.run_file:
         parser.error("--system 또는 --run-file 중 하나가 필요합니다")
@@ -131,6 +133,7 @@ def main() -> None:
         "meta": {
             "system": system,
             "dataset": args.dataset,
+            "tag": args.tag,
             "date": date.today().isoformat(),
             "commit": _git_commit(),
             "corpus_sha256": manifest["sha256"]["corpus.jsonl"],
@@ -142,7 +145,7 @@ def main() -> None:
 
     reports_dir = EVAL_DIR / "reports"
     reports_dir.mkdir(exist_ok=True)
-    stem = f"{report['meta']['date']}-{args.dataset}-{system}"
+    stem = f"{report['meta']['date']}-{args.dataset}-{system}" + (f"-{args.tag}" if args.tag else "")
     (reports_dir / f"{stem}.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (reports_dir / f"{stem}.md").write_text(to_markdown(report), encoding="utf-8")
     overall = report["groups"]["overall"]

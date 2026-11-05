@@ -1,6 +1,7 @@
 """검색 기법 실험: 구성 그리드 실행 → dev에서 선택 → test에서 확인.
 
     uv run python -m eecar_eval.experiment
+    uv run python -m eecar_eval.experiment --dataset v2 --grid root-cause   # 문서 정의·구현 가능 결합 (E-23)
 
 과적합 방지 절차
 1. 질의를 유형(qtype)별로 층화해 dev/test로 나눈다 (qid 해시 순서로 번갈아 배정, 결정적).
@@ -61,6 +62,48 @@ def build_grid() -> list[dict[str, Any]]:
     return grid
 
 
+def build_root_cause_grid() -> list[dict[str, Any]]:
+    """실패 원인 분석(E-23)에서 나온 가설을 검증하는 그리드.
+    문서 정의(legacy / v2-noalias / v2)와 프로덕션에서 구현 가능한 결합(union)을 함께 본다."""
+    grid: list[dict[str, Any]] = [
+        {"family": "A.prod-alpha", "name": BASELINE, "retrieval": "prod", "fusion": "weighted", "alpha": 0.7,
+         "candidates": 20},
+        {"family": "A.prod-alpha", "name": "prod-ws-a0.9-c20", "retrieval": "prod", "fusion": "weighted", "alpha": 0.9,
+         "candidates": 20},
+    ]
+    for doc in ("legacy", "v2-noalias", "v2"):
+        # 문서 정의의 효과를 검색기별로 분리해서 본다
+        grid.append({"family": "G.doc-vector", "name": f"doc-{doc}-vector", "retrieval": "full", "fusion": "vector",
+                     "doc": doc})
+        grid.append({"family": "G.doc-bm25", "name": f"doc-{doc}-bm25", "retrieval": "full", "fusion": "bm25", "doc": doc})
+        grid.append({"family": "G.doc-prod", "name": f"doc-{doc}-prod-a0.7-c20", "retrieval": "prod",
+                     "fusion": "weighted", "alpha": 0.7, "candidates": 20, "doc": doc})
+        for a in (0.5, 0.6, 0.7, 0.8, 0.9):
+            grid.append({"family": f"H.full-convex-{doc}", "name": f"doc-{doc}-full-a{a}", "retrieval": "full",
+                         "fusion": "weighted", "alpha": a, "doc": doc})
+        # 구현 가능한 형태: 각 검색기 상위 N개만 사용
+        for n in (20, 50, 100):
+            for a in (0.5, 0.6, 0.7, 0.8, 0.9):
+                grid.append({"family": f"I.union-{doc}", "name": f"doc-{doc}-union-n{n}-a{a}", "retrieval": "union",
+                             "fusion": "weighted", "alpha": a, "candidates": n, "doc": doc})
+    # 임베딩 텍스트 가설 (E-23): 모든 문서에 공통인 거래 조건 줄이 임베딩 변별력을 낮춘다.
+    # BM25는 v2 문서, 벡터는 문서 정의를 바꿔 가며 결합한다
+    grid.append({"family": "G.doc-vector", "name": "doc-v2-notrade-vector", "retrieval": "full", "fusion": "vector",
+                 "doc": "v2-notrade"})
+    for vec_doc in ("legacy", "v2-notrade"):
+        for a in (0.5, 0.6, 0.7, 0.8):
+            grid.append({"family": f"J.mixed-bm25v2-vec{vec_doc}", "name": f"mix-bm25v2-vec{vec_doc}-full-a{a}",
+                         "retrieval": "full", "fusion": "weighted", "alpha": a, "bm25Doc": "v2", "vecDoc": vec_doc})
+            for n in (50, 100):
+                grid.append({"family": f"K.mixed-union-vec{vec_doc}", "name": f"mix-bm25v2-vec{vec_doc}-union-n{n}-a{a}",
+                             "retrieval": "union", "fusion": "weighted", "alpha": a, "candidates": n,
+                             "bm25Doc": "v2", "vecDoc": vec_doc})
+    return grid
+
+
+GRIDS = {"default": build_grid, "root-cause": build_root_cause_grid}
+
+
 def split_queries(queries: list[dict[str, Any]]) -> dict[str, str]:
     """(source, qtype)별로 qid의 sha256 순서로 정렬한 뒤 dev/test를 번갈아 배정한다.
     v1 질의에는 source가 없으므로 v1 분할은 qtype별 층화 그대로다."""
@@ -84,14 +127,16 @@ def main() -> None:
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", default="v1")
-    dataset = parser.parse_args().dataset
+    parser.add_argument("--grid", default="default", choices=sorted(GRIDS))
+    args = parser.parse_args()
+    dataset = args.dataset
     dataset_dir = EVAL_DIR / "datasets" / dataset
     queries = _read_jsonl(dataset_dir / "queries.jsonl")
     qrels = _read_jsonl(dataset_dir / "qrels.jsonl")
     split = split_queries(queries)
     dev = {q for q, s in split.items() if s == "dev"}
     test = {q for q, s in split.items() if s == "test"}
-    grid = build_grid()
+    grid = GRIDS[args.grid]()
 
     import shutil
     import subprocess
@@ -136,6 +181,7 @@ def main() -> None:
 
     report = {
         "meta": {"date": date.today().isoformat(), "commit": _git_commit(), "baseline": BASELINE, "dataset": dataset,
+                 "grid": args.grid,
                  "dev_queries": len(dev), "test_queries": len(test), "configs": len(grid)},
         "split": split,
         "rows": rows,
@@ -143,7 +189,8 @@ def main() -> None:
         "overall_best": overall_best["name"],
         "test_confirmation": confirmations,
     }
-    out = EVAL_DIR / "reports" / f"{report['meta']['date']}-{dataset}-experiments"
+    suffix = "" if args.grid == "default" else f"-{args.grid}"
+    out = EVAL_DIR / "reports" / f"{report['meta']['date']}-{dataset}-experiments{suffix}"
     out.with_suffix(".json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     out.with_suffix(".md").write_text(to_markdown(report), encoding="utf-8")
     print(f"{len(grid)} configs; dev best = {overall_best['name']} "
