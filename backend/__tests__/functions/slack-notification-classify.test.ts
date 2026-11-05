@@ -77,14 +77,37 @@ describe('parseLogEvent', () => {
     expect(parseLogEvent({ timestamp: 1, message }, VECTOR_SEARCH_LOG_GROUP).errorType).toBe(expectedType);
   });
 
-  // 알려진 한계: 부분 문자열로만 분류해서 Bedrock의 ValidationException
-  // (예: 퇴역 모델 ID 호출)도 DynamoDB 오류로 분류된다. 알림 재설계(2개월차)에서 다룬다.
-  it('documents that ValidationException is attributed to DynamoDB regardless of the service', () => {
+  // 회귀 테스트: 2026-11-04 프로덕션 로그의 실제 메시지. 이전에는 DynamoDBResourceNotFound + INFO로 알림됐다.
+  it('classifies the legacy-model outage as a Bedrock error and pages it as CRITICAL', () => {
     const parsed = parseLogEvent(
+      {
+        timestamp: 1,
+        message:
+          '2026-11-04T12:20:02.258Z\tfb322d49-efd8-4064-bf9e-834d35641926\tERROR\tQuery expansion failed: ResourceNotFoundException: ' +
+          'Access denied. This Model is marked by provider as Legacy and you have not been actively using the model in the last 30 days.',
+      },
+      VECTOR_SEARCH_LOG_GROUP
+    );
+    expect(parsed.errorType).toBe('BedrockModelUnavailable');
+    expect(classifySeverity(parsed.functionName, parsed.errorType)).toBe('CRITICAL');
+  });
+
+  it('separates Bedrock and DynamoDB exceptions that share a name', () => {
+    const bedrock = parseLogEvent(
       { timestamp: 1, message: 'ValidationException: The provided model identifier is invalid.' },
       VECTOR_SEARCH_LOG_GROUP
     );
-    expect(parsed.errorType).toBe('DynamoDBValidation');
+    const dynamo = parseLogEvent(
+      { timestamp: 1, message: 'ValidationException: One or more parameter values were invalid: Missing the key PK' },
+      VECTOR_SEARCH_LOG_GROUP
+    );
+    const dynamoMissingTable = parseLogEvent(
+      { timestamp: 1, message: 'ResourceNotFoundException: Requested resource not found' },
+      VECTOR_SEARCH_LOG_GROUP
+    );
+    expect(bedrock.errorType).toBe('BedrockValidation');
+    expect(dynamo.errorType).toBe('DynamoDBValidation');
+    expect(dynamoMissingTable.errorType).toBe('DynamoDBResourceNotFound');
   });
 
   it('summarises Lambda timeouts and reads START/END style request ids', () => {
