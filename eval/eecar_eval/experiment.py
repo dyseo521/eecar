@@ -62,10 +62,12 @@ def build_grid() -> list[dict[str, Any]]:
 
 
 def split_queries(queries: list[dict[str, Any]]) -> dict[str, str]:
-    """qtype별로 qid의 sha256 순서로 정렬한 뒤 dev/test를 번갈아 배정한다."""
+    """(source, qtype)별로 qid의 sha256 순서로 정렬한 뒤 dev/test를 번갈아 배정한다.
+    v1 질의에는 source가 없으므로 v1 분할은 qtype별 층화 그대로다."""
     assignment: dict[str, str] = {}
-    for qtype in sorted({q["qtype"] for q in queries}):
-        members = sorted((q["id"] for q in queries if q["qtype"] == qtype),
+    strata = sorted({(q.get("source", ""), q["qtype"]) for q in queries})
+    for source, qtype in strata:
+        members = sorted((q["id"] for q in queries if q.get("source", "") == source and q["qtype"] == qtype),
                          key=lambda qid: hashlib.sha256(qid.encode()).hexdigest())
         for i, qid in enumerate(members):
             assignment[qid] = "dev" if i % 2 == 0 else "test"
@@ -79,7 +81,11 @@ def _scores(run_rows, queries, qrels, qids: set[str]) -> dict[str, Any]:
 
 
 def main() -> None:
-    dataset_dir = EVAL_DIR / "datasets" / "v1"
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", default="v1")
+    dataset = parser.parse_args().dataset
+    dataset_dir = EVAL_DIR / "datasets" / dataset
     queries = _read_jsonl(dataset_dir / "queries.jsonl")
     qrels = _read_jsonl(dataset_dir / "qrels.jsonl")
     split = split_queries(queries)
@@ -95,7 +101,7 @@ def main() -> None:
         grid_file.write_text(json.dumps(grid), encoding="utf-8")
         out_dir = Path(tmp) / "runs"
         result = subprocess.run(
-            [shutil.which("npx"), "tsx", "eval/ts/experiment-cli.ts", "--dataset", "eval/datasets/v1",
+            [shutil.which("npx"), "tsx", "eval/ts/experiment-cli.ts", "--dataset", f"eval/datasets/{dataset}",
              "--configs", str(grid_file), "--out-dir", str(out_dir)],
             cwd=REPO_ROOT, capture_output=True, text=True, encoding="utf-8",
         )
@@ -129,7 +135,7 @@ def main() -> None:
         confirmations[r["name"]] = paired_stats(base_scores, cand)
 
     report = {
-        "meta": {"date": date.today().isoformat(), "commit": _git_commit(), "baseline": BASELINE,
+        "meta": {"date": date.today().isoformat(), "commit": _git_commit(), "baseline": BASELINE, "dataset": dataset,
                  "dev_queries": len(dev), "test_queries": len(test), "configs": len(grid)},
         "split": split,
         "rows": rows,
@@ -137,7 +143,7 @@ def main() -> None:
         "overall_best": overall_best["name"],
         "test_confirmation": confirmations,
     }
-    out = EVAL_DIR / "reports" / f"{report['meta']['date']}-v1-experiments"
+    out = EVAL_DIR / "reports" / f"{report['meta']['date']}-{dataset}-experiments"
     out.with_suffix(".json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     out.with_suffix(".md").write_text(to_markdown(report), encoding="utf-8")
     print(f"{len(grid)} configs; dev best = {overall_best['name']} "
@@ -149,10 +155,10 @@ def to_markdown(report: dict[str, Any]) -> str:
     rows = sorted(report["rows"], key=lambda r: r["dev"]["ndcg@10"], reverse=True)
     base = next(r for r in report["rows"] if r["name"] == m["baseline"])
     lines = [
-        "# 검색 기법 실험 (v1, 오프라인)",
+        f"# 검색 기법 실험 ({m.get('dataset', 'v1')}, 오프라인)",
         "",
         f"- 날짜 {m['date']}, 코드 `{m['commit']}`, 구성 {m['configs']}개",
-        f"- 질의 분할: dev {m['dev_queries']}개 / test {m['test_queries']}개 (qtype별 층화, qid 해시 순 교대 배정)",
+        f"- 질의 분할: dev {m['dev_queries']}개 / test {m['test_queries']}개 ((source, qtype)별 층화, qid 해시 순 교대 배정)",
         f"- 선택은 dev nDCG@10만 사용. 기준 구성(현재 프로덕션): `{m['baseline']}` "
         f"(dev {base['dev']['ndcg@10']:.3f} / test {base['test']['ndcg@10']:.3f})",
         "- 쿼리 확장(Claude)은 제외. 오프라인 벡터 검색은 정확한 코사인(프로덕션 S3 Vectors는 근사 검색)",

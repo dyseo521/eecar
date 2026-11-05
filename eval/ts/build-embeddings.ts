@@ -2,6 +2,10 @@
  * 평가용 Titan 임베딩 캐시 생성 (AWS 자격 증명과 Bedrock 접근 권한 필요).
  *
  *   npx tsx eval/ts/build-embeddings.ts --dataset eval/datasets/v1
+ *   npx tsx eval/ts/build-embeddings.ts --dataset eval/datasets/v2 --reuse-docs-from eval/datasets/v1
+ *
+ * --reuse-docs-from: 같은 부품(partId·문서 텍스트 동일)의 임베딩을 다른 데이터셋 캐시에서 가져온다.
+ * 문서 텍스트가 다르면 재사용하지 않고 새로 임베딩한다.
  *
  * 프로덕션과 같은 함수를 쓴다.
  * - 문서: preparePartText(part) → generateEmbedding  (part-registration과 동일)
@@ -40,13 +44,29 @@ function round(vector: number[]): number[] {
 }
 
 async function main(): Promise<void> {
-  const index = process.argv.indexOf('--dataset');
-  const dataset = index >= 0 ? process.argv[index + 1] : 'eval/datasets/v1';
+  const arg = (name: string): string | undefined => {
+    const i = process.argv.indexOf(`--${name}`);
+    return i >= 0 ? process.argv[i + 1] : undefined;
+  };
+  const dataset = arg('dataset') ?? 'eval/datasets/v1';
+  const reuseFrom = arg('reuse-docs-from');
 
   const parts = readJsonl<{ part: { partId: string } }>(join(dataset, 'corpus.jsonl')).map(r => r.part);
   const queries = readJsonl<{ id: string; text: string }>(join(dataset, 'queries.jsonl'));
 
-  const docVectors = await mapWithConcurrency(parts, CONCURRENCY, p => generateEmbedding(preparePartText(p)));
+  const reusable = new Map<string, number[]>();
+  if (reuseFrom) {
+    const prior = JSON.parse(readFileSync(join(reuseFrom, CACHE_FILE), 'utf-8'));
+    const priorParts = readJsonl<{ part: { partId: string } }>(join(reuseFrom, 'corpus.jsonl')).map(r => r.part);
+    const priorText = new Map(priorParts.map(p => [p.partId, preparePartText(p)]));
+    for (const p of parts) {
+      if (priorText.get(p.partId) === preparePartText(p) && prior.docs[p.partId]) reusable.set(p.partId, prior.docs[p.partId]);
+    }
+  }
+  const docVectors = await mapWithConcurrency(parts, CONCURRENCY, async p =>
+    reusable.get(p.partId) ?? generateEmbedding(preparePartText(p))
+  );
+  console.log(`reused ${reusable.size}/${parts.length} document embeddings`);
   const queryVectors = await mapWithConcurrency(queries, CONCURRENCY, q => generateEmbedding(q.text));
 
   const cache = {
