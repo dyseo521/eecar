@@ -62,6 +62,15 @@ MATCHERS: dict[str, Matcher] = {
     "application": _any_of("applications"),
     "recommended_use": _in("recommended_use"),
     "connector": _in("connector"),
+    # v2: 실제 구매자 질의에 자주 나오는 거래 조건 (v2 빌더가 part의 가격·수량·상태를 attrs로 옮긴다)
+    "price_max": _max("price"),
+    "price_min": _min("price"),
+    "year_min": _min("year"),
+    "year_max": _max("year"),
+    "quantity_min": _min("quantity"),
+    "condition": _in("condition"),
+    "kwh_min": _min("kwh"),
+    "kwh_max": _max("kwh"),
 }
 
 

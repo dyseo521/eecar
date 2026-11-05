@@ -1,0 +1,15 @@
+{
+  "version": "v2",
+  "documents": 300,
+  "queries": 351,
+  "queries_by_source": {
+    "demand-persona": 260,
+    "v1-generated": 91
+  },
+  "judgments": 5809,
+  "sha256": {
+    "corpus.jsonl": "5abdfeb1047c146774954395f3dbacce000a3f957f25810ab59d6718462391c2",
+    "queries.jsonl": "f7025ca2c8d2a9f4847c0d99149b93c25620dcc0d066abde6a62cbffb0a5e9ff",
+    "qrels.jsonl": "597edb3cba89b5bb47f4c4450db2e4e2f15aed735186249cdb45fbf2e939ca0b"
+  }
+}
