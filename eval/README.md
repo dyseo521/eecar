@@ -195,6 +195,30 @@ v1과는 결론이 반대다. 문서에서 생성한 v1 질의에서는 BM25가 
 
 근거는 [결정 기록 E-20~E-22](../docs/DECISION_LOG.md)에 있다.
 
+## 실패 원인 분석과 검색 구조 변경 (2026-11-05, fusion-v2)
+
+v2에서 피할 수 있었던 오답을 원인별로 나눴습니다. 결합 방식보다 **검색 문서 데이터**가 더 큰 원인이었습니다([결정 기록 E-23](../docs/DECISION_LOG.md)).
+
+- **결합 비중**: 명목 70:30인 결합에서 BM25가 실제로는 순위의 약 72%를 결정했다. 벡터 점수를 정규화하지 않았기 때문이다.
+- **문서 내용**: 검색 문서에 가격·연식·상태가 없었고, 필드 이름이 어긋나 충방전 횟수가 빠졌다. 사실과 다른 고정 키워드(SiC 인버터에 IGBT)도 들어 있었다.
+- **차종 표기**: 운영 부품의 89%가 차종을 영문으로만 적어, 한글 질의가 BM25에서 맞지 않았다.
+
+| (v2 test 174개, nDCG@10) | 이전 | 변경 후 |
+|---|---:|---:|
+| 프로덕션 하이브리드 | 0.700 | **0.775** (+0.075 [+0.047, +0.105]) |
+
+문서 정의를 바꿔 문서 임베딩을 다시 만들 때는 다음을 실행합니다.
+
+```bash
+npx tsx eval/ts/build-embeddings.ts --dataset eval/datasets/v2 --doc-text v2-notrade   # 현재 프로덕션 임베딩 텍스트
+uv run python -m eecar_eval.run --dataset v2 --system prod-hybrid --tag <이름>           # --tag: 같은 날 리포트 덮어쓰기 방지
+uv run python -m eecar_eval.run --dataset v2 --system legacy-hybrid                     # 이전 구조 재현
+uv run python -m eecar_eval.experiment --dataset v2 --grid root-cause
+```
+
+- 이전 구조를 다시 실행한 값은 기존 리포트와 정확히 일치한다(v1 0.8012, v2 0.6959).
+- v2 test 분할은 두 번 썼다(E-24). 다음 기법 선택 전에는 새 질의 묶음으로 test를 바꾼다.
+
 ## 한계 (해석할 때 주의)
 
 - **코퍼스와 라벨이 합성 데이터다.**

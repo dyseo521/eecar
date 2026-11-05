@@ -1,0 +1,1710 @@
+{
+  "meta": {
+    "system": "vector",
+    "dataset": "v1",
+    "tag": "fusion-v2",
+    "date": "2026-11-05",
+    "commit": "42fa856",
+    "corpus_sha256": "8884fd8a72ceac317a0d9a2d189efc829684ff8065993db8d0a8a85c6206f499",
+    "documents": 300,
+    "queries": 91
+  },
+  "groups": {
+    "overall": {
+      "queries": 91,
+      "ndcg@10": 0.7052,
+      "recall@10": 0.7475,
+      "mrr@10": 0.7473,
+      "p@5": 0.4374,
+      "zero_result": 0.0
+    },
+    "qtype=keyword": {
+      "queries": 53,
+      "ndcg@10": 0.839,
+      "recall@10": 0.8946,
+      "mrr@10": 0.87,
+      "p@5": 0.483,
+      "zero_result": 0.0
+    },
+    "qtype=mixed": {
+      "queries": 17,
+      "ndcg@10": 0.5131,
+      "recall@10": 0.5889,
+      "mrr@10": 0.582,
+      "p@5": 0.3412,
+      "zero_result": 0.0
+    },
+    "qtype=semantic": {
+      "queries": 21,
+      "ndcg@10": 0.5234,
+      "recall@10": 0.5048,
+      "mrr@10": 0.5714,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    "difficulty=easy": {
+      "queries": 23,
+      "ndcg@10": 0.8921,
+      "recall@10": 0.917,
+      "mrr@10": 0.8853,
+      "p@5": 0.4783,
+      "zero_result": 0.0
+    },
+    "difficulty=hard": {
+      "queries": 22,
+      "ndcg@10": 0.4743,
+      "recall@10": 0.4992,
+      "mrr@10": 0.5115,
+      "p@5": 0.3182,
+      "zero_result": 0.0
+    },
+    "difficulty=medium": {
+      "queries": 46,
+      "ndcg@10": 0.7223,
+      "recall@10": 0.7816,
+      "mrr@10": 0.7911,
+      "p@5": 0.4739,
+      "zero_result": 0.0
+    }
+  },
+  "per_query": [
+    {
+      "qid": "q001",
+      "text": "아이오닉5 배터리 팩",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "bat-054",
+        "bat-001",
+        "bat-048",
+        "bat-053",
+        "frm-015"
+      ],
+      "ndcg@10": 0.9594718623792032,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q002",
+      "text": "IONIQ 5 battery",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "bat-003",
+        "bat-001",
+        "bat-054",
+        "bat-002",
+        "bat-048"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 1.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q003",
+      "text": "아이오닉 5 72.6kWh 배터리",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "bat-054",
+        "bat-003",
+        "bat-002",
+        "chg-002",
+        "bat-048"
+      ],
+      "ndcg@10": 0.930664430944195,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q004",
+      "text": "EV6 77.4kWh 배터리 팩",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "bat-005",
+        "bat-004",
+        "bat-044",
+        "bat-027",
+        "bat-028"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q005",
+      "text": "니로EV 배터리를 구합니다",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "bat-009",
+        "inv-005",
+        "pnl-010",
+        "mot-007",
+        "elc-019"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q006",
+      "text": "코나 일렉트릭 64kWh 배터리",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "bat-055",
+        "bat-007",
+        "bat-006",
+        "bat-066",
+        "mot-036"
+      ],
+      "ndcg@10": 0.9690271122296037,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q007",
+      "text": "닛산 리프 24kWh 배터리 모듈",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "bat-020",
+        "bat-041",
+        "bat-036",
+        "bat-022",
+        "bat-021"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q008",
+      "text": "볼트 EV 배터리",
+      "qtype": "keyword",
+      "difficulty": "hard",
+      "top5": [
+        "chg-010",
+        "bat-026",
+        "frm-023",
+        "bat-027",
+        "bat-040"
+      ],
+      "ndcg@10": 0.6797310500037655,
+      "recall@10": 1.0,
+      "mrr@10": 0.5,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q009",
+      "text": "쉐보레 볼트 PHEV 배터리 팩",
+      "qtype": "keyword",
+      "difficulty": "hard",
+      "top5": [
+        "bat-027",
+        "bat-040",
+        "bat-028",
+        "frm-023",
+        "bat-026"
+      ],
+      "ndcg@10": 0.5,
+      "recall@10": 1.0,
+      "mrr@10": 0.3333333333333333,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q010",
+      "text": "테슬라 모델3 LFP 배터리",
+      "qtype": "mixed",
+      "difficulty": "medium",
+      "top5": [
+        "bat-016",
+        "bat-017",
+        "bat-051",
+        "bat-015",
+        "bat-014"
+      ],
+      "ndcg@10": 0.8292073559133635,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q011",
+      "text": "Model S 85kWh 배터리 팩",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "bat-014",
+        "bat-015",
+        "bat-017",
+        "bat-019",
+        "bat-051"
+      ],
+      "ndcg@10": 0.7098097413968655,
+      "recall@10": 1.0,
+      "mrr@10": 0.5,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q012",
+      "text": "BMW i3 배터리",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "bat-024",
+        "bat-056",
+        "bat-023",
+        "chg-008",
+        "mot-043"
+      ],
+      "ndcg@10": 0.9619991470595831,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q013",
+      "text": "LFP 배터리",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "bat-041",
+        "bat-036",
+        "bat-020",
+        "bat-022",
+        "bat-021"
+      ],
+      "ndcg@10": 0.17856411732486627,
+      "recall@10": 0.3333333333333333,
+      "mrr@10": 0.1111111111111111,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q014",
+      "text": "리튬인산철 배터리 팩",
+      "qtype": "semantic",
+      "difficulty": "hard",
+      "top5": [
+        "bat-022",
+        "bat-060",
+        "bat-036",
+        "bat-029",
+        "bat-064"
+      ],
+      "ndcg@10": 0.0,
+      "recall@10": 0.0,
+      "mrr@10": 0.0,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q015",
+      "text": "NCA 양극재 배터리",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "bat-006",
+        "bat-029",
+        "bat-060",
+        "bat-007",
+        "bat-052"
+      ],
+      "ndcg@10": 0.0,
+      "recall@10": 0.0,
+      "mrr@10": 0.0,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q016",
+      "text": "LMO 계열 1세대 전기차 배터리",
+      "qtype": "mixed",
+      "difficulty": "medium",
+      "top5": [
+        "bat-020",
+        "chg-011",
+        "bat-026",
+        "bat-041",
+        "bat-046"
+      ],
+      "ndcg@10": 0.6212166613240646,
+      "recall@10": 0.6,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q017",
+      "text": "하이니켈 NCM 배터리",
+      "qtype": "semantic",
+      "difficulty": "hard",
+      "top5": [
+        "bat-002",
+        "bat-003",
+        "bat-026",
+        "bat-008",
+        "bat-046"
+      ],
+      "ndcg@10": 0.666740561363255,
+      "recall@10": 0.625,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q018",
+      "text": "SOH 90% 이상 배터리",
+      "qtype": "mixed",
+      "difficulty": "hard",
+      "top5": [
+        "bat-003",
+        "bat-001",
+        "bat-047",
+        "bat-035",
+        "bat-002"
+      ],
+      "ndcg@10": 0.17737000478273524,
+      "recall@10": 0.2857142857142857,
+      "mrr@10": 0.16666666666666666,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q019",
+      "text": "잔존용량 85% 이상인 배터리 팩",
+      "qtype": "mixed",
+      "difficulty": "hard",
+      "top5": [
+        "bat-031",
+        "bat-005",
+        "bat-045",
+        "bat-070",
+        "bat-001"
+      ],
+      "ndcg@10": 0.44555180837183644,
+      "recall@10": 0.16666666666666666,
+      "mrr@10": 1.0,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q020",
+      "text": "ESS로 재사용할 수 있는 LFP 배터리",
+      "qtype": "mixed",
+      "difficulty": "medium",
+      "top5": [
+        "bat-041",
+        "bat-036",
+        "bat-020",
+        "bat-015",
+        "bat-022"
+      ],
+      "ndcg@10": 0.1255194643385657,
+      "recall@10": 0.16666666666666666,
+      "mrr@10": 0.1,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q021",
+      "text": "전기 지게차에 쓸 중고 배터리 모듈",
+      "qtype": "semantic",
+      "difficulty": "hard",
+      "top5": [
+        "bat-011",
+        "bat-039",
+        "bat-026",
+        "bat-008",
+        "bat-003"
+      ],
+      "ndcg@10": 0.19851760647935032,
+      "recall@10": 0.0625,
+      "mrr@10": 0.3333333333333333,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q022",
+      "text": "재활용 공정으로 보내야 하는 노후 배터리",
+      "qtype": "semantic",
+      "difficulty": "hard",
+      "top5": [
+        "bat-036",
+        "bat-041",
+        "bat-020",
+        "bat-010",
+        "bat-015"
+      ],
+      "ndcg@10": 0.7059054020403313,
+      "recall@10": 0.2857142857142857,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q023",
+      "text": "삼성SDI 셀 배터리",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "bat-014",
+        "bat-015",
+        "bat-068",
+        "bat-039",
+        "bat-016"
+      ],
+      "ndcg@10": 0.3024762969187364,
+      "recall@10": 0.3333333333333333,
+      "mrr@10": 0.3333333333333333,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q024",
+      "text": "SK온 배터리 팩",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "bat-055",
+        "bat-007",
+        "bat-028",
+        "bat-005",
+        "bat-037"
+      ],
+      "ndcg@10": 0.4622134617310566,
+      "recall@10": 0.5,
+      "mrr@10": 0.25,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q025",
+      "text": "800V 고전압 배터리 팩",
+      "qtype": "mixed",
+      "difficulty": "hard",
+      "top5": [
+        "bat-028",
+        "bat-027",
+        "bat-040",
+        "bat-036",
+        "bat-043"
+      ],
+      "ndcg@10": 0.16075232266845793,
+      "recall@10": 0.0,
+      "mrr@10": 0.0,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q026",
+      "text": "캠핑카 전원용 배터리",
+      "qtype": "semantic",
+      "difficulty": "medium",
+      "top5": [
+        "bat-028",
+        "bat-045",
+        "bat-065",
+        "bat-039",
+        "bat-052"
+      ],
+      "ndcg@10": 0.07979453856244817,
+      "recall@10": 0.125,
+      "mrr@10": 0.125,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q027",
+      "text": "UPS 비상전원에 활용 가능한 배터리",
+      "qtype": "semantic",
+      "difficulty": "medium",
+      "top5": [
+        "bat-036",
+        "bat-020",
+        "bat-041",
+        "bat-021",
+        "bat-014"
+      ],
+      "ndcg@10": 0.17318663334822615,
+      "recall@10": 0.2,
+      "mrr@10": 0.25,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q028",
+      "text": "i-MiEV 배터리",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "bat-046",
+        "bat-058",
+        "bat-035",
+        "bat-047",
+        "chg-019"
+      ],
+      "ndcg@10": 0.9818483242455303,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q029",
+      "text": "아토3 블레이드 배터리",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "bat-038",
+        "chg-006",
+        "bat-034",
+        "bat-049",
+        "inv-021"
+      ],
+      "ndcg@10": 0.9060254355346823,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q030",
+      "text": "포르쉐 타이칸 배터리 팩",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "bat-065",
+        "bat-033",
+        "frm-021",
+        "bat-055",
+        "bat-007"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q031",
+      "text": "아이오닉5 후륜 모터",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "mot-001",
+        "mot-044",
+        "mot-002",
+        "inv-001",
+        "mot-021"
+      ],
+      "ndcg@10": 0.9479283790710723,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q032",
+      "text": "EV6 front motor",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "mot-004",
+        "inv-002",
+        "elc-013",
+        "frm-009",
+        "mot-030"
+      ],
+      "ndcg@10": 0.7437850037395074,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q033",
+      "text": "테슬라 모델S 인덕션 모터",
+      "qtype": "mixed",
+      "difficulty": "medium",
+      "top5": [
+        "inv-031",
+        "inv-008",
+        "inv-025",
+        "mot-010",
+        "chg-022"
+      ],
+      "ndcg@10": 0.33690000328137887,
+      "recall@10": 1.0,
+      "mrr@10": 0.25,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q034",
+      "text": "희토류 회수가 가능한 150kW 이상 영구자석 모터",
+      "qtype": "semantic",
+      "difficulty": "hard",
+      "top5": [
+        "mot-021",
+        "mot-045",
+        "mot-033",
+        "mot-031",
+        "mot-040"
+      ],
+      "ndcg@10": 0.9363792118010483,
+      "recall@10": 0.4090909090909091,
+      "mrr@10": 1.0,
+      "p@5": 1.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q035",
+      "text": "희토류를 쓰지 않는 구동모터",
+      "qtype": "semantic",
+      "difficulty": "hard",
+      "top5": [
+        "mot-015",
+        "mot-032",
+        "mot-020",
+        "mot-006",
+        "mot-029"
+      ],
+      "ndcg@10": 0.1420920162033653,
+      "recall@10": 0.2222222222222222,
+      "mrr@10": 0.125,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q036",
+      "text": "200kW 이상 고출력 구동모터",
+      "qtype": "mixed",
+      "difficulty": "hard",
+      "top5": [
+        "mot-003",
+        "mot-034",
+        "mot-039",
+        "mot-006",
+        "mot-020"
+      ],
+      "ndcg@10": 0.2561736782935595,
+      "recall@10": 0.2857142857142857,
+      "mrr@10": 0.5,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q037",
+      "text": "권선형 동기모터",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "mot-030",
+        "mot-006",
+        "mot-036",
+        "mot-037",
+        "mot-003"
+      ],
+      "ndcg@10": 0.16812753627111748,
+      "recall@10": 0.25,
+      "mrr@10": 0.25,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q038",
+      "text": "르노 조에 모터",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "mot-019",
+        "mot-039",
+        "elc-003",
+        "bat-060",
+        "inv-027"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q039",
+      "text": "아우디 e-tron 전륜 모터",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "mot-041",
+        "mot-022",
+        "mot-023",
+        "chg-012",
+        "elc-006"
+      ],
+      "ndcg@10": 0.9180874268973281,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q040",
+      "text": "모델3 구동모터",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "mot-012",
+        "mot-011",
+        "inv-026",
+        "inv-009",
+        "elc-011"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q041",
+      "text": "Model 3 rear motor",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "mot-011",
+        "mot-012",
+        "mot-010",
+        "inv-026",
+        "inv-009"
+      ],
+      "ndcg@10": 0.8587572392349534,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q042",
+      "text": "볼트 EV 구동 모터",
+      "qtype": "keyword",
+      "difficulty": "hard",
+      "top5": [
+        "mot-017",
+        "mot-031",
+        "mot-033",
+        "mot-018",
+        "chg-010"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q043",
+      "text": "소형 전기차용 저출력 모터",
+      "qtype": "semantic",
+      "difficulty": "hard",
+      "top5": [
+        "mot-017",
+        "mot-031",
+        "mot-010",
+        "mot-007",
+        "mot-033"
+      ],
+      "ndcg@10": 0.1478294909154526,
+      "recall@10": 0.2,
+      "mrr@10": 0.16666666666666666,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q044",
+      "text": "토크 400Nm 이상 모터",
+      "qtype": "mixed",
+      "difficulty": "hard",
+      "top5": [
+        "inv-019",
+        "mot-007",
+        "inv-017",
+        "mot-036",
+        "mot-021"
+      ],
+      "ndcg@10": 0.26737277514940755,
+      "recall@10": 0.42857142857142855,
+      "mrr@10": 0.16666666666666666,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q045",
+      "text": "SiC 인버터",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "inv-001",
+        "inv-010",
+        "inv-032",
+        "inv-009",
+        "inv-017"
+      ],
+      "ndcg@10": 0.7380396325465056,
+      "recall@10": 0.625,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q046",
+      "text": "실리콘카바이드 전력반도체 인버터",
+      "qtype": "semantic",
+      "difficulty": "medium",
+      "top5": [
+        "inv-022",
+        "inv-006",
+        "inv-033",
+        "inv-032",
+        "inv-009"
+      ],
+      "ndcg@10": 0.3730314366226675,
+      "recall@10": 0.5,
+      "mrr@10": 0.25,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q047",
+      "text": "800V 인버터",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "inv-029",
+        "inv-017",
+        "inv-020",
+        "inv-034",
+        "inv-002"
+      ],
+      "ndcg@10": 0.7860137352654724,
+      "recall@10": 0.8,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q048",
+      "text": "800V 시스템용 SiC 인버터",
+      "qtype": "mixed",
+      "difficulty": "medium",
+      "top5": [
+        "inv-001",
+        "inv-034",
+        "inv-017",
+        "inv-020",
+        "inv-010"
+      ],
+      "ndcg@10": 0.6680235826778435,
+      "recall@10": 0.6666666666666666,
+      "mrr@10": 1.0,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q049",
+      "text": "테슬라 모델3 인버터",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "inv-009",
+        "inv-026",
+        "chg-020",
+        "inv-031",
+        "inv-008"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q050",
+      "text": "Model 3 inverter",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "inv-009",
+        "inv-026",
+        "chg-020",
+        "inv-010",
+        "inv-008"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q051",
+      "text": "아이오닉 일렉트릭 IGBT 인버터",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "inv-004",
+        "inv-022",
+        "inv-013",
+        "inv-027",
+        "inv-028"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q052",
+      "text": "보쉬 인버터",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "inv-017",
+        "inv-015",
+        "inv-011",
+        "inv-018",
+        "inv-030"
+      ],
+      "ndcg@10": 0.6508562437134189,
+      "recall@10": 0.6666666666666666,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q053",
+      "text": "300kW급 고출력 인버터",
+      "qtype": "mixed",
+      "difficulty": "hard",
+      "top5": [
+        "inv-017",
+        "inv-019",
+        "inv-027",
+        "inv-007",
+        "inv-024"
+      ],
+      "ndcg@10": 0.18457569677956817,
+      "recall@10": 0.5,
+      "mrr@10": 0.1111111111111111,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q054",
+      "text": "히타치 리프 인버터",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "inv-012",
+        "inv-023",
+        "inv-011",
+        "inv-035",
+        "chg-015"
+      ],
+      "ndcg@10": 0.9983270303599034,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q055",
+      "text": "차데모 충전 인렛",
+      "qtype": "keyword",
+      "difficulty": "hard",
+      "top5": [
+        "chg-015",
+        "chg-019",
+        "chg-013",
+        "chg-016",
+        "chg-017"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q056",
+      "text": "CHAdeMO 충전구",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "chg-015",
+        "chg-019",
+        "chg-013",
+        "chg-016",
+        "chg-017"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q057",
+      "text": "11kW 온보드 충전기",
+      "qtype": "mixed",
+      "difficulty": "medium",
+      "top5": [
+        "chg-001",
+        "chg-012",
+        "chg-003",
+        "chg-002",
+        "chg-005"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q058",
+      "text": "OBC 차량 탑재 충전기",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "chg-005",
+        "chg-010",
+        "chg-007",
+        "chg-012",
+        "chg-001"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 0.8333333333333334,
+      "mrr@10": 1.0,
+      "p@5": 1.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q059",
+      "text": "휴대용 충전 케이블",
+      "qtype": "semantic",
+      "difficulty": "medium",
+      "top5": [
+        "chg-023",
+        "chg-025",
+        "chg-024",
+        "chg-017",
+        "chg-003"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q060",
+      "text": "가정용 콘센트로 충전하는 장비",
+      "qtype": "semantic",
+      "difficulty": "hard",
+      "top5": [
+        "chg-023",
+        "chg-021",
+        "chg-024",
+        "chg-017",
+        "chg-020"
+      ],
+      "ndcg@10": 0.8710785440003371,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q061",
+      "text": "유럽형 CCS2 충전 인렛",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "chg-018",
+        "chg-017",
+        "chg-021",
+        "chg-020",
+        "chg-013"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q062",
+      "text": "르노 조에 충전구",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "bat-060",
+        "bat-029",
+        "chg-017",
+        "elc-003",
+        "mot-019"
+      ],
+      "ndcg@10": 0.5,
+      "recall@10": 1.0,
+      "mrr@10": 0.3333333333333333,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q063",
+      "text": "BMS 보드",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "elc-001",
+        "elc-009",
+        "elc-016",
+        "int-008",
+        "pnl-029"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q064",
+      "text": "배터리 관리 시스템",
+      "qtype": "semantic",
+      "difficulty": "easy",
+      "top5": [
+        "elc-009",
+        "elc-016",
+        "elc-001",
+        "bat-046",
+        "bat-037"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q065",
+      "text": "12V 변환 DC-DC 컨버터",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "elc-017",
+        "elc-025",
+        "elc-002",
+        "inv-033",
+        "inv-006"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q066",
+      "text": "전동 컴프레서",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "elc-011",
+        "elc-004",
+        "elc-017",
+        "mot-029",
+        "mot-025"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q067",
+      "text": "겨울철 주행거리 개선용 히트펌프",
+      "qtype": "semantic",
+      "difficulty": "medium",
+      "top5": [
+        "elc-006",
+        "elc-023",
+        "elc-020",
+        "inv-015",
+        "inv-012"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q068",
+      "text": "고전압 배전 릴레이 박스",
+      "qtype": "semantic",
+      "difficulty": "hard",
+      "top5": [
+        "elc-008",
+        "elc-007",
+        "elc-014",
+        "elc-013",
+        "chg-017"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q069",
+      "text": "한온시스템 에어컨 컴프레서",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "elc-004",
+        "elc-011",
+        "elc-002",
+        "bat-066",
+        "elc-017"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q070",
+      "text": "배터리 예열 히터",
+      "qtype": "semantic",
+      "difficulty": "medium",
+      "top5": [
+        "elc-012",
+        "elc-022",
+        "elc-018",
+        "bat-028",
+        "elc-005"
+      ],
+      "ndcg@10": 0.9747429528567877,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q071",
+      "text": "알루미늄 배터리 트레이",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "frm-023",
+        "frm-020",
+        "frm-011",
+        "frm-015",
+        "bat-020"
+      ],
+      "ndcg@10": 0.8687949224876581,
+      "recall@10": 0.8,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q072",
+      "text": "6082 알루미늄 압출 프레임",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "frm-025",
+        "frm-015",
+        "frm-024",
+        "frm-004",
+        "pnl-003"
+      ],
+      "ndcg@10": 0.8899603164338973,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q073",
+      "text": "탄소섬유 차체 구조",
+      "qtype": "semantic",
+      "difficulty": "medium",
+      "top5": [
+        "frm-019",
+        "pnl-026",
+        "frm-017",
+        "pnl-030",
+        "pnl-016"
+      ],
+      "ndcg@10": 0.0,
+      "recall@10": 0.0,
+      "mrr@10": 0.0,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q074",
+      "text": "BMW i3 CFRP 라이프 모듈",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "frm-001",
+        "pnl-002",
+        "bat-024",
+        "dor-020",
+        "pnl-013"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.2,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q075",
+      "text": "1500MPa 핫스탬핑 사이드 실",
+      "qtype": "mixed",
+      "difficulty": "medium",
+      "top5": [
+        "frm-008",
+        "frm-010",
+        "frm-016",
+        "frm-012",
+        "frm-022"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 1.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q076",
+      "text": "충돌 에너지 흡수용 범퍼 빔",
+      "qtype": "semantic",
+      "difficulty": "hard",
+      "top5": [
+        "dor-004",
+        "frm-017",
+        "dor-016",
+        "dor-014",
+        "frm-014"
+      ],
+      "ndcg@10": 0.3451913422468693,
+      "recall@10": 0.4,
+      "mrr@10": 0.5,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q077",
+      "text": "7003 알루미늄 크래시 빔",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "frm-013",
+        "frm-018",
+        "frm-005",
+        "int-006",
+        "pnl-029"
+      ],
+      "ndcg@10": 0.9357996741960194,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q078",
+      "text": "초고장력강 서브프레임",
+      "qtype": "mixed",
+      "difficulty": "medium",
+      "top5": [
+        "frm-004",
+        "frm-009",
+        "frm-002",
+        "frm-003",
+        "frm-024"
+      ],
+      "ndcg@10": 0.7127909865942833,
+      "recall@10": 1.0,
+      "mrr@10": 0.5,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q079",
+      "text": "알루미늄 6061 후드",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "pnl-004",
+        "pnl-001",
+        "pnl-002",
+        "pnl-011",
+        "pnl-025"
+      ],
+      "ndcg@10": 0.7222503411387473,
+      "recall@10": 1.0,
+      "mrr@10": 0.5,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q080",
+      "text": "6016 알루미늄 외판",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "pnl-003",
+        "pnl-019",
+        "pnl-026",
+        "frm-025",
+        "pnl-027"
+      ],
+      "ndcg@10": 0.4690000933206748,
+      "recall@10": 0.2727272727272727,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q081",
+      "text": "가벼운 알루미늄 보닛",
+      "qtype": "semantic",
+      "difficulty": "medium",
+      "top5": [
+        "pnl-017",
+        "pnl-025",
+        "pnl-003",
+        "pnl-013",
+        "pnl-030"
+      ],
+      "ndcg@10": 0.6946156750576561,
+      "recall@10": 0.5714285714285714,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q082",
+      "text": "테슬라 모델S 알루미늄 후드",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "pnl-001",
+        "pnl-014",
+        "pnl-019",
+        "oth-003",
+        "frm-014"
+      ],
+      "ndcg@10": 0.8607761330035307,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q083",
+      "text": "인장강도 500MPa 이상 도어 보강재",
+      "qtype": "mixed",
+      "difficulty": "hard",
+      "top5": [
+        "dor-005",
+        "dor-017",
+        "dor-015",
+        "dor-019",
+        "dor-018"
+      ],
+      "ndcg@10": 0.06794340091829075,
+      "recall@10": 0.1111111111111111,
+      "mrr@10": 0.1,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q084",
+      "text": "7075 사이드 임팩트 빔",
+      "qtype": "keyword",
+      "difficulty": "medium",
+      "top5": [
+        "dor-003",
+        "dor-016",
+        "dor-013",
+        "dor-004",
+        "dor-014"
+      ],
+      "ndcg@10": 0.8667163765466585,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q085",
+      "text": "재활용률 높은 알루미늄 펜더",
+      "qtype": "semantic",
+      "difficulty": "hard",
+      "top5": [
+        "pnl-028",
+        "pnl-024",
+        "pnl-021",
+        "pnl-015",
+        "pnl-014"
+      ],
+      "ndcg@10": 0.6812760101184446,
+      "recall@10": 1.0,
+      "mrr@10": 0.25,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q086",
+      "text": "HUD 대응 앞유리",
+      "qtype": "mixed",
+      "difficulty": "medium",
+      "top5": [
+        "win-008",
+        "win-003",
+        "win-010",
+        "win-007",
+        "dor-006"
+      ],
+      "ndcg@10": 0.8687949224876581,
+      "recall@10": 0.8,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q087",
+      "text": "파노라마 선루프 유리",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "win-002",
+        "win-001",
+        "win-006",
+        "win-009",
+        "pnl-006"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.8,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q088",
+      "text": "차음 접합유리",
+      "qtype": "semantic",
+      "difficulty": "medium",
+      "top5": [
+        "pnl-016",
+        "dor-019",
+        "dor-012",
+        "pnl-026",
+        "pnl-015"
+      ],
+      "ndcg@10": 0.0,
+      "recall@10": 0.0,
+      "mrr@10": 0.0,
+      "p@5": 0.0,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q089",
+      "text": "통풍 시트",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "int-004",
+        "int-002",
+        "frm-010",
+        "frm-008",
+        "int-009"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.4,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q090",
+      "text": "인포테인먼트 디스플레이",
+      "qtype": "keyword",
+      "difficulty": "easy",
+      "top5": [
+        "int-005",
+        "int-003",
+        "int-001",
+        "pnl-022",
+        "elc-016"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 0.6,
+      "zero_result": 0.0
+    },
+    {
+      "qid": "q091",
+      "text": "알루미늄 주조 휠",
+      "qtype": "mixed",
+      "difficulty": "medium",
+      "top5": [
+        "oth-005",
+        "oth-002",
+        "oth-004",
+        "oth-001",
+        "oth-003"
+      ],
+      "ndcg@10": 1.0,
+      "recall@10": 1.0,
+      "mrr@10": 1.0,
+      "p@5": 1.0,
+      "zero_result": 0.0
+    }
+  ]
+}
