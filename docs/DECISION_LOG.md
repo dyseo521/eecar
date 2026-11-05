@@ -317,6 +317,8 @@
 
 ### A-17 Lambda 런타임 nodejs20.x 지원 종료 대응 필요 · 2026-11-05 · 공식 제약
 
+> **정정 (2026-11-05)**: 아래 'cfn-lint' 날짜는 예전 일정이다. AWS Lambda 런타임 문서([lambda-runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)) 기준 nodejs20.x는 지원 종료 2026-04-30, 생성 차단 2027-07-29, **업데이트 차단 2027-08-31**이다. 지원이 종료된 런타임에는 보안 패치가 없으므로 업그레이드 판단 자체는 그대로다(A-19).
+
 - `sam validate --lint`(cfn-lint W2531) 결과: nodejs20.x는 2026-04-30에 지원이 종료됐다. 2027-02-01부터 생성, **2027-03-03부터 업데이트가 막힌다**.
 - 모델 퇴역(C-09)과 같은 종류의 수명 주기 위험이다.
 - **조치**: nodejs22.x 또는 24.x로 올리고, CI(테스트·평가 게이트)로 검증한다. 2027-02 이전, 1개월차 안에 한다.
@@ -330,3 +332,25 @@
   - 폴백 로그 → Slack 알림 (BedrockModelUnavailable, CRITICAL)
   - EMF 지표 `EECAR/Search LLMFallback` 발행
 - **재검토**: 2개월차 SLO 알림 작업 때 배포 역할에 `cloudwatch:PutMetricAlarm`·`DeleteAlarms`·`DescribeAlarms`를 `arn:aws:cloudwatch:ap-northeast-2:*:alarm:eecar-stack-*` 범위로 추가하고 알람을 다시 넣는다. IAM 권한 확대라 사용자 확인 후 진행한다.
+
+### A-19 Lambda 런타임은 nodejs24.x · 2026-11-05 · 공식 제약
+
+- **근거**: AWS Lambda 런타임 문서(2026-11-05 조회)
+
+| 런타임 | 지원 종료 | 업데이트 차단 |
+|---|---|---|
+| nodejs22.x | 2027-04-30 | 2027-08-31 |
+| nodejs24.x | **2028-04-30** | 2028-07-01 |
+
+  nodejs26.x는 아직 public preview라 프로덕션 대상이 아니다.
+- **결정**: 지원 기간이 1년 더 긴 nodejs24.x로 올린다. CI의 Node 버전(setup-node-workspace, deploy-backend, security-scan, deploy-api-docs)도 24로 맞춰 빌드·테스트 환경과 실행 런타임을 일치시킨다. 로컬 개발 환경도 Node 24다.
+- **검증**: CI(테스트·평가 게이트)와 배포 후 운영 호출로 확인한다.
+
+### A-20 배포 역할에 CloudWatch 알람 권한 추가 (사용자 승인) · 2026-11-05 · 측정
+
+- **변경**: 관리형 정책 `eecar-github`의 새 기본 버전 v6에 `CloudWatchAlarms` 문을 추가했다.
+  - 동작: `PutMetricAlarm`, `DeleteAlarms`, `DescribeAlarms`, `TagResource`, `UntagResource`, `ListTagsForResource`
+  - 리소스: `arn:aws:cloudwatch:ap-northeast-2:425454508084:alarm:eecar-stack-*`로 한정. 기존 정책도 서비스마다 리소스를 좁혀 둔 방식이라 같은 원칙을 따랐다.
+- **검증** (`iam simulate-principal-policy`): `eecar-stack-search-llm-fallback` 알람은 allowed, 다른 이름의 알람은 implicitDeny.
+- **버전 관리**: 관리형 정책은 버전을 5개까지만 둘 수 있어 가장 오래된 비기본 버전 v1을 삭제했다. 직전 기본 버전 v5는 남겨 두어 문제가 생기면 즉시 되돌릴 수 있다.
+- 이 변경으로 A-18에서 보류한 폴백 알람을 복원한다.
