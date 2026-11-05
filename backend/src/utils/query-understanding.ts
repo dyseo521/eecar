@@ -190,7 +190,7 @@ export function checkConstraints(attrs: SearchAttributes, constraints: QueryCons
 }
 
 /** 조건 위반 1개당 점수 배율 (1 − 감점). 값은 v2 dev 질의에서 선택한다 (DECISION_LOG A-27) */
-export const CONSTRAINT_PENALTY = 0.5;
+export const CONSTRAINT_PENALTY = 0.8;
 
 export type ConstraintScope = 'all' | 'category' | 'numeric';
 

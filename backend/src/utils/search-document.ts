@@ -14,13 +14,15 @@
  * - 저장 형태가 달라도 같은 문서가 나온다 (중첩 사양과 평평한 사양 모두 읽음).
  */
 import { findAliasGroups, MAKER_ALIASES, VEHICLE_ALIASES } from './search-vocabulary.js';
+import { extractSearchAttributes, SearchAttributes } from './search-attributes.js';
 
 /** 검색 문서 정의가 바뀌면 올린다. 저장된 searchText·임베딩이 어느 정의로 만들어졌는지 구분한다 */
-export const SEARCH_DOCUMENT_VERSION = 2;
+export const SEARCH_DOCUMENT_VERSION = 3; // 3: searchAttributes 추가 (A-27)
 
 /** 저장된 searchText가 현재 정의로 만들어졌는지 확인할 때 쓰는 METADATA 속성 이름 */
 export const SEARCH_TEXT_ATTRIBUTE = 'searchText';
 export const SEARCH_DOC_VERSION_ATTRIBUTE = 'searchDocVersion';
+export const SEARCH_ATTRIBUTES_ATTRIBUTE = 'searchAttributes';
 
 const CATEGORY_LABELS: Record<string, string> = {
   battery: '배터리',
@@ -214,4 +216,13 @@ export function searchTextOf(item: any): string {
     return item[SEARCH_TEXT_ATTRIBUTE];
   }
   return buildSearchText(item);
+}
+
+/** METADATA 항목의 비교용 속성. 저장된 값이 현재 정의면 그대로, 아니면 METADATA로 다시 뽑는다 */
+export function searchAttributesOf(item: any): SearchAttributes {
+  const stored = item[SEARCH_ATTRIBUTES_ATTRIBUTE];
+  if (stored && typeof stored === 'object' && item[SEARCH_DOC_VERSION_ATTRIBUTE] === SEARCH_DOCUMENT_VERSION) {
+    return stored as SearchAttributes;
+  }
+  return extractSearchAttributes(item);
 }
