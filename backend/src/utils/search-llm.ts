@@ -1,0 +1,150 @@
+/**
+ * 검색에서 쓰는 LLM 작업(쿼리 확장, 결과 설명)의 프롬프트와 파싱.
+ *
+ * 모델 호출은 generate 함수로 주입받는다. 그래서 Lambda(callClaude)와 평가 하네스
+ * (모델별 실측)가 같은 프롬프트·파싱 코드를 쓴다. 프롬프트 문자열과 파싱 규칙은
+ * vector-search에 있던 구현을 그대로 옮긴 것이다.
+ */
+
+export type TextGenerator = (prompt: string, maxTokens: number) => Promise<string>;
+
+export const EXPANSION_MAX_TOKENS = 150;
+export const EXPLANATION_MAX_TOKENS = 1800;
+export const MAX_EXPANSIONS = 3;
+export const FALLBACK_REASON = '유사도 기반 매칭';
+
+// ---------------------------------------------------------------- 쿼리 확장
+
+export function buildExpansionPrompt(query: string): string {
+  return `전기차 부품 검색 쿼리를 확장해주세요. 유사한 의미의 검색어 3개를 JSON 배열로만 응답해주세요.
+입력: "${query}"
+예시 입력: "배터리"
+예시 출력: ["배터리 팩", "리튬이온 셀", "에너지 저장 모듈"]
+
+JSON 배열만 출력하세요:`;
+}
+
+/**
+ * 모델 응답을 [원래 질의, 확장 질의...]로 파싱한다. 쓸 수 없는 응답이면 null.
+ * @throws JSON이 아닌 응답 (호출자가 폴백 처리)
+ */
+export function parseExpansion(query: string, response: string): string[] | null {
+  const cleaned = response.trim().replace(/```json\n?|\n?```/g, '');
+  const parsed = JSON.parse(cleaned);
+  if (Array.isArray(parsed) && parsed.length > 0) {
+    return [...new Set([query, ...(parsed.slice(0, MAX_EXPANSIONS) as string[])])];
+  }
+  return null;
+}
+
+export interface ExpansionResult {
+  queries: string[];
+  fallback: boolean;
+  error?: string;
+}
+
+/** 실패하면 원래 질의만으로 검색을 계속한다 (fallback = true). */
+export async function expandSearchQuery(query: string, generate: TextGenerator): Promise<ExpansionResult> {
+  try {
+    const response = await generate(buildExpansionPrompt(query), EXPANSION_MAX_TOKENS);
+    const queries = parseExpansion(query, response);
+    if (queries) {
+      return { queries, fallback: false };
+    }
+    console.error('Query expansion failed: empty or non-array response');
+    return { queries: [query], fallback: true, error: 'empty or non-array response' };
+  } catch (error) {
+    console.error('Query expansion failed:', error);
+    return { queries: [query], fallback: true, error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+/** 확장 질의 임베딩들의 평균을 L2 정규화한다. 하나뿐이면 그대로 반환한다. */
+export function averageEmbeddings(embeddings: number[][]): number[] {
+  if (embeddings.length === 1) {
+    return embeddings[0];
+  }
+  const length = embeddings[0].length;
+  const averaged: number[] = new Array(length).fill(0);
+  for (const embedding of embeddings) {
+    for (let i = 0; i < length; i++) {
+      averaged[i] += embedding[i];
+    }
+  }
+  for (let i = 0; i < length; i++) {
+    averaged[i] /= embeddings.length;
+  }
+  const norm = Math.sqrt(averaged.reduce((sum, x) => sum + x * x, 0));
+  return averaged.map(x => x / norm);
+}
+
+// ---------------------------------------------------------------- 결과 설명
+
+export interface ExplanationItem {
+  id: string;
+  name: string;
+  manufacturer: string;
+  category: string;
+}
+
+export function buildExplanationPrompt(query: string, items: ExplanationItem[]): string {
+  const partsInfo = items
+    .map((item, index) => `${index + 1}. [${item.id}] ${item.name} (${item.manufacturer}, ${item.category})`)
+    .join('\n');
+  return `"${query}" 검색에 왜 이 부품들이 적합한지 이유를 각각 20-30자로 작성.
+"~이므로 적합", "~와 호환", "~에 사용 가능" 형식으로.
+
+반드시 JSON 배열 형식으로만 응답하세요. 다른 텍스트는 절대 포함하지 마세요.
+형식: ["이유1","이유2",...]
+
+부품 목록:
+${partsInfo}
+
+JSON 배열:`;
+}
+
+export interface ExplanationResult {
+  explanations: string[];
+  /** 정확히 count개의 설명을 파싱했는지 */
+  ok: boolean;
+  /** 호출 실패나 배열 없음으로 전부 기본 문구가 됐는지 */
+  fallback: boolean;
+}
+
+/**
+ * 응답에서 JSON 배열을 찾아 설명 목록을 만든다. 모자라면 기본 문구로 채운다.
+ * @throws 배열 부분이 JSON이 아닌 경우 (호출자가 폴백 처리)
+ */
+export function parseExplanations(response: string, count: number): ExplanationResult {
+  const jsonStr = response.trim().replace(/^```json\s*|\s*```$/g, '');
+  const match = jsonStr.match(/\[[\s\S]*?\]/);
+  if (!match) {
+    console.error('No JSON array found in response:', response.substring(0, 200));
+    return { explanations: new Array(count).fill(FALLBACK_REASON), ok: false, fallback: true };
+  }
+  const explanations = JSON.parse(match[0]) as string[];
+  const ok = Array.isArray(explanations) && explanations.length === count;
+  if (!ok) {
+    console.warn(`Expected ${count} explanations, got ${explanations.length}`);
+    while (explanations.length < count) {
+      explanations.push(FALLBACK_REASON);
+    }
+  }
+  return { explanations, ok, fallback: false };
+}
+
+export async function generateExplanations(
+  query: string,
+  items: ExplanationItem[],
+  generate: TextGenerator
+): Promise<ExplanationResult> {
+  let response = '';
+  try {
+    response = await generate(buildExplanationPrompt(query, items), EXPLANATION_MAX_TOKENS);
+    return parseExplanations(response, items.length);
+  } catch (error) {
+    console.error('Batch explanation generation failed:', error);
+    console.error('Raw response:', response.substring(0, 200));
+    return { explanations: new Array(items.length).fill(FALLBACK_REASON), ok: false, fallback: true };
+  }
+}

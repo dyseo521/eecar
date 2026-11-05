@@ -5,6 +5,16 @@ import { getVector, listVectorKeys } from '/opt/nodejs/utils/s3.js';
 import { getItem, putItem, batchGetItems } from '/opt/nodejs/utils/dynamodb.js';
 import { successResponse, errorResponse, parseJsonBody } from '/opt/nodejs/utils/response.js';
 import { hybridSearch, preparePartForBM25 } from '/opt/nodejs/utils/search.js';
+import {
+  averageEmbeddings,
+  expandSearchQuery,
+  generateExplanations,
+  FALLBACK_REASON,
+  TextGenerator,
+} from '/opt/nodejs/utils/search-llm.js';
+
+const generateWithClaude: TextGenerator = (prompt, maxTokens) =>
+  callClaude([{ role: 'user', content: prompt }], undefined, maxTokens);
 
 // Feature flags for gradual rollout
 const USE_S3_VECTORS = process.env.USE_S3_VECTORS === 'true';
@@ -133,72 +143,15 @@ async function searchWithLegacy(
  * Generates semantically similar queries to improve search coverage
  */
 async function expandQuery(query: string): Promise<string[]> {
-  try {
-    const prompt = `전기차 부품 검색 쿼리를 확장해주세요. 유사한 의미의 검색어 3개를 JSON 배열로만 응답해주세요.
-입력: "${query}"
-예시 입력: "배터리"
-예시 출력: ["배터리 팩", "리튬이온 셀", "에너지 저장 모듈"]
-
-JSON 배열만 출력하세요:`;
-
-    const response = await callClaude([{ role: 'user', content: prompt }], undefined, 150);
-
-    // Parse JSON response, handle potential formatting issues
-    const cleanedResponse = response.trim().replace(/```json\n?|\n?```/g, '');
-    const expandedQueries = JSON.parse(cleanedResponse);
-
-    if (Array.isArray(expandedQueries) && expandedQueries.length > 0) {
-      // Return original query + expanded queries (deduplicated)
-      const allQueries = [query, ...expandedQueries.slice(0, 3)];
-      return [...new Set(allQueries)];
-    }
-
-    return [query]; // Fallback to original query
-  } catch (error) {
-    console.error('Query expansion failed:', error);
-    return [query]; // Fallback to original query on error
-  }
+  return (await expandSearchQuery(query, generateWithClaude)).queries;
 }
 
 /**
  * Generate embeddings for multiple queries and average them
  */
 async function generateMultiQueryEmbedding(queries: string[]): Promise<number[]> {
-  // Generate embeddings for all queries in parallel
-  const embeddings = await Promise.all(
-    queries.map(q => generateEmbedding(q))
-  );
-
-  if (embeddings.length === 1) {
-    return embeddings[0];
-  }
-
-  // Average all embeddings
-  const vectorLength = embeddings[0].length;
-  const averaged: number[] = new Array(vectorLength).fill(0);
-
-  for (const embedding of embeddings) {
-    for (let i = 0; i < vectorLength; i++) {
-      averaged[i] += embedding[i];
-    }
-  }
-
-  for (let i = 0; i < vectorLength; i++) {
-    averaged[i] /= embeddings.length;
-  }
-
-  // Normalize the averaged vector
-  let norm = 0;
-  for (let i = 0; i < vectorLength; i++) {
-    norm += averaged[i] * averaged[i];
-  }
-  norm = Math.sqrt(norm);
-
-  for (let i = 0; i < vectorLength; i++) {
-    averaged[i] /= norm;
-  }
-
-  return averaged;
+  const embeddings = await Promise.all(queries.map(q => generateEmbedding(q)));
+  return averageEmbeddings(embeddings);
 }
 
 /**
@@ -409,63 +362,21 @@ async function enrichWithAISequential(
 ): Promise<any[]> {
   const partsMap = new Map(parts.map(p => [p.PK.split('#')[1], p]));
 
-  const partsInfo = matches.map((match, index) => {
-    const part = partsMap.get(match.id);
-    if (!part) return null;
-    return `${index + 1}. [${match.id}] ${part.name} (${part.manufacturer}, ${part.category})`;
-  }).filter(Boolean).join('\n');
-
-  const batchPrompt = `"${query}" 검색에 왜 이 부품들이 적합한지 이유를 각각 20-30자로 작성.
-"~이므로 적합", "~와 호환", "~에 사용 가능" 형식으로.
-
-반드시 JSON 배열 형식으로만 응답하세요. 다른 텍스트는 절대 포함하지 마세요.
-형식: ["이유1","이유2",...]
-
-부품 목록:
-${partsInfo}
-
-JSON 배열:`;
-
-  let explanations: string[] = [];
-  let response = '';  // 스코프 문제 해결
-
-  try {
-    response = await callClaude([{ role: 'user', content: batchPrompt }], undefined, 1800);
-    
-    // Claude 응답에서 JSON 추출 (여러 형식 처리)
-    let jsonStr = response.trim();
-    
-    // ```json ... ``` 형식 제거
-    jsonStr = jsonStr.replace(/^```json\s*|\s*```$/g, '');
-    
-    // 배열 찾기 (non-greedy로 변경)
-    const jsonMatch = jsonStr.match(/\[[\s\S]*?\]/);
-    
-    if (jsonMatch) {
-      explanations = JSON.parse(jsonMatch[0]);
-      
-      // 배열 길이 검증
-      if (!Array.isArray(explanations) || explanations.length !== matches.length) {
-        console.warn(`Expected ${matches.length} explanations, got ${explanations.length}`);
-        // 부족하면 기본값으로 채우기
-        while (explanations.length < matches.length) {
-          explanations.push('유사도 기반 매칭');
-        }
-      }
-    } else {
-      console.error('No JSON array found in response:', response.substring(0, 200));
-      explanations = matches.map(() => '유사도 기반 매칭');
-    }
-  } catch (error) {
-    console.error('Batch explanation generation failed:', error);
-    console.error('Raw response:', response.substring(0, 200));
-    explanations = matches.map(() => '유사도 기반 매칭');
+  // 메타데이터가 있는 부품만 프롬프트에 넣고, 설명도 같은 순서로 매칭한다
+  // (이전에는 빠진 부품이 있으면 뒤쪽 부품의 설명이 한 칸씩 밀렸다)
+  const present = matches.filter(match => partsMap.has(match.id));
+  if (present.length === 0) {
+    return [];
   }
+  const items = present.map(match => {
+    const part = partsMap.get(match.id);
+    return { id: match.id, name: part.name, manufacturer: part.manufacturer, category: part.category };
+  });
+  const { explanations } = await generateExplanations(query, items, generateWithClaude);
 
   // Build results with explanations
-  return matches.map((match, index) => {
+  return present.map((match, index) => {
     const part = partsMap.get(match.id);
-    if (!part) return null;
 
     return {
       partId: match.id,
@@ -484,9 +395,9 @@ JSON 배열:`;
         quantity: part.quantity,
         images: part.images || [],
       },
-      reason: explanations[index] || '유사도 기반 매칭',
+      reason: explanations[index] || FALLBACK_REASON,
     };
-  }).filter(Boolean);
+  });
 }
 
 /**
