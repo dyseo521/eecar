@@ -1,0 +1,107 @@
+{
+  "difficulty=easy": {
+    "mrr@10": 0.6969,
+    "ndcg@10": 0.7216,
+    "recall@10": 0.7812
+  },
+  "difficulty=hard": {
+    "mrr@10": 0.4849,
+    "ndcg@10": 0.4079,
+    "recall@10": 0.3553
+  },
+  "difficulty=medium": {
+    "mrr@10": 0.6821,
+    "ndcg@10": 0.6079,
+    "recall@10": 0.6346
+  },
+  "form=keyword": {
+    "mrr@10": 0.6143,
+    "ndcg@10": 0.5873,
+    "recall@10": 0.5805
+  },
+  "form=phrase": {
+    "mrr@10": 0.7126,
+    "ndcg@10": 0.6228,
+    "recall@10": 0.6861
+  },
+  "form=sentence": {
+    "mrr@10": 0.4452,
+    "ndcg@10": 0.4219,
+    "recall@10": 0.4114
+  },
+  "form=v1": {
+    "mrr@10": 0.8142,
+    "ndcg@10": 0.758,
+    "recall@10": 0.7851
+  },
+  "overall": {
+    "mrr@10": 0.6486,
+    "ndcg@10": 0.5982,
+    "recall@10": 0.618
+  },
+  "qtype=keyword": {
+    "mrr@10": 0.6801,
+    "ndcg@10": 0.6659,
+    "recall@10": 0.7263
+  },
+  "qtype=mixed": {
+    "mrr@10": 0.6187,
+    "ndcg@10": 0.4951,
+    "recall@10": 0.4267
+  },
+  "qtype=semantic": {
+    "mrr@10": 0.5893,
+    "ndcg@10": 0.5011,
+    "recall@10": 0.4839
+  },
+  "segment=A-ess": {
+    "mrr@10": 0.6193,
+    "ndcg@10": 0.4666,
+    "recall@10": 0.4371
+  },
+  "segment=B-small-reuse": {
+    "mrr@10": 0.504,
+    "ndcg@10": 0.4092,
+    "recall@10": 0.3102
+  },
+  "segment=C-recycling": {
+    "mrr@10": 0.5843,
+    "ndcg@10": 0.5519,
+    "recall@10": 0.5078
+  },
+  "segment=D-collision": {
+    "mrr@10": 0.5615,
+    "ndcg@10": 0.6031,
+    "recall@10": 0.7456
+  },
+  "segment=E-electronics": {
+    "mrr@10": 0.5335,
+    "ndcg@10": 0.5508,
+    "recall@10": 0.7234
+  },
+  "segment=F-conversion-rnd": {
+    "mrr@10": 0.7426,
+    "ndcg@10": 0.6237,
+    "recall@10": 0.5882
+  },
+  "segment=G-browse": {
+    "mrr@10": 0.7211,
+    "ndcg@10": 0.6298,
+    "recall@10": 0.2868
+  },
+  "segment=v1": {
+    "mrr@10": 0.8142,
+    "ndcg@10": 0.758,
+    "recall@10": 0.7851
+  },
+  "source=demand-persona": {
+    "mrr@10": 0.5907,
+    "ndcg@10": 0.5422,
+    "recall@10": 0.5595
+  },
+  "source=v1-generated": {
+    "mrr@10": 0.8142,
+    "ndcg@10": 0.758,
+    "recall@10": 0.7851
+  }
+}
