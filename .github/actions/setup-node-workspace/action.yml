@@ -5,7 +5,7 @@ inputs:
   node-version:
     description: 'Node.js version to use'
     required: false
-    default: '20.x'
+    default: '24.x'
   skip-shared-build:
     description: 'Skip building shared types'
     required: false
