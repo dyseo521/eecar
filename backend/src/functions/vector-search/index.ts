@@ -2,9 +2,11 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import crypto from 'crypto';
 import { generateEmbedding, findTopKSimilar, callClaude } from '/opt/nodejs/utils/bedrock.js';
 import { getVector, listVectorKeys } from '/opt/nodejs/utils/s3.js';
-import { getItem, putItem, batchGetItems } from '/opt/nodejs/utils/dynamodb.js';
+import { getItem, putItem, batchGetItems, DynamoDBItem } from '/opt/nodejs/utils/dynamodb.js';
 import { successResponse, errorResponse, parseJsonBody } from '/opt/nodejs/utils/response.js';
-import { hybridSearch, preparePartForBM25 } from '/opt/nodejs/utils/search.js';
+import { CANDIDATES_PER_RETRIEVER, fuseRankedLists, HYBRID_ALPHA } from '/opt/nodejs/utils/search.js';
+import { getSearchIndex, partIdOf } from '/opt/nodejs/utils/search-index.js';
+import { SEARCH_DOCUMENT_VERSION } from '/opt/nodejs/utils/search-document.js';
 import {
   averageEmbeddings,
   expandSearchQuery,
@@ -34,13 +36,33 @@ function recordLlmCall(feature: string, latencyMs: number, fallback: boolean): v
   }, [['Feature'], []]);
 }
 
-/** 검색 SLI: 요청 수, 캐시 적중, 결과 0건 (C-06처럼 에러 없는 조용한 장애를 잡기 위함) */
-function recordSearch(cached: boolean, resultCount: number): void {
+/**
+ * 검색 SLI: 요청 수, 캐시 적중, 결과 0건 (C-06처럼 에러 없는 조용한 장애를 잡기 위함)과
+ * 단계별 지연 (어느 단계가 응답 시간을 차지하는지 보기 위함, C-08)
+ */
+function recordSearch(cached: boolean, resultCount: number, timings: Record<string, number>): void {
   emitMetrics(METRICS_NAMESPACE, { Operation: 'Search' }, {
     SearchRequests: { value: 1, unit: 'Count' },
     CacheHit: { value: cached ? 1 : 0, unit: 'Count' },
     ZeroResult: { value: resultCount === 0 ? 1 : 0, unit: 'Count' },
+    ...Object.fromEntries(Object.entries(timings).map(([name, ms]) => [name, { value: ms, unit: 'Milliseconds' as const }])),
   });
+}
+
+/** 검색 파이프라인 정의가 바뀌면 올린다. 캐시 키에 들어가므로 배포 직후 이전 파이프라인의 결과가 나가지 않는다 */
+export const SEARCH_PIPELINE_VERSION = `fusion-v2.doc-v${SEARCH_DOCUMENT_VERSION}`;
+
+/**
+ * 결과 캐시 키. 이전에는 질의 문자열만 써서 필터·topK가 다른 요청에 같은 결과를 돌려줬다 (C-04).
+ */
+export function searchCacheKey(query: string, filters: Record<string, unknown> | undefined, topK: number): string {
+  const canonicalFilters = filters
+    ? Object.fromEntries(Object.keys(filters).sort().map(key => [key, filters[key]]))
+    : null;
+  return crypto
+    .createHash('md5')
+    .update(JSON.stringify({ q: query, f: canonicalFilters, k: topK, v: SEARCH_PIPELINE_VERSION }))
+    .digest('hex');
 }
 
 // Feature flags for gradual rollout
@@ -187,11 +209,40 @@ async function generateMultiQueryEmbedding(queries: string[]): Promise<number[]>
   return averageEmbeddings(embeddings);
 }
 
+/** 설정된 벡터 저장소에서 질의 임베딩과 가까운 부품 상위 topK개 */
+async function vectorSearch(
+  query: string,
+  queryEmbedding: number[],
+  topK: number,
+  filters?: any
+): Promise<Array<{ id: string; score: number }>> {
+  if (USE_KNOWLEDGE_BASE && KNOWLEDGE_BASE_ID) {
+    return searchWithKnowledgeBase(query, topK, filters);
+  }
+  if (USE_S3_VECTORS && S3_VECTORS_BUCKET) {
+    return searchWithS3Vectors(queryEmbedding, topK, filters);
+  }
+  return searchWithLegacy(queryEmbedding, topK);
+}
+
+async function timed<T>(timings: Record<string, number>, name: string, fn: () => Promise<T>): Promise<T> {
+  const started = Date.now();
+  try {
+    return await fn();
+  } finally {
+    timings[name] = Date.now() - started;
+  }
+}
+
 /**
  * Vector Search Lambda Function
- * AI-powered semantic search for parts matching
+ *
+ * 질의 임베딩 → (벡터 상위 100 ∥ BM25 색인 적재) → BM25 상위 100 → 볼록 결합 → 필터 → 상위 topK → 결과 설명
+ * 벡터와 BM25는 서로의 후보에 의존하지 않는다 (DECISION_LOG E-23).
  */
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  const started = Date.now();
+  const timings: Record<string, number> = {};
   try {
     const parsed = parseJsonBody(event);
     if (!parsed.ok) {
@@ -207,90 +258,68 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     console.log('Processing search query:', query);
 
     // Step 1: Check cache
-    const queryHash = crypto.createHash('md5').update(query).digest('hex');
+    const queryHash = searchCacheKey(query, filters, topK);
     const cachedResult = await getItem(`MATCH#${queryHash}`, 'RESULT');
 
     if (cachedResult && cachedResult.TTL && Date.now() < cachedResult.TTL * 1000) {
       console.log('Cache hit!');
       await incrementCacheHit(queryHash);
-      recordSearch(true, (cachedResult.matchedParts || []).length);
+      recordSearch(true, (cachedResult.matchedParts || []).length, { TotalMs: Date.now() - started });
       return successResponse({
         results: cachedResult.matchedParts,
         cached: true,
       }, 200, event);
     }
 
-    // Step 2: Query Expansion (RAG Enhancement)
-    console.log('Expanding query for better recall...');
+    // Step 2: Query Expansion (기본 꺼짐)
     const expandedQueries = await expandQuery(query);
-    console.log('Expanded queries:', expandedQueries);
 
-    // Step 3: Generate combined embedding from expanded queries
-    console.log('Generating query embedding...');
-    const queryEmbedding = await generateMultiQueryEmbedding(expandedQueries);
+    // Step 3: 질의 임베딩
+    const queryEmbedding = await timed(timings, 'EmbeddingMs', () => generateMultiQueryEmbedding(expandedQueries));
 
-    // Step 4-5: Vector Search (with feature flag support)
-    let vectorMatches: Array<{ id: string; score: number }>;
-    const candidateCount = topK * 2;
+    // Step 4: 벡터 검색과 BM25 색인 적재를 동시에 (서로 의존하지 않음)
+    const [vectorMatches, { index, loaded }] = await Promise.all([
+      timed(timings, 'VectorSearchMs', () => vectorSearch(query, queryEmbedding, CANDIDATES_PER_RETRIEVER, filters)),
+      timed(timings, 'IndexLoadMs', () => getSearchIndex()),
+    ]);
 
-    if (USE_KNOWLEDGE_BASE && KNOWLEDGE_BASE_ID) {
-      // Option 1: Bedrock Knowledge Base (fully managed RAG)
-      console.log('Using Bedrock Knowledge Base for search...');
-      vectorMatches = await searchWithKnowledgeBase(query, candidateCount, filters);
-      console.log(`Knowledge Base returned ${vectorMatches.length} results`);
-    } else if (USE_S3_VECTORS && S3_VECTORS_BUCKET) {
-      // Option 2: S3 Vectors (server-side vector search, O(log n))
-      console.log('Using S3 Vectors for search...');
-      vectorMatches = await searchWithS3Vectors(queryEmbedding, candidateCount, filters);
-      console.log(`S3 Vectors returned ${vectorMatches.length} results`);
-    } else {
-      // Option 3: Legacy S3 JSON vectors (client-side search, O(n))
-      console.log('Using legacy S3 JSON vectors...');
-      vectorMatches = await searchWithLegacy(queryEmbedding, candidateCount);
-      console.log(`Legacy search returned ${vectorMatches.length} results`);
+    // Step 5: BM25 독립 검색 + 결합
+    const fusionStarted = Date.now();
+    const bm25Matches = index.bm25.search(query, CANDIDATES_PER_RETRIEVER);
+    const fused = fuseRankedLists(vectorMatches, bm25Matches, HYBRID_ALPHA);
+    timings.FusionMs = Date.now() - fusionStarted;
+    console.log(`vector ${vectorMatches.length}, bm25 ${bm25Matches.length} (index ${index.bm25.size}${loaded ? ', loaded' : ''}) -> fused ${fused.length}`);
+
+    // Step 6: 메타데이터. 색인에 없는 부품(색인 적재 뒤에 등록된 부품)만 따로 읽는다
+    const partsMap = new Map<string, DynamoDBItem>();
+    const missing: Array<{ pk: string; sk: string }> = [];
+    for (const hit of fused) {
+      const item = index.parts.get(hit.id);
+      if (item) partsMap.set(hit.id, item);
+      else missing.push({ pk: `PART#${hit.id}`, sk: 'METADATA' });
+    }
+    if (missing.length > 0) {
+      for (const item of await batchGetItems(missing)) partsMap.set(partIdOf(item), item);
     }
 
-    // Step 6: Fetch part metadata for hybrid search
-    const candidateIds = vectorMatches.map(m => ({ pk: `PART#${m.id}`, sk: 'METADATA' }));
-    const allCandidateParts = await batchGetItems(candidateIds);
+    // Step 7: 필터를 상위 topK로 자르기 전에 적용 (이전에는 자른 뒤 적용해 결과가 줄었다, C-05)
+    const topMatches = fused
+      .filter(hit => partsMap.has(hit.id) && matchesFilters(partsMap.get(hit.id), filters))
+      .slice(0, topK);
+    const parts = topMatches.map(m => partsMap.get(m.id));
 
-    // Step 7: Hybrid Search - combine vector + BM25 scores
-    console.log('Applying hybrid search (vector + BM25)...');
-    const partsForBM25 = allCandidateParts.map(p => ({
-      id: p.PK.split('#')[1],
-      text: preparePartForBM25(p)
-    }));
+    // Step 8: 결과 설명 (단일 프롬프트)
+    const filteredResults = await timed(timings, 'ExplanationMs', () => enrichWithAISequential(query, topMatches, parts));
 
-    const hybridResults = hybridSearch(vectorMatches, partsForBM25, query, 0.7);
-    console.log(`Hybrid search completed: ${hybridResults.length} candidates`);
-
-    // Create parts map for enrichment
-    const partsMap = new Map(allCandidateParts.map(p => [p.PK.split('#')[1], p]));
-
-    // Step 8: Use Hybrid Score directly (skip Claude re-ranking to avoid throttling)
-    // Hybrid search already combines Vector + BM25 scores for good precision
-    const topMatches = hybridResults.slice(0, topK);
-    console.log(`Using top ${topMatches.length} hybrid results (skipping Claude re-ranking)`);
-
-    const parts = topMatches.map(m => partsMap.get(m.id)).filter(Boolean);
-
-    // Step 9: Generate AI explanations sequentially to avoid throttling
-    console.log('Generating AI explanations (sequential to avoid throttling)...');
-    const enrichedResults = await enrichWithAISequential(query, topMatches, parts);
-
-    // Step 10: Apply filters if provided
-    let filteredResults = enrichedResults;
-    if (filters) {
-      filteredResults = applyFilters(enrichedResults, filters);
-    }
-
-    // Step 11: Cache the results (7 days TTL)
+    // Step 9: Cache the results (7 days TTL)
     const ttl = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60;
     await putItem({
       PK: `MATCH#${queryHash}`,
       SK: 'RESULT',
       query,
-      expandedQueries, // RAG Enhancement: Store expanded queries for debugging
+      filters: filters ?? null,
+      pipelineVersion: SEARCH_PIPELINE_VERSION,
+      expandedQueries,
       matchedParts: filteredResults,
       modelUsed: process.env.BEDROCK_MODEL_ID || 'haiku',
       createdAt: new Date().toISOString(),
@@ -300,7 +329,8 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       GSI1SK: `HIT_COUNT#${1}`,
     });
 
-    recordSearch(false, filteredResults.length);
+    timings.TotalMs = Date.now() - started;
+    recordSearch(false, filteredResults.length, timings);
     return successResponse({
       results: filteredResults,
       expandedQueries, // Include expanded queries in response for transparency
@@ -515,30 +545,15 @@ async function _enrichWithAI(
 }
 
 /**
- * Apply filters to search results
+ * 부품 METADATA가 요청 필터를 만족하는지
  */
-function applyFilters(results: any[], filters: any): any[] {
-  return results.filter(result => {
-    const part = result.part;
-
-    if (filters.category && part.category !== filters.category) {
-      return false;
-    }
-
-    if (filters.maxPrice && part.price > filters.maxPrice) {
-      return false;
-    }
-
-    if (filters.minQuantity && part.quantity < filters.minQuantity) {
-      return false;
-    }
-
-    if (filters.manufacturer && part.manufacturer !== filters.manufacturer) {
-      return false;
-    }
-
-    return true;
-  });
+export function matchesFilters(part: any, filters: any): boolean {
+  if (!filters) return true;
+  if (filters.category && part.category !== filters.category) return false;
+  if (filters.maxPrice && part.price > filters.maxPrice) return false;
+  if (filters.minQuantity && part.quantity < filters.minQuantity) return false;
+  if (filters.manufacturer && part.manufacturer !== filters.manufacturer) return false;
+  return true;
 }
 
 /**
