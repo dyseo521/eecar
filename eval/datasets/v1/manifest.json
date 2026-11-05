@@ -1,0 +1,11 @@
+{
+  "version": "v1",
+  "documents": 300,
+  "queries": 91,
+  "judgments": 930,
+  "sha256": {
+    "corpus.jsonl": "8884fd8a72ceac317a0d9a2d189efc829684ff8065993db8d0a8a85c6206f499",
+    "queries.jsonl": "956fba46500a0316d40c9f48a0f6c3bbcf8c9aed98aa0c8334ffd32d672384c5",
+    "qrels.jsonl": "c8069a169fd33565529162d6310ea5651fa2a2080f2418c552e8f5148134751c"
+  }
+}
