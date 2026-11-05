@@ -15,6 +15,8 @@
  *   doc        legacy | v2 | v2-noalias  문서 텍스트 정의 (BM25 텍스트와 문서 임베딩 모두)
  *              legacy = preparePartForBM25 + preparePartText 임베딩, v2 = buildSearchText (search-document.ts)
  *   bm25Doc / vecDoc  doc을 BM25 쪽 / 벡터 쪽만 따로 바꿀 때
+ *   constraintPenalty / constraintScope  union 결합 뒤 질의 조건 재정렬 (query-understanding.ts).
+ *              부품 속성은 정답 attrs가 아니라 프로덕션 extractSearchAttributes로 문서에서 뽑은 값을 쓴다
  *
  * BM25는 프로덕션 Bm25Index, union 결합은 프로덕션 fuseRankedLists를 그대로 쓴다.
  * 실행할 때마다 Bm25Index 점수를 calculateBM25Scores와, prod 구성을 이전 프로덕션 hybridSearch와 대조해 다르면 중단한다.
@@ -33,6 +35,8 @@ import {
 } from '../../backend/src/utils/search.js';
 import { cosineSimilarity } from '../../backend/src/utils/bedrock.js';
 import { buildSearchText } from '../../backend/src/utils/search-document.js';
+import { extractSearchAttributes } from '../../backend/src/utils/search-attributes.js';
+import { ConstraintScope, parseQuery, rerankByConstraints, scopeConstraints } from '../../backend/src/utils/query-understanding.js';
 
 type Tokenizer = 'ws' | 'bigram' | 'ws+bigram';
 type DocText = 'legacy' | 'v2' | 'v2-noalias' | 'v2-notrade';
@@ -49,6 +53,8 @@ interface Config {
   doc?: DocText;
   bm25Doc?: DocText;
   vecDoc?: DocText;
+  constraintPenalty?: number;
+  constraintScope?: ConstraintScope;
 }
 
 interface Ranked {
@@ -108,6 +114,8 @@ function main(): void {
   const queries = readJsonl<{ id: string; text: string }>(join(dataset, 'queries.jsonl'));
   const cache = JSON.parse(readFileSync(join(dataset, 'embeddings/titan-embed-text-v2.json'), 'utf-8'));
   const ids = parts.map(p => p.partId);
+  const attrsById = new Map(parts.map(p => [p.partId, extractSearchAttributes(p)]));
+  const parsedQueries = queries.map(q => parseQuery(q.text));
 
   const TEXT_BUILDERS: Record<DocText, (part: any) => string> = {
     legacy: preparePartForBM25,
@@ -206,9 +214,12 @@ function main(): void {
           values.map((score, i) => ({ id: ids[i], score, i })).filter(h => keep(h.i))
             .sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : 1)).slice(0, n)
             .map(({ id, score }) => ({ id, score }));
-        return fuseRankedLists(top(vec, () => true), top(bm25, i => bm25[i] > 0), config.alpha ?? 0.5)
-          .slice(0, FULL_TOP_N)
-          .map(h => ({ partId: h.id, score: h.score }));
+        let fused: Array<{ id: string; score: number }> = fuseRankedLists(top(vec, () => true), top(bm25, i => bm25[i] > 0), config.alpha ?? 0.5);
+        if (config.constraintPenalty !== undefined) {
+          const constraints = scopeConstraints(parsedQueries[qi], config.constraintScope ?? 'all');
+          fused = rerankByConstraints(fused, id => attrsById.get(id), constraints, config.constraintPenalty);
+        }
+        return fused.slice(0, FULL_TOP_N).map(h => ({ partId: h.id, score: h.score }));
       }
       if (config.fusion === 'bm25') {
         scores = bm25;

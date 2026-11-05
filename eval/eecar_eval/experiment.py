@@ -2,6 +2,10 @@
 
     uv run python -m eecar_eval.experiment
     uv run python -m eecar_eval.experiment --dataset v2 --grid root-cause   # 문서 정의·구현 가능 결합 (E-23)
+    uv run python -m eecar_eval.experiment --dataset v3 --grid query-understanding --holdout   # 사전 등록 구성 확인
+
+--holdout: 선택에 쓰지 않은 데이터셋에서 모든 질의를 test로 쓴다. 구성을 고르지 않고 모든 구성을 기준과 비교하므로,
+해석은 다른 데이터셋의 dev에서 미리 고른 구성(결정 기록에 사전 등록)에만 한다.
 
 과적합 방지 절차
 1. 질의를 유형(qtype)별로 층화해 dev/test로 나눈다 (qid 해시 순서로 번갈아 배정, 결정적).
@@ -101,7 +105,30 @@ def build_root_cause_grid() -> list[dict[str, Any]]:
     return grid
 
 
-GRIDS = {"default": build_grid, "root-cause": build_root_cause_grid}
+# 현재 프로덕션 구성 (v1.6.0, E-23)
+CURRENT = {"retrieval": "union", "fusion": "weighted", "alpha": 0.5, "candidates": 100, "bm25Doc": "v2", "vecDoc": "v2-notrade"}
+CURRENT_NAME = "prod2-union-n100-a0.5"
+
+
+def build_query_understanding_grid() -> list[dict[str, Any]]:
+    """질의 이해(카테고리·수치 조건 감점)와 토크나이저 실험 (A-27). 기준은 현재 프로덕션(v1.6.0)."""
+    grid: list[dict[str, Any]] = [{"family": "A.current", "name": CURRENT_NAME, **CURRENT}]
+    for scope in ("all", "category", "numeric"):
+        for p in (0.1, 0.2, 0.3, 0.5, 0.8, 1.0):
+            grid.append({"family": f"Q.penalty-{scope}", "name": f"qu-{scope}-p{p}", **CURRENT,
+                         "constraintPenalty": p, "constraintScope": scope})
+    for tok in ("bigram", "ws+bigram"):
+        for a in (0.5, 0.6):
+            grid.append({"family": "T.tokenizer", "name": f"tok-{tok}-a{a}", **CURRENT, "alpha": a, "tokenizer": tok})
+        for p in (0.3, 0.5, 0.8):
+            grid.append({"family": "QT.tokenizer+qu", "name": f"tok-{tok}-qu-all-p{p}", **CURRENT, "tokenizer": tok,
+                         "constraintPenalty": p, "constraintScope": "all"})
+    return grid
+
+
+GRIDS = {"default": build_grid, "root-cause": build_root_cause_grid, "query-understanding": build_query_understanding_grid}
+# 그리드별 비교 기준 구성
+GRID_BASELINES = {"query-understanding": CURRENT_NAME}
 
 
 def split_queries(queries: list[dict[str, Any]]) -> dict[str, str]:
@@ -128,7 +155,9 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", default="v1")
     parser.add_argument("--grid", default="default", choices=sorted(GRIDS))
+    parser.add_argument("--holdout", action="store_true", help="모든 질의를 test로 쓰고 선택 없이 기준과 비교")
     args = parser.parse_args()
+    baseline = GRID_BASELINES.get(args.grid, BASELINE)
     dataset = args.dataset
     dataset_dir = EVAL_DIR / "datasets" / dataset
     queries = _read_jsonl(dataset_dir / "queries.jsonl")
@@ -154,6 +183,10 @@ def main() -> None:
             raise SystemExit(f"experiment-cli failed:\n{result.stderr.strip()}")
         runs = {c["name"]: _read_jsonl(out_dir / f"{c['name']}.jsonl") for c in grid}
 
+    if args.holdout:
+        write_holdout_report(dataset, args.grid, baseline, grid, runs, queries, qrels)
+        return
+
     rows = []
     per_query: dict[str, dict[str, Any]] = {}
     for c in grid:
@@ -173,14 +206,14 @@ def main() -> None:
 
     # test 확인: 선택된 구성 vs 프로덕션 기준 구성 (질의별 쌍체)
     test_ids = sorted(test)
-    base_scores = [per_query[BASELINE][q]["ndcg@10"] for q in test_ids]
+    base_scores = [per_query[baseline][q]["ndcg@10"] for q in test_ids]
     confirmations = {}
     for r in {**best_by_family, "overall": overall_best}.values():
         cand = [per_query[r["name"]][q]["ndcg@10"] for q in test_ids]
         confirmations[r["name"]] = paired_stats(base_scores, cand)
 
     report = {
-        "meta": {"date": date.today().isoformat(), "commit": _git_commit(), "baseline": BASELINE, "dataset": dataset,
+        "meta": {"date": date.today().isoformat(), "commit": _git_commit(), "baseline": baseline, "dataset": dataset,
                  "grid": args.grid,
                  "dev_queries": len(dev), "test_queries": len(test), "configs": len(grid)},
         "split": split,
@@ -195,6 +228,39 @@ def main() -> None:
     out.with_suffix(".md").write_text(to_markdown(report), encoding="utf-8")
     print(f"{len(grid)} configs; dev best = {overall_best['name']} "
           f"(dev nDCG@10 {overall_best['dev']['ndcg@10']:.3f}) -> {out.name}.md")
+
+
+def write_holdout_report(dataset, grid_name, baseline, grid, runs, queries, qrels) -> None:
+    all_ids = {q["id"] for q in queries}
+    per_query = {c["name"]: {r["qid"]: r for r in _scores(runs[c["name"]], queries, qrels, all_ids)["per_query"]}
+                 for c in grid}
+    groups = {c["name"]: _scores(runs[c["name"]], queries, qrels, all_ids)["groups"] for c in grid}
+    ids = sorted(all_ids)
+    base = [per_query[baseline][q]["ndcg@10"] for q in ids]
+    rows = []
+    for c in grid:
+        stats = paired_stats(base, [per_query[c["name"]][q]["ndcg@10"] for q in ids])
+        rows.append({**c, "overall": groups[c["name"]]["overall"], "vs_baseline": stats})
+    report = {"meta": {"date": date.today().isoformat(), "commit": _git_commit(), "dataset": dataset, "grid": grid_name,
+                       "baseline": baseline, "queries": len(ids), "mode": "holdout"}, "rows": rows}
+    out = EVAL_DIR / "reports" / f"{report['meta']['date']}-{dataset}-holdout-{grid_name}"
+    out.with_suffix(".json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    lines = [
+        f"# 홀드아웃 확인 ({dataset}, {grid_name})",
+        "",
+        f"- 날짜 {report['meta']['date']}, 코드 `{report['meta']['commit']}`, 질의 {len(ids)}개 전부 test",
+        f"- 기준 구성: `{baseline}`. 구성을 여기서 고르지 않는다. 해석은 결정 기록에 사전 등록한 구성에만 한다",
+        "",
+        "| 구성 | 계열 | nDCG@10 | Δ | 95% CI | p | 승/패/무 |",
+        "|---|---|---:|---:|---|---:|---|",
+    ]
+    for r in rows:
+        st = r["vs_baseline"]
+        lines.append(f"| `{r['name']}` | {r['family']} | {r['overall']['ndcg@10']:.3f} | {st['delta']:+.3f} "
+                     f"| [{st['ci_low']:+.3f}, {st['ci_high']:+.3f}] | {format_p(st['p_value'])} "
+                     f"| {st['wins']}/{st['losses']}/{st['ties']} |")
+    out.with_suffix(".md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"holdout: {len(grid)} configs on {len(ids)} queries -> {out.name}.md")
 
 
 def to_markdown(report: dict[str, Any]) -> str:
