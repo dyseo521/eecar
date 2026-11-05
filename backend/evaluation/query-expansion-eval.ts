@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { precisionAtK, recallAtK, f1Score } from './metrics.js';
+import { precisionAtK, recallAtK } from './metrics.js';
 import type { GoldenDataset, GoldenQuery, QueryExpansionMetrics } from './types.js';
 
 const __filename = fileURLToPath(import.meta.url);

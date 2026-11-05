@@ -9,11 +9,11 @@
  *   npm run eval:embedding
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { cosineSimilarity, average } from './metrics.js';
-import type { ClusteringMetrics, VisualizationPoint } from './types.js';
+import type { VisualizationPoint } from './types.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
