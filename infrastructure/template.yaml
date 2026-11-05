@@ -14,7 +14,10 @@ Globals:
         VECTORS_BUCKET_NAME: !Ref VectorsBucket
         DOCUMENTS_BUCKET_NAME: !Ref DocumentsBucket
         SNS_TOPIC_ARN: !Ref NotificationTopic
-        BEDROCK_MODEL_ID: anthropic.claude-3-haiku-20240307-v1:0  # Cost-optimized for text generation (Titan is for embeddings)
+        # Claude 3 Haiku는 퇴역(LEGACY, 30일 미사용 시 차단)해 global inference profile로 교체 (docs/DECISION_LOG.md A-11, A-14)
+        BEDROCK_MODEL_ID: global.anthropic.claude-haiku-4-5-20251001-v1:0
+        # 쿼리 확장은 측정상 품질 이득이 없어 기본값 off (docs/DECISION_LOG.md E-18, E-19)
+        QUERY_EXPANSION_ENABLED: 'false'
         # RAG Enhancement: S3 Vectors + Bedrock Knowledge Base (Phase 2-3)
         USE_S3_VECTORS: 'true'  # Enabled after successful migration (79 vectors)
         USE_KNOWLEDGE_BASE: 'false'  # Set to 'true' after KB setup
@@ -70,7 +73,11 @@ Resources:
               Action:
                 - bedrock:InvokeModel
                 - bedrock:InvokeModelWithResponseStream
-              Resource: 'arn:aws:bedrock:ap-northeast-2::foundation-model/*'
+              # global inference profile은 요청을 다른 리전의 모델로 라우팅하므로 profile과 모든 리전의 모델 ARN이 필요하다
+              Resource:
+                - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
+                - 'arn:aws:bedrock:*::foundation-model/*'
+                - 'arn:aws:bedrock:::foundation-model/*'
             # S3 Vectors permissions (Phase 2)
             # ARN format: arn:aws:s3vectors:region:account:bucket/bucket-name/index/index-name
             - Effect: Allow
@@ -116,7 +123,11 @@ Resources:
               Action:
                 - bedrock:InvokeModel
                 - bedrock:InvokeModelWithResponseStream
-              Resource: 'arn:aws:bedrock:ap-northeast-2::foundation-model/*'
+              # global inference profile은 요청을 다른 리전의 모델로 라우팅하므로 profile과 모든 리전의 모델 ARN이 필요하다
+              Resource:
+                - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
+                - 'arn:aws:bedrock:*::foundation-model/*'
+                - 'arn:aws:bedrock:::foundation-model/*'
             - Effect: Allow
               Action:
                 - lambda:InvokeFunction
@@ -150,7 +161,11 @@ Resources:
               Action:
                 - bedrock:InvokeModel
                 - bedrock:InvokeModelWithResponseStream
-              Resource: 'arn:aws:bedrock:ap-northeast-2::foundation-model/*'
+              # global inference profile은 요청을 다른 리전의 모델로 라우팅하므로 profile과 모든 리전의 모델 ARN이 필요하다
+              Resource:
+                - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
+                - 'arn:aws:bedrock:*::foundation-model/*'
+                - 'arn:aws:bedrock:::foundation-model/*'
 
   GetPartsFunction:
     Type: AWS::Serverless::Function
@@ -245,7 +260,11 @@ Resources:
               Action:
                 - bedrock:InvokeModel
                 - bedrock:InvokeModelWithResponseStream
-              Resource: 'arn:aws:bedrock:ap-northeast-2::foundation-model/*'
+              # global inference profile은 요청을 다른 리전의 모델로 라우팅하므로 profile과 모든 리전의 모델 ARN이 필요하다
+              Resource:
+                - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
+                - 'arn:aws:bedrock:*::foundation-model/*'
+                - 'arn:aws:bedrock:::foundation-model/*'
             # S3 Vectors permissions for synthetic data upload
             - Effect: Allow
               Action:
@@ -364,6 +383,8 @@ Resources:
       Environment:
         Variables:
           SLACK_BOT_TOKEN_SSM_PARAM: /eecar/slack/bot-token
+          AGENT_MODEL_ID: global.anthropic.claude-haiku-4-5-20251001-v1:0
+          AGENT_COMPLEX_MODEL_ID: global.anthropic.claude-sonnet-4-6
           SLACK_SIGNING_SECRET_SSM_PARAM: /eecar/slack/signing-secret
           BEDROCK_KB_ID_SSM_PARAM: /eecar/bedrock/kb-id
           S3_VECTORS_BUCKET: eecar-vectors-index-12234628
@@ -411,7 +432,11 @@ Resources:
               Action:
                 - bedrock:InvokeModel
                 - bedrock:InvokeModelWithResponseStream
-              Resource: 'arn:aws:bedrock:ap-northeast-2::foundation-model/*'
+              # global inference profile은 요청을 다른 리전의 모델로 라우팅하므로 profile과 모든 리전의 모델 ARN이 필요하다
+              Resource:
+                - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
+                - 'arn:aws:bedrock:*::foundation-model/*'
+                - 'arn:aws:bedrock:::foundation-model/*'
         # S3 Vectors: jadong-memories (장기 기억)
         - Statement:
             - Effect: Allow
@@ -754,6 +779,22 @@ Resources:
       DestinationArn: !GetAtt SlackNotificationFunction.Arn
 
   # CloudWatch Dashboard for monitoring
+  # 검색 LLM 폴백 알람: 응답은 200이어도 AI 기능이 꺼진 상태를 감지 (C-09 재발 방지)
+  # 알람 액션은 아직 두지 않는다. SNS 구독자가 팀 공용 메일이라 2개월차 SLO 알림 경로(Slack)와 함께 연결한다.
+  SearchLLMFallbackAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${AWS::StackName}-search-llm-fallback'
+      AlarmDescription: Search LLM calls (query expansion / explanation) fell back. Model access, quota or throttling issue.
+      Namespace: EECAR/Search
+      MetricName: LLMFallback
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+
   EECARDashboard:
     Type: AWS::CloudWatch::Dashboard
     Properties:

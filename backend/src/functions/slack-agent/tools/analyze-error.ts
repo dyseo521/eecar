@@ -40,7 +40,7 @@ async function getKnowledgeBaseId(): Promise<string> {
 }
 
 // 모델 ID (비용 최적화: Haiku 기본)
-const MODEL_ID = process.env.BEDROCK_MODEL_ID || 'anthropic.claude-3-haiku-20240307-v1:0';
+const MODEL_ID = process.env.BEDROCK_MODEL_ID || 'global.anthropic.claude-haiku-4-5-20251001-v1:0';
 
 interface AnalyzeErrorInput {
   errorMessage: string;
@@ -198,8 +198,9 @@ async function callClaudeForAnalysis(context: {
       })
     );
 
+    // 추론(reasoning) 블록이 먼저 올 수 있으므로 첫 텍스트 블록을 찾는다
     const responseText =
-      response.output?.message?.content?.[0]?.text || '';
+      response.output?.message?.content?.find((block) => 'text' in block && block.text)?.text || '';
 
     // 응답 파싱
     return parseAnalysisResponse(responseText);

@@ -18,9 +18,9 @@ import { TOOLS, executeTool } from './tools/index.js';
 
 const bedrockClient = new BedrockRuntimeClient({ region: 'ap-northeast-2' });
 
-// Haiku 기본, 복잡한 분석은 Sonnet
-const HAIKU_MODEL_ID = 'anthropic.claude-3-haiku-20240307-v1:0';
-const SONNET_MODEL_ID = 'anthropic.claude-3-5-sonnet-20241022-v2:0';
+// 기본 모델과 복잡한 분석용 모델 (template.yaml에서 주입, 퇴역 모델 하드코딩 제거: DECISION_LOG A-11)
+const HAIKU_MODEL_ID = process.env.AGENT_MODEL_ID || 'global.anthropic.claude-haiku-4-5-20251001-v1:0';
+const SONNET_MODEL_ID = process.env.AGENT_COMPLEX_MODEL_ID || 'global.anthropic.claude-sonnet-4-6';
 
 const MAX_TURNS = 10; // 최대 에이전트 턴 수
 
