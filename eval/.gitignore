@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+.pytest_cache/
+# Titan 임베딩 캐시는 build-embeddings.ts로 재생성한다 (수 MB, 결정적 출력)
+datasets/*/embeddings/

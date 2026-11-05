@@ -1,0 +1,91 @@
+{"difficulty": "easy", "id": "q001", "must": {"category": "battery", "subtype": "battery-pack", "vehicle": "ioniq5"}, "qtype": "keyword", "should": {}, "text": "아이오닉5 배터리 팩"}
+{"difficulty": "medium", "id": "q002", "must": {"category": "battery", "vehicle": "ioniq5"}, "qtype": "keyword", "should": {}, "text": "IONIQ 5 battery"}
+{"difficulty": "medium", "id": "q003", "must": {"category": "battery", "pack_kwh": 72.6, "vehicle": "ioniq5"}, "qtype": "keyword", "should": {}, "text": "아이오닉 5 72.6kWh 배터리"}
+{"difficulty": "easy", "id": "q004", "must": {"category": "battery", "pack_kwh": 77.4, "subtype": "battery-pack", "vehicle": "ev6"}, "qtype": "keyword", "should": {}, "text": "EV6 77.4kWh 배터리 팩"}
+{"difficulty": "medium", "id": "q005", "must": {"category": "battery", "vehicle": "niro_ev"}, "qtype": "keyword", "should": {}, "text": "니로EV 배터리를 구합니다"}
+{"difficulty": "easy", "id": "q006", "must": {"category": "battery", "pack_kwh": 64.0, "vehicle": "kona"}, "qtype": "keyword", "should": {}, "text": "코나 일렉트릭 64kWh 배터리"}
+{"difficulty": "medium", "id": "q007", "must": {"category": "battery", "vehicle": "leaf_ze0"}, "qtype": "keyword", "should": {"subtype": "battery-module"}, "text": "닛산 리프 24kWh 배터리 모듈"}
+{"difficulty": "hard", "id": "q008", "must": {"category": "battery", "vehicle": "bolt"}, "qtype": "keyword", "should": {}, "text": "볼트 EV 배터리"}
+{"difficulty": "hard", "id": "q009", "must": {"category": "battery", "vehicle": "volt"}, "qtype": "keyword", "should": {}, "text": "쉐보레 볼트 PHEV 배터리 팩"}
+{"difficulty": "medium", "id": "q010", "must": {"category": "battery", "cathode": "LFP", "vehicle": "model3"}, "qtype": "mixed", "should": {}, "text": "테슬라 모델3 LFP 배터리"}
+{"difficulty": "easy", "id": "q011", "must": {"category": "battery", "pack_kwh": 85.0, "vehicle": "model_s"}, "qtype": "keyword", "should": {}, "text": "Model S 85kWh 배터리 팩"}
+{"difficulty": "easy", "id": "q012", "must": {"category": "battery", "vehicle": "bmw_i3"}, "qtype": "keyword", "should": {}, "text": "BMW i3 배터리"}
+{"difficulty": "easy", "id": "q013", "must": {"category": "battery", "cathode": "LFP"}, "qtype": "keyword", "should": {}, "text": "LFP 배터리"}
+{"difficulty": "hard", "id": "q014", "must": {"category": "battery", "cathode": "LFP"}, "qtype": "semantic", "should": {"subtype": "battery-pack"}, "text": "리튬인산철 배터리 팩"}
+{"difficulty": "medium", "id": "q015", "must": {"category": "battery", "cathode": "NCA"}, "qtype": "keyword", "should": {}, "text": "NCA 양극재 배터리"}
+{"difficulty": "medium", "id": "q016", "must": {"category": "battery", "cathode": "LMO"}, "qtype": "mixed", "should": {}, "text": "LMO 계열 1세대 전기차 배터리"}
+{"difficulty": "hard", "id": "q017", "must": {"category": "battery", "cathode": "NCM Ni 80%"}, "qtype": "semantic", "should": {}, "text": "하이니켈 NCM 배터리"}
+{"difficulty": "hard", "id": "q018", "must": {"category": "battery", "soh_min": 90}, "qtype": "mixed", "should": {}, "text": "SOH 90% 이상 배터리"}
+{"difficulty": "hard", "id": "q019", "must": {"category": "battery", "soh_min": 85, "subtype": "battery-pack"}, "qtype": "mixed", "should": {}, "text": "잔존용량 85% 이상인 배터리 팩"}
+{"difficulty": "medium", "id": "q020", "must": {"application": ["ESS"], "category": "battery", "cathode": "LFP"}, "qtype": "mixed", "should": {}, "text": "ESS로 재사용할 수 있는 LFP 배터리"}
+{"difficulty": "hard", "id": "q021", "must": {"application": ["전기 지게차"], "category": "battery"}, "qtype": "semantic", "should": {"subtype": "battery-module"}, "text": "전기 지게차에 쓸 중고 배터리 모듈"}
+{"difficulty": "hard", "id": "q022", "must": {"category": "battery", "recommended_use": "recycle"}, "qtype": "semantic", "should": {}, "text": "재활용 공정으로 보내야 하는 노후 배터리"}
+{"difficulty": "medium", "id": "q023", "must": {"category": "battery", "cell_maker": "삼성SDI"}, "qtype": "keyword", "should": {}, "text": "삼성SDI 셀 배터리"}
+{"difficulty": "easy", "id": "q024", "must": {"category": "battery", "cell_maker": "SK온", "subtype": "battery-pack"}, "qtype": "keyword", "should": {}, "text": "SK온 배터리 팩"}
+{"difficulty": "hard", "id": "q025", "must": {"category": "battery", "subtype": "battery-pack", "voltage_class": 800}, "qtype": "mixed", "should": {}, "text": "800V 고전압 배터리 팩"}
+{"difficulty": "medium", "id": "q026", "must": {"application": ["캠핑카 전원"], "category": "battery"}, "qtype": "semantic", "should": {}, "text": "캠핑카 전원용 배터리"}
+{"difficulty": "medium", "id": "q027", "must": {"application": ["UPS"], "category": "battery"}, "qtype": "semantic", "should": {}, "text": "UPS 비상전원에 활용 가능한 배터리"}
+{"difficulty": "medium", "id": "q028", "must": {"category": "battery", "vehicle": "imiev"}, "qtype": "keyword", "should": {}, "text": "i-MiEV 배터리"}
+{"difficulty": "medium", "id": "q029", "must": {"category": "battery", "vehicle": "atto3"}, "qtype": "keyword", "should": {}, "text": "아토3 블레이드 배터리"}
+{"difficulty": "easy", "id": "q030", "must": {"category": "battery", "vehicle": "taycan"}, "qtype": "keyword", "should": {}, "text": "포르쉐 타이칸 배터리 팩"}
+{"difficulty": "easy", "id": "q031", "must": {"category": "motor", "subtype": "motor-rear", "vehicle": "ioniq5"}, "qtype": "keyword", "should": {}, "text": "아이오닉5 후륜 모터"}
+{"difficulty": "medium", "id": "q032", "must": {"category": "motor", "subtype": "motor-front", "vehicle": "ev6"}, "qtype": "keyword", "should": {}, "text": "EV6 front motor"}
+{"difficulty": "medium", "id": "q033", "must": {"category": "motor", "motor_type": "IM", "vehicle": "model_s"}, "qtype": "mixed", "should": {}, "text": "테슬라 모델S 인덕션 모터"}
+{"difficulty": "hard", "id": "q034", "must": {"category": "motor", "power_min": 150, "rare_earth": true}, "qtype": "semantic", "should": {}, "text": "희토류 회수가 가능한 150kW 이상 영구자석 모터"}
+{"difficulty": "hard", "id": "q035", "must": {"category": "motor", "rare_earth": false}, "qtype": "semantic", "should": {}, "text": "희토류를 쓰지 않는 구동모터"}
+{"difficulty": "hard", "id": "q036", "must": {"category": "motor", "power_min": 200}, "qtype": "mixed", "should": {}, "text": "200kW 이상 고출력 구동모터"}
+{"difficulty": "medium", "id": "q037", "must": {"category": "motor", "motor_type": "WRSM"}, "qtype": "keyword", "should": {}, "text": "권선형 동기모터"}
+{"difficulty": "easy", "id": "q038", "must": {"category": "motor", "vehicle": "zoe"}, "qtype": "keyword", "should": {}, "text": "르노 조에 모터"}
+{"difficulty": "medium", "id": "q039", "must": {"category": "motor", "subtype": "motor-front", "vehicle": "etron"}, "qtype": "keyword", "should": {}, "text": "아우디 e-tron 전륜 모터"}
+{"difficulty": "easy", "id": "q040", "must": {"category": "motor", "vehicle": "model3"}, "qtype": "keyword", "should": {}, "text": "모델3 구동모터"}
+{"difficulty": "medium", "id": "q041", "must": {"category": "motor", "subtype": "motor-rear", "vehicle": "model3"}, "qtype": "keyword", "should": {}, "text": "Model 3 rear motor"}
+{"difficulty": "hard", "id": "q042", "must": {"category": "motor", "vehicle": "bolt"}, "qtype": "keyword", "should": {}, "text": "볼트 EV 구동 모터"}
+{"difficulty": "hard", "id": "q043", "must": {"category": "motor", "power_max": 90}, "qtype": "semantic", "should": {}, "text": "소형 전기차용 저출력 모터"}
+{"difficulty": "hard", "id": "q044", "must": {"category": "motor", "torque_min": 400}, "qtype": "mixed", "should": {}, "text": "토크 400Nm 이상 모터"}
+{"difficulty": "easy", "id": "q045", "must": {"category": "inverter", "semiconductor": "SiC"}, "qtype": "keyword", "should": {}, "text": "SiC 인버터"}
+{"difficulty": "medium", "id": "q046", "must": {"category": "inverter", "semiconductor": "SiC"}, "qtype": "semantic", "should": {}, "text": "실리콘카바이드 전력반도체 인버터"}
+{"difficulty": "medium", "id": "q047", "must": {"category": "inverter", "voltage_class": 800}, "qtype": "keyword", "should": {}, "text": "800V 인버터"}
+{"difficulty": "medium", "id": "q048", "must": {"category": "inverter", "semiconductor": "SiC", "voltage_class": 800}, "qtype": "mixed", "should": {}, "text": "800V 시스템용 SiC 인버터"}
+{"difficulty": "easy", "id": "q049", "must": {"category": "inverter", "vehicle": "model3"}, "qtype": "keyword", "should": {}, "text": "테슬라 모델3 인버터"}
+{"difficulty": "medium", "id": "q050", "must": {"category": "inverter", "vehicle": "model3"}, "qtype": "keyword", "should": {}, "text": "Model 3 inverter"}
+{"difficulty": "medium", "id": "q051", "must": {"category": "inverter", "vehicle": "ioniq_ev"}, "qtype": "keyword", "should": {}, "text": "아이오닉 일렉트릭 IGBT 인버터"}
+{"difficulty": "medium", "id": "q052", "must": {"category": "inverter", "part_maker": "보쉬"}, "qtype": "keyword", "should": {}, "text": "보쉬 인버터"}
+{"difficulty": "hard", "id": "q053", "must": {"category": "inverter", "power_min": 300}, "qtype": "mixed", "should": {}, "text": "300kW급 고출력 인버터"}
+{"difficulty": "medium", "id": "q054", "must": {"category": "inverter", "part_maker": "히타치", "vehicle": ["leaf_ze0", "leaf_ze1"]}, "qtype": "keyword", "should": {}, "text": "히타치 리프 인버터"}
+{"difficulty": "hard", "id": "q055", "must": {"category": "charger", "connector": "CHAdeMO"}, "qtype": "keyword", "should": {}, "text": "차데모 충전 인렛"}
+{"difficulty": "medium", "id": "q056", "must": {"category": "charger", "connector": "CHAdeMO"}, "qtype": "keyword", "should": {}, "text": "CHAdeMO 충전구"}
+{"difficulty": "medium", "id": "q057", "must": {"category": "charger", "power_min": 10.5, "subtype": "obc"}, "qtype": "mixed", "should": {}, "text": "11kW 온보드 충전기"}
+{"difficulty": "easy", "id": "q058", "must": {"category": "charger", "subtype": "obc"}, "qtype": "keyword", "should": {}, "text": "OBC 차량 탑재 충전기"}
+{"difficulty": "medium", "id": "q059", "must": {"category": "charger", "subtype": "portable-charger"}, "qtype": "semantic", "should": {}, "text": "휴대용 충전 케이블"}
+{"difficulty": "hard", "id": "q060", "must": {"category": "charger", "subtype": "portable-charger"}, "qtype": "semantic", "should": {}, "text": "가정용 콘센트로 충전하는 장비"}
+{"difficulty": "medium", "id": "q061", "must": {"category": "charger", "connector": "CCS2"}, "qtype": "keyword", "should": {}, "text": "유럽형 CCS2 충전 인렛"}
+{"difficulty": "medium", "id": "q062", "must": {"category": "charger", "vehicle": "zoe"}, "qtype": "keyword", "should": {}, "text": "르노 조에 충전구"}
+{"difficulty": "easy", "id": "q063", "must": {"category": "electronics", "subtype": "bms"}, "qtype": "keyword", "should": {}, "text": "BMS 보드"}
+{"difficulty": "easy", "id": "q064", "must": {"category": "electronics", "subtype": "bms"}, "qtype": "semantic", "should": {}, "text": "배터리 관리 시스템"}
+{"difficulty": "medium", "id": "q065", "must": {"category": "electronics", "subtype": "ldc"}, "qtype": "keyword", "should": {}, "text": "12V 변환 DC-DC 컨버터"}
+{"difficulty": "easy", "id": "q066", "must": {"category": "electronics", "subtype": "e-compressor"}, "qtype": "keyword", "should": {}, "text": "전동 컴프레서"}
+{"difficulty": "medium", "id": "q067", "must": {"category": "electronics", "subtype": "heat-pump"}, "qtype": "semantic", "should": {}, "text": "겨울철 주행거리 개선용 히트펌프"}
+{"difficulty": "hard", "id": "q068", "must": {"category": "electronics", "subtype": "junction-box"}, "qtype": "semantic", "should": {}, "text": "고전압 배전 릴레이 박스"}
+{"difficulty": "medium", "id": "q069", "must": {"category": "electronics", "subtype": "e-compressor"}, "qtype": "keyword", "should": {"part_maker": "한온시스템"}, "text": "한온시스템 에어컨 컴프레서"}
+{"difficulty": "medium", "id": "q070", "must": {"category": "electronics", "subtype": "ptc-heater"}, "qtype": "semantic", "should": {}, "text": "배터리 예열 히터"}
+{"difficulty": "easy", "id": "q071", "must": {"category": "body-chassis-frame", "subtype": "battery-tray"}, "qtype": "keyword", "should": {}, "text": "알루미늄 배터리 트레이"}
+{"difficulty": "medium", "id": "q072", "must": {"alloy": "6082", "category": "body-chassis-frame"}, "qtype": "keyword", "should": {}, "text": "6082 알루미늄 압출 프레임"}
+{"difficulty": "medium", "id": "q073", "must": {"material": "cfrp"}, "qtype": "semantic", "should": {}, "text": "탄소섬유 차체 구조"}
+{"difficulty": "easy", "id": "q074", "must": {"category": "body-chassis-frame", "subtype": "life-module"}, "qtype": "keyword", "should": {}, "text": "BMW i3 CFRP 라이프 모듈"}
+{"difficulty": "medium", "id": "q075", "must": {"alloy": "HPF1500", "category": "body-chassis-frame", "subtype": "side-sill"}, "qtype": "mixed", "should": {}, "text": "1500MPa 핫스탬핑 사이드 실"}
+{"difficulty": "hard", "id": "q076", "must": {"category": "body-chassis-frame", "subtype": "front-crash-beam"}, "qtype": "semantic", "should": {}, "text": "충돌 에너지 흡수용 범퍼 빔"}
+{"difficulty": "medium", "id": "q077", "must": {"alloy": "7003", "category": "body-chassis-frame", "subtype": "front-crash-beam"}, "qtype": "keyword", "should": {}, "text": "7003 알루미늄 크래시 빔"}
+{"difficulty": "medium", "id": "q078", "must": {"alloy": "DP980", "category": "body-chassis-frame", "subtype": "subframe"}, "qtype": "mixed", "should": {}, "text": "초고장력강 서브프레임"}
+{"difficulty": "easy", "id": "q079", "must": {"alloy": "6061", "category": "body-panel", "subtype": "hood"}, "qtype": "keyword", "should": {}, "text": "알루미늄 6061 후드"}
+{"difficulty": "medium", "id": "q080", "must": {"alloy": "6016", "category": "body-panel"}, "qtype": "keyword", "should": {}, "text": "6016 알루미늄 외판"}
+{"difficulty": "medium", "id": "q081", "must": {"category": "body-panel", "material": "aluminum", "subtype": "hood"}, "qtype": "semantic", "should": {}, "text": "가벼운 알루미늄 보닛"}
+{"difficulty": "medium", "id": "q082", "must": {"category": "body-panel", "material": "aluminum", "vehicle": "model_s"}, "qtype": "keyword", "should": {}, "text": "테슬라 모델S 알루미늄 후드"}
+{"difficulty": "hard", "id": "q083", "must": {"category": "body-door", "subtype": "door-impact-beam", "tensile_min": 500}, "qtype": "mixed", "should": {}, "text": "인장강도 500MPa 이상 도어 보강재"}
+{"difficulty": "medium", "id": "q084", "must": {"alloy": "7075", "category": "body-door"}, "qtype": "keyword", "should": {}, "text": "7075 사이드 임팩트 빔"}
+{"difficulty": "hard", "id": "q085", "must": {"category": "body-panel", "material": "aluminum", "subtype": "fender"}, "qtype": "semantic", "should": {}, "text": "재활용률 높은 알루미늄 펜더"}
+{"difficulty": "medium", "id": "q086", "must": {"category": "body-window", "subtype": "windshield"}, "qtype": "mixed", "should": {}, "text": "HUD 대응 앞유리"}
+{"difficulty": "easy", "id": "q087", "must": {"category": "body-window", "subtype": "panoramic-roof"}, "qtype": "keyword", "should": {}, "text": "파노라마 선루프 유리"}
+{"difficulty": "medium", "id": "q088", "must": {"category": "body-window", "subtype": ["windshield", "side-glass"]}, "qtype": "semantic", "should": {}, "text": "차음 접합유리"}
+{"difficulty": "easy", "id": "q089", "must": {"category": "interior", "subtype": "seat"}, "qtype": "keyword", "should": {}, "text": "통풍 시트"}
+{"difficulty": "easy", "id": "q090", "must": {"category": "interior", "subtype": "display"}, "qtype": "keyword", "should": {}, "text": "인포테인먼트 디스플레이"}
+{"difficulty": "medium", "id": "q091", "must": {"category": "other", "subtype": "wheel"}, "qtype": "mixed", "should": {}, "text": "알루미늄 주조 휠"}
