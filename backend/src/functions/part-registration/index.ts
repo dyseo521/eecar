@@ -5,10 +5,12 @@ import { generateEmbedding } from '/opt/nodejs/utils/bedrock.js';
 import {
   buildEmbeddingText,
   buildSearchText,
+  SEARCH_ATTRIBUTES_ATTRIBUTE,
   SEARCH_DOC_VERSION_ATTRIBUTE,
   SEARCH_DOCUMENT_VERSION,
   SEARCH_TEXT_ATTRIBUTE,
 } from '/opt/nodejs/utils/search-document.js';
+import { extractSearchAttributes } from '/opt/nodejs/utils/search-attributes.js';
 import { uploadVector, updateVectorsManifest } from '/opt/nodejs/utils/s3.js';
 import { putItem } from '/opt/nodejs/utils/dynamodb.js';
 import { successResponse, errorResponse, parseJsonBody } from '/opt/nodejs/utils/response.js';
@@ -139,6 +141,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       images: images || [],
       ...(batteryHealth ? { batteryHealth } : {}),
       [SEARCH_TEXT_ATTRIBUTE]: buildSearchText(searchRecord),
+      [SEARCH_ATTRIBUTES_ATTRIBUTE]: extractSearchAttributes(searchRecord),
       [SEARCH_DOC_VERSION_ATTRIBUTE]: SEARCH_DOCUMENT_VERSION,
       createdAt: timestamp,
       updatedAt: timestamp,
