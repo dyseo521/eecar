@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
-import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
+import { successResponse, errorResponse, parseJsonBody } from '/opt/nodejs/utils/response.js';
 
 const snsClient = new SNSClient({});
 const SNS_TOPIC_ARN = process.env.SNS_TOPIC_ARN!;
@@ -11,7 +11,11 @@ const SNS_TOPIC_ARN = process.env.SNS_TOPIC_ARN!;
  */
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    const body = JSON.parse(event.body || '{}');
+    const parsed = parseJsonBody(event);
+    if (!parsed.ok) {
+      return parsed.response;
+    }
+    const body = parsed.body;
     const { name, email, subject, message, partId, partName } = body;
 
     // Validation

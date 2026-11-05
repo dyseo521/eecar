@@ -66,6 +66,34 @@ export function errorResponse(
   };
 }
 
+export type ParsedBody<T> =
+  | { ok: true; body: T }
+  | { ok: false; response: APIGatewayProxyResult };
+
+/**
+ * Parse a JSON object request body.
+ * Malformed input is a client error (400), not a server error: returning 500 here
+ * made bad requests show up as Lambda errors and fire Slack alerts.
+ */
+export function parseJsonBody<T = Record<string, any>>(event: APIGatewayProxyEvent): ParsedBody<T> {
+  if (!event.body) {
+    return { ok: true, body: {} as T };
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(event.body);
+  } catch {
+    return { ok: false, response: errorResponse('Invalid JSON body', undefined, 400, event) };
+  }
+
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return { ok: false, response: errorResponse('Request body must be a JSON object', undefined, 400, event) };
+  }
+
+  return { ok: true, body: parsed as T };
+}
+
 /**
  * Create a response with custom status code and CORS headers
  */
