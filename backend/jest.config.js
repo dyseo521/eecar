@@ -9,8 +9,9 @@ export default {
   extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
-    // Mock Lambda Layer paths
-    '^/opt/nodejs/utils/(.*)$': '<rootDir>/src/utils/$1',
+    // Lambda Layer paths -> source utils (strip the .js extension like relative imports,
+    // otherwise handler modules that import '/opt/nodejs/utils/x.js' cannot be loaded in tests)
+    '^/opt/nodejs/utils/(.*?)(\\.js)?$': '<rootDir>/src/utils/$1',
   },
 
   // Transform ESM packages (handles both local and hoisted node_modules in monorepo)
