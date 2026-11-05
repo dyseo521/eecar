@@ -4,7 +4,7 @@ Description: EECAR - B2B Platform for Used EV Parts Trading
 
 Globals:
   Function:
-    Runtime: nodejs20.x
+    Runtime: nodejs24.x  # nodejs20.x 지원 종료(2026-04-30), 24.x 지원 종료 2028-04-30 (docs/DECISION_LOG.md A-19)
     MemorySize: 512  # Cost-optimized, increase if needed
     Timeout: 30
     Tracing: Active  # X-Ray distributed tracing enabled
@@ -39,10 +39,10 @@ Resources:
       Description: Shared utilities for EECAR Lambda functions (DynamoDB, S3, Bedrock)
       ContentUri: ../backend/dist/layer/nodejs/
       CompatibleRuntimes:
-        - nodejs20.x
+        - nodejs24.x
       RetentionPolicy: Retain
     Metadata:
-      BuildMethod: nodejs20.x
+      BuildMethod: nodejs24.x
 
   # API Gateway
   EECARApi:
