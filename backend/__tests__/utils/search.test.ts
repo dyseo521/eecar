@@ -5,7 +5,9 @@ import {
   normalizeBM25Scores,
   hybridScore,
   hybridSearch,
-  preparePartForBM25
+  preparePartForBM25,
+  Bm25Index,
+  fuseRankedLists,
 } from '../../src/utils/search.js';
 
 describe('Search Utils', () => {
@@ -304,6 +306,78 @@ describe('Search Utils', () => {
     it('should handle empty part object', () => {
       const text = preparePartForBM25({});
       expect(text).toBe('');
+    });
+  });
+
+  describe('Bm25Index', () => {
+    const documents = [
+      { id: 'a', text: '현대 아이오닉5 배터리 팩 SOH 90%' },
+      { id: 'b', text: '테슬라 모델3 구동 모터' },
+      { id: 'c', text: '배터리 관리 시스템 BMS 배터리' },
+    ];
+
+    it('gives the same scores as calculateBM25Scores', () => {
+      const index = Bm25Index.fromTexts(documents);
+      const expected = calculateBM25Scores('배터리 모터', documents).map(s => s.bm25Score);
+      const actual = index.scores(tokenize('배터리 모터'));
+      actual.forEach((score, i) => expect(score).toBeCloseTo(expected[i], 12));
+    });
+
+    it('returns only matching documents, best first', () => {
+      const hits = Bm25Index.fromTexts(documents).search('배터리', 10);
+      expect(hits.map(h => h.id)).toEqual(['c', 'a']);
+      expect(Bm25Index.fromTexts(documents).search('없는단어', 10)).toEqual([]);
+    });
+
+    it('limits the number of hits', () => {
+      expect(Bm25Index.fromTexts(documents).search('배터리', 1)).toHaveLength(1);
+    });
+
+    it('can disable IDF', () => {
+      const index = new Bm25Index(['a', 'b'], [['x'], ['x', 'y']], false);
+      expect(index.scores(['x'])[0]).toBeGreaterThan(0);
+    });
+
+    it('handles an empty corpus', () => {
+      const index = Bm25Index.fromTexts([]);
+      expect(index.size).toBe(0);
+      expect(index.search('배터리', 10)).toEqual([]);
+    });
+  });
+
+  describe('fuseRankedLists', () => {
+    it('normalizes each list separately before combining', () => {
+      // 벡터 점수 범위가 좁아도(0.50~0.52) BM25 범위(1~9)에 묻히지 않는다
+      const fused = fuseRankedLists(
+        [{ id: 'a', score: 0.52 }, { id: 'b', score: 0.5 }],
+        [{ id: 'b', score: 9 }, { id: 'a', score: 1 }],
+        0.5
+      );
+      expect(fused.map(h => [h.id, h.score])).toEqual([['a', 0.5], ['b', 0.5]]);
+      expect(fused[0]).toMatchObject({ vectorScore: 1, bm25Score: 0 });
+    });
+
+    it('gives zero for the retriever that did not return the document', () => {
+      const fused = fuseRankedLists([{ id: 'v', score: 0.9 }, { id: 'w', score: 0.1 }], [{ id: 'k', score: 3 }], 0.7);
+      const byId = Object.fromEntries(fused.map(h => [h.id, h]));
+      expect(byId.v.score).toBeCloseTo(0.7);
+      expect(byId.k).toMatchObject({ vectorScore: 0, bm25Score: 1 });
+      expect(byId.k.score).toBeCloseTo(0.3);
+      expect(byId.w.score).toBe(0);
+    });
+
+    it('treats a list of equal scores as all relevant', () => {
+      const fused = fuseRankedLists([{ id: 'a', score: 0.4 }], [], 0.5);
+      expect(fused).toEqual([{ id: 'a', score: 0.5, vectorScore: 1, bm25Score: 0 }]);
+    });
+
+    it('breaks ties by id so results are deterministic', () => {
+      const fused = fuseRankedLists([{ id: 'b', score: 1 }, { id: 'a', score: 1 }], []);
+      expect(fused.map(h => h.id)).toEqual(['a', 'b']);
+    });
+
+    it('returns nothing for two empty lists', () => {
+      expect(fuseRankedLists([], [])).toEqual([]);
     });
   });
 });

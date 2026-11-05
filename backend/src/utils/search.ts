@@ -130,6 +130,9 @@ export function hybridScore(
 }
 
 /**
+ * @deprecated 이전 검색 구조 (벡터 후보 안에서만 BM25, 벡터 점수 비정규화). 평가 기준선 재현에만 쓴다.
+ * 새 코드는 fuseRankedLists
+ *
  * Perform hybrid search combining vector and BM25 results
  */
 export function hybridSearch(
@@ -157,7 +160,127 @@ export function hybridSearch(
   }).sort((a, b) => b.score - a.score);
 }
 
+// ---------------------------------------------------------------------------
+// 독립 검색 + 결합 (DECISION_LOG E-23)
+//
+// 이전 구조(hybridSearch)는 벡터 상위 20개 안에서만 BM25를 계산하고 벡터 점수는 정규화하지 않았다.
+// 벡터 상위 20개의 코사인 범위가 중앙값 0.16이라, 0~1로 펴진 BM25가 순위의 약 72%를 결정했다(명목 30%).
+// 이제 두 검색기가 각자 상위 N개를 찾고, 각 목록 안에서 같은 방식으로 정규화한 뒤 결합한다.
+// ---------------------------------------------------------------------------
+
+/** 결합 비율 α (벡터 비중). v2 dev 질의에서 선택, test에서 확인 (E-23) */
+export const HYBRID_ALPHA = 0.5;
+/** 검색기별 후보 수. S3 Vectors QueryVectors 한 페이지 최대 100건 (공식 한도) */
+export const CANDIDATES_PER_RETRIEVER = 100;
+
+export interface RankedHit {
+  id: string;
+  score: number;
+}
+
+export interface FusedHit {
+  id: string;
+  score: number;
+  /** 목록 안에서 정규화한 벡터 점수 (목록에 없으면 0) */
+  vectorScore: number;
+  /** 목록 안에서 정규화한 BM25 점수 (목록에 없으면 0) */
+  bm25Score: number;
+}
+
 /**
+ * 문서 집합에 대한 BM25 색인. 문서 빈도를 미리 계산해 두고 질의마다 점수만 계산한다.
+ * 점수식은 bm25Score와 같다 (k1=1.5, b=0.75, idf=ln((N-df+0.5)/(df+0.5)+1)).
+ */
+export class Bm25Index {
+  private readonly df = new Map<string, number>();
+  private readonly tf: Array<Map<string, number>>;
+  private readonly lengths: number[];
+  private readonly avgLength: number;
+
+  constructor(
+    private readonly ids: string[],
+    docTokens: string[][],
+    private readonly useIdf = true,
+    private readonly k1 = 1.5,
+    private readonly b = 0.75
+  ) {
+    this.tf = docTokens.map(tokens => {
+      const counts = new Map<string, number>();
+      for (const t of tokens) counts.set(t, (counts.get(t) ?? 0) + 1);
+      for (const t of counts.keys()) this.df.set(t, (this.df.get(t) ?? 0) + 1);
+      return counts;
+    });
+    this.lengths = docTokens.map(t => t.length);
+    this.avgLength = docTokens.length ? this.lengths.reduce((a, b) => a + b, 0) / docTokens.length : 0;
+  }
+
+  static fromTexts(docs: Array<{ id: string; text: string }>, tokenizer: (text: string) => string[] = tokenize): Bm25Index {
+    return new Bm25Index(docs.map(d => d.id), docs.map(d => tokenizer(d.text)));
+  }
+
+  get size(): number {
+    return this.ids.length;
+  }
+
+  /** 모든 문서의 점수 (색인 순서) */
+  scores(queryTokens: string[]): number[] {
+    const n = this.ids.length;
+    const idfs = queryTokens.map(term => {
+      if (!this.useIdf) return 1;
+      const df = this.df.get(term) ?? 0;
+      return Math.log((n - df + 0.5) / (df + 0.5) + 1);
+    });
+    return this.tf.map((counts, i) => {
+      let score = 0;
+      queryTokens.forEach((term, j) => {
+        const tf = counts.get(term) ?? 0;
+        if (tf === 0) return;
+        score += idfs[j] * (tf * (this.k1 + 1)) / (tf + this.k1 * (1 - this.b + this.b * (this.lengths[i] / this.avgLength)));
+      });
+      return score;
+    });
+  }
+
+  /** 점수가 0보다 큰 문서 상위 limit개 (점수 0은 검색되지 않은 문서) */
+  search(query: string, limit: number, tokenizer: (text: string) => string[] = tokenize): RankedHit[] {
+    return this.scores(tokenizer(query))
+      .map((score, i) => ({ id: this.ids[i], score }))
+      .filter(hit => hit.score > 0)
+      .sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : 1))
+      .slice(0, limit);
+  }
+}
+
+function minMaxNormalize(hits: RankedHit[]): Map<string, number> {
+  if (hits.length === 0) return new Map();
+  const max = Math.max(...hits.map(h => h.score));
+  const min = Math.min(...hits.map(h => h.score));
+  // 점수가 모두 같으면 목록 안에서는 구분할 수 없으므로 모두 1 (목록에 든 것 자체가 신호)
+  return new Map(hits.map(h => [h.id, max === min ? 1 : (h.score - min) / (max - min)]));
+}
+
+/**
+ * 두 검색기의 상위 목록을 볼록 결합한다: α·norm(벡터) + (1-α)·norm(BM25).
+ * 각 목록 안에서 min-max 정규화하고, 한쪽 목록에만 있는 문서는 다른 쪽 점수를 0으로 둔다
+ * (Bruch et al., ACM TOIS 2023의 convex combination. 정규화 범위를 목록으로 한정한 것은
+ * 검색기가 상위 N개만 돌려주는 프로덕션 제약 때문이다).
+ */
+export function fuseRankedLists(vector: RankedHit[], bm25: RankedHit[], alpha: number = HYBRID_ALPHA): FusedHit[] {
+  const nv = minMaxNormalize(vector);
+  const nb = minMaxNormalize(bm25);
+  const ids = [...new Set([...vector.map(h => h.id), ...bm25.map(h => h.id)])];
+  return ids
+    .map(id => {
+      const vectorScore = nv.get(id) ?? 0;
+      const bm25Score = nb.get(id) ?? 0;
+      return { id, score: alpha * vectorScore + (1 - alpha) * bm25Score, vectorScore, bm25Score };
+    })
+    .sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : 1));
+}
+
+/**
+ * @deprecated 이전 검색 구조의 BM25 텍스트. 평가 기준선 재현에만 쓴다. 새 코드는 search-document.ts의 buildSearchText
+ *
  * Prepare part data for BM25 indexing
  * Creates searchable text from part metadata
  */
