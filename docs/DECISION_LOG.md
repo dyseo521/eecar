@@ -320,3 +320,13 @@
 - `sam validate --lint`(cfn-lint W2531) 결과: nodejs20.x는 2026-04-30에 지원이 종료됐다. 2027-02-01부터 생성, **2027-03-03부터 업데이트가 막힌다**.
 - 모델 퇴역(C-09)과 같은 종류의 수명 주기 위험이다.
 - **조치**: nodejs22.x 또는 24.x로 올리고, CI(테스트·평가 게이트)로 검증한다. 2027-02 이전, 1개월차 안에 한다.
+
+### A-18 폴백 알람은 배포 역할 권한 문제로 보류 · 2026-11-05 · 측정
+
+- **측정**: v1.5.0 배포가 `SearchLLMFallbackAlarm` 생성 단계에서 실패하고 롤백됐다. 사유는 `GitHubActionsOIDCRole-EECAR is not authorized to perform: cloudwatch:PutMetricAlarm`(CloudFormation 스택 이벤트)이다.
+  - 배포 역할 정책(`eecar-github`)은 서비스별로 리소스 범위를 좁힌 최소 권한 정책이다. CloudWatch 알람·지표 권한은 없다.
+  - 같은 실패로 함께 바뀌던 역할과 Layer도 취소·롤백됐다. 남은 리소스는 없다.
+- **결정**: 이번에는 알람을 템플릿에서 빼고 C-09 복구를 먼저 배포한다. 폴백 감지는 다음 두 경로로 유지된다.
+  - 폴백 로그 → Slack 알림 (BedrockModelUnavailable, CRITICAL)
+  - EMF 지표 `EECAR/Search LLMFallback` 발행
+- **재검토**: 2개월차 SLO 알림 작업 때 배포 역할에 `cloudwatch:PutMetricAlarm`·`DeleteAlarms`·`DescribeAlarms`를 `arn:aws:cloudwatch:ap-northeast-2:*:alarm:eecar-stack-*` 범위로 추가하고 알람을 다시 넣는다. IAM 권한 확대라 사용자 확인 후 진행한다.

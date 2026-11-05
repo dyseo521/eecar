@@ -779,21 +779,8 @@ Resources:
       DestinationArn: !GetAtt SlackNotificationFunction.Arn
 
   # CloudWatch Dashboard for monitoring
-  # 검색 LLM 폴백 알람: 응답은 200이어도 AI 기능이 꺼진 상태를 감지 (C-09 재발 방지)
-  # 알람 액션은 아직 두지 않는다. SNS 구독자가 팀 공용 메일이라 2개월차 SLO 알림 경로(Slack)와 함께 연결한다.
-  SearchLLMFallbackAlarm:
-    Type: AWS::CloudWatch::Alarm
-    Properties:
-      AlarmName: !Sub '${AWS::StackName}-search-llm-fallback'
-      AlarmDescription: Search LLM calls (query expansion / explanation) fell back. Model access, quota or throttling issue.
-      Namespace: EECAR/Search
-      MetricName: LLMFallback
-      Statistic: Sum
-      Period: 300
-      EvaluationPeriods: 1
-      Threshold: 1
-      ComparisonOperator: GreaterThanOrEqualToThreshold
-      TreatMissingData: notBreaching
+  # 검색 LLM 폴백 알람(EECAR/Search LLMFallback)은 배포 역할에 cloudwatch:PutMetricAlarm 권한이 없어 보류한다.
+  # 지표는 발행 중이며, 폴백 로그는 Slack 알림(BedrockModelUnavailable, CRITICAL)으로 전달된다. (docs/DECISION_LOG.md A-18)
 
   EECARDashboard:
     Type: AWS::CloudWatch::Dashboard
