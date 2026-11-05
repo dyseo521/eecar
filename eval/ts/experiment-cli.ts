@@ -25,6 +25,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import {
   bigramTokenize,
+  joinedBigramTokenize,
   Bm25Index,
   calculateBM25Scores,
   fuseRankedLists,
@@ -39,7 +40,7 @@ import { buildSearchText } from '../../backend/src/utils/search-document.js';
 import { extractSearchAttributes } from '../../backend/src/utils/search-attributes.js';
 import { ConstraintScope, parseQuery, rerankByConstraints, scopeConstraints } from '../../backend/src/utils/query-understanding.js';
 
-type Tokenizer = 'ws' | 'bigram' | 'ws+bigram';
+type Tokenizer = 'ws' | 'bigram' | 'ws+bigram' | 'bigram-joined';
 type DocText = 'legacy' | 'v2' | 'v2-noalias' | 'v2-notrade';
 
 interface Config {
@@ -56,6 +57,9 @@ interface Config {
   vecDoc?: DocText;
   constraintPenalty?: number;
   constraintScope?: ConstraintScope;
+  categoryMode?: 'first' | 'all';
+  vehicleConstraint?: boolean;
+  vehiclePenalty?: number;
 }
 
 interface Ranked {
@@ -87,6 +91,7 @@ function charBigrams(token: string): string[] {
 const TOKENIZERS: Record<Tokenizer, (text: string) => string[]> = {
   ws: text => tokenize(text),
   bigram: bigramTokenize, // 프로덕션 SEARCH_TOKENIZER
+  'bigram-joined': joinedBigramTokenize,
   'ws+bigram': text =>
     tokenize(text).flatMap(token => {
       const grams = charBigrams(token);
@@ -116,7 +121,14 @@ function main(): void {
   const cache = JSON.parse(readFileSync(join(dataset, 'embeddings/titan-embed-text-v2.json'), 'utf-8'));
   const ids = parts.map(p => p.partId);
   const attrsById = new Map(parts.map(p => [p.partId, extractSearchAttributes(p)]));
-  const parsedQueries = queries.map(q => parseQuery(q.text));
+  const parsedBy = new Map<string, ReturnType<typeof parseQuery>[]>();
+  const parsedFor = (config: Config) => {
+    const key = `${config.categoryMode ?? 'first'}|${config.vehicleConstraint ?? false}`;
+    if (!parsedBy.has(key)) {
+      parsedBy.set(key, queries.map(q => parseQuery(q.text, { categoryMode: config.categoryMode, vehicles: config.vehicleConstraint })));
+    }
+    return parsedBy.get(key)!;
+  };
 
   const TEXT_BUILDERS: Record<DocText, (part: any) => string> = {
     legacy: preparePartForBM25,
@@ -217,8 +229,8 @@ function main(): void {
             .map(({ id, score }) => ({ id, score }));
         let fused: Array<{ id: string; score: number }> = fuseRankedLists(top(vec, () => true), top(bm25, i => bm25[i] > 0), config.alpha ?? 0.5);
         if (config.constraintPenalty !== undefined) {
-          const constraints = scopeConstraints(parsedQueries[qi], config.constraintScope ?? 'all');
-          fused = rerankByConstraints(fused, id => attrsById.get(id), constraints, config.constraintPenalty);
+          const constraints = scopeConstraints(parsedFor(config)[qi], config.constraintScope ?? 'all');
+          fused = rerankByConstraints(fused, id => attrsById.get(id), constraints, config.constraintPenalty, config.vehiclePenalty ?? 0.8);
         }
         return fused.slice(0, FULL_TOP_N).map(h => ({ partId: h.id, score: h.score }));
       }

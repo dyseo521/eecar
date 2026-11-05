@@ -7,6 +7,7 @@
  * 뽑지 못한 조건은 무시한다(검색 결과가 없어지지 않도록 필터가 아니라 감점으로 쓴다).
  */
 import type { SearchAttributes } from './search-attributes.js';
+import { findAliasGroups, VEHICLE_ALIASES } from './search-vocabulary.js';
 
 export type NumericField = 'kwh' | 'soh' | 'powerKw' | 'voltage' | 'torqueNm' | 'tensileMPa' | 'price' | 'year' | 'quantity';
 
@@ -21,6 +22,18 @@ export interface QueryConstraints {
   categories: string[];
   numeric: NumericConstraint[];
   conditions: string[];
+  /** 질의에 나온 차종 (표기 변형 묶음의 대표 표기). 하나라도 맞으면 만족 */
+  vehicles?: string[];
+}
+
+export interface ParseOptions {
+  /**
+   * first: 먼저 맞은 규칙 하나 (v1.7.0)
+   * all:   맞은 규칙 모두. 다른 매치 안에 들어 있는 짧은 매치는 버린다 ("임팩트 빔" 안의 "팩") (E-27 후보)
+   */
+  categoryMode?: 'first' | 'all';
+  /** 질의의 차종을 조건으로 쓴다 (E-27 후보) */
+  vehicles?: boolean;
 }
 
 /**
@@ -114,8 +127,24 @@ const CONDITION_RULES: Array<{ pattern: RegExp; condition: string }> = [
   { pattern: /신품|새\s*제품|미사용|새것/, condition: 'new' },
 ];
 
-export function parseQuery(query: string): QueryConstraints {
-  const categoryRule = CATEGORY_RULES.find(rule => rule.pattern.test(query));
+function matchCategories(query: string, mode: 'first' | 'all'): string[] {
+  if (mode === 'first') return CATEGORY_RULES.find(rule => rule.pattern.test(query))?.categories ?? [];
+  const spans = CATEGORY_RULES.flatMap(rule => {
+    const m = rule.pattern.exec(query);
+    return m ? [{ start: m.index, end: m.index + m[0].length, categories: rule.categories }] : [];
+  });
+  const kept = spans.filter(a => !spans.some(b => b !== a && b.start <= a.start && a.end <= b.end && b.end - b.start > a.end - a.start));
+  return [...new Set(kept.flatMap(s => s.categories))];
+}
+
+/** 차종 표기 변형 묶음의 대표 표기 (search-vocabulary.ts) */
+export function vehicleGroupsOf(text: string): string[] {
+  return findAliasGroups(text, VEHICLE_ALIASES).map(group => group[0]);
+}
+
+export function parseQuery(query: string, options: ParseOptions = {}): QueryConstraints {
+  const categories = matchCategories(query, options.categoryMode ?? 'first');
+  const categoryRule = categories.length ? { categories } : undefined;
   const numeric = [
     ...unitConstraints(query, 'kwh', 'kWh'),
     ...unitConstraints(query, 'powerKw', 'kW(?!h)'),
@@ -126,17 +155,22 @@ export function parseQuery(query: string): QueryConstraints {
     ...yearConstraints(query),
     ...sohConstraints(query, categoryRule?.categories.includes('battery') ?? false),
   ];
+  const vehicles = options.vehicles ? vehicleGroupsOf(query) : [];
   return {
-    categories: categoryRule ? categoryRule.categories : [],
+    categories,
     numeric,
     conditions: CONDITION_RULES.filter(rule => rule.pattern.test(query)).map(rule => rule.condition),
+    ...(vehicles.length ? { vehicles } : {}),
   };
 }
 
 export interface ConstraintCheck {
   /** 확인한 조건 수 (부품에 값이 없어 확인하지 못한 조건은 세지 않는다) */
   checked: number;
+  /** 위반한 조건 수 (차종 제외) */
   violated: number;
+  /** 차종 조건 위반 (0 또는 1). 차종은 다른 조건보다 약하게 감점한다 (E-27) */
+  vehicleViolated?: number;
   matched: string[];
   mismatched: string[];
 }
@@ -186,18 +220,32 @@ export function checkConstraints(attrs: SearchAttributes, constraints: QueryCons
       result.mismatched.push('상태');
     }
   }
+  if (constraints.vehicles?.length && attrs.vehicles?.length) {
+    result.checked++;
+    if (constraints.vehicles.some(v => attrs.vehicles!.includes(v))) result.matched.push('차종');
+    else {
+      result.vehicleViolated = 1;
+      result.mismatched.push(`차종 ${attrs.vehicles.join('/')}`);
+    }
+  }
   return result;
 }
 
 /** 조건 위반 1개당 점수 배율 (1 − 감점). 값은 v2 dev 질의에서 선택한다 (DECISION_LOG A-27) */
 export const CONSTRAINT_PENALTY = 0.8;
+/**
+ * 차종 위반 감점. 카테고리 위반과 같게(0.8) 주면 "다른 차종의 같은 부품"이 "같은 차종의 다른 부품"보다 밀려
+ * dev nDCG가 떨어졌다(0.878 → 0.861). 구매자에게는 전자가 차선책이므로 더 약하게 준다 (E-27)
+ */
+export const VEHICLE_PENALTY = 0.3;
 
-export type ConstraintScope = 'all' | 'category' | 'numeric';
+export type ConstraintScope = 'all' | 'category' | 'numeric' | 'vehicle';
 
 /** 조건 범위를 줄인다 (실험에서 카테고리·수치 조건의 효과를 따로 보기 위함) */
 export function scopeConstraints(constraints: QueryConstraints, scope: ConstraintScope): QueryConstraints {
   if (scope === 'category') return { categories: constraints.categories, numeric: [], conditions: [] };
   if (scope === 'numeric') return { categories: [], numeric: constraints.numeric, conditions: constraints.conditions };
+  if (scope === 'vehicle') return { categories: [], numeric: [], conditions: [], vehicles: constraints.vehicles };
   return constraints;
 }
 
@@ -209,12 +257,14 @@ export function rerankByConstraints<T extends { id: string; score: number }>(
   hits: T[],
   attrsOf: (id: string) => SearchAttributes | undefined,
   constraints: QueryConstraints,
-  penalty: number = CONSTRAINT_PENALTY
+  penalty: number = CONSTRAINT_PENALTY,
+  vehiclePenalty: number = VEHICLE_PENALTY
 ): Array<T & { constraints: ConstraintCheck }> {
   return hits
     .map(hit => {
       const check = checkConstraints(attrsOf(hit.id) ?? {}, constraints);
-      return { ...hit, score: hit.score * Math.pow(1 - penalty, check.violated), constraints: check };
+      const factor = Math.pow(1 - penalty, check.violated) * Math.pow(1 - vehiclePenalty, check.vehicleViolated ?? 0);
+      return { ...hit, score: hit.score * factor, constraints: check };
     })
     .sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : 1));
 }

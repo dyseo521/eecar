@@ -7,6 +7,8 @@
  * 등록·재색인 때 이 함수로 한 번 뽑아 METADATA의 searchAttributes에 저장하고, 검색 시점에는 그 값만 읽는다.
  */
 
+import { findAliasGroups, VEHICLE_ALIASES } from './search-vocabulary.js';
+
 export interface SearchAttributes {
   category?: string;
   /** 배터리 용량 kWh */
@@ -21,6 +23,8 @@ export interface SearchAttributes {
   year?: number;
   quantity?: number;
   condition?: string;
+  /** 부품 이름·모델에 나온 차종 (표기 변형 묶음의 대표 표기) */
+  vehicles?: string[];
 }
 
 function num(value: unknown): number | undefined {
@@ -63,6 +67,10 @@ export function extractSearchAttributes(part: any): SearchAttributes {
     year: num(part.year),
     quantity: num(part.quantity),
     condition: part.condition || undefined,
+    vehicles: (() => {
+      const groups = findAliasGroups(label, VEHICLE_ALIASES).map(group => group[0]);
+      return groups.length ? groups : undefined;
+    })(),
   };
   return Object.fromEntries(Object.entries(attrs).filter(([, v]) => v !== undefined)) as SearchAttributes;
 }

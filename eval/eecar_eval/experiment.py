@@ -126,9 +126,42 @@ def build_query_understanding_grid() -> list[dict[str, Any]]:
     return grid
 
 
-GRIDS = {"default": build_grid, "root-cause": build_root_cause_grid, "query-understanding": build_query_understanding_grid}
+# 현재 프로덕션 구성 (v1.7.0, E-26)
+CURRENT_V17 = {**CURRENT, "tokenizer": "bigram", "constraintPenalty": 0.8, "constraintScope": "all"}
+CURRENT_V17_NAME = "prod3-bigram-qu-p0.8"
+
+
+def build_vehicle_intent_grid() -> list[dict[str, Any]]:
+    """차종 조건, 카테고리 다중 추출, 원형 토큰 유지 (E-27). 기준은 v1.7.0."""
+    grid: list[dict[str, Any]] = [{"family": "A.current", "name": CURRENT_V17_NAME, **CURRENT_V17}]
+    for p in (0.5, 0.8):
+        grid.append({"family": "V.vehicle-same", "name": f"veh-p{p}", **CURRENT_V17, "constraintPenalty": p,
+                     "vehicleConstraint": True, "vehiclePenalty": p})
+    # 차종 위반은 카테고리 위반보다 약하게 (다른 차종의 같은 부품 > 같은 차종의 다른 부품)
+    for vp in (0.1, 0.2, 0.3, 0.5):
+        grid.append({"family": "V.vehicle-weak", "name": f"veh-weak-v{vp}", **CURRENT_V17, "vehicleConstraint": True,
+                     "vehiclePenalty": vp})
+        grid.append({"family": "VC.vehicle-weak+category-all", "name": f"veh-weak-v{vp}-cat-all", **CURRENT_V17,
+                     "vehicleConstraint": True, "vehiclePenalty": vp, "categoryMode": "all"})
+    grid.append({"family": "C.category-all", "name": "cat-all", **CURRENT_V17, "categoryMode": "all"})
+    grid.append({"family": "T.ws+bigram", "name": "wsbigram", **CURRENT_V17, "tokenizer": "ws+bigram"})
+    grid.append({"family": "T.bigram-joined", "name": "joined", **CURRENT_V17, "tokenizer": "bigram-joined"})
+    for vp in (0.2, 0.3):
+        grid.append({"family": "J.joined+vehicle-weak+category-all", "name": f"joined-veh-weak-v{vp}-cat-all",
+                     **CURRENT_V17, "tokenizer": "bigram-joined", "vehicleConstraint": True, "vehiclePenalty": vp,
+                     "categoryMode": "all"})
+    for tok in ("bigram", "ws+bigram"):
+        for p in (0.5, 0.8):
+            grid.append({"family": "VC.vehicle+category-all", "name": f"veh-cat-all-{tok}-p{p}", **CURRENT_V17,
+                         "tokenizer": tok, "constraintPenalty": p, "vehicleConstraint": True, "vehiclePenalty": p,
+                         "categoryMode": "all"})
+    return grid
+
+
+GRIDS = {"default": build_grid, "root-cause": build_root_cause_grid, "query-understanding": build_query_understanding_grid,
+         "vehicle-intent": build_vehicle_intent_grid}
 # 그리드별 비교 기준 구성
-GRID_BASELINES = {"query-understanding": CURRENT_NAME}
+GRID_BASELINES = {"query-understanding": CURRENT_NAME, "vehicle-intent": CURRENT_V17_NAME}
 
 
 def split_queries(queries: list[dict[str, Any]]) -> dict[str, str]:

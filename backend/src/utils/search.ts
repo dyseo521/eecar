@@ -39,6 +39,21 @@ export function bigramTokenize(text: string): string[] {
   });
 }
 
+/**
+ * bigramTokenize에 띄어쓰기를 넘는 바이그램을 더한다. "배터리 팩" → 배터·터리·팩 + "리팩".
+ * 한 글자 토큰("팩")이 붙여 쓴 문서("배터리팩"의 리팩)와 맞지 않던 문제 (E-27 후보, 운영 확인에서 발견)
+ */
+export function joinedBigramTokenize(text: string): string[] {
+  const tokens = tokenize(text);
+  const out = bigramTokenize(text);
+  for (let i = 0; i + 1 < tokens.length; i++) {
+    const a = tokens[i];
+    const b = tokens[i + 1];
+    if (HANGUL.test(a[a.length - 1]) && HANGUL.test(b[0])) out.push(a[a.length - 1] + b[0]);
+  }
+  return out;
+}
+
 /** 검색 BM25 색인과 질의에 쓰는 토크나이저 */
 export const SEARCH_TOKENIZER = bigramTokenize;
 
