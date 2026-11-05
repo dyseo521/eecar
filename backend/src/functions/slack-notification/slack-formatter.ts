@@ -32,7 +32,8 @@ function generateCloudWatchDashboardUrl(): string {
 export function formatSlackMessage(
   event: ParsedLogEvent,
   severity: Severity,
-  logGroup: string
+  logGroup: string,
+  options: { suppressedSinceLastAlert?: number } = {}
 ): any {
   const color = getSeverityColor(severity);
   const emoji = getSeverityEmoji(severity);
@@ -93,6 +94,19 @@ export function formatSlackMessage(
       },
     },
   ];
+
+  // 직전 억제 구간에 묻힌 발생 횟수 (중복 제거로 알림이 생략된 건수)
+  if (options.suppressedSinceLastAlert && options.suppressedSinceLastAlert > 0) {
+    blocks.push({
+      type: 'context',
+      elements: [
+        {
+          type: 'mrkdwn',
+          text: `🔁 직전 알림 이후 같은 에러가 *${options.suppressedSinceLastAlert}회* 더 발생했습니다 (중복 제거로 알림 생략)`,
+        },
+      ],
+    });
+  }
 
   // 스택 추적 (있는 경우)
   if (truncatedStackTrace) {
