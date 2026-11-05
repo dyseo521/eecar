@@ -1,2 +1,4 @@
 # 데이터셋 해시(manifest.json)는 LF 기준이다. Windows autocrlf 체크아웃에서도 바이트가 바뀌지 않게 고정한다.
 datasets/** text eol=lf
+# 게이트용 임베딩 묶음은 바이너리(gzip)다. 위 규칙이 줄바꿈을 바꾸면 파일이 깨진다 (A-29)
+datasets/**/*.gz binary

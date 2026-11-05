@@ -1,107 +1,107 @@
 {
   "difficulty=easy": {
-    "mrr@10": 0.8973,
-    "ndcg@10": 0.8938,
-    "recall@10": 0.8797
+    "mrr@10": 0.9025,
+    "ndcg@10": 0.875,
+    "recall@10": 0.8719
   },
   "difficulty=hard": {
-    "mrr@10": 0.6401,
-    "ndcg@10": 0.5443,
-    "recall@10": 0.4714
+    "mrr@10": 0.6843,
+    "ndcg@10": 0.6003,
+    "recall@10": 0.5578
   },
   "difficulty=medium": {
-    "mrr@10": 0.7752,
-    "ndcg@10": 0.7209,
-    "recall@10": 0.7834
+    "mrr@10": 0.8434,
+    "ndcg@10": 0.7685,
+    "recall@10": 0.7914
   },
   "form=keyword": {
-    "mrr@10": 0.7595,
-    "ndcg@10": 0.7385,
-    "recall@10": 0.7198
+    "mrr@10": 0.8437,
+    "ndcg@10": 0.7945,
+    "recall@10": 0.7508
   },
   "form=phrase": {
-    "mrr@10": 0.82,
-    "ndcg@10": 0.729,
-    "recall@10": 0.7959
+    "mrr@10": 0.8184,
+    "ndcg@10": 0.759,
+    "recall@10": 0.8153
   },
   "form=sentence": {
-    "mrr@10": 0.6309,
-    "ndcg@10": 0.5925,
-    "recall@10": 0.5864
+    "mrr@10": 0.7398,
+    "ndcg@10": 0.6501,
+    "recall@10": 0.6368
   },
   "form=v1": {
-    "mrr@10": 0.9036,
-    "ndcg@10": 0.8619,
-    "recall@10": 0.8844
+    "mrr@10": 0.9132,
+    "ndcg@10": 0.8541,
+    "recall@10": 0.8616
   },
   "overall": {
-    "mrr@10": 0.7797,
-    "ndcg@10": 0.7301,
-    "recall@10": 0.7483
+    "mrr@10": 0.828,
+    "ndcg@10": 0.763,
+    "recall@10": 0.7672
   },
   "qtype=keyword": {
-    "mrr@10": 0.8543,
-    "ndcg@10": 0.8315,
-    "recall@10": 0.8794
+    "mrr@10": 0.8996,
+    "ndcg@10": 0.8566,
+    "recall@10": 0.8896
   },
   "qtype=mixed": {
-    "mrr@10": 0.6725,
-    "ndcg@10": 0.5431,
-    "recall@10": 0.5021
+    "mrr@10": 0.6518,
+    "ndcg@10": 0.5305,
+    "recall@10": 0.4699
   },
   "qtype=semantic": {
-    "mrr@10": 0.6679,
-    "ndcg@10": 0.6108,
-    "recall@10": 0.5979
+    "mrr@10": 0.7789,
+    "ndcg@10": 0.7007,
+    "recall@10": 0.6807
   },
   "segment=A-ess": {
-    "mrr@10": 0.725,
-    "ndcg@10": 0.5962,
-    "recall@10": 0.6156
+    "mrr@10": 0.7415,
+    "ndcg@10": 0.6412,
+    "recall@10": 0.6319
   },
   "segment=B-small-reuse": {
-    "mrr@10": 0.5864,
-    "ndcg@10": 0.521,
-    "recall@10": 0.4553
+    "mrr@10": 0.7627,
+    "ndcg@10": 0.6346,
+    "recall@10": 0.5569
   },
   "segment=C-recycling": {
-    "mrr@10": 0.6755,
-    "ndcg@10": 0.6554,
-    "recall@10": 0.5861
+    "mrr@10": 0.79,
+    "ndcg@10": 0.7182,
+    "recall@10": 0.5924
   },
   "segment=D-collision": {
-    "mrr@10": 0.7704,
-    "ndcg@10": 0.7413,
-    "recall@10": 0.8947
+    "mrr@10": 0.7904,
+    "ndcg@10": 0.7762,
+    "recall@10": 0.9649
   },
   "segment=E-electronics": {
-    "mrr@10": 0.7729,
-    "ndcg@10": 0.7576,
-    "recall@10": 0.9067
+    "mrr@10": 0.8692,
+    "ndcg@10": 0.8079,
+    "recall@10": 0.9513
   },
   "segment=F-conversion-rnd": {
-    "mrr@10": 0.7377,
-    "ndcg@10": 0.6751,
-    "recall@10": 0.6417
+    "mrr@10": 0.7463,
+    "ndcg@10": 0.6306,
+    "recall@10": 0.5645
   },
   "segment=G-browse": {
-    "mrr@10": 0.8575,
-    "ndcg@10": 0.83,
-    "recall@10": 0.3676
+    "mrr@10": 0.9035,
+    "ndcg@10": 0.8906,
+    "recall@10": 0.3841
   },
   "segment=v1": {
-    "mrr@10": 0.9036,
-    "ndcg@10": 0.8619,
-    "recall@10": 0.8844
+    "mrr@10": 0.9132,
+    "ndcg@10": 0.8541,
+    "recall@10": 0.8616
   },
   "source=demand-persona": {
-    "mrr@10": 0.7363,
-    "ndcg@10": 0.684,
-    "recall@10": 0.7007
+    "mrr@10": 0.7982,
+    "ndcg@10": 0.7311,
+    "recall@10": 0.7342
   },
   "source=v1-generated": {
-    "mrr@10": 0.9036,
-    "ndcg@10": 0.8619,
-    "recall@10": 0.8844
+    "mrr@10": 0.9132,
+    "ndcg@10": 0.8541,
+    "recall@10": 0.8616
   }
 }

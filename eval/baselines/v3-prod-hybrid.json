@@ -1,0 +1,92 @@
+{
+  "difficulty=easy": {
+    "mrr@10": 0.9861,
+    "ndcg@10": 0.9612,
+    "recall@10": 0.8669
+  },
+  "difficulty=hard": {
+    "mrr@10": 0.7679,
+    "ndcg@10": 0.7467,
+    "recall@10": 0.6756
+  },
+  "difficulty=medium": {
+    "mrr@10": 0.9137,
+    "ndcg@10": 0.8965,
+    "recall@10": 0.8708
+  },
+  "form=keyword": {
+    "mrr@10": 0.9402,
+    "ndcg@10": 0.9391,
+    "recall@10": 0.7787
+  },
+  "form=phrase": {
+    "mrr@10": 0.9353,
+    "ndcg@10": 0.9161,
+    "recall@10": 0.9425
+  },
+  "form=sentence": {
+    "mrr@10": 0.8586,
+    "ndcg@10": 0.8217,
+    "recall@10": 0.7712
+  },
+  "overall": {
+    "mrr@10": 0.9099,
+    "ndcg@10": 0.8897,
+    "recall@10": 0.8354
+  },
+  "qtype=keyword": {
+    "mrr@10": 0.9762,
+    "ndcg@10": 0.9625,
+    "recall@10": 0.8862
+  },
+  "qtype=mixed": {
+    "mrr@10": 0.9127,
+    "ndcg@10": 0.8819,
+    "recall@10": 0.8561
+  },
+  "qtype=semantic": {
+    "mrr@10": 0.7018,
+    "ndcg@10": 0.7099,
+    "recall@10": 0.5933
+  },
+  "segment=A-ess": {
+    "mrr@10": 0.9024,
+    "ndcg@10": 0.8951,
+    "recall@10": 0.814
+  },
+  "segment=B-small-reuse": {
+    "mrr@10": 0.8333,
+    "ndcg@10": 0.7769,
+    "recall@10": 0.6989
+  },
+  "segment=C-recycling": {
+    "mrr@10": 0.8294,
+    "ndcg@10": 0.8136,
+    "recall@10": 0.7078
+  },
+  "segment=D-collision": {
+    "mrr@10": 0.9238,
+    "ndcg@10": 0.9012,
+    "recall@10": 0.9905
+  },
+  "segment=E-electronics": {
+    "mrr@10": 0.9609,
+    "ndcg@10": 0.9352,
+    "recall@10": 0.9844
+  },
+  "segment=F-conversion-rnd": {
+    "mrr@10": 0.8939,
+    "ndcg@10": 0.8773,
+    "recall@10": 0.8658
+  },
+  "segment=G-browse": {
+    "mrr@10": 1.0,
+    "ndcg@10": 0.9947,
+    "recall@10": 0.4035
+  },
+  "source=holdout-blind": {
+    "mrr@10": 0.9099,
+    "ndcg@10": 0.8897,
+    "recall@10": 0.8354
+  }
+}

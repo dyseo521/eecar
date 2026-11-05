@@ -7,8 +7,9 @@
  * mode
  *   bm25           전체 코퍼스에 프로덕션 BM25 색인(Bm25Index) 적용. 문서 텍스트는 buildSearchText
  *   vector         캐시된 Titan 임베딩으로 전체 코퍼스 코사인 검색 (findTopKSimilar). 문서 임베딩은 buildEmbeddingText
- *   prod-hybrid    vector-search Lambda 4~7단계 재현 (2026-11 이후 구조, DECISION_LOG E-23):
- *                  벡터 상위 100 + BM25 상위 100 → fuseRankedLists(α=0.5) → 상위 topK
+ *   prod-hybrid    vector-search Lambda 4~8단계 재현 (DECISION_LOG E-23, E-25):
+ *                  벡터 상위 100 + BM25 상위 100(바이그램) → rankCandidates(결합 α=0.5 + 질의 조건 감점) → 상위 topK
+ *                  부품 속성은 정답 attrs가 아니라 extractSearchAttributes로 문서에서 뽑는다
  *   legacy-hybrid  이전 프로덕션 구조 (벡터 상위 topK*2 → 후보 안에서만 BM25 → α=0.7 → 상위 topK).
  *                  문서 텍스트도 이전 정의(preparePartForBM25, preparePartText 임베딩)
  *   (쿼리 확장, 캐시, 필터, 설명 생성은 제외)
@@ -19,15 +20,17 @@
  */
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { gunzipSync } from 'zlib';
+import { docTextSha256, GATE_EMBEDDINGS_FILE } from './export-gate-embeddings.js';
 import {
   Bm25Index,
   CANDIDATES_PER_RETRIEVER,
-  fuseRankedLists,
-  HYBRID_ALPHA,
   hybridSearch,
   preparePartForBM25,
 } from '../../backend/src/utils/search.js';
 import { buildSearchText } from '../../backend/src/utils/search-document.js';
+import { extractSearchAttributes } from '../../backend/src/utils/search-attributes.js';
+import { bm25Candidates, rankCandidates } from '../../backend/src/utils/search-ranking.js';
 
 type Mode = 'bm25' | 'vector' | 'prod-hybrid' | 'legacy-hybrid';
 const MODES: Mode[] = ['bm25', 'vector', 'prod-hybrid', 'legacy-hybrid'];
@@ -101,8 +104,29 @@ function readCache(path: string, hint: string): any {
   return JSON.parse(readFileSync(path, 'utf-8'));
 }
 
+/**
+ * 커밋된 게이트용 임베딩 묶음 (AWS 없이 CI에서 prod-hybrid 실행). 문서 정의가 바뀌었으면 실패한다
+ */
+function loadGateEmbeddings(dataset: string, parts: Part[]): EmbeddingCache | undefined {
+  const path = join(dataset, GATE_EMBEDDINGS_FILE);
+  if (!existsSync(path)) return undefined;
+  const bundle = JSON.parse(gunzipSync(readFileSync(path)).toString('utf-8'));
+  if (bundle.docTextSha256 !== docTextSha256(parts)) {
+    throw new Error(
+      `${path} was built from a different document definition (buildEmbeddingText changed).\n` +
+        `rebuild: build-embeddings --doc-text v2-notrade, then export-gate-embeddings --dataset ${dataset}`
+    );
+  }
+  return { model: bundle.model, docs: bundle.docs, queries: bundle.queries };
+}
+
 /** legacy=true면 이전 문서 임베딩(preparePartText), 아니면 현재 문서 임베딩(buildEmbeddingText) */
-function loadEmbeddings(dataset: string, legacy = false): EmbeddingCache {
+function loadEmbeddings(dataset: string, parts: Part[], legacy = false): EmbeddingCache {
+  // 로컬 캐시가 없으면(CI) 커밋된 게이트 묶음을 쓴다. 이전 구조 재현(legacy)은 로컬 캐시가 필요하다
+  if (!legacy && !existsSync(join(dataset, DOC_EMBEDDING_CACHE_FILE))) {
+    const gate = loadGateEmbeddings(dataset, parts);
+    if (gate) return gate;
+  }
   const base = readCache(join(dataset, EMBEDDING_CACHE_FILE), `--dataset ${dataset}`) as EmbeddingCache;
   if (legacy) return base;
   const docs = readCache(join(dataset, DOC_EMBEDDING_CACHE_FILE), `--dataset ${dataset} --doc-text v2-notrade`).docs;
@@ -149,13 +173,13 @@ async function runProdHybrid(
   const { findTopKSimilar } = await import('../../backend/src/utils/bedrock.js');
   const vectors = parts.map(p => ({ id: p.partId, vector: cache.docs[p.partId] }));
   const index = bm25IndexOf(parts);
+  const attributes = new Map(parts.map(p => [p.partId, extractSearchAttributes(p)]));
   const runs = new Map<string, Ranked[]>();
   for (const q of queries) {
-    // vector-search/index.ts Step 4~7 (필터 없음)
+    // vector-search/index.ts Step 4~8 (필터 없음)
     const vectorMatches = findTopKSimilar(cache.queries[q.id], vectors, CANDIDATES_PER_RETRIEVER);
-    const bm25Matches = index.search(q.text, CANDIDATES_PER_RETRIEVER);
-    const fused = fuseRankedLists(vectorMatches, bm25Matches, HYBRID_ALPHA).slice(0, topK);
-    runs.set(q.id, fused.map(m => ({ partId: m.id, score: m.score })));
+    const ranked = rankCandidates(q.text, vectorMatches, bm25Candidates(index, q.text), id => attributes.get(id)).slice(0, topK);
+    runs.set(q.id, ranked.map(m => ({ partId: m.id, score: m.score })));
   }
   return runs;
 }
@@ -190,11 +214,11 @@ async function main(): Promise<void> {
   if (args.mode === 'bm25') {
     runs = runBm25(parts, queries, args.top);
   } else if (args.mode === 'vector') {
-    runs = await runVector(parts, queries, loadEmbeddings(args.dataset), args.top);
+    runs = await runVector(parts, queries, loadEmbeddings(args.dataset, parts), args.top);
   } else if (args.mode === 'prod-hybrid') {
-    runs = await runProdHybrid(parts, queries, loadEmbeddings(args.dataset), args.prodTopK);
+    runs = await runProdHybrid(parts, queries, loadEmbeddings(args.dataset, parts), args.prodTopK);
   } else {
-    runs = await runLegacyHybrid(parts, queries, loadEmbeddings(args.dataset, true), args.prodTopK, args.alpha);
+    runs = await runLegacyHybrid(parts, queries, loadEmbeddings(args.dataset, parts, true), args.prodTopK, args.alpha);
   }
 
   const lines = queries.map(q => JSON.stringify({ qid: q.id, results: runs.get(q.id) ?? [] }));

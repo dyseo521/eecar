@@ -105,6 +105,13 @@ jobs:
       - name: Search quality regression gate (BM25, v2 demand-grounded queries)
         run: cd eval && uv run python -m eecar_eval.gate --dataset v2 --system bm25
 
+      # 운영 순위 로직 전체(결합 + 질의 조건). 커밋된 gate-embeddings.json.gz를 써서 AWS가 필요 없다 (DECISION_LOG A-29)
+      - name: Search quality regression gate (production ranking, v2)
+        run: cd eval && uv run python -m eecar_eval.gate --dataset v2 --system prod-hybrid
+
+      - name: Search quality regression gate (production ranking, v3 blind holdout)
+        run: cd eval && uv run python -m eecar_eval.gate --dataset v3 --system prod-hybrid
+
   # E2E tests (only on master)
   e2e:
     name: E2E Tests

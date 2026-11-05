@@ -24,6 +24,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import {
+  bigramTokenize,
   Bm25Index,
   calculateBM25Scores,
   fuseRankedLists,
@@ -85,7 +86,7 @@ function charBigrams(token: string): string[] {
 
 const TOKENIZERS: Record<Tokenizer, (text: string) => string[]> = {
   ws: text => tokenize(text),
-  bigram: text => tokenize(text).flatMap(charBigrams),
+  bigram: bigramTokenize, // 프로덕션 SEARCH_TOKENIZER
   'ws+bigram': text =>
     tokenize(text).flatMap(token => {
       const grams = charBigrams(token);
