@@ -121,3 +121,21 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "::warning::Dependency scan found issues. Please review npm audit results."
           fi
+
+      # 주간 스캔이 수개월간 실패해도 아무도 몰랐던 문제 대응 (PR은 체크 결과로 충분하므로 제외)
+      - name: Notify Slack on failure
+        if: >-
+          github.event_name != 'pull_request' &&
+          (needs.dependency-scan.result == 'failure' ||
+           needs.sast-scan.result == 'failure' ||
+           needs.secrets-scan.result == 'failure')
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL is not set; skipping notification"
+            exit 0
+          fi
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          curl -sS -X POST "$SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' \
+            -d "{\"text\":\":rotating_light: *Security Scan failed* (dependency: ${{ needs.dependency-scan.result }}, sast: ${{ needs.sast-scan.result }}, secrets: ${{ needs.secrets-scan.result }})\n${RUN_URL}\"}"
