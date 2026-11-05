@@ -219,6 +219,31 @@ uv run python -m eecar_eval.experiment --dataset v2 --grid root-cause
 - 이전 구조를 다시 실행한 값은 기존 리포트와 정확히 일치한다(v1 0.8012, v2 0.6959).
 - v2 test 분할은 두 번 썼다(E-24). 다음 기법 선택 전에는 새 질의 묶음으로 test를 바꾼다.
 
+## 질의 이해와 블라인드 홀드아웃 v3 (2026-11-06, rank-v3)
+
+- **남은 원인**: 문서와 결합을 고친 뒤 남은 오답의 38%는 "60kWh 이상" 같은 수치 조건, 24%는 카테고리 오답이었습니다.
+- **변경 1, 질의 조건 감점**: 질의에서 카테고리·수치 조건을 뽑아 부품 속성과 비교하고, 위반하면 감점합니다.
+  - 부품 속성은 정답 attrs가 아니라 프로덕션 추출 함수로 문서에서 뽑은 값입니다.
+- **변경 2, 토크나이저**: BM25는 한글을 글자 2-gram으로 나눕니다("배터리팩" = "배터리 팩").
+- **선택과 확인 절차**:
+  1. v2 dev에서 구성을 고르고, v3에서 볼 구성과 채택 기준을 [결정 기록 E-25](../docs/DECISION_LOG.md)에 먼저 커밋했습니다.
+  2. v3는 규칙과 기존 질의를 보지 않은 별도 에이전트가 쓴 질의 160개입니다([datasets/v3/README.md](datasets/v3/README.md)).
+
+| v3 홀드아웃 160개, nDCG@10 | 값 |
+|---|---:|
+| 이전 프로덕션 (v1.6.0) | 0.789 |
+| **사전 등록 구성** | **0.890** (+0.101 [+0.062, +0.142]) |
+
+- 카테고리 조건만으로는 v3에서 효과가 재현되지 않았습니다(+0.006). 이득은 주로 수치 조건에서 나옵니다(E-26).
+- **CI 게이트**: 운영 순위 로직(`prod-hybrid`)도 v2·v3에서 검사합니다. 커밋된 `gate-embeddings.json.gz`를 쓰므로 AWS가 필요 없습니다.
+  - BM25 단독 게이트는 운영 구조와 어긋나 있었습니다. 이번 변경에서 BM25 단독은 일부 그룹이 떨어졌지만 운영 파이프라인은 모든 그룹이 올랐습니다(A-29).
+
+```bash
+uv run python -m eecar_eval.experiment --dataset v2 --grid query-understanding            # 선택 (dev)
+uv run python -m eecar_eval.experiment --dataset v3 --grid query-understanding --holdout  # 사전 등록 구성 확인
+npx tsx eval/ts/export-gate-embeddings.ts --dataset eval/datasets/v3                     # 문서 정의를 바꾼 뒤 게이트 묶음 갱신
+```
+
 ## 한계 (해석할 때 주의)
 
 - **코퍼스와 라벨이 합성 데이터다.**
