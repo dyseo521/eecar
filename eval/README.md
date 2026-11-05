@@ -35,6 +35,8 @@ npx tsx eval/ts/build-embeddings.ts --dataset eval/datasets/v1
 # 다시 eval/ 에서
 uv run python -m eecar_eval.run --system vector
 uv run python -m eecar_eval.run --system prod-hybrid
+uv run python -m eecar_eval.compare reports/<A>.json reports/<B>.json   # 질의별 쌍체 비교
+uv run python -m eecar_eval.experiment                                   # 기법·비율 실험 그리드
 ```
 
 Windows 콘솔에서 한글이 깨지면 `PYTHONIOENCODING=utf-8`을 설정한다.
@@ -112,10 +114,46 @@ LLM으로 판정하지 않는 이유는 코퍼스를 LLM과 함께 만들었기 
 
 ## 결과 (2026-11-05)
 
+### 기준값 (질의 91개 전체)
+
 | 시스템 | nDCG@10 | Recall@10 | MRR@10 | hard nDCG@10 | 리포트 |
 |---|---:|---:|---:|---:|---|
-| bm25 | 0.758 | 0.785 | 0.814 | 0.491 | [reports/2026-11-05-v1-bm25.md](reports/2026-11-05-v1-bm25.md) |
-| vector / prod-hybrid | AWS 자격 증명을 받은 뒤 측정 | | | | |
+| bm25 (전체 코퍼스) | 0.758 | 0.785 | 0.814 | 0.491 | [보기](reports/2026-11-05-v1-bm25.md) |
+| vector (Titan v2, 정확한 코사인) | 0.733 | 0.762 | 0.797 | 0.460 | [보기](reports/2026-11-05-v1-vector.md) |
+| **prod-hybrid (현재 프로덕션 재현)** | **0.801** | 0.804 | 0.902 | 0.520 | [보기](reports/2026-11-05-v1-prod-hybrid.md) |
+
+### 쌍체 비교 (nDCG@10)
+
+| 비교 | Δ | 95% CI | p | 리포트 |
+|---|---:|---|---:|---|
+| prod-hybrid vs vector | +0.068 | [+0.032, +0.108] | <0.001 | [보기](reports/compare-v1-prod-hybrid-vs-vector-ndcg10.md) |
+| prod-hybrid vs bm25 | +0.043 | [+0.001, +0.088] | 0.055 | [보기](reports/compare-v1-prod-hybrid-vs-bm25-ndcg10.md) |
+| bm25 vs vector | +0.025 | [−0.042, +0.090] | 0.46 | [보기](reports/compare-v1-bm25-vs-vector-ndcg10.md) |
+
+현재 구조에서 BM25 재정렬은 벡터 단독보다 분명히 낫다. BM25 단독보다 나은지는 경계선이다.
+
+### 기법 실험 (구성 46개, dev에서 선택하고 test에서 확인)
+
+`uv run python -m eecar_eval.experiment` → [reports/2026-11-05-v1-experiments.md](reports/2026-11-05-v1-experiments.md)
+
+| 계열 | 내용 |
+|---|---|
+| A | 프로덕션 구조에서 α를 0~1 범위로 스윕 |
+| B | 후보 수 20 / 50 / 100 |
+| C | 독립 검색 + 볼록 결합, α 스윕 |
+| D | RRF, k = 10 / 30 / 60 / 100 |
+| E | 토크나이저: 공백 / 문자 bigram / 공백+bigram |
+| F | IDF 제거 |
+
+test 44개에서 현재 프로덕션(`prod-ws-a0.7-c20`, test 0.772)과 비교한 결과다.
+
+| 후보 (dev 기준으로 선택) | Δ | 95% CI | p |
+|---|---:|---|---:|
+| 후보 풀 20 → 100 (파라미터 1개 변경) | +0.036 | [−0.000, +0.071] | 0.060 |
+| 독립 검색 + 볼록 결합 α=0.5 + IDF 제거 | +0.034 | [−0.002, +0.068] | 0.070 |
+| RRF k=30 | −0.012 | [−0.057, +0.029] | 0.59 |
+
+결론은 이렇다. 두 개선 후보가 유망하지만, 신뢰구간이 0에 걸쳐 있어 **v1으로는 확정할 수 없다**. 그래서 프로덕션 변경은 보류하고, 질의를 약 350개로 늘린 v2에서 다시 확인한다. 이 수치가 나온 계산 과정은 [결정 기록 E-05, E-17](../docs/DECISION_LOG.md)에 있다. 구성을 고르는 기준, 허용치, 표본 수의 근거도 모두 결정 기록에 있다.
 
 관찰한 점
 - **차종 표기 변형에 약하다.** "아이오닉 일렉트릭 IGBT 인버터"(nDCG 0)는 같은 차종이 "IONIQ Electric"·"아이오닉EV"로 적힌 문서를 찾지 못했다.
