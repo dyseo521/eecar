@@ -49,7 +49,7 @@ components:
   schemas:
     PartCategory:
       type: string
-      enum: &a2
+      enum:
         - battery
         - motor
         - inverter
@@ -65,7 +65,7 @@ components:
       example: battery
     PartCondition:
       type: string
-      enum: &a3
+      enum:
         - new
         - used
         - refurbished
@@ -74,7 +74,7 @@ components:
       example: used
     CathodeType:
       type: string
-      enum: &a1
+      enum:
         - NCM Ni 33%
         - NCM Ni 60%
         - NCM Ni 80%
@@ -84,6 +84,122 @@ components:
         - Other
       description: 양극재 타입
       example: NCM Ni 80%
+    Part:
+      type: object
+      properties:
+        partId:
+          type: string
+          example: battery-001
+        name:
+          type: string
+          minLength: 1
+          example: Tesla Model 3 Battery Pack
+        category:
+          type: string
+          enum:
+            - battery
+            - motor
+            - inverter
+            - charger
+            - electronics
+            - body-chassis-frame
+            - body-panel
+            - body-door
+            - body-window
+            - interior
+            - other
+          description: 부품 카테고리
+          example: battery
+        manufacturer:
+          type: string
+          example: Tesla
+        model:
+          type: string
+          example: Model 3 LR
+        year:
+          type: integer
+          minimum: 2010
+          maximum: 2030
+          example: 2023
+        condition:
+          type: string
+          enum:
+            - new
+            - used
+            - refurbished
+            - for-parts
+          description: 부품 상태
+          example: used
+        price:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+          example: 4500000
+        quantity:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          example: 1
+        sellerId:
+          type: string
+        description:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+          default: []
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        specifications:
+          $ref: "#/components/schemas/PartSpecifications"
+        useCases:
+          type: array
+          items:
+            $ref: "#/components/schemas/UseCase"
+        batteryHealth:
+          $ref: "#/components/schemas/BatteryHealthInfo"
+      required:
+        - partId
+        - name
+        - category
+        - manufacturer
+        - model
+        - year
+        - condition
+        - price
+        - quantity
+        - sellerId
+        - description
+    PartSpecifications:
+      type: object
+      properties:
+        materialComposition:
+          $ref: "#/components/schemas/MaterialComposition"
+        dimensions:
+          $ref: "#/components/schemas/Dimensions"
+        weight:
+          type: number
+          description: 무게 (kg)
+        electricalProps:
+          $ref: "#/components/schemas/ElectricalProperties"
+        chemicalProps:
+          type: object
+          additionalProperties:
+            nullable: true
+        thermalProps:
+          type: object
+          additionalProperties:
+            nullable: true
+        recyclingInfo:
+          type: object
+          additionalProperties:
+            nullable: true
     MaterialComposition:
       type: object
       properties:
@@ -173,30 +289,6 @@ components:
         resistance:
           type: number
           description: 저항 (Ω)
-    PartSpecifications:
-      type: object
-      properties:
-        materialComposition:
-          $ref: "#/components/schemas/MaterialComposition"
-        dimensions:
-          $ref: "#/components/schemas/Dimensions"
-        weight:
-          type: number
-          description: 무게 (kg)
-        electricalProps:
-          $ref: "#/components/schemas/ElectricalProperties"
-        chemicalProps:
-          type: object
-          additionalProperties:
-            nullable: true
-        thermalProps:
-          type: object
-          additionalProperties:
-            nullable: true
-        recyclingInfo:
-          type: object
-          additionalProperties:
-            nullable: true
     UseCase:
       type: object
       properties:
@@ -238,7 +330,14 @@ components:
           description: 예상 잔여 주행거리 (km)
         cathodeType:
           type: string
-          enum: *a1
+          enum:
+            - NCM Ni 33%
+            - NCM Ni 60%
+            - NCM Ni 80%
+            - NCA
+            - LMO
+            - LFP
+            - Other
           description: 양극재 타입
           example: NCM Ni 80%
         manufacturer:
@@ -286,90 +385,56 @@ components:
         - model
         - year
         - recommendedUse
-    Part:
+    SearchFilters:
       type: object
       properties:
-        partId:
-          type: string
-          example: battery-001
-        name:
-          type: string
-          minLength: 1
-          example: Tesla Model 3 Battery Pack
         category:
           type: string
-          enum: *a2
+          enum:
+            - battery
+            - motor
+            - inverter
+            - charger
+            - electronics
+            - body-chassis-frame
+            - body-panel
+            - body-door
+            - body-window
+            - interior
+            - other
           description: 부품 카테고리
           example: battery
         manufacturer:
           type: string
-          example: Tesla
-        model:
-          type: string
-          example: Model 3 LR
-        year:
-          type: integer
-          minimum: 2010
-          maximum: 2030
-          example: 2023
-        condition:
-          type: string
-          enum: *a3
-          description: 부품 상태
-          example: used
-        price:
+        maxPrice:
           type: number
           minimum: 0
           exclusiveMinimum: true
-          example: 4500000
-        quantity:
+        minQuantity:
           type: integer
           minimum: 0
           exclusiveMinimum: true
-          example: 1
-        sellerId:
-          type: string
-        description:
-          type: string
-        images:
+        yearRange:
+          type: array
+          items:
+            type: number
+          minItems: 2
+          maxItems: 2
+        condition:
           type: array
           items:
             type: string
-            format: uri
-          default: &a5 []
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-        specifications:
-          $ref: "#/components/schemas/PartSpecifications"
-        useCases:
-          type: array
-          items:
-            $ref: "#/components/schemas/UseCase"
-        batteryHealth:
-          $ref: "#/components/schemas/BatteryHealthInfo"
-      required:
-        - partId
-        - name
-        - category
-        - manufacturer
-        - model
-        - year
-        - condition
-        - price
-        - quantity
-        - sellerId
-        - description
-    RangeFilter:
-      type: object
-      properties:
-        min:
-          type: number
-        max:
-          type: number
+            enum:
+              - new
+              - used
+              - refurbished
+              - for-parts
+            description: 부품 상태
+            example: used
+        materialFilters:
+          $ref: "#/components/schemas/AdvancedMaterialFilters"
+        batteryFilters:
+          $ref: "#/components/schemas/BatteryFilters"
     AdvancedMaterialFilters:
       type: object
       properties:
@@ -405,6 +470,13 @@ components:
           properties:
             min:
               type: number
+    RangeFilter:
+      type: object
+      properties:
+        min:
+          type: number
+        max:
+          type: number
     BatteryFilters:
       type: object
       properties:
@@ -414,7 +486,14 @@ components:
           type: array
           items:
             type: string
-            enum: *a1
+            enum:
+              - NCM Ni 33%
+              - NCM Ni 60%
+              - NCM Ni 80%
+              - NCA
+              - LMO
+              - LFP
+              - Other
             description: 양극재 타입
             example: NCM Ni 80%
         recommendedUse:
@@ -431,52 +510,6 @@ components:
             type: string
         estimatedMileageKm:
           $ref: "#/components/schemas/RangeFilter"
-    SearchFilters:
-      type: object
-      properties:
-        category:
-          type: string
-          enum: *a2
-          description: 부품 카테고리
-          example: battery
-        manufacturer:
-          type: string
-        maxPrice:
-          type: number
-          minimum: 0
-          exclusiveMinimum: true
-        minQuantity:
-          type: integer
-          minimum: 0
-          exclusiveMinimum: true
-        yearRange:
-          type: array
-          items:
-            type: number
-          minItems: 2
-          maxItems: 2
-        condition:
-          type: array
-          items:
-            type: string
-            enum: *a3
-            description: 부품 상태
-            example: used
-        materialFilters:
-          $ref: "#/components/schemas/AdvancedMaterialFilters"
-        batteryFilters:
-          $ref: "#/components/schemas/BatteryFilters"
-    ProposalTerms:
-      type: object
-      properties:
-        deliveryDate:
-          type: string
-        paymentTerms:
-          type: string
-        warranty:
-          type: string
-        notes:
-          type: string
     Proposal:
       type: object
       properties:
@@ -505,7 +538,7 @@ components:
           $ref: "#/components/schemas/ProposalTerms"
         status:
           type: string
-          enum: &a4
+          enum:
             - pending
             - accepted
             - rejected
@@ -531,9 +564,27 @@ components:
         - terms
         - status
         - createdAt
+    ProposalTerms:
+      type: object
+      properties:
+        deliveryDate:
+          type: string
+        paymentTerms:
+          type: string
+        warranty:
+          type: string
+        notes:
+          type: string
+      additionalProperties:
+        nullable: true
     ProposalStatus:
       type: string
-      enum: *a4
+      enum:
+        - pending
+        - accepted
+        - rejected
+        - negotiating
+        - cancelled
       description: 제안 상태
       example: pending
     ErrorResponse:
@@ -547,26 +598,6 @@ components:
           type: integer
       required:
         - error
-    SearchResult:
-      type: object
-      properties:
-        partId:
-          type: string
-        score:
-          type: number
-          minimum: 0
-          maximum: 1
-          description: 유사도 점수 (0-1)
-        part:
-          $ref: "#/components/schemas/Part"
-        reason:
-          type: string
-          description: Claude가 생성한 매칭 이유
-      required:
-        - partId
-        - score
-        - part
-        - reason
     SearchResponse:
       type: object
       properties:
@@ -583,6 +614,104 @@ components:
         - results
         - cached
         - count
+    SearchResult:
+      type: object
+      properties:
+        partId:
+          type: string
+        score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: 유사도 점수 (0-1)
+        part:
+          type: object
+          properties:
+            partId:
+              type: string
+              example: battery-001
+            name:
+              type: string
+              minLength: 1
+              example: Tesla Model 3 Battery Pack
+            category:
+              type: string
+              enum:
+                - battery
+                - motor
+                - inverter
+                - charger
+                - electronics
+                - body-chassis-frame
+                - body-panel
+                - body-door
+                - body-window
+                - interior
+                - other
+              description: 부품 카테고리
+              example: battery
+            manufacturer:
+              type: string
+              example: Tesla
+            model:
+              type: string
+              example: Model 3 LR
+            year:
+              type: integer
+              minimum: 2010
+              maximum: 2030
+              example: 2023
+            condition:
+              type: string
+              enum:
+                - new
+                - used
+                - refurbished
+                - for-parts
+              description: 부품 상태
+              example: used
+            price:
+              type: number
+              minimum: 0
+              exclusiveMinimum: true
+              example: 4500000
+            quantity:
+              type: integer
+              minimum: 0
+              exclusiveMinimum: true
+              example: 1
+            sellerId:
+              type: string
+            description:
+              type: string
+            images:
+              type: array
+              items:
+                type: string
+                format: uri
+              default: []
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+            specifications:
+              $ref: "#/components/schemas/PartSpecifications"
+            useCases:
+              type: array
+              items:
+                $ref: "#/components/schemas/UseCase"
+            batteryHealth:
+              $ref: "#/components/schemas/BatteryHealthInfo"
+        reason:
+          type: string
+          description: Claude가 생성한 매칭 이유
+      required:
+        - partId
+        - score
+        - part
+        - reason
     SearchRequest:
       type: object
       properties:
@@ -636,7 +765,18 @@ components:
           example: Tesla Model 3 Battery Pack
         category:
           type: string
-          enum: *a2
+          enum:
+            - battery
+            - motor
+            - inverter
+            - charger
+            - electronics
+            - body-chassis-frame
+            - body-panel
+            - body-door
+            - body-window
+            - interior
+            - other
           description: 부품 카테고리
           example: battery
         manufacturer:
@@ -652,7 +792,11 @@ components:
           example: 2023
         condition:
           type: string
-          enum: *a3
+          enum:
+            - new
+            - used
+            - refurbished
+            - for-parts
           description: 부품 상태
           example: used
         price:
@@ -674,7 +818,7 @@ components:
           items:
             type: string
             format: uri
-          default: *a5
+          default: []
         specifications:
           $ref: "#/components/schemas/PartSpecifications"
         useCases:
@@ -723,7 +867,18 @@ components:
           $ref: "#/components/schemas/AdvancedMaterialFilters"
         category:
           type: string
-          enum: *a2
+          enum:
+            - battery
+            - motor
+            - inverter
+            - charger
+            - electronics
+            - body-chassis-frame
+            - body-panel
+            - body-door
+            - body-window
+            - interior
+            - other
           description: 부품 카테고리
           example: battery
         topK:
@@ -741,26 +896,6 @@ components:
       required:
         - message
         - watchId
-    WatchCriteria:
-      type: object
-      properties:
-        category:
-          type: string
-          enum: *a2
-          description: 부품 카테고리
-          example: battery
-        maxPrice:
-          type: number
-          minimum: 0
-          exclusiveMinimum: true
-        minSpecs:
-          $ref: "#/components/schemas/PartSpecifications"
-        manufacturer:
-          type: string
-        keywords:
-          type: array
-          items:
-            type: string
     WatchRequest:
       type: object
       properties:
@@ -776,6 +911,59 @@ components:
       required:
         - buyerId
         - criteria
+    WatchCriteria:
+      type: object
+      properties:
+        category:
+          type: string
+          enum:
+            - battery
+            - motor
+            - inverter
+            - charger
+            - electronics
+            - body-chassis-frame
+            - body-panel
+            - body-door
+            - body-window
+            - interior
+            - other
+          description: 부품 카테고리
+          example: battery
+        maxPrice:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+        minSpecs:
+          type: object
+          properties:
+            materialComposition:
+              $ref: "#/components/schemas/MaterialComposition"
+            dimensions:
+              $ref: "#/components/schemas/Dimensions"
+            weight:
+              type: number
+              description: 무게 (kg)
+            electricalProps:
+              $ref: "#/components/schemas/ElectricalProperties"
+            chemicalProps:
+              type: object
+              additionalProperties:
+                nullable: true
+            thermalProps:
+              type: object
+              additionalProperties:
+                nullable: true
+            recyclingInfo:
+              type: object
+              additionalProperties:
+                nullable: true
+        manufacturer:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
     ProposalResponse:
       type: object
       properties:
@@ -883,7 +1071,18 @@ components:
       properties:
         category:
           type: string
-          enum: *a2
+          enum:
+            - battery
+            - motor
+            - inverter
+            - charger
+            - electronics
+            - body-chassis-frame
+            - body-panel
+            - body-door
+            - body-window
+            - interior
+            - other
           description: 부품 카테고리
           example: battery
         count:
@@ -933,6 +1132,8 @@ components:
           description: Slack 이벤트 데이터
       required:
         - type
+      additionalProperties:
+        nullable: true
   parameters: {}
 paths:
   /api/search:
@@ -979,26 +1180,40 @@ paths:
       parameters:
         - schema:
             type: string
-            enum: *a2
+            enum:
+              - battery
+              - motor
+              - inverter
+              - charger
+              - electronics
+              - body-chassis-frame
+              - body-panel
+              - body-door
+              - body-window
+              - interior
+              - other
             description: 부품 카테고리
             example: battery
           required: false
+          description: 부품 카테고리
           name: category
           in: query
         - schema:
             type: integer
             minimum: 0
             exclusiveMinimum: true
-            description: 조회 개수 (기본값 20, 최대 100)
             example: 20
+            description: 조회 개수 (기본값 20, 최대 100)
           required: false
+          description: 조회 개수 (기본값 20, 최대 100)
           name: limit
           in: query
         - schema:
             type: string
-            description: 페이지네이션 커서
             example: battery-001
+            description: 페이지네이션 커서
           required: false
+          description: 페이지네이션 커서
           name: cursor
           in: query
       responses:
@@ -1218,16 +1433,23 @@ paths:
       parameters:
         - schema:
             type: string
-            enum: *a4
+            enum:
+              - pending
+              - accepted
+              - rejected
+              - negotiating
+              - cancelled
             description: 제안 상태
             example: pending
           required: true
+          description: 제안 상태
           name: status
           in: query
         - schema:
             type: string
             description: 조회할 회사 ID
           required: true
+          description: 조회할 회사 ID
           name: companyId
           in: query
       responses:
