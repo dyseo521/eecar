@@ -4,7 +4,7 @@ import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
 import { parseLogEvent } from './parser.js';
 import { classifySeverity } from './severity.js';
 import { formatSlackMessage } from './slack-formatter.js';
-import { checkDuplicate, recordError } from './deduplicator.js';
+import { acquireAlertSlot, releaseAlertSlot } from './deduplicator.js';
 
 const ssmClient = new SSMClient({ region: 'ap-northeast-2' });
 const SLACK_WEBHOOK_PARAM = process.env.SLACK_WEBHOOK_SSM_PARAM || '/eecar/slack/webhook-url';
@@ -63,10 +63,10 @@ export const handler = async (event: CloudWatchLogsEvent) => {
     // 5. 각 에러에 대해 처리
     let sentCount = 0;
     for (const errorEvent of errorEvents) {
-      // 5.1 중복 확인
-      const isDuplicate = await checkDuplicate(errorEvent);
-      if (isDuplicate) {
-        console.log(`Duplicate error detected: ${errorEvent.errorHash}`);
+      // 5.1 중복 확인 (조건부 쓰기로 원자적 판정)
+      const slot = await acquireAlertSlot(errorEvent);
+      if (!slot.shouldAlert) {
+        console.log(`Duplicate error suppressed: ${errorEvent.errorHash}`);
         continue;
       }
 
@@ -74,7 +74,9 @@ export const handler = async (event: CloudWatchLogsEvent) => {
       const severity = classifySeverity(errorEvent.functionName, errorEvent.errorType);
 
       // 5.3 Slack 메시지 생성
-      const slackMessage = formatSlackMessage(errorEvent, severity, logData.logGroup);
+      const slackMessage = formatSlackMessage(errorEvent, severity, logData.logGroup, {
+        suppressedSinceLastAlert: slot.suppressedSinceLastAlert,
+      });
 
       // 5.4 Slack 전송
       const response = await fetch(webhookUrl, {
@@ -85,13 +87,12 @@ export const handler = async (event: CloudWatchLogsEvent) => {
 
       if (!response.ok) {
         console.error(`Failed to send Slack notification: ${response.status} ${response.statusText}`);
+        // 전송 실패 시 슬롯을 반납해 다음 발생 때 다시 알림을 시도한다
+        await releaseAlertSlot(errorEvent);
       } else {
         console.log(`Sent ${severity} alert for ${errorEvent.functionName}: ${errorEvent.errorType}`);
         sentCount++;
       }
-
-      // 5.5 중복 제거 레코드 저장
-      await recordError(errorEvent);
     }
 
     console.log(`Successfully sent ${sentCount}/${errorEvents.length} notifications to Slack`);
