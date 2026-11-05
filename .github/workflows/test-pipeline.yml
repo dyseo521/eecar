@@ -146,3 +146,17 @@ jobs:
 
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "✅ All tests passed!" >> $GITHUB_STEP_SUMMARY
+
+      # 실패한 파이프라인이 아무에게도 알려지지 않던 문제 대응 (master/develop push 한정)
+      - name: Notify Slack on failure
+        if: failure() && github.event_name == 'push'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL is not set; skipping notification"
+            exit 0
+          fi
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          curl -sS -X POST "$SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' \
+            -d "{\"text\":\":x: *Test Pipeline failed* on \`${GITHUB_REF_NAME}\` (${GITHUB_SHA::7})\n${RUN_URL}\"}"
