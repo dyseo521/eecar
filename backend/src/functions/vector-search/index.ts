@@ -12,9 +12,36 @@ import {
   FALLBACK_REASON,
   TextGenerator,
 } from '/opt/nodejs/utils/search-llm.js';
+import { emitMetrics } from '/opt/nodejs/utils/emf.js';
 
 const generateWithClaude: TextGenerator = (prompt, maxTokens) =>
   callClaude([{ role: 'user', content: prompt }], undefined, maxTokens);
+
+// 쿼리 확장은 측정상 품질 이득이 없어 기본값을 끈다 (DECISION_LOG E-18, E-19)
+const QUERY_EXPANSION_ENABLED = process.env.QUERY_EXPANSION_ENABLED === 'true';
+const METRICS_NAMESPACE = 'EECAR/Search';
+
+/**
+ * LLM 호출 결과를 지표로 남긴다. 폴백은 응답이 200이어도 기능이 꺼진 상태라
+ * 에러율만 보면 드러나지 않는다 (C-09: 퇴역 모델로 AI 기능이 조용히 꺼졌던 장애).
+ * Feature 차원별 값과 차원 없는 합계를 함께 발행해 합계에 알람을 건다.
+ */
+function recordLlmCall(feature: string, latencyMs: number, fallback: boolean): void {
+  emitMetrics(METRICS_NAMESPACE, { Feature: feature }, {
+    LLMCalls: { value: 1, unit: 'Count' },
+    LLMFallback: { value: fallback ? 1 : 0, unit: 'Count' },
+    LLMLatency: { value: latencyMs, unit: 'Milliseconds' },
+  }, [['Feature'], []]);
+}
+
+/** 검색 SLI: 요청 수, 캐시 적중, 결과 0건 (C-06처럼 에러 없는 조용한 장애를 잡기 위함) */
+function recordSearch(cached: boolean, resultCount: number): void {
+  emitMetrics(METRICS_NAMESPACE, { Operation: 'Search' }, {
+    SearchRequests: { value: 1, unit: 'Count' },
+    CacheHit: { value: cached ? 1 : 0, unit: 'Count' },
+    ZeroResult: { value: resultCount === 0 ? 1 : 0, unit: 'Count' },
+  });
+}
 
 // Feature flags for gradual rollout
 const USE_S3_VECTORS = process.env.USE_S3_VECTORS === 'true';
@@ -143,7 +170,13 @@ async function searchWithLegacy(
  * Generates semantically similar queries to improve search coverage
  */
 async function expandQuery(query: string): Promise<string[]> {
-  return (await expandSearchQuery(query, generateWithClaude)).queries;
+  if (!QUERY_EXPANSION_ENABLED) {
+    return [query];
+  }
+  const started = Date.now();
+  const result = await expandSearchQuery(query, generateWithClaude);
+  recordLlmCall('QueryExpansion', Date.now() - started, result.fallback);
+  return result.queries;
 }
 
 /**
@@ -180,6 +213,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     if (cachedResult && cachedResult.TTL && Date.now() < cachedResult.TTL * 1000) {
       console.log('Cache hit!');
       await incrementCacheHit(queryHash);
+      recordSearch(true, (cachedResult.matchedParts || []).length);
       return successResponse({
         results: cachedResult.matchedParts,
         cached: true,
@@ -266,6 +300,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       GSI1SK: `HIT_COUNT#${1}`,
     });
 
+    recordSearch(false, filteredResults.length);
     return successResponse({
       results: filteredResults,
       expandedQueries, // Include expanded queries in response for transparency
@@ -372,7 +407,9 @@ async function enrichWithAISequential(
     const part = partsMap.get(match.id);
     return { id: match.id, name: part.name, manufacturer: part.manufacturer, category: part.category };
   });
-  const { explanations } = await generateExplanations(query, items, generateWithClaude);
+  const started = Date.now();
+  const { explanations, fallback } = await generateExplanations(query, items, generateWithClaude);
+  recordLlmCall('Explanation', Date.now() - started, fallback);
 
   // Build results with explanations
   return present.map((match, index) => {

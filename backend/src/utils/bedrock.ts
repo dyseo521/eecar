@@ -5,7 +5,8 @@ const bedrockClient = new BedrockRuntimeClient({
   region: 'ap-northeast-2'  
 });
 
-const MODEL_ID = process.env.BEDROCK_MODEL_ID || 'anthropic.claude-3-haiku-20240307-v1:0';
+// 기본값은 global inference profile. Claude 3 계열은 퇴역해 호출되지 않는다 (DECISION_LOG A-11, A-14)
+const MODEL_ID = process.env.BEDROCK_MODEL_ID || 'global.anthropic.claude-haiku-4-5-20251001-v1:0';
 const EMBEDDING_MODEL_ID = 'amazon.titan-embed-text-v2:0';  // Titan Embeddings G2 (서울 지원)
 
 interface ClaudeMessage {
