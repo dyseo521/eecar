@@ -20,8 +20,6 @@ import {
   mrr,
   f1Score,
   average,
-  percentile,
-  standardDeviation,
 } from './metrics.js';
 import type {
   GoldenDataset,
