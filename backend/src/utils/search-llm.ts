@@ -85,14 +85,30 @@ export interface ExplanationItem {
   name: string;
   manufacturer: string;
   category: string;
+  /** 질의 조건 중 이 부품이 만족한 것 / 만족하지 못한 것 (규칙으로 확인한 사실) */
+  matched?: string[];
+  mismatched?: string[];
 }
 
+/**
+ * 결과 설명 프롬프트. 이전 프롬프트는 "왜 적합한지"를 "~이므로 적합" 형식으로 쓰게 해서, 조건에 맞지 않는
+ * 부품에도 적합한 이유를 지어냈다(운영 확인: 언더커버에 "Model 3 모터 성능 향상에 필요"). 이제 규칙으로 확인한
+ * 일치·불일치를 근거로 주고, 맞지 않으면 그렇게 쓰게 한다 (DECISION_LOG A-28).
+ */
 export function buildExplanationPrompt(query: string, items: ExplanationItem[]): string {
+  const facts = (item: ExplanationItem) => {
+    const parts = [];
+    if (item.matched?.length) parts.push(`일치: ${item.matched.join(', ')}`);
+    if (item.mismatched?.length) parts.push(`불일치: ${item.mismatched.join(', ')}`);
+    return parts.length ? ` | ${parts.join(' | ')}` : '';
+  };
   const partsInfo = items
-    .map((item, index) => `${index + 1}. [${item.id}] ${item.name} (${item.manufacturer}, ${item.category})`)
+    .map((item, index) => `${index + 1}. [${item.id}] ${item.name} (${item.manufacturer}, ${item.category})${facts(item)}`)
     .join('\n');
-  return `"${query}" 검색에 왜 이 부품들이 적합한지 이유를 각각 20-30자로 작성.
-"~이므로 적합", "~와 호환", "~에 사용 가능" 형식으로.
+  return `"${query}" 검색 결과의 각 부품이 검색 조건에 맞는지 20-40자로 설명.
+- 부품 목록의 "불일치"가 있으면 그 내용을 먼저 쓴다 (예: "용량 17.6kWh로 조건 미달").
+- 검색어와 다른 종류의 부품이면 적합하다고 쓰지 않는다.
+- 부품 정보에 없는 호환성·성능은 지어내지 않는다. 근거가 없으면 "조건 확인 필요"라고 쓴다.
 
 반드시 JSON 배열 형식으로만 응답하세요. 다른 텍스트는 절대 포함하지 마세요.
 형식: ["이유1","이유2",...]

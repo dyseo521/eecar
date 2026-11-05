@@ -4,9 +4,11 @@ import { generateEmbedding, findTopKSimilar, callClaude } from '/opt/nodejs/util
 import { getVector, listVectorKeys } from '/opt/nodejs/utils/s3.js';
 import { getItem, putItem, batchGetItems, DynamoDBItem } from '/opt/nodejs/utils/dynamodb.js';
 import { successResponse, errorResponse, parseJsonBody } from '/opt/nodejs/utils/response.js';
-import { CANDIDATES_PER_RETRIEVER, fuseRankedLists, HYBRID_ALPHA } from '/opt/nodejs/utils/search.js';
+import { CANDIDATES_PER_RETRIEVER } from '/opt/nodejs/utils/search.js';
 import { getSearchIndex, partIdOf } from '/opt/nodejs/utils/search-index.js';
-import { SEARCH_DOCUMENT_VERSION } from '/opt/nodejs/utils/search-document.js';
+import { SEARCH_DOCUMENT_VERSION, searchAttributesOf } from '/opt/nodejs/utils/search-document.js';
+import { bm25Candidates, rankCandidates, RankedResult } from '/opt/nodejs/utils/search-ranking.js';
+import { parseQuery } from '/opt/nodejs/utils/query-understanding.js';
 import {
   averageEmbeddings,
   expandSearchQuery,
@@ -50,7 +52,7 @@ function recordSearch(cached: boolean, resultCount: number, timings: Record<stri
 }
 
 /** 검색 파이프라인 정의가 바뀌면 올린다. 캐시 키에 들어가므로 배포 직후 이전 파이프라인의 결과가 나가지 않는다 */
-export const SEARCH_PIPELINE_VERSION = `fusion-v2.doc-v${SEARCH_DOCUMENT_VERSION}`;
+export const SEARCH_PIPELINE_VERSION = `rank-v3.doc-v${SEARCH_DOCUMENT_VERSION}`;
 
 /**
  * 결과 캐시 키. 이전에는 질의 문자열만 써서 필터·topK가 다른 요청에 같은 결과를 돌려줬다 (C-04).
@@ -283,35 +285,41 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       timed(timings, 'IndexLoadMs', () => getSearchIndex()),
     ]);
 
-    // Step 5: BM25 독립 검색 + 결합
-    const fusionStarted = Date.now();
-    const bm25Matches = index.bm25.search(query, CANDIDATES_PER_RETRIEVER);
-    const fused = fuseRankedLists(vectorMatches, bm25Matches, HYBRID_ALPHA);
-    timings.FusionMs = Date.now() - fusionStarted;
-    console.log(`vector ${vectorMatches.length}, bm25 ${bm25Matches.length} (index ${index.bm25.size}${loaded ? ', loaded' : ''}) -> fused ${fused.length}`);
+    // Step 5: BM25 독립 검색
+    const bm25Matches = bm25Candidates(index.bm25, query);
 
     // Step 6: 메타데이터. 색인에 없는 부품(색인 적재 뒤에 등록된 부품)만 따로 읽는다
     const partsMap = new Map<string, DynamoDBItem>();
     const missing: Array<{ pk: string; sk: string }> = [];
-    for (const hit of fused) {
-      const item = index.parts.get(hit.id);
-      if (item) partsMap.set(hit.id, item);
-      else missing.push({ pk: `PART#${hit.id}`, sk: 'METADATA' });
+    for (const id of new Set([...vectorMatches.map(h => h.id), ...bm25Matches.map(h => h.id)])) {
+      const item = index.parts.get(id);
+      if (item) partsMap.set(id, item);
+      else missing.push({ pk: `PART#${id}`, sk: 'METADATA' });
     }
     if (missing.length > 0) {
       for (const item of await batchGetItems(missing)) partsMap.set(partIdOf(item), item);
     }
 
-    // Step 7: 필터를 상위 topK로 자르기 전에 적용 (이전에는 자른 뒤 적용해 결과가 줄었다, C-05)
-    const topMatches = fused
+    // Step 7: 결합 + 질의 조건(카테고리·수치) 재정렬 (E-23, E-25)
+    const rankStarted = Date.now();
+    const constraints = parseQuery(query);
+    const ranked = rankCandidates(query, vectorMatches, bm25Matches, id => {
+      const item = partsMap.get(id);
+      return index.attributes.get(id) ?? (item ? searchAttributesOf(item) : undefined);
+    }, constraints);
+    timings.FusionMs = Date.now() - rankStarted;
+    console.log(`vector ${vectorMatches.length}, bm25 ${bm25Matches.length} (index ${index.bm25.size}${loaded ? ', loaded' : ''}) -> ranked ${ranked.length}, constraints ${JSON.stringify(constraints)}`);
+
+    // Step 8: 필터를 상위 topK로 자르기 전에 적용 (이전에는 자른 뒤 적용해 결과가 줄었다, C-05)
+    const topMatches = ranked
       .filter(hit => partsMap.has(hit.id) && matchesFilters(partsMap.get(hit.id), filters))
       .slice(0, topK);
     const parts = topMatches.map(m => partsMap.get(m.id));
 
-    // Step 8: 결과 설명 (단일 프롬프트)
+    // Step 9: 결과 설명 (단일 프롬프트, 조건 확인 결과를 근거로 준다)
     const filteredResults = await timed(timings, 'ExplanationMs', () => enrichWithAISequential(query, topMatches, parts));
 
-    // Step 9: Cache the results (7 days TTL)
+    // Step 10: Cache the results (7 days TTL)
     const ttl = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60;
     await putItem({
       PK: `MATCH#${queryHash}`,
@@ -422,7 +430,7 @@ async function _rerankWithClaude(
  */
 async function enrichWithAISequential(
   query: string,
-  matches: HybridMatch[],
+  matches: RankedResult[],
   parts: any[]
 ): Promise<any[]> {
   const partsMap = new Map(parts.map(p => [p.PK.split('#')[1], p]));
@@ -435,7 +443,14 @@ async function enrichWithAISequential(
   }
   const items = present.map(match => {
     const part = partsMap.get(match.id);
-    return { id: match.id, name: part.name, manufacturer: part.manufacturer, category: part.category };
+    return {
+      id: match.id,
+      name: part.name,
+      manufacturer: part.manufacturer,
+      category: part.category,
+      matched: match.constraints.matched,
+      mismatched: match.constraints.mismatched,
+    };
   });
   const started = Date.now();
   const { explanations, fallback } = await generateExplanations(query, items, generateWithClaude);
@@ -452,6 +467,11 @@ async function enrichWithAISequential(
         hybrid: match.score,
         vector: match.vectorScore,
         bm25: match.bm25Score,
+      },
+      // 질의 조건 확인 결과 (규칙 기반, 사실). LLM 설명과 달리 지어낼 수 없다
+      conditions: {
+        matched: match.constraints.matched,
+        mismatched: match.constraints.mismatched,
       },
       part: {
         name: part.name,

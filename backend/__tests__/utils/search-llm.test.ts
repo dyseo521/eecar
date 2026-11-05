@@ -89,6 +89,17 @@ describe('explanations', () => {
     expect(prompt).toContain('2. [bat-002] EV6 배터리 팩 (SK온, battery)');
   });
 
+  it('grounds each part with the checked conditions and does not presuppose a fit', () => {
+    const prompt = buildExplanationPrompt('60kWh 이상 배터리', [
+      { ...items[0], matched: ['카테고리', '용량 72.6kWh'] },
+      { ...items[1], matched: ['카테고리'], mismatched: ['용량 58kWh'] },
+    ]);
+    expect(prompt).toContain('1. [bat-001] 아이오닉5 배터리 팩 (SK온, battery) | 일치: 카테고리, 용량 72.6kWh');
+    expect(prompt).toContain('| 불일치: 용량 58kWh');
+    expect(prompt).toContain('지어내지 않는다');
+    expect(prompt).not.toContain('~이므로 적합');
+  });
+
   it('accepts exactly one explanation per part', () => {
     expect(parseExplanations('```json\n["이유1", "이유2"]\n```', 2)).toEqual({
       explanations: ['이유1', '이유2'],
