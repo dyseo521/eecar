@@ -1,0 +1,13 @@
+{
+  "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+  "temperature": 0.5,
+  "ok": true,
+  "stopReason": "end_turn",
+  "usage": {
+    "inputTokens": 14,
+    "outputTokens": 4,
+    "totalTokens": 18,
+    "cacheReadInputTokens": 0,
+    "cacheWriteInputTokens": 0
+  }
+}

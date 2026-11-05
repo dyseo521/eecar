@@ -118,6 +118,34 @@
 
 ---
 
+### E-18 후보 모델 실측 방법 · 2026-11-05 · 측정
+
+- **경로**: 프로덕션과 같은 코드를 쓴다(`search-llm.ts` 프롬프트·파싱, `invokeClaude`, Titan 평균 임베딩, vector-search와 같은 prod-hybrid). 실행기는 `eval/ts/llm-candidates.ts`, 리포트 생성은 `eecar_eval.llm_candidates`다.
+- **호출 간격을 분당 40회로 제한한다**
+  - 계정 쿼터가 global cross-region 분당 요청 50이다(Haiku 4.5, Sonnet 4.6 모두, Service Quotas 조회).
+  - 제한 없이 동시 4개로 첫 실행을 했을 때 SDK 재시도 3회 후에도 쿼리 확장 21/91, 결과 설명 14/20이 `ThrottlingException`으로 실패했다. 이 상태로는 파싱 성공률과 지연을 잴 수 없다.
+- **결과 설명 비교 조건**: 모든 모델에 같은 입력(확장 없는 prod-hybrid 상위 10, 정렬한 qid 앞 20개 질의)을 준다.
+- **쿼리 확장 비교 조건**: 확장 결과는 비결정적이므로 Haiku 4.5는 2회 실행해 실행 간 차이를 함께 보고한다. 기준은 확장 없는 prod-hybrid다. 레거시 모델이 차단된 뒤 프로덕션이 실제로 내는 결과가 이것이다.
+
+### E-19 쿼리 확장은 기본값을 끈다 (v2에서 다시 비교) · 2026-11-05 · 측정
+
+- **측정** (`eval/reports/2026-11-05-v1-llm-candidates.md`, 질의 91개, 확장 없는 prod-hybrid 대비 nDCG@10)
+
+| 실행 | Δ | 95% CI | p |
+|---|---:|---|---:|
+| Haiku 4.5 run1 | +0.006 | [−0.014, +0.025] | 0.51 |
+| Haiku 4.5 run2 | +0.015 | [−0.003, +0.033] | 0.10 |
+| Sonnet 4.6 | +0.012 | [−0.010, +0.034] | 0.30 |
+
+  - 모든 신뢰구간이 0을 포함한다. 이득이 있더라도 상한이 약 +0.03이다.
+  - 실행 간 확장 결과가 같은 질의는 7/91개뿐이다.
+- **비용** (측정): 캐시를 놓친 검색마다 다음이 순차로 더해진다.
+  - LLM 호출 1회, Haiku 4.5 기준 지연 p50 0.77s
+  - 1천 검색당 약 $0.39
+  - Bedrock 요청 쿼터 소모 (A-13)
+- **결정**: 측정 가능한 이득 없이 지연, 비용, 쿼터만 쓰므로 기본값을 끈다(기능 플래그). "효과 없음이 증명됐다"가 아니라 "v1에서 측정되지 않았다"는 뜻이다.
+- **재검토**: 평가 v2(사람이 쓴 질의, E-05). semantic 질의에서 보인 +0.026 [−0.007, +0.061]을 다시 확인한다.
+
 ## 애플리케이션 (0단계 수정)
 
 ### A-01 심각도 판정: 물리 함수명을 논리 ID로 정규화 · 2026-11-05 · 측정
@@ -174,3 +202,73 @@
   - 서울 리전 Bedrock에서 `anthropic.claude-3-haiku-20240307-v1:0`과 `claude-3-5-sonnet-20241022-v2:0`은 모두 LEGACY다. 3.5 Sonnet v2는 INFERENCE_PROFILE로만 호출할 수 있다(`aws bedrock list-foundation-models`).
   - 프로덕션 로그(2026-11-04)에 쿼리 확장과 결과 설명 호출이 `ResourceNotFoundException: ... marked by provider as Legacy`로 실패한 기록이 있다. 응답은 폴백으로 성공 처리됐다.
 - **대상 모델 선정**: 아직 정하지 않았다. 후보 모델별로 쿼리 확장 효과, 지연, 비용을 평가 하네스로 비교해서 정한다.
+- **추가 측정 (2026-11-05)**
+  - 레거시 모델 차단 사유는 응답 메시지에 그대로 있다: "not actively using the model in the last **30 days**". 프로덕션에 트래픽이 없던 것 자체가 원인이다.
+  - 그래서 LEGACY 모델(Sonnet 4.5 포함)은 호출이 되더라도 후보에서 뺀다.
+
+### A-12 Claude 5.x 모델 접근: 원인은 미수락 이용 약정 · 2026-11-05 · 측정
+
+- **증상**: `global.anthropic.claude-haiku-5-5`·`claude-sonnet-5-5` 호출이 `AccessDeniedException: ... is not available for this account`로 실패한다. 4.7 이후 모델과 5.x 모두 같다. Haiku 4.5, Sonnet 4.6, Opus 4.5·4.6은 동작한다.
+- **원인** (`bedrock:GetFoundationModelAvailability`, boto3 1.43)
+
+| 모델 | 약정(agreement) | 권한 | 자격 | 리전 |
+|---|---|---|---|---|
+| Haiku 4.5, Sonnet 4.6 | AVAILABLE | AUTHORIZED | AVAILABLE | AVAILABLE |
+| Haiku 5.5, Sonnet 5.5 | **NOT_AVAILABLE** | AUTHORIZED | AVAILABLE | AVAILABLE |
+
+  권한, 자격, 리전 가용성은 모두 갖춰져 있고 **이용 약정만 수락하지 않은 상태**다.
+- **해결 방법**: Marketplace offer 약정을 수락한다. 콘솔의 Bedrock 모델 접근 화면이나 `CreateFoundationModelAgreement(modelId, offerToken)`으로 할 수 있다. 현재 IAM 사용자에게 필요한 권한이 있다(`iam simulate-principal-policy` 결과 allowed).
+- **약정 조건** (offer 요금표, 1M 토큰당 USD, Global Standard)
+
+| 모델 | 입력 | 출력 |
+|---|---:|---:|
+| Haiku 5.5 | 0.1 | 0.5 |
+| Haiku 4.5 (비교) | 1 | 5 |
+| Sonnet 5.5 | 2 | 10 |
+
+  사용량 기반 요금이고 선불 비용은 없다. "No refunds" 조건이 붙어 있다. Haiku 5.5는 Haiku 4.5보다 입출력 단가가 **10배 낮다**.
+- **약정 수락 후 (사용자 승인, 2026-11-05)**
+  - `CreateFoundationModelAgreement`로 두 모델의 약정을 수락했다. 약 60초 뒤 상태가 AVAILABLE이 됐다.
+  - 그 뒤 5분 동안 재시도해도 InvokeModel·Converse 호출은 계속 `not available for this account`였다. **약정은 원인이 아니었다.**
+- **실제 원인: 계정 단위 접근 제한**
+  - Anthropic 공식 문서("Claude in Amazon Bedrock (Opus 4.7 and later)")에 따르면 4.7 이후 모델은 새 Messages 엔드포인트 `bedrock-mantle`로 제공된다. 접근 기준은 Amazon이 모델별로 정한다. 문서상 Sonnet 5, Opus 4.8, Haiku 4.5는 "모든 고객에게 열림"이고, Haiku 5.5와 Sonnet 5.5는 "See Access"다.
+  - 새 엔드포인트를 직접 호출했다(`AnthropicBedrockMantle`, IAM `bedrock-mantle:CreateInference` 허용 확인).
+
+| 리전 | 결과 |
+|---|---|
+| ap-northeast-2 | Haiku 5.5·Sonnet 5.5·Haiku 4.5: 404 "does not exist" / Sonnet 5: 403 "not available for this account" |
+| us-east-1 | Sonnet 5·Haiku 4.5·Opus 4.8 (모두 "열림" 모델): 403 "not available for this account" / Haiku 5.5·Sonnet 5.5: 404 |
+
+  - 결론: 문서상 모든 고객에게 열린 모델까지 막혀 있으므로 **이 계정이 새 엔드포인트를 쓸 수 없는 상태**다. 셀프서비스로 해결할 방법은 찾지 못했다. 커뮤니티(re:Post)에도 같은 증상과 "사용량에 따라 점진적으로 확대된다"는 언급이 있지만, 원문을 열지 못해 2차 출처로만 남긴다.
+  - 조치: AWS Support 케이스(Account and billing)로 계정 활성화를 요청한다. 사용자가 진행한다.
+  - 영향: 약정은 사용량 기반이라 호출이 없으면 비용이 없다.
+- **결정**: 교체 후보는 지금 호출 가능한 ACTIVE 모델인 **Haiku 4.5**(InvokeModel·global profile)와 비교용 **Sonnet 4.6**으로 정한다. 계정이 활성화되면 Haiku 5.5를 같은 평가 절차로 다시 비교한다. Haiku 5.5의 단가는 Haiku 4.5의 1/10이다.
+
+### A-13 Bedrock 요청 쿼터가 검색 처리량의 상한이다 · 2026-11-05 · 측정
+
+- **측정**
+  - global cross-region 분당 요청 쿼터가 50이다(Haiku 4.5, Sonnet 4.6, 조정 가능, Service Quotas 조회).
+  - 캐시를 놓친 검색 1회는 Claude를 2회 호출한다(쿼리 확장 1 + 결과 설명 1).
+  - 따라서 캐시를 놓친 검색이 **분당 약 25회**를 넘으면 스로틀링이 시작된다.
+  - 실측: 제한 없이 동시 4개로 호출하자 SDK 재시도 3회 후에도 확장 21/91, 설명 14/20이 실패했다. 포트폴리오 스크린샷의 `BedrockThrottling` CRITICAL 알림과 같은 종류다.
+- **결정**: 쿼터 증설보다 호출 수를 줄이는 쪽을 먼저 한다. 확장의 효과를 측정해 효과가 없으면 끄고(E-19), 설명은 응답 경로에서 분리하는 것(C-08)을 검토한다.
+- **재검토**: 실사용 트래픽이 생기면 쿼터와 호출 수를 함께 다시 계산한다.
+
+### A-14 검색 LLM 교체 모델은 Haiku 4.5로 하고, 결과 설명은 응답 경로에서 분리한다 · 2026-11-05 · 측정 + 판단
+
+- **후보**: 이 계정에서 호출할 수 있는 ACTIVE 모델인 Haiku 4.5와 Sonnet 4.6(global inference profile). 5.x는 계정 접근이 막혀 있다(A-12).
+- **측정** (결과 설명, 같은 입력 20개)
+
+| 지표 | Haiku 4.5 | Sonnet 4.6 |
+|---|---|---|
+| 형식 유효 (설명 정확히 10개) | 20/20 | 20/20 |
+| 지연 p50 | 1.78s | 2.71s |
+| 지연 p95 | 8.90s (4/20이 6.7~9.0s) | 3.29s |
+| 1천 검색당 LLM 비용 | $2.26 | $6.94 |
+| 단가 (입력/출력, 1M 토큰당) | $1 / $5 | $3 / $15 |
+
+  단가 출처는 Bedrock 약정 offer 요금표(APN2 Global)다. 두 모델 모두 Converse에 temperature를 넣은 호출을 받아들였다.
+- **판단**: 설명 품질은 평가하지 않았다(judge 없음). 형식, 지연, 비용 기준으로 Haiku 4.5를 고른다. Haiku 4.5의 꼬리 지연은 응답 경로 분리(C-08)로 사용자 영향을 없애는 쪽이 모델 교체보다 낫다고 판단했다.
+- **재검토**
+  - 계정에서 Haiku 5.5가 열리면(단가가 1/10) 같은 하네스로 다시 비교한다.
+  - 설명 품질 평가 기준을 만들면 모델을 다시 비교한다.
