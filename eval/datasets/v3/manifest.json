@@ -1,0 +1,15 @@
+{
+  "version": "v3",
+  "documents": 300,
+  "queries": 160,
+  "queries_by_source": {
+    "holdout-blind": 160
+  },
+  "judgments": 5175,
+  "max_relevant_per_query": 40,
+  "sha256": {
+    "corpus.jsonl": "5abdfeb1047c146774954395f3dbacce000a3f957f25810ab59d6718462391c2",
+    "queries.jsonl": "c785527ada17aee5550a34f6ddd1d3dfeb6a8a15294d0f41ebfa9267f2e74154",
+    "qrels.jsonl": "fc1e4ff1c21fcb10b6e9723abf36425dba2a28612fdb52d054efc6702fd43312"
+  }
+}
