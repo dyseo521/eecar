@@ -5,19 +5,32 @@
  *   npx tsx eval/ts/search-cli.ts --mode bm25 --dataset eval/datasets/v1 --out run.jsonl [--top 100]
  *
  * mode
- *   bm25         전체 코퍼스에 프로덕션 BM25 적용 (토크나이저·점수식·문서 텍스트 동일)
- *   vector       캐시된 Titan 임베딩으로 전체 코퍼스 코사인 검색 (findTopKSimilar)
- *   prod-hybrid  vector-search Lambda 4~8단계 재현:
- *                벡터 상위 topK*2 후보 → 후보 안에서만 BM25 → α=0.7 결합 → 상위 topK
- *                (쿼리 확장, 캐시, 필터, 설명 생성은 제외)
+ *   bm25           전체 코퍼스에 프로덕션 BM25 색인(Bm25Index) 적용. 문서 텍스트는 buildSearchText
+ *   vector         캐시된 Titan 임베딩으로 전체 코퍼스 코사인 검색 (findTopKSimilar). 문서 임베딩은 buildEmbeddingText
+ *   prod-hybrid    vector-search Lambda 4~7단계 재현 (2026-11 이후 구조, DECISION_LOG E-23):
+ *                  벡터 상위 100 + BM25 상위 100 → fuseRankedLists(α=0.5) → 상위 topK
+ *   legacy-hybrid  이전 프로덕션 구조 (벡터 상위 topK*2 → 후보 안에서만 BM25 → α=0.7 → 상위 topK).
+ *                  문서 텍스트도 이전 정의(preparePartForBM25, preparePartText 임베딩)
+ *   (쿼리 확장, 캐시, 필터, 설명 생성은 제외)
  *
- * vector, prod-hybrid는 build-embeddings.ts로 만든 임베딩 캐시가 필요하다.
+ * vector, prod-hybrid, legacy-hybrid는 build-embeddings.ts로 만든 임베딩 캐시가 필요하다.
+ *   질의·이전 문서 임베딩: build-embeddings --dataset <dir>
+ *   현재 문서 임베딩:      build-embeddings --dataset <dir> --doc-text v2-notrade
  */
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { calculateBM25Scores, hybridSearch, preparePartForBM25 } from '../../backend/src/utils/search.js';
+import {
+  Bm25Index,
+  CANDIDATES_PER_RETRIEVER,
+  fuseRankedLists,
+  HYBRID_ALPHA,
+  hybridSearch,
+  preparePartForBM25,
+} from '../../backend/src/utils/search.js';
+import { buildSearchText } from '../../backend/src/utils/search-document.js';
 
-type Mode = 'bm25' | 'vector' | 'prod-hybrid';
+type Mode = 'bm25' | 'vector' | 'prod-hybrid' | 'legacy-hybrid';
+const MODES: Mode[] = ['bm25', 'vector', 'prod-hybrid', 'legacy-hybrid'];
 
 interface Args {
   mode: Mode;
@@ -50,6 +63,8 @@ interface EmbeddingCache {
 }
 
 export const EMBEDDING_CACHE_FILE = 'embeddings/titan-embed-text-v2.json';
+/** 현재 프로덕션 문서 임베딩 (buildEmbeddingText) */
+export const DOC_EMBEDDING_CACHE_FILE = 'embeddings/titan-embed-text-v2.doc-v2-notrade.json';
 
 function parseArgs(argv: string[]): Args {
   const get = (name: string, fallback?: string): string => {
@@ -59,7 +74,7 @@ function parseArgs(argv: string[]): Args {
     throw new Error(`missing --${name}`);
   };
   const mode = get('mode') as Mode;
-  if (!['bm25', 'vector', 'prod-hybrid'].includes(mode)) {
+  if (!MODES.includes(mode)) {
     throw new Error(`unknown mode: ${mode}`);
   }
   return {
@@ -79,27 +94,30 @@ function readJsonl<T>(path: string): T[] {
     .map(line => JSON.parse(line) as T);
 }
 
-function loadEmbeddings(dataset: string): EmbeddingCache {
-  const path = join(dataset, EMBEDDING_CACHE_FILE);
+function readCache(path: string, hint: string): any {
   if (!existsSync(path)) {
-    throw new Error(
-      `embedding cache not found: ${path}\n` +
-        'run `npx tsx eval/ts/build-embeddings.ts --dataset <dir>` with AWS credentials first'
-    );
+    throw new Error(`embedding cache not found: ${path}\nrun \`npx tsx eval/ts/build-embeddings.ts ${hint}\` with AWS credentials first`);
   }
-  return JSON.parse(readFileSync(path, 'utf-8')) as EmbeddingCache;
+  return JSON.parse(readFileSync(path, 'utf-8'));
+}
+
+/** legacy=true면 이전 문서 임베딩(preparePartText), 아니면 현재 문서 임베딩(buildEmbeddingText) */
+function loadEmbeddings(dataset: string, legacy = false): EmbeddingCache {
+  const base = readCache(join(dataset, EMBEDDING_CACHE_FILE), `--dataset ${dataset}`) as EmbeddingCache;
+  if (legacy) return base;
+  const docs = readCache(join(dataset, DOC_EMBEDDING_CACHE_FILE), `--dataset ${dataset} --doc-text v2-notrade`).docs;
+  return { ...base, docs };
+}
+
+function bm25IndexOf(parts: Part[]): Bm25Index {
+  return Bm25Index.fromTexts(parts.map(p => ({ id: p.partId, text: buildSearchText(p) })));
 }
 
 function runBm25(parts: Part[], queries: Query[], top: number): Map<string, Ranked[]> {
-  const documents = parts.map(p => ({ id: p.partId, text: preparePartForBM25(p) }));
+  const index = bm25IndexOf(parts);
   const runs = new Map<string, Ranked[]>();
   for (const q of queries) {
-    const ranked = calculateBM25Scores(q.text, documents)
-      .filter(s => s.bm25Score > 0) // 점수 0은 검색되지 않은 문서로 본다
-      .sort((a, b) => b.bm25Score - a.bm25Score)
-      .slice(0, top)
-      .map(s => ({ partId: s.id, score: s.bm25Score }));
-    runs.set(q.id, ranked);
+    runs.set(q.id, index.search(q.text, top).map(h => ({ partId: h.id, score: h.score })));
   }
   return runs;
 }
@@ -123,6 +141,26 @@ async function runVector(
 }
 
 async function runProdHybrid(
+  parts: Part[],
+  queries: Query[],
+  cache: EmbeddingCache,
+  topK: number
+): Promise<Map<string, Ranked[]>> {
+  const { findTopKSimilar } = await import('../../backend/src/utils/bedrock.js');
+  const vectors = parts.map(p => ({ id: p.partId, vector: cache.docs[p.partId] }));
+  const index = bm25IndexOf(parts);
+  const runs = new Map<string, Ranked[]>();
+  for (const q of queries) {
+    // vector-search/index.ts Step 4~7 (필터 없음)
+    const vectorMatches = findTopKSimilar(cache.queries[q.id], vectors, CANDIDATES_PER_RETRIEVER);
+    const bm25Matches = index.search(q.text, CANDIDATES_PER_RETRIEVER);
+    const fused = fuseRankedLists(vectorMatches, bm25Matches, HYBRID_ALPHA).slice(0, topK);
+    runs.set(q.id, fused.map(m => ({ partId: m.id, score: m.score })));
+  }
+  return runs;
+}
+
+async function runLegacyHybrid(
   parts: Part[],
   queries: Query[],
   cache: EmbeddingCache,
@@ -153,8 +191,10 @@ async function main(): Promise<void> {
     runs = runBm25(parts, queries, args.top);
   } else if (args.mode === 'vector') {
     runs = await runVector(parts, queries, loadEmbeddings(args.dataset), args.top);
+  } else if (args.mode === 'prod-hybrid') {
+    runs = await runProdHybrid(parts, queries, loadEmbeddings(args.dataset), args.prodTopK);
   } else {
-    runs = await runProdHybrid(parts, queries, loadEmbeddings(args.dataset), args.prodTopK, args.alpha);
+    runs = await runLegacyHybrid(parts, queries, loadEmbeddings(args.dataset, true), args.prodTopK, args.alpha);
   }
 
   const lines = queries.map(q => JSON.stringify({ qid: q.id, results: runs.get(q.id) ?? [] }));

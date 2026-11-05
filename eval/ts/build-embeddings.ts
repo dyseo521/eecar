@@ -7,6 +7,14 @@
  * --reuse-docs-from: 같은 부품(partId·문서 텍스트 동일)의 임베딩을 다른 데이터셋 캐시에서 가져온다.
  * 문서 텍스트가 다르면 재사용하지 않고 새로 임베딩한다.
  *
+ *   npx tsx eval/ts/build-embeddings.ts --dataset eval/datasets/v2 --doc-text v2
+ *
+ * --doc-text: 문서 텍스트 정의를 바꿔 문서 임베딩만 다시 만든다 (질의 임베딩은 기본 캐시를 그대로 쓴다).
+ *   legacy     preparePartText (기본, 기존 캐시 파일)
+ *   v2         buildSearchText (search-document.ts)       → embeddings/titan-embed-text-v2.doc-v2.json
+ *   v2-noalias buildSearchText, 표기 변형 확장 없음       → embeddings/titan-embed-text-v2.doc-v2-noalias.json
+ *   v2-notrade buildSearchText, 거래 조건 줄 없음         → embeddings/titan-embed-text-v2.doc-v2-notrade.json
+ *
  * 프로덕션과 같은 함수를 쓴다.
  * - 문서: preparePartText(part) → generateEmbedding  (part-registration과 동일)
  * - 질의: generateEmbedding(query.text)             (쿼리 확장 없는 경우)
@@ -15,6 +23,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { generateEmbedding, preparePartText } from '../../backend/src/utils/bedrock.js';
+import { buildSearchText } from '../../backend/src/utils/search-document.js';
 
 const CACHE_FILE = 'embeddings/titan-embed-text-v2.json';
 const CONCURRENCY = 4;
@@ -50,6 +59,27 @@ async function main(): Promise<void> {
   };
   const dataset = arg('dataset') ?? 'eval/datasets/v1';
   const reuseFrom = arg('reuse-docs-from');
+  const docText = arg('doc-text') ?? 'legacy';
+  const DOC_TEXT: Record<string, (part: any) => string> = {
+    legacy: preparePartText,
+    v2: part => buildSearchText(part),
+    'v2-noalias': part => buildSearchText(part, { aliases: false }),
+    'v2-notrade': part => buildSearchText(part, { trade: false }),
+  };
+  if (!DOC_TEXT[docText]) throw new Error(`unknown --doc-text: ${docText}`);
+  if (docText !== 'legacy') {
+    const parts = readJsonl<{ part: { partId: string } }>(join(dataset, 'corpus.jsonl')).map(r => r.part);
+    const vectors = await mapWithConcurrency(parts, CONCURRENCY, p => generateEmbedding(DOC_TEXT[docText](p)));
+    const out = join(dataset, CACHE_FILE.replace('.json', `.doc-${docText}.json`));
+    writeFileSync(out, JSON.stringify({
+      model: 'amazon.titan-embed-text-v2:0',
+      docText,
+      createdAt: new Date().toISOString(),
+      docs: Object.fromEntries(parts.map((p, i) => [p.partId, round(vectors[i])])),
+    }), 'utf-8');
+    console.log(`wrote ${parts.length} document embeddings (${docText}) to ${out}`);
+    return;
+  }
 
   const parts = readJsonl<{ part: { partId: string } }>(join(dataset, 'corpus.jsonl')).map(r => r.part);
   const queries = readJsonl<{ id: string; text: string }>(join(dataset, 'queries.jsonl'));
