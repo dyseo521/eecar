@@ -1,5 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, UpdateCommand, BatchGetCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, UpdateCommand, BatchGetCommand } from '@aws-sdk/lib-dynamodb';
 
 const client = new DynamoDBClient({});
 export const ddbDocClient = DynamoDBDocumentClient.from(client);
@@ -113,34 +113,40 @@ export async function updateItem(
 /**
  * Batch get items
  */
-export async function batchGetItems(keys: Array<{ pk: string; sk: string }>): Promise<DynamoDBItem[]> {
-  if (keys.length === 0) return [];
-
-  const command = new BatchGetCommand({
-    RequestItems: {
-      [TABLE_NAME]: {
-        Keys: keys.map(k => ({ PK: k.pk, SK: k.sk })),
-      },
-    },
-  });
-
-  const response = await ddbDocClient.send(command);
-  return response.Responses?.[TABLE_NAME] as DynamoDBItem[] || [];
-}
+const BATCH_GET_MAX_KEYS = 100; // DynamoDB BatchGetItem hard limit
+const BATCH_GET_MAX_ATTEMPTS = 4;
 
 /**
- * Scan table with optional filter
+ * Batch get items.
+ * Splits into chunks of 100 keys and retries UnprocessedKeys with backoff,
+ * which BatchGetItem returns instead of throwing when it is throttled.
  */
-export async function scanTable(filterExpression?: string, expressionAttributeValues?: Record<string, any>, limit?: number): Promise<DynamoDBItem[]> {
-  const command = new ScanCommand({
-    TableName: TABLE_NAME,
-    ...(filterExpression && { FilterExpression: filterExpression }),
-    ...(expressionAttributeValues && { ExpressionAttributeValues: expressionAttributeValues }),
-    ...(limit && { Limit: limit }),
-  });
+export async function batchGetItems(keys: Array<{ pk: string; sk: string }>): Promise<DynamoDBItem[]> {
+  const results: DynamoDBItem[] = [];
 
-  const response = await ddbDocClient.send(command);
-  return response.Items as DynamoDBItem[] || [];
+  for (let i = 0; i < keys.length; i += BATCH_GET_MAX_KEYS) {
+    let pending: Record<string, unknown>[] = keys
+      .slice(i, i + BATCH_GET_MAX_KEYS)
+      .map(k => ({ PK: k.pk, SK: k.sk }));
+
+    for (let attempt = 0; pending.length > 0; attempt++) {
+      if (attempt >= BATCH_GET_MAX_ATTEMPTS) {
+        throw new Error(`BatchGetItem left ${pending.length} keys unprocessed after ${BATCH_GET_MAX_ATTEMPTS} attempts`);
+      }
+      if (attempt > 0) {
+        await new Promise(resolve => setTimeout(resolve, 50 * 2 ** attempt));
+      }
+
+      const response = await ddbDocClient.send(new BatchGetCommand({
+        RequestItems: { [TABLE_NAME]: { Keys: pending } },
+      }));
+
+      results.push(...((response.Responses?.[TABLE_NAME] as DynamoDBItem[]) || []));
+      pending = (response.UnprocessedKeys?.[TABLE_NAME]?.Keys as Record<string, unknown>[]) || [];
+    }
+  }
+
+  return results;
 }
 
 export interface PaginatedResult {
@@ -203,38 +209,6 @@ export async function queryAllMetadataWithPagination(
   const response = await ddbDocClient.send(command);
   return {
     items: response.Items as DynamoDBItem[] || [],
-    lastKey: response.LastEvaluatedKey || null,
-  };
-}
-
-/**
- * Scan table with pagination support (DEPRECATED - use queryAllMetadataWithPagination)
- * Returns METADATA items only, sorted by createdAt descending
- */
-export async function scanTableWithPagination(
-  limit: number,
-  exclusiveStartKey?: Record<string, any>
-): Promise<PaginatedResult> {
-  const command = new ScanCommand({
-    TableName: TABLE_NAME,
-    FilterExpression: 'SK = :sk',
-    ExpressionAttributeValues: { ':sk': 'METADATA' },
-    Limit: limit * 5, // Scan more to account for filtering
-    ...(exclusiveStartKey && { ExclusiveStartKey: exclusiveStartKey }),
-  });
-
-  const response = await ddbDocClient.send(command);
-  const items = response.Items as DynamoDBItem[] || [];
-
-  // Sort by createdAt descending
-  items.sort((a, b) => {
-    const dateA = new Date(a.createdAt || 0).getTime();
-    const dateB = new Date(b.createdAt || 0).getTime();
-    return dateB - dateA;
-  });
-
-  return {
-    items: items.slice(0, limit),
     lastKey: response.LastEvaluatedKey || null,
   };
 }

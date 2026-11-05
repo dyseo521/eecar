@@ -1,66 +1,40 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import { DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
-import { unmarshall } from '@aws-sdk/util-dynamodb';
-import {
+import type {
   Part,
   BatteryHealthInfo,
   BatteryFilters,
   SearchResponse,
   SearchResult,
 } from 'eecar-shared';
-import { successResponse, errorResponse } from '/opt/nodejs/utils/response.js';
-
-const dynamodb = new DynamoDBClient({
-  region: process.env.AWS_REGION || 'us-east-1',
-  ...(process.env.DYNAMODB_ENDPOINT && {
-    endpoint: process.env.DYNAMODB_ENDPOINT,
-  }),
-});
-
-const PARTS_TABLE = process.env.PARTS_TABLE_NAME || 'eecar-parts-table-local';
+import { successResponse, errorResponse, parseJsonBody } from '/opt/nodejs/utils/response.js';
+import { loadPartsWithDetails } from '/opt/nodejs/utils/parts.js';
 
 /**
  * Lambda handler for battery health assessment
  * Searches and evaluates batteries based on SOH and other health metrics
  */
 export const handler: APIGatewayProxyHandler = async (event) => {
+  const parsed = parseJsonBody<{ batteryFilters?: BatteryFilters; topK?: number }>(event);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+  const { batteryFilters, topK = 10 } = parsed.body;
+
   try {
-    const body = JSON.parse(event.body || '{}');
-    const { batteryFilters, topK = 10 } = body as {
-      batteryFilters?: BatteryFilters;
-      topK?: number;
-    };
+    // Battery METADATA via GSI1 (all pages), joined with BATTERY_HEALTH detail items
+    const parts = await loadPartsWithDetails({ category: 'battery', details: ['BATTERY_HEALTH'] });
 
-    // Scan for battery parts
-    const scanCommand = new ScanCommand({
-      TableName: PARTS_TABLE,
-    });
-
-    const response = await dynamodb.send(scanCommand);
-    const allItems = response.Items?.map((item) => unmarshall(item)) || [];
-
-    // Filter battery parts
-    const batteryParts = allItems
+    const batteryParts = parts
       .filter((item) => {
-        // Only process PART#*#METADATA items with battery category
-        if (!item.PK?.startsWith('PART#') || !item.SK?.endsWith('#METADATA')) {
-          return false;
-        }
-
-        const part = item as Part;
-        if (part.category !== 'battery') {
-          return false;
-        }
-
         // Apply battery filters if provided
         if (batteryFilters) {
-          return checkBatteryFilters(part.batteryHealth, batteryFilters);
+          return checkBatteryFilters((item as unknown as Part).batteryHealth, batteryFilters);
         }
 
         return true;
       })
       .map((item) => {
-        const part = item as Part;
+        const part = item as unknown as Part;
         const batteryHealth = part.batteryHealth;
 
         // If no battery health info, generate basic assessment
