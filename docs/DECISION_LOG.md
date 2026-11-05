@@ -206,7 +206,9 @@
   - 레거시 모델 차단 사유는 응답 메시지에 그대로 있다: "not actively using the model in the last **30 days**". 프로덕션에 트래픽이 없던 것 자체가 원인이다.
   - 그래서 LEGACY 모델(Sonnet 4.5 포함)은 호출이 되더라도 후보에서 뺀다.
 
-### A-12 Claude 5.x 모델 접근: 원인은 미수락 이용 약정 · 2026-11-05 · 측정
+### A-12 Claude 4.7 이후 모델 접근 불가: 원인은 계정 쿼터 0 (처음에는 약정으로 오판) · 2026-11-05 · 측정
+
+> **정정**: 처음에는 이용 약정 미수락을 원인으로 판단했다. 그러나 약정을 수락한 뒤에도 호출이 막혔다. 아래 "쿼터 조사"가 최종 결론이다.
 
 - **증상**: `global.anthropic.claude-haiku-5-5`·`claude-sonnet-5-5` 호출이 `AccessDeniedException: ... is not available for this account`로 실패한다. 4.7 이후 모델과 5.x 모두 같다. Haiku 4.5, Sonnet 4.6, Opus 4.5·4.6은 동작한다.
 - **원인** (`bedrock:GetFoundationModelAvailability`, boto3 1.43)
@@ -243,6 +245,20 @@
   - 조치: AWS Support 케이스(Account and billing)로 계정 활성화를 요청한다. 사용자가 진행한다.
   - 영향: 약정은 사용량 기반이라 호출이 없으면 비용이 없다.
 - **결정**: 교체 후보는 지금 호출 가능한 ACTIVE 모델인 **Haiku 4.5**(InvokeModel·global profile)와 비교용 **Sonnet 4.6**으로 정한다. 계정이 활성화되면 Haiku 5.5를 같은 평가 절차로 다시 비교한다. Haiku 5.5의 단가는 Haiku 4.5의 1/10이다.
+- **쿼터 조사로 확인한 최종 원인** (2026-11-05, Service Quotas `list_service_quotas` / `list_aws_default_service_quotas`, ap-northeast-2·us-east-1 결과 동일)
+
+| 모델 (global cross-region 분당 토큰) | 계정 적용값 | AWS 기본값 | 호출 |
+|---|---:|---:|---|
+| Haiku 4.5 | 5,000,000 | 5,000,000 | 됨 |
+| Sonnet 4.6 | 6,000,000 | 6,000,000 | 됨 |
+| Haiku 5.5 | **0** | 10,000,000 | 막힘 |
+| Sonnet 5.5 | **0** | 6,000,000 | 막힘 |
+| Sonnet 5, Opus 4.7·4.8·5.5 | **0** | 6M~30M | 막힘 |
+
+  - 동작하는 모델도 분당 요청 수는 기본 10,000이 아니라 **50**으로 낮게 잡혀 있다(A-13).
+  - 쿼터 증설 요청에 기본값 이하의 값을 넣으면 "기본값보다 큰 값을 넣어야 한다"며 거부된다. 즉 0은 기본값보다 낮게 조정된 상태가 아니라 **계정에 대한 의도적인 제한**으로 보인다. 사용 이력이 적은 계정에 대한 AWS의 제한으로 추정하지만, 공식 근거는 없다.
+  - 조치: 기본값보다 약간 큰 값으로 증설을 요청했다(Haiku 5.5 1,050만, Sonnet 5.5 650만). 2분 뒤 자동 승인 없이 AWS 지원 케이스로 넘어갔다. 케이스 179388130300834(Haiku 5.5), 179388130400997(Sonnet 5.5), 비용 없음.
+  - 그 사이 적용값은 0으로 그대로였고 호출도 계속 거부됐다. 승인되면 A-14 하네스로 Haiku 5.5를 다시 비교한다.
 
 ### A-13 Bedrock 요청 쿼터가 검색 처리량의 상한이다 · 2026-11-05 · 측정
 
@@ -272,3 +288,35 @@
 - **재검토**
   - 계정에서 Haiku 5.5가 열리면(단가가 1/10) 같은 하네스로 다시 비교한다.
   - 설명 품질 평가 기준을 만들면 모델을 다시 비교한다.
+
+### A-15 지표는 EMF를 stdout에 직접 쓴다 (Powertools 미도입) · 2026-11-05 · 공식 제약 + 판단
+
+- **공식 제약**
+  - CloudWatch EMF는 로그 이벤트 하나가 JSON 객체여야 지표로 추출된다. Node.js Lambda의 `console.log`는 "타임스탬프 요청ID INFO" 접두어를 붙인다. 그래서 `process.stdout.write`로 JSON 한 줄을 쓴다.
+  - `utils/emf.ts`는 Lambda Layer에 들어간다. Layer 코드는 함수의 `node_modules`를 해석하지 못한다. AWS SDK는 런타임에 내장돼 있어 예외다.
+- **판단**: 지표가 몇 개뿐이라 Powertools를 Layer에 넣는 대신 20줄짜리 유틸로 시작한다. 2주차에 Powertools(Logger·Idempotency)를 도입할 때 Metrics로 옮길지 다시 판단한다.
+
+### A-16 C-09 배포 설정 · 2026-11-05 · 측정 + 판단
+
+- **모델**: `BEDROCK_MODEL_ID`, 에이전트 `AGENT_MODEL_ID`는 Haiku 4.5, `AGENT_COMPLEX_MODEL_ID`는 Sonnet 4.6. 모두 global profile이다. 근거는 A-14, 측정 결과다.
+- **쿼리 확장**: `QUERY_EXPANSION_ENABLED=false`. 측정 결과 품질 이득이 없었다(E-18, E-19). 끄면 캐시를 놓친 검색의 Claude 호출이 2회에서 1회로 줄어 A-13의 처리량 한도가 2배가 된다.
+- **결과 설명은 이번에는 응답 경로에 남긴다** (판단)
+  - 분리(C-08)하려면 별도 엔드포인트와 프론트엔드의 지연 로딩이 필요하다.
+  - 이번 배포의 목적은 꺼진 기능을 복구하는 것이다.
+  - 지연 p95 8.9초(A-14)는 C-08에서 해결한다.
+- **IAM**: global profile은 요청을 다른 리전의 모델로 라우팅한다. 그래서 `inference-profile/*`(자기 리전), `foundation-model/*`(모든 리전), 리전 없는 foundation-model ARN을 허용한다.
+  - 검증: 배포 후 실제 호출로 확인한다.
+  - 재검토: 특정 모델 ARN으로 좁힌다.
+- **폴백 알람**: 지표는 `EECAR/Search LLMFallback`, 합계 1 이상이 5분간 지속되면 ALARM, 데이터가 없으면 notBreaching이다. **알람 액션은 두지 않는다** (판단).
+  - 기존 SNS 구독자가 팀 공용 메일이라 알림이 그쪽으로 간다.
+  - 2개월차 SLO 알림 경로(Slack)를 만들 때 함께 연결한다.
+  - 폴백 로그(`console.error`)는 지금도 Slack 알림 파이프라인으로 간다. 이제 BedrockModelUnavailable, CRITICAL로 분류된다.
+- **staging은 보류한다** (판단)
+  - 프로덕션에 실사용자가 없다.
+  - 온라인 평가용 고정 코퍼스를 적재해야 하는 시점(평가 v2)에 분리한다.
+
+### A-17 Lambda 런타임 nodejs20.x 지원 종료 대응 필요 · 2026-11-05 · 공식 제약
+
+- `sam validate --lint`(cfn-lint W2531) 결과: nodejs20.x는 2026-04-30에 지원이 종료됐다. 2027-02-01부터 생성, **2027-03-03부터 업데이트가 막힌다**.
+- 모델 퇴역(C-09)과 같은 종류의 수명 주기 위험이다.
+- **조치**: nodejs22.x 또는 24.x로 올리고, CI(테스트·평가 게이트)로 검증한다. 2027-02 이전, 1개월차 안에 한다.
