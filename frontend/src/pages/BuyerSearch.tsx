@@ -13,7 +13,7 @@ import {
 } from '../constants/categoryImages';
 import { CATEGORIES, EXAMPLE_CASES, CATHODE_TYPES } from '../constants/searchConstants';
 import { createImageErrorHandler } from '../utils/imageUtils';
-import { useFilteredParts } from '../hooks';
+import { useFilteredParts, useSearchExplanations } from '../hooks';
 import { Modal, Button } from '../components/ui';
 
 export default function BuyerSearch() {
@@ -53,10 +53,11 @@ export default function BuyerSearch() {
     queryFn: async () => {
       if (!searchParams) return null;
 
+      // 결과를 먼저 받고 AI 설명은 useSearchExplanations로 따로 받는다 (A-30)
       const response = await fetch(getApiUrl('search'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(searchParams),
+        body: JSON.stringify({ ...searchParams, explain: false }),
       });
 
       if (!response.ok) {
@@ -325,6 +326,13 @@ export default function BuyerSearch() {
   const loadMoreAiResults = useCallback(() => {
     setAiDisplayLimit(prev => prev + 6);
   }, []);
+
+  // 화면에 보이는 AI 검색 결과의 설명만 나중에 불러온다
+  const explainIds = useMemo(
+    () => (searchMode === 'ai' ? displayedAiResults.filter(r => r.reasonSource === 'rules').map(r => r.partId) : []),
+    [displayedAiResults, searchMode]
+  );
+  const { data: explanations, isLoading: isExplaining } = useSearchExplanations(searchParams?.query, explainIds);
 
   return (
     <div className="buyer-search">
@@ -637,8 +645,11 @@ export default function BuyerSearch() {
 
               <div className="parts-grid">
                 {displayedAiResults.map((result, index) => {
-                  const accuracy = result.score * 100;
-                  const isEliteMatch = accuracy >= 85;
+                  // score는 목록 안 상대 점수라 일치도가 아니다. 배지는 규칙으로 확인한 조건 일치만 보여 준다
+                  const matchedCount = result.conditions?.matched.length ?? 0;
+                  const conditionCount = matchedCount + (result.conditions?.mismatched.length ?? 0);
+                  const isEliteMatch = conditionCount > 0 && matchedCount === conditionCount;
+                  const aiReason = explanations?.[result.partId];
                   const isTop1 = index === 0;
                   const isTop3 = index < 3;
                   const part = result.part as Part;
@@ -657,17 +668,22 @@ export default function BuyerSearch() {
                           alt={part.name}
                           onError={createImageErrorHandler(part.category)}
                         />
-                        <div className={`accuracy-badge ${isEliteMatch ? 'elite' : ''}`}>
-                          {accuracy.toFixed(0)}% 일치
-                        </div>
+                        {conditionCount > 0 && (
+                          <div className={`accuracy-badge ${isEliteMatch ? 'elite' : ''}`}>
+                            조건 {matchedCount}/{conditionCount} 일치
+                          </div>
+                        )}
                         <div className="quantity-badge">{part.quantity}개 재고</div>
                       </div>
                       <div className="part-info">
                         <h4>{part.name}</h4>
                         <p className="manufacturer">{part.manufacturer} · {part.model}</p>
                         <p className="price">{part.price?.toLocaleString()}원</p>
-                        {result.reason && (
-                          <p className="ai-reason-compact">{result.reason}</p>
+                        {(aiReason || result.reason) && (
+                          <p className="ai-reason-compact">{aiReason || result.reason}</p>
+                        )}
+                        {!aiReason && result.reasonSource === 'rules' && isExplaining && (
+                          <p className="ai-reason-pending">AI 설명 생성 중…</p>
                         )}
                         <div className="spec-tags">
                           <span className="spec-tag">{part.category}</span>
@@ -1540,6 +1556,12 @@ export default function BuyerSearch() {
         }
 
         /* AI 추천 이유 - 컴팩트 */
+        .ai-reason-pending {
+          font-size: 0.75rem;
+          color: #94a3b8;
+          margin: 0.25rem 0 0;
+        }
+
         .ai-reason-compact {
           margin: 0 0 0.5rem 0;
           font-size: 0.8125rem;
