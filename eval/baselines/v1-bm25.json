@@ -1,0 +1,37 @@
+{
+  "difficulty=easy": {
+    "mrr@10": 0.8798,
+    "ndcg@10": 0.8669,
+    "recall@10": 0.9022
+  },
+  "difficulty=hard": {
+    "mrr@10": 0.5906,
+    "ndcg@10": 0.4914,
+    "recall@10": 0.479
+  },
+  "difficulty=medium": {
+    "mrr@10": 0.8884,
+    "ndcg@10": 0.831,
+    "recall@10": 0.873
+  },
+  "overall": {
+    "mrr@10": 0.8142,
+    "ndcg@10": 0.758,
+    "recall@10": 0.7851
+  },
+  "qtype=keyword": {
+    "mrr@10": 0.8246,
+    "ndcg@10": 0.8125,
+    "recall@10": 0.8906
+  },
+  "qtype=mixed": {
+    "mrr@10": 0.7206,
+    "ndcg@10": 0.6237,
+    "recall@10": 0.6234
+  },
+  "qtype=semantic": {
+    "mrr@10": 0.8639,
+    "ndcg@10": 0.7289,
+    "recall@10": 0.6497
+  }
+}
