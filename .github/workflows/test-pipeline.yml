@@ -112,6 +112,9 @@ jobs:
       - name: Search quality regression gate (production ranking, v3 blind holdout)
         run: cd eval && uv run python -m eecar_eval.gate --dataset v3 --system prod-hybrid
 
+      - name: Search quality regression gate (production ranking, v4 blind holdout)
+        run: cd eval && uv run python -m eecar_eval.gate --dataset v4 --system prod-hybrid
+
   # E2E tests (only on master)
   e2e:
     name: E2E Tests

@@ -1,62 +1,62 @@
 {
   "difficulty=easy": {
-    "mrr@10": 0.9861,
-    "ndcg@10": 0.9612,
+    "mrr@10": 1.0,
+    "ndcg@10": 0.9737,
     "recall@10": 0.8669
   },
   "difficulty=hard": {
-    "mrr@10": 0.7679,
-    "ndcg@10": 0.7467,
-    "recall@10": 0.6756
+    "mrr@10": 0.7571,
+    "ndcg@10": 0.7457,
+    "recall@10": 0.6845
   },
   "difficulty=medium": {
-    "mrr@10": 0.9137,
-    "ndcg@10": 0.8965,
-    "recall@10": 0.8708
+    "mrr@10": 0.9603,
+    "ndcg@10": 0.9258,
+    "recall@10": 0.8787
   },
   "form=keyword": {
-    "mrr@10": 0.9402,
-    "ndcg@10": 0.9391,
+    "mrr@10": 0.9547,
+    "ndcg@10": 0.9496,
     "recall@10": 0.7787
   },
   "form=phrase": {
-    "mrr@10": 0.9353,
-    "ndcg@10": 0.9161,
+    "mrr@10": 0.944,
+    "ndcg@10": 0.9248,
     "recall@10": 0.9425
   },
   "form=sentence": {
-    "mrr@10": 0.8586,
-    "ndcg@10": 0.8217,
-    "recall@10": 0.7712
+    "mrr@10": 0.9143,
+    "ndcg@10": 0.8582,
+    "recall@10": 0.7876
   },
   "overall": {
-    "mrr@10": 0.9099,
-    "ndcg@10": 0.8897,
-    "recall@10": 0.8354
+    "mrr@10": 0.9367,
+    "ndcg@10": 0.9086,
+    "recall@10": 0.8412
   },
   "qtype=keyword": {
-    "mrr@10": 0.9762,
-    "ndcg@10": 0.9625,
+    "mrr@10": 0.9881,
+    "ndcg@10": 0.9757,
     "recall@10": 0.8862
   },
   "qtype=mixed": {
-    "mrr@10": 0.9127,
-    "ndcg@10": 0.8819,
-    "recall@10": 0.8561
+    "mrr@10": 0.9588,
+    "ndcg@10": 0.9119,
+    "recall@10": 0.8669
   },
   "qtype=semantic": {
-    "mrr@10": 0.7018,
-    "ndcg@10": 0.7099,
+    "mrr@10": 0.686,
+    "ndcg@10": 0.696,
     "recall@10": 0.5933
   },
   "segment=A-ess": {
-    "mrr@10": 0.9024,
-    "ndcg@10": 0.8951,
-    "recall@10": 0.814
+    "mrr@10": 0.9571,
+    "ndcg@10": 0.9199,
+    "recall@10": 0.8188
   },
   "segment=B-small-reuse": {
     "mrr@10": 0.8333,
-    "ndcg@10": 0.7769,
+    "ndcg@10": 0.7775,
     "recall@10": 0.6989
   },
   "segment=C-recycling": {
@@ -65,19 +65,19 @@
     "recall@10": 0.7078
   },
   "segment=D-collision": {
-    "mrr@10": 0.9238,
-    "ndcg@10": 0.9012,
+    "mrr@10": 0.981,
+    "ndcg@10": 0.9429,
     "recall@10": 0.9905
   },
   "segment=E-electronics": {
-    "mrr@10": 0.9609,
-    "ndcg@10": 0.9352,
-    "recall@10": 0.9844
+    "mrr@10": 0.9516,
+    "ndcg@10": 0.935,
+    "recall@10": 1.0
   },
   "segment=F-conversion-rnd": {
-    "mrr@10": 0.8939,
-    "ndcg@10": 0.8773,
-    "recall@10": 0.8658
+    "mrr@10": 0.9545,
+    "ndcg@10": 0.9412,
+    "recall@10": 0.8886
   },
   "segment=G-browse": {
     "mrr@10": 1.0,
@@ -85,8 +85,8 @@
     "recall@10": 0.4035
   },
   "source=holdout-blind": {
-    "mrr@10": 0.9099,
-    "ndcg@10": 0.8897,
-    "recall@10": 0.8354
+    "mrr@10": 0.9367,
+    "ndcg@10": 0.9086,
+    "recall@10": 0.8412
   }
 }

@@ -1,68 +1,68 @@
 {
   "difficulty=easy": {
-    "mrr@10": 0.9646,
-    "ndcg@10": 0.9638,
-    "recall@10": 0.9076
+    "mrr@10": 0.9748,
+    "ndcg@10": 0.9698,
+    "recall@10": 0.9154
   },
   "difficulty=hard": {
-    "mrr@10": 0.7678,
-    "ndcg@10": 0.739,
+    "mrr@10": 0.7706,
+    "ndcg@10": 0.7397,
     "recall@10": 0.6487
   },
   "difficulty=medium": {
-    "mrr@10": 0.9376,
-    "ndcg@10": 0.8838,
-    "recall@10": 0.8553
+    "mrr@10": 0.9453,
+    "ndcg@10": 0.8893,
+    "recall@10": 0.8603
   },
   "form=keyword": {
-    "mrr@10": 0.8899,
-    "ndcg@10": 0.8829,
+    "mrr@10": 0.8949,
+    "ndcg@10": 0.882,
     "recall@10": 0.7803
   },
   "form=phrase": {
     "mrr@10": 0.902,
-    "ndcg@10": 0.8654,
-    "recall@10": 0.8688
+    "ndcg@10": 0.8683,
+    "recall@10": 0.8759
   },
   "form=sentence": {
-    "mrr@10": 0.8875,
-    "ndcg@10": 0.8224,
-    "recall@10": 0.7353
+    "mrr@10": 0.912,
+    "ndcg@10": 0.8399,
+    "recall@10": 0.7461
   },
   "form=v1": {
     "mrr@10": 0.9662,
-    "ndcg@10": 0.9353,
+    "ndcg@10": 0.934,
     "recall@10": 0.9229
   },
   "overall": {
-    "mrr@10": 0.9123,
-    "ndcg@10": 0.8761,
-    "recall@10": 0.8293
+    "mrr@10": 0.9197,
+    "ndcg@10": 0.8809,
+    "recall@10": 0.834
   },
   "qtype=keyword": {
-    "mrr@10": 0.9557,
-    "ndcg@10": 0.9408,
-    "recall@10": 0.9129
+    "mrr@10": 0.9673,
+    "ndcg@10": 0.95,
+    "recall@10": 0.9207
   },
   "qtype=mixed": {
     "mrr@10": 0.8735,
-    "ndcg@10": 0.8407,
+    "ndcg@10": 0.8402,
     "recall@10": 0.741
   },
   "qtype=semantic": {
-    "mrr@10": 0.8282,
-    "ndcg@10": 0.7334,
+    "mrr@10": 0.8306,
+    "ndcg@10": 0.7305,
     "recall@10": 0.6786
   },
   "segment=A-ess": {
-    "mrr@10": 0.85,
-    "ndcg@10": 0.8261,
-    "recall@10": 0.7655
+    "mrr@10": 0.8566,
+    "ndcg@10": 0.8341,
+    "recall@10": 0.7713
   },
   "segment=B-small-reuse": {
     "mrr@10": 0.8587,
-    "ndcg@10": 0.7419,
-    "recall@10": 0.6383
+    "ndcg@10": 0.7571,
+    "recall@10": 0.6673
   },
   "segment=C-recycling": {
     "mrr@10": 0.9299,
@@ -70,19 +70,19 @@
     "recall@10": 0.6814
   },
   "segment=D-collision": {
-    "mrr@10": 0.8692,
-    "ndcg@10": 0.8685,
+    "mrr@10": 0.905,
+    "ndcg@10": 0.8838,
     "recall@10": 0.9649
   },
   "segment=E-electronics": {
-    "mrr@10": 0.937,
-    "ndcg@10": 0.9195,
+    "mrr@10": 0.9407,
+    "ndcg@10": 0.9123,
     "recall@10": 0.9662
   },
   "segment=F-conversion-rnd": {
     "mrr@10": 0.8889,
-    "ndcg@10": 0.7991,
-    "recall@10": 0.7078
+    "ndcg@10": 0.8262,
+    "recall@10": 0.7439
   },
   "segment=G-browse": {
     "mrr@10": 0.9579,
@@ -91,17 +91,17 @@
   },
   "segment=v1": {
     "mrr@10": 0.9662,
-    "ndcg@10": 0.9353,
+    "ndcg@10": 0.934,
     "recall@10": 0.9229
   },
   "source=demand-persona": {
-    "mrr@10": 0.8934,
-    "ndcg@10": 0.8554,
-    "recall@10": 0.7965
+    "mrr@10": 0.9034,
+    "ndcg@10": 0.8623,
+    "recall@10": 0.8029
   },
   "source=v1-generated": {
     "mrr@10": 0.9662,
-    "ndcg@10": 0.9353,
+    "ndcg@10": 0.934,
     "recall@10": 0.9229
   }
 }
