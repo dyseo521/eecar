@@ -65,8 +65,8 @@ function normalize(text: string): string {
   return text.toLowerCase().replace(/[\s.\-()·_/]+/g, '');
 }
 
-// "IONIQ 5용", "모델3의"처럼 표기 뒤에 붙는 조사·접미사
-const TRAILING_PARTICLE = /(용|의|에|을|를|은|는|과|와|로|용으로)$/;
+// "IONIQ 5용", "모델3의", "코나EV나 니로EV"처럼 표기 뒤에 붙는 조사·접미사
+const TRAILING_PARTICLE = /(용으로|이랑|이나|하고|용|의|에|을|를|은|는|과|와|로|나|랑|도)$/;
 
 function words(text: string): string[] {
   return text.toLowerCase().split(/[\s,()[\]/·:;]+/).filter(Boolean);

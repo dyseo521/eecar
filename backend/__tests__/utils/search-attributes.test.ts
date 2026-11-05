@@ -17,6 +17,7 @@ describe('extractSearchAttributes', () => {
     });
     expect(attrs).toEqual({
       category: 'battery', kwh: 72.6, soh: 82, voltage: 653, price: 6_250_000, year: 2022, quantity: 2, condition: 'used',
+      vehicles: ['아이오닉5'],
     });
   });
 

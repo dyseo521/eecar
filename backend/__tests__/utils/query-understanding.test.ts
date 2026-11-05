@@ -119,3 +119,38 @@ describe('rerankByConstraints', () => {
     expect(scopeConstraints(c, 'all')).toBe(c);
   });
 });
+
+describe('parse options (E-27)', () => {
+  it('collects every category but drops matches inside longer ones', () => {
+    expect(parseQuery('테슬라 후륜 모터랑 인버터 세트', { categoryMode: 'all' }).categories.sort()).toEqual(['inverter', 'motor']);
+    expect(parseQuery('사이드 유리 도어 글라스', { categoryMode: 'all' }).categories.sort()).toEqual(['body-door', 'body-window']);
+    // "임팩트 빔" 안의 "팩", "배터리 트레이" 안의 "배터리"는 버린다
+    expect(parseQuery('아이오닉5 도어 임팩트 빔', { categoryMode: 'all' }).categories).toEqual(['body-door']);
+    expect(parseQuery('배터리 트레이', { categoryMode: 'all' }).categories).toEqual(['body-chassis-frame', 'other']);
+  });
+
+  it('extracts vehicles only when asked', () => {
+    expect(parseQuery('아이오닉5 배터리 팩').vehicles).toBeUndefined();
+    expect(parseQuery('아이오닉5 배터리 팩', { vehicles: true }).vehicles).toEqual(['아이오닉5']);
+    expect(parseQuery('코나EV나 니로EV 모터', { vehicles: true }).vehicles).toEqual(['코나 일렉트릭', '니로 EV']);
+  });
+
+  it('demotes another vehicle less than another category', () => {
+    const constraints = parseQuery('아이오닉5 배터리', { vehicles: true });
+    const attrs: Record<string, object> = {
+      sameVehicleDoor: { category: 'body-door', vehicles: ['아이오닉5'] },
+      otherVehicleBattery: { category: 'battery', vehicles: ['아이오닉 일렉트릭'] },
+    };
+    const hits = [{ id: 'sameVehicleDoor', score: 1 }, { id: 'otherVehicleBattery', score: 1 }];
+    const ranked = rerankByConstraints(hits, id => attrs[id], constraints, 0.8, 0.3);
+    expect(ranked.map(h => h.id)).toEqual(['otherVehicleBattery', 'sameVehicleDoor']);
+    expect(ranked[0].score).toBeCloseTo(0.7);
+    expect(ranked[0].constraints.mismatched).toEqual(['차종 아이오닉 일렉트릭']);
+    expect(ranked[1].score).toBeCloseTo(0.2);
+  });
+
+  it('scopes to vehicle constraints', () => {
+    const c = parseQuery('아이오닉5 60kWh 이상 배터리', { vehicles: true });
+    expect(scopeConstraints(c, 'vehicle')).toEqual({ categories: [], numeric: [], conditions: [], vehicles: ['아이오닉5'] });
+  });
+});

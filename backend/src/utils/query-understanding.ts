@@ -129,9 +129,10 @@ const CONDITION_RULES: Array<{ pattern: RegExp; condition: string }> = [
 
 function matchCategories(query: string, mode: 'first' | 'all'): string[] {
   if (mode === 'first') return CATEGORY_RULES.find(rule => rule.pattern.test(query))?.categories ?? [];
+  // 규칙마다 모든 매치를 본다 ("도어 임팩트 빔"에서 도어 규칙은 "도어"와 "임팩트 빔" 둘 다 맞는다)
   const spans = CATEGORY_RULES.flatMap(rule => {
-    const m = rule.pattern.exec(query);
-    return m ? [{ start: m.index, end: m.index + m[0].length, categories: rule.categories }] : [];
+    const global = new RegExp(rule.pattern.source, rule.pattern.flags.includes('g') ? rule.pattern.flags : `${rule.pattern.flags}g`);
+    return [...query.matchAll(global)].map(m => ({ start: m.index!, end: m.index! + m[0].length, categories: rule.categories }));
   });
   const kept = spans.filter(a => !spans.some(b => b !== a && b.start <= a.start && a.end <= b.end && b.end - b.start > a.end - a.start));
   return [...new Set(kept.flatMap(s => s.categories))];
