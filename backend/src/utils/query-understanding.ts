@@ -143,6 +143,16 @@ export function vehicleGroupsOf(text: string): string[] {
   return findAliasGroups(text, VEHICLE_ALIASES).map(group => group[0]);
 }
 
+/**
+ * 운영 검색이 쓰는 질의 해석 설정: 카테고리 다중 추출 + 차종 조건 (E-27, v4 홀드아웃에서 비열등성 확인).
+ * parseQuery의 기본값은 v1.7.0 동작으로 두어 실험의 기준 구성 의미가 바뀌지 않게 한다.
+ */
+export const PRODUCTION_PARSE_OPTIONS: ParseOptions = { categoryMode: 'all', vehicles: true };
+
+export function parseSearchQuery(query: string): QueryConstraints {
+  return parseQuery(query, PRODUCTION_PARSE_OPTIONS);
+}
+
 export function parseQuery(query: string, options: ParseOptions = {}): QueryConstraints {
   const categories = matchCategories(query, options.categoryMode ?? 'first');
   const categoryRule = categories.length ? { categories } : undefined;
@@ -230,6 +240,18 @@ export function checkConstraints(attrs: SearchAttributes, constraints: QueryCons
     }
   }
   return result;
+}
+
+/**
+ * 조건 확인 결과를 한 줄로 요약한다. LLM 설명이 오기 전에 바로 보여 주는 문구라 사실만 쓴다 (A-30)
+ */
+export function summarizeCheck(check: Pick<ConstraintCheck, 'matched' | 'mismatched'>): string {
+  if (check.mismatched.length > 0) {
+    const matched = check.matched.length > 0 ? ` (일치: ${check.matched.join(', ')})` : '';
+    return `조건 불일치: ${check.mismatched.join(', ')}${matched}`;
+  }
+  if (check.matched.length > 0) return `조건 일치: ${check.matched.join(', ')}`;
+  return '검색어와 내용이 비슷한 부품';
 }
 
 /** 조건 위반 1개당 점수 배율 (1 − 감점). 값은 v2 dev 질의에서 선택한다 (DECISION_LOG A-27) */
