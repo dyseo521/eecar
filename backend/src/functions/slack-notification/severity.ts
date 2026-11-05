@@ -10,6 +10,16 @@ const WARNING_FUNCTIONS = [
   'GetPartsFunction',
 ];
 
+/**
+ * SAM이 배포한 물리 함수명(예: eecar-stack-VectorSearchFunction-yXyHE1D702wX)을
+ * template.yaml의 논리 ID(VectorSearchFunction)로 되돌린다.
+ * 패턴에 맞지 않으면 입력을 그대로 반환한다.
+ */
+export function toLogicalFunctionName(functionName: string): string {
+  const match = functionName.match(/(?:^|-)([A-Za-z0-9]+Function)(?:-[A-Za-z0-9]+)?$/);
+  return match ? match[1] : functionName;
+}
+
 export function classifySeverity(functionName: string, errorType: string): Severity {
   // 타임아웃은 무조건 CRITICAL
   if (errorType === 'LambdaTimeout') {
@@ -31,12 +41,14 @@ export function classifySeverity(functionName: string, errorType: string): Sever
     return 'WARNING';
   }
 
-  // 함수별 우선순위
-  if (CRITICAL_FUNCTIONS.includes(functionName)) {
+  // 함수별 우선순위 (로그 그룹의 물리 이름을 template.yaml 논리 ID로 바꿔 비교)
+  const logicalName = toLogicalFunctionName(functionName);
+
+  if (CRITICAL_FUNCTIONS.includes(logicalName)) {
     return 'CRITICAL';
   }
 
-  if (WARNING_FUNCTIONS.includes(functionName)) {
+  if (WARNING_FUNCTIONS.includes(logicalName)) {
     return 'WARNING';
   }
 
