@@ -1,7 +1,7 @@
 {
   "meta": {
     "date": "2026-11-06",
-    "commit": "dc318e1-dirty",
+    "commit": "b4c6c26-dirty",
     "baseline": "prod3-bigram-qu-p0.8",
     "dataset": "v2",
     "grid": "vehicle-intent",
@@ -606,7 +606,7 @@
       "categoryMode": "all",
       "dev": {
         "queries": 177,
-        "ndcg@10": 0.8799,
+        "ndcg@10": 0.8801,
         "recall@10": 0.845,
         "mrr@10": 0.9059,
         "p@5": 0.5424,
@@ -623,7 +623,7 @@
       "dev_by_type": {
         "qtype=keyword": {
           "queries": 105,
-          "ndcg@10": 0.9471,
+          "ndcg@10": 0.9474,
           "recall@10": 0.9057,
           "mrr@10": 0.9683,
           "p@5": 0.501,
@@ -721,7 +721,7 @@
       "categoryMode": "all",
       "dev": {
         "queries": 177,
-        "ndcg@10": 0.8809,
+        "ndcg@10": 0.8812,
         "recall@10": 0.8479,
         "mrr@10": 0.9066,
         "p@5": 0.5424,
@@ -738,7 +738,7 @@
       "dev_by_type": {
         "qtype=keyword": {
           "queries": 105,
-          "ndcg@10": 0.9485,
+          "ndcg@10": 0.949,
           "recall@10": 0.9105,
           "mrr@10": 0.9683,
           "p@5": 0.501,
@@ -836,7 +836,7 @@
       "categoryMode": "all",
       "dev": {
         "queries": 177,
-        "ndcg@10": 0.8823,
+        "ndcg@10": 0.8826,
         "recall@10": 0.8516,
         "mrr@10": 0.9066,
         "p@5": 0.5435,
@@ -853,7 +853,7 @@
       "dev_by_type": {
         "qtype=keyword": {
           "queries": 105,
-          "ndcg@10": 0.9509,
+          "ndcg@10": 0.9515,
           "recall@10": 0.9168,
           "mrr@10": 0.9683,
           "p@5": 0.5029,
@@ -951,7 +951,7 @@
       "categoryMode": "all",
       "dev": {
         "queries": 177,
-        "ndcg@10": 0.8805,
+        "ndcg@10": 0.8814,
         "recall@10": 0.8516,
         "mrr@10": 0.9075,
         "p@5": 0.5469,
@@ -968,7 +968,7 @@
       "dev_by_type": {
         "qtype=keyword": {
           "queries": 105,
-          "ndcg@10": 0.9484,
+          "ndcg@10": 0.9501,
           "recall@10": 0.9168,
           "mrr@10": 0.9698,
           "p@5": 0.5086,
@@ -1233,7 +1233,7 @@
       "categoryMode": "all",
       "dev": {
         "queries": 177,
-        "ndcg@10": 0.8818,
+        "ndcg@10": 0.882,
         "recall@10": 0.8467,
         "mrr@10": 0.9074,
         "p@5": 0.5424,
@@ -1250,7 +1250,7 @@
       "dev_by_type": {
         "qtype=keyword": {
           "queries": 105,
-          "ndcg@10": 0.9515,
+          "ndcg@10": 0.9518,
           "recall@10": 0.9105,
           "mrr@10": 0.973,
           "p@5": 0.501,
@@ -1291,7 +1291,7 @@
       "categoryMode": "all",
       "dev": {
         "queries": 177,
-        "ndcg@10": 0.8642,
+        "ndcg@10": 0.8645,
         "recall@10": 0.8554,
         "mrr@10": 0.9111,
         "p@5": 0.5458,
@@ -1308,7 +1308,7 @@
       "dev_by_type": {
         "qtype=keyword": {
           "queries": 105,
-          "ndcg@10": 0.9276,
+          "ndcg@10": 0.9281,
           "recall@10": 0.9168,
           "mrr@10": 0.9746,
           "p@5": 0.5086,
@@ -1349,7 +1349,7 @@
       "categoryMode": "all",
       "dev": {
         "queries": 177,
-        "ndcg@10": 0.8637,
+        "ndcg@10": 0.8641,
         "recall@10": 0.8573,
         "mrr@10": 0.9083,
         "p@5": 0.5469,
@@ -1366,7 +1366,7 @@
       "dev_by_type": {
         "qtype=keyword": {
           "queries": 105,
-          "ndcg@10": 0.9247,
+          "ndcg@10": 0.9254,
           "recall@10": 0.9168,
           "mrr@10": 0.9698,
           "p@5": 0.5086,
@@ -1407,7 +1407,7 @@
       "categoryMode": "all",
       "dev": {
         "queries": 177,
-        "ndcg@10": 0.8595,
+        "ndcg@10": 0.8596,
         "recall@10": 0.8492,
         "mrr@10": 0.9133,
         "p@5": 0.5435,
@@ -1424,7 +1424,7 @@
       "dev_by_type": {
         "qtype=keyword": {
           "queries": 105,
-          "ndcg@10": 0.9243,
+          "ndcg@10": 0.9246,
           "recall@10": 0.9164,
           "mrr@10": 0.9733,
           "p@5": 0.5086,
@@ -1465,7 +1465,7 @@
       "categoryMode": "all",
       "dev": {
         "queries": 177,
-        "ndcg@10": 0.8597,
+        "ndcg@10": 0.86,
         "recall@10": 0.8511,
         "mrr@10": 0.9112,
         "p@5": 0.5446,
@@ -1482,7 +1482,7 @@
       "dev_by_type": {
         "qtype=keyword": {
           "queries": 105,
-          "ndcg@10": 0.922,
+          "ndcg@10": 0.9224,
           "recall@10": 0.9164,
           "mrr@10": 0.9698,
           "p@5": 0.5086,

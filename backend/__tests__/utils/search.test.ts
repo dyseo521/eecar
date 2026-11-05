@@ -9,6 +9,7 @@ import {
   Bm25Index,
   fuseRankedLists,
   bigramTokenize,
+  joinedBigramTokenize,
 } from '../../src/utils/search.js';
 
 describe('Search Utils', () => {
@@ -394,6 +395,13 @@ describe('Search Utils', () => {
 
     it('splits mixed-script tokens that contain Hangul', () => {
       expect(bigramTokenize('모델3')).toEqual(['모델', '델3']);
+    });
+  });
+
+  describe('joinedBigramTokenize', () => {
+    it('adds bigrams across a space between Hangul tokens', () => {
+      expect(joinedBigramTokenize('배터리 팩')).toEqual(['배터', '터리', '팩', '리팩']);
+      expect(joinedBigramTokenize('IONIQ 5 배터리')).toEqual(['ioniq', '5', '배터', '터리']);
     });
   });
 });
