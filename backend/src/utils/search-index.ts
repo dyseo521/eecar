@@ -8,7 +8,8 @@
  */
 import { DynamoDBItem } from './dynamodb.js';
 import { listPartMetadata } from './parts.js';
-import { searchTextOf } from './search-document.js';
+import { searchAttributesOf, searchTextOf } from './search-document.js';
+import { SearchAttributes } from './search-attributes.js';
 import { Bm25Index } from './search.js';
 
 /** 색인 유지 시간. 새로 등록한 부품은 최대 이 시간 뒤에 BM25에 잡힌다 (벡터 검색에는 즉시 잡힘) */
@@ -17,6 +18,8 @@ export const SEARCH_INDEX_TTL_MS = 5 * 60 * 1000;
 export interface SearchIndex {
   bm25: Bm25Index;
   parts: Map<string, DynamoDBItem>;
+  /** 질의 조건과 비교할 부품 속성 (query-understanding.ts) */
+  attributes: Map<string, SearchAttributes>;
   loadedAt: number;
 }
 
@@ -31,6 +34,7 @@ export function buildSearchIndex(items: DynamoDBItem[], loadedAt = Date.now()): 
   return {
     bm25: Bm25Index.fromTexts(docs),
     parts: new Map(items.map(item => [partIdOf(item), item])),
+    attributes: new Map(items.map(item => [partIdOf(item), searchAttributesOf(item)])),
     loadedAt,
   };
 }

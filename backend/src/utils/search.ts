@@ -24,6 +24,24 @@ export function tokenize(text: string): string[] {
   return tokens;
 }
 
+const HANGUL = /[가-힣]/;
+
+/**
+ * 공백 토큰을 한글이면 글자 2-gram으로 나눈다. "배터리팩"과 "배터리 팩"이 "배터·터리"를 공유하게 되고,
+ * 조사가 붙은 "배터리를"도 "배터·터리"로 맞는다 (DECISION_LOG E-25). 영문·숫자 토큰은 그대로 둔다.
+ */
+export function bigramTokenize(text: string): string[] {
+  return tokenize(text).flatMap(token => {
+    if (!HANGUL.test(token) || token.length < 2) return [token];
+    const grams: string[] = [];
+    for (let i = 0; i < token.length - 1; i++) grams.push(token.slice(i, i + 2));
+    return grams;
+  });
+}
+
+/** 검색 BM25 색인과 질의에 쓰는 토크나이저 */
+export const SEARCH_TOKENIZER = bigramTokenize;
+
 /**
  * Calculate term frequency in a document
  */
@@ -214,7 +232,7 @@ export class Bm25Index {
     this.avgLength = docTokens.length ? this.lengths.reduce((a, b) => a + b, 0) / docTokens.length : 0;
   }
 
-  static fromTexts(docs: Array<{ id: string; text: string }>, tokenizer: (text: string) => string[] = tokenize): Bm25Index {
+  static fromTexts(docs: Array<{ id: string; text: string }>, tokenizer: (text: string) => string[] = SEARCH_TOKENIZER): Bm25Index {
     return new Bm25Index(docs.map(d => d.id), docs.map(d => tokenizer(d.text)));
   }
 
@@ -242,7 +260,7 @@ export class Bm25Index {
   }
 
   /** 점수가 0보다 큰 문서 상위 limit개 (점수 0은 검색되지 않은 문서) */
-  search(query: string, limit: number, tokenizer: (text: string) => string[] = tokenize): RankedHit[] {
+  search(query: string, limit: number, tokenizer: (text: string) => string[] = SEARCH_TOKENIZER): RankedHit[] {
     return this.scores(tokenizer(query))
       .map((score, i) => ({ id: this.ids[i], score }))
       .filter(hit => hit.score > 0)

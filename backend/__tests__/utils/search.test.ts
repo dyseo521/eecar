@@ -8,6 +8,7 @@ import {
   preparePartForBM25,
   Bm25Index,
   fuseRankedLists,
+  bigramTokenize,
 } from '../../src/utils/search.js';
 
 describe('Search Utils', () => {
@@ -316,8 +317,8 @@ describe('Search Utils', () => {
       { id: 'c', text: '배터리 관리 시스템 BMS 배터리' },
     ];
 
-    it('gives the same scores as calculateBM25Scores', () => {
-      const index = Bm25Index.fromTexts(documents);
+    it('gives the same scores as calculateBM25Scores with the whitespace tokenizer', () => {
+      const index = Bm25Index.fromTexts(documents, tokenize);
       const expected = calculateBM25Scores('배터리 모터', documents).map(s => s.bm25Score);
       const actual = index.scores(tokenize('배터리 모터'));
       actual.forEach((score, i) => expect(score).toBeCloseTo(expected[i], 12));
@@ -378,6 +379,21 @@ describe('Search Utils', () => {
 
     it('returns nothing for two empty lists', () => {
       expect(fuseRankedLists([], [])).toEqual([]);
+    });
+  });
+
+  describe('bigramTokenize', () => {
+    it('splits Korean tokens into character bigrams so spacing variants share terms', () => {
+      expect(bigramTokenize('배터리팩')).toEqual(['배터', '터리', '리팩']);
+      expect(bigramTokenize('배터리 팩')).toEqual(['배터', '터리', '팩']);
+    });
+
+    it('keeps latin and numeric tokens whole', () => {
+      expect(bigramTokenize('IONIQ 5 72kWh')).toEqual(['ioniq', '5', '72kwh']);
+    });
+
+    it('splits mixed-script tokens that contain Hangul', () => {
+      expect(bigramTokenize('모델3')).toEqual(['모델', '델3']);
     });
   });
 });
