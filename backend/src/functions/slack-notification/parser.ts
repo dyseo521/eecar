@@ -78,6 +78,11 @@ function extractRequestId(message: string): string {
 }
 
 function extractErrorType(message: string): string {
+  // Bedrock 모델 수명 주기·입력 에러. 예외 이름이 DynamoDB와 같으므로 'model' 문맥으로 먼저 구분한다.
+  // (2026-11-04 퇴역 모델 장애가 DynamoDBResourceNotFound로 잘못 분류됐었다)
+  if (message.includes('ResourceNotFoundException') && /\bmodel\b/i.test(message)) return 'BedrockModelUnavailable';
+  if (message.includes('ValidationException') && /\bmodel\b/i.test(message)) return 'BedrockValidation';
+
   // Bedrock 에러
   if (message.includes('ThrottlingException')) return 'BedrockThrottling';
   if (message.includes('ModelNotFoundException')) return 'BedrockModelNotFound';
