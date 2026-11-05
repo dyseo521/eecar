@@ -239,15 +239,35 @@ export const SearchRequestSchema = z.object({
   filters: SearchFiltersSchema.optional(),
   topK: z.number().int().positive().max(50).default(10).openapi({
     description: '반환할 결과 수 (최대 50)'
+  }),
+  explain: z.boolean().default(true).openapi({
+    description: 'false면 LLM 설명 없이 바로 응답하고, reason에는 조건 확인 요약을 넣는다. 설명은 /api/search/explain으로 받는다'
   })
 }).openapi('SearchRequest');
 
+export const SearchConditionsSchema = z.object({
+  matched: z.array(z.string()).openapi({ example: ['카테고리', '용량 72kWh'] }),
+  mismatched: z.array(z.string()).openapi({ example: [] })
+}).openapi('SearchConditions');
+
 export const SearchResultSchema = z.object({
   partId: z.string(),
-  score: z.number().min(0).max(1).openapi({ description: '유사도 점수 (0-1)' }),
+  score: z.number().min(0).max(1).openapi({ description: '상대 순위 점수 (0-1). 일치도가 아니다' }),
   part: PartSchema.partial(),
-  reason: z.string().openapi({ description: 'Claude가 생성한 매칭 이유' })
+  reason: z.string().openapi({ description: '매칭 설명 (reasonSource가 ai면 Claude, rules면 조건 확인 요약)' }),
+  reasonSource: z.enum(['ai', 'rules']).optional(),
+  conditions: SearchConditionsSchema.optional().openapi({ description: '질의에서 뽑은 조건의 일치·불일치 (규칙 기반)' })
 }).openapi('SearchResult');
+
+export const SearchExplainRequestSchema = z.object({
+  query: z.string().min(1).openapi({ example: 'ESS용 60kWh 이상 배터리' }),
+  partIds: z.array(z.string()).min(1).max(20).openapi({ description: '설명할 부품 ID (최대 20개)' })
+}).openapi('SearchExplainRequest');
+
+export const SearchExplainResponseSchema = z.object({
+  explanations: z.record(z.string(), z.string()).openapi({ description: '부품 ID별 설명' }),
+  cached: z.boolean()
+}).openapi('SearchExplainResponse');
 
 export const SearchResponseSchema = z.object({
   results: z.array(SearchResultSchema),

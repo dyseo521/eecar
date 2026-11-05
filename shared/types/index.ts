@@ -129,6 +129,8 @@ export interface SearchRequest {
   query: string;
   filters?: SearchFilters;
   topK?: number;
+  /** false면 LLM 설명 없이 바로 응답한다. 설명은 /api/search/explain으로 따로 받는다 */
+  explain?: boolean;
 }
 
 export interface SearchFilters {
@@ -171,6 +173,20 @@ export interface SearchResult {
   score: number;
   part: Partial<Part>;
   reason: string;
+  /** reason을 만든 방식: ai(LLM 설명) 또는 rules(조건 확인 요약) */
+  reasonSource?: 'ai' | 'rules';
+  /** 질의 조건 확인 결과 (규칙 기반) */
+  conditions?: { matched: string[]; mismatched: string[] };
+}
+
+export interface SearchExplainRequest {
+  query: string;
+  partIds: string[];
+}
+
+export interface SearchExplainResponse {
+  explanations: Record<string, string>;
+  cached: boolean;
 }
 
 export interface SearchResponse {

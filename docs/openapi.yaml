@@ -623,7 +623,7 @@ components:
           type: number
           minimum: 0
           maximum: 1
-          description: 유사도 점수 (0-1)
+          description: 상대 순위 점수 (0-1). 일치도가 아니다
         part:
           type: object
           properties:
@@ -706,12 +706,38 @@ components:
               $ref: "#/components/schemas/BatteryHealthInfo"
         reason:
           type: string
-          description: Claude가 생성한 매칭 이유
+          description: 매칭 설명 (reasonSource가 ai면 Claude, rules면 조건 확인 요약)
+        reasonSource:
+          type: string
+          enum:
+            - ai
+            - rules
+        conditions:
+          $ref: "#/components/schemas/SearchConditions"
       required:
         - partId
         - score
         - part
         - reason
+    SearchConditions:
+      type: object
+      properties:
+        matched:
+          type: array
+          items:
+            type: string
+          example:
+            - 카테고리
+            - 용량 72kWh
+        mismatched:
+          type: array
+          items:
+            type: string
+          example: []
+      required:
+        - matched
+        - mismatched
+      description: 질의에서 뽑은 조건의 일치·불일치 (규칙 기반)
     SearchRequest:
       type: object
       properties:
@@ -729,8 +755,42 @@ components:
           maximum: 50
           default: 10
           description: 반환할 결과 수 (최대 50)
+        explain:
+          type: boolean
+          default: true
+          description: false면 LLM 설명 없이 바로 응답하고, reason에는 조건 확인 요약을 넣는다. 설명은 /api/search/explain으로 받는다
       required:
         - query
+    SearchExplainResponse:
+      type: object
+      properties:
+        explanations:
+          type: object
+          additionalProperties:
+            type: string
+          description: 부품 ID별 설명
+        cached:
+          type: boolean
+      required:
+        - explanations
+        - cached
+    SearchExplainRequest:
+      type: object
+      properties:
+        query:
+          type: string
+          minLength: 1
+          example: ESS용 60kWh 이상 배터리
+        partIds:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          maxItems: 20
+          description: 설명할 부품 ID (최대 20개)
+      required:
+        - query
+        - partIds
     PartsListResponse:
       type: object
       properties:
@@ -1140,13 +1200,13 @@ paths:
     post:
       tags:
         - Search
-      summary: AI RAG 검색
+      summary: AI 하이브리드 검색
       description: |-
-        Amazon Bedrock 기반 RAG(Retrieval-Augmented Generation) 검색
-        - 쿼리 확장 (언어적 변형)
-        - 하이브리드 스코어링 (70% 벡터 + 30% BM25)
-        - S3 Vectors 벡터 유사도 검색
-        - 결과 캐싱 (7일 TTL)
+        벡터(Titan v2, S3 Vectors)와 BM25를 각각 상위 100개씩 독립 검색해 결합하고, 질의에서 뽑은
+        카테고리·수치 조건(용량·SOH·가격·연식 등) 위반을 감점해 정렬한다.
+        - 결과에는 규칙으로 확인한 조건 일치·불일치(conditions)가 들어 있다
+        - explain=false면 LLM 설명 없이 바로 응답한다 (설명은 POST /api/search/explain)
+        - 결과 캐싱 (7일 TTL, 키에 필터·topK·explain·파이프라인 버전 포함)
       requestBody:
         content:
           application/json:
@@ -1167,6 +1227,32 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "500":
           description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/search/explain:
+    post:
+      tags:
+        - Search
+      summary: 검색 결과 설명
+      description: |-
+        검색 결과 부품의 매칭 설명을 Claude로 만든다. 규칙으로 확인한 조건 일치·불일치를 근거로 주며,
+        조건에 맞지 않는 부품은 맞지 않는다고 쓴다. 같은 질의·부품 조합은 7일 캐시한다.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchExplainRequest"
+      responses:
+        "200":
+          description: 부품별 설명
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchExplainResponse"
+        "400":
+          description: 잘못된 요청
           content:
             application/json:
               schema:

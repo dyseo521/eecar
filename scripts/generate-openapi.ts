@@ -20,6 +20,8 @@ import {
   // Request/Response schemas
   SearchRequestSchema,
   SearchResponseSchema,
+  SearchExplainRequestSchema,
+  SearchExplainResponseSchema,
   PartSchema,
   PartsListResponseSchema,
   PartRegistrationRequestSchema,
@@ -78,12 +80,12 @@ registry.registerPath({
   method: 'post',
   path: '/api/search',
   tags: ['Search'],
-  summary: 'AI RAG 검색',
-  description: `Amazon Bedrock 기반 RAG(Retrieval-Augmented Generation) 검색
-- 쿼리 확장 (언어적 변형)
-- 하이브리드 스코어링 (70% 벡터 + 30% BM25)
-- S3 Vectors 벡터 유사도 검색
-- 결과 캐싱 (7일 TTL)`,
+  summary: 'AI 하이브리드 검색',
+  description: `벡터(Titan v2, S3 Vectors)와 BM25를 각각 상위 100개씩 독립 검색해 결합하고, 질의에서 뽑은
+카테고리·수치 조건(용량·SOH·가격·연식 등) 위반을 감점해 정렬한다.
+- 결과에는 규칙으로 확인한 조건 일치·불일치(conditions)가 들어 있다
+- explain=false면 LLM 설명 없이 바로 응답한다 (설명은 POST /api/search/explain)
+- 결과 캐싱 (7일 TTL, 키에 필터·topK·explain·파이프라인 버전 포함)`,
   request: {
     body: {
       content: {
@@ -112,6 +114,43 @@ registry.registerPath({
     },
     500: {
       description: '서버 오류',
+      content: {
+        'application/json': {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+// POST /api/search/explain - 검색 결과 설명 (응답 경로에서 분리)
+registry.registerPath({
+  method: 'post',
+  path: '/api/search/explain',
+  tags: ['Search'],
+  summary: '검색 결과 설명',
+  description: `검색 결과 부품의 매칭 설명을 Claude로 만든다. 규칙으로 확인한 조건 일치·불일치를 근거로 주며,
+조건에 맞지 않는 부품은 맞지 않는다고 쓴다. 같은 질의·부품 조합은 7일 캐시한다.`,
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: SearchExplainRequestSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: '부품별 설명',
+      content: {
+        'application/json': {
+          schema: SearchExplainResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: '잘못된 요청',
       content: {
         'application/json': {
           schema: ErrorResponseSchema,
