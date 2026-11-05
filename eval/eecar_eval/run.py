@@ -24,6 +24,8 @@ from .metrics import mean, query_metrics
 EVAL_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = EVAL_DIR.parent
 SYSTEMS = ("bm25", "vector", "prod-hybrid")
+# v2 질의에만 있는 분류 필드. 있으면 이 기준으로도 지표를 나눠 집계한다
+OPTIONAL_GROUP_FIELDS = ("source", "segment", "form")
 METRICS = ("ndcg@10", "recall@10", "mrr@10", "p@5", "zero_result")
 
 
@@ -63,15 +65,16 @@ def evaluate(run_rows: list[dict[str, Any]], queries: list[dict[str, Any]], qrel
     for q in queries:
         m = query_metrics(ranked.get(q["id"], []), grades[q["id"]])
         per_query.append({"qid": q["id"], "text": q["text"], "qtype": q["qtype"], "difficulty": q["difficulty"],
+                          **{f: q[f] for f in OPTIONAL_GROUP_FIELDS if q.get(f)},
                           "top5": ranked.get(q["id"], [])[:5], **m})
 
     def aggregate(rows: list[dict[str, Any]]) -> dict[str, float]:
         return {"queries": len(rows), **{k: round(mean([r[k] for r in rows]), 4) for k in METRICS}}
 
     groups: dict[str, dict[str, Any]] = {"overall": aggregate(per_query)}
-    for field in ("qtype", "difficulty"):
-        for value in sorted({r[field] for r in per_query}):
-            groups[f"{field}={value}"] = aggregate([r for r in per_query if r[field] == value])
+    for field in ("qtype", "difficulty", *OPTIONAL_GROUP_FIELDS):
+        for value in sorted({r[field] for r in per_query if r.get(field)}):
+            groups[f"{field}={value}"] = aggregate([r for r in per_query if r.get(field) == value])
     return {"groups": groups, "per_query": per_query}
 
 
