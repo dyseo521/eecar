@@ -1,0 +1,47 @@
+# 운영 검색 합성 검사 (DECISION_LOG A-39)
+# 오류 없이 품질이 떨어지는 장애(결과 0건, LLM 폴백, 벡터 누락)는 에러 알림으로 잡히지 않았다 (C-06, C-09, C-26).
+# 배포 역할에 EventBridge 권한이 없어 Lambda 스케줄 대신 GitHub Actions 일정 실행을 쓴다.
+name: Search Canary
+
+on:
+  schedule:
+    - cron: '23 * * * *'  # 매시 23분 (정각 혼잡을 피함)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: search-canary
+  cancel-in-progress: false
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Run search canary
+        id: canary
+        env:
+          EECAR_API_URL: https://6o4futufni.execute-api.ap-northeast-2.amazonaws.com/prod
+        run: node eval/prod/search-canary.mjs
+
+      - name: Notify Slack on failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          FAILURES: ${{ steps.canary.outputs.failures }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL is not set; skipping notification"
+            exit 0
+          fi
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          TEXT=$(printf ':rotating_light: *검색 합성 검사 실패*\n%s\n%s' "${FAILURES:-상세는 실행 기록 참고}" "$RUN_URL")
+          jq -n --arg text "$TEXT" '{text: $text}' | curl -sS -X POST "$SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' -d @-
