@@ -169,7 +169,7 @@ async function main(): Promise<void> {
       const scenario = scenarios.get(r.id);
       // v3 시나리오는 정답을 시나리오에 함께 둔다. 유효한 다른 조치와 금지 조치도 정답 요지에 넣는다
       const truth = scenario?.truth
-        ? { cause: scenario.truth.cause, fix: [scenario.truth.fix, ...(scenario.truth.acceptableFixes ?? []).map((f: string) => `또는 ${f}`), ...(scenario.truth.forbiddenFixes?.length ? [`(하면 안 되는 조치: ${scenario.truth.forbiddenFixes.join(', ')})`] : [])].join(' ') }
+        ? { cause: truthCause(scenario.truth), fix: [scenario.truth.fix, ...(scenario.truth.acceptableFixes ?? []).map((f: string) => `또는 ${f}`), ...(scenario.truth.forbiddenFixes?.length ? [`(하면 안 되는 조치: ${scenario.truth.forbiddenFixes.join(', ')})`] : [])].join(' ') }
         : TRUTH[r.id];
       if (!truth) continue;
       const evidence = await fullEvidence(scenario, r.steps);

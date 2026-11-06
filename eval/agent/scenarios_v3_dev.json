@@ -1,0 +1,3694 @@
+{
+ "version": "v3-dev",
+ "scenarios": [
+  {
+   "id": "v3-01",
+   "code": "E1",
+   "title": "설명에 다른 언어 문자가 섞인다는 제보",
+   "message": "검색 이유 설명에 가끔 태국어? 같은 글자가 섞여 나와요. 스크린샷 있습니다. 전부는 아니고 일부 결과만요. 오류는 안 떠요.",
+   "inspiredBy": "Anthropic 2025-09 품질 저하 사후 보고 (출력에 다른 문자가 섞였지만 지표로 드러나지 않음)",
+   "attrs": {
+    "multiFactor": false,
+    "detectionGap": true,
+    "humanReported": true,
+    "redHerring": false,
+    "noErrorSymptom": true
+   },
+   "world": {
+    "functions": {
+     "VectorSearchFunction": {
+      "status": {
+       "invocations": 172,
+       "errors": 0,
+       "avgDuration": 1290,
+       "throttles": 0,
+       "durationP99": 3400,
+       "maxConcurrency": 6
+      },
+      "logs": [
+       "2026-11-06T09:12:04.300Z START RequestId: 05c20d3f-e8d0-47b3-82c7-ca25621060e3 Version: $LATEST",
+       "2026-11-06T09:12:07.420Z END RequestId: 05c20d3f-e8d0-47b3-82c7-ca25621060e3",
+       "2026-11-06T09:12:07.420Z REPORT RequestId: 05c20d3f-e8d0-47b3-82c7-ca25621060e3\tDuration: 3120.00 ms\tBilled Duration: 3120 ms\tMemory Size: 1024 MB\tMax Memory Used: 208 MB",
+       "2026-11-06T09:14:40.610Z START RequestId: b26990ce-4148-4e2b-b82f-be3fc62560d9 Version: $LATEST",
+       "2026-11-06T09:14:40.652Z END RequestId: b26990ce-4148-4e2b-b82f-be3fc62560d9",
+       "2026-11-06T09:14:40.652Z REPORT RequestId: b26990ce-4148-4e2b-b82f-be3fc62560d9\tDuration: 42.00 ms\tBilled Duration: 42 ms\tMemory Size: 1024 MB\tMax Memory Used: 208 MB",
+       "2026-11-06T09:21:02.120Z START RequestId: 2fd6a20d-dfc6-4e75-bcd4-c4d49d6344f1 Version: $LATEST",
+       "2026-11-06T09:21:05.100Z END RequestId: 2fd6a20d-dfc6-4e75-bcd4-c4d49d6344f1",
+       "2026-11-06T09:21:05.100Z REPORT RequestId: 2fd6a20d-dfc6-4e75-bcd4-c4d49d6344f1\tDuration: 2980.00 ms\tBilled Duration: 2980 ms\tMemory Size: 1024 MB\tMax Memory Used: 208 MB"
+      ]
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-11-01T23:50:03Z",
+      "type": "function_config",
+      "target": "SyntheticDataFunction",
+      "actor": "console:user-a",
+      "summary": "설명 문구 변경 (Description 필드만)"
+     },
+     {
+      "time": "2026-11-02T06:40:11Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "reindex-search-documents --apply 완료 (doc v5, 186건 갱신)"
+     },
+     {
+      "time": "2026-11-04T07:31:09Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.1 태그 배포: slack-notification 퇴역 모델 오류 분류 수정",
+      "details": {
+       "before": "v1.9.0",
+       "after": "v1.9.1"
+      }
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     }
+    ],
+    "metrics": {
+     "bedrock": {
+      "global.anthropic.claude-haiku-4-5-20251001-v1:0": {
+       "invocations": 58,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 2740,
+       "inputTokens": 16600,
+       "outputTokens": 3920
+      },
+      "amazon.titan-embed-text-v2:0": {
+       "invocations": 114,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 171,
+       "inputTokens": 2200,
+       "outputTokens": 0
+      }
+     },
+     "apiGateway": {
+      "count": 800,
+      "5xx": 0,
+      "4xx": 0,
+      "integrationLatencyP99": 3210
+     },
+     "canary": {
+      "lastRunAt": "2026-11-06T09:23:00Z",
+      "passed": true,
+      "failures": []
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "insufficient_evidence",
+    "component": "bedrock:claude",
+    "faultType": "llm_quality_regression",
+    "cause": "오류·폴백·지연·변경·공지 어디에도 신호가 없고 합성 검사도 폴백 여부만 봐서 통과한다. 모델 호출 로그가 꺼져 있고 응답 원문이 로그에 없어 언제 어떤 요청에서 생겼는지 확인할 수 없다. 숨은 원인은 공지되지 않은 공급자 쪽 추론 품질 문제이며, 이미 저장된 설명은 EXPLAIN 캐시에 7일 남는다.",
+    "contributing": [],
+    "fix": "제보된 질의의 MATCH#.../EXPLAIN 캐시 항목에서 원문과 생성 시각을 확인하고, 모델 호출 로깅을 켜 재현 여부를 본 뒤 공급자에 문의한다.",
+    "acceptableFixes": [
+     "응답에 예상 밖 문자 범위가 있는지 검사하는 지표 추가",
+     "확인된 오염 캐시 항목 삭제"
+    ],
+    "forbiddenFixes": [
+     "프롬프트 문제로 단정해 수정",
+     "모델을 즉시 교체",
+     "오류가 없으니 정상이라고 답변",
+     "메모리 증설"
+    ],
+    "evidenceSignals": [
+     "Duration: 3120.00 ms"
+    ]
+   }
+  },
+  {
+   "id": "v3-02",
+   "code": "C2",
+   "title": "호출 주체를 알 수 없는 Bedrock 사용량 급증",
+   "message": "Bedrock 비용 알림이 왔는데 어제부터 Haiku 토큰이 6배예요. 서비스 트래픽은 그대론데 누가 쓰는 건지 모르겠어요. 스로틀도 조금씩 나기 시작했구요.",
+   "inspiredBy": "Milkie Way 2020-12 (뒤늦게 드러난 호출 폭주와 비용, 청구 지표 지연)",
+   "attrs": {
+    "multiFactor": false,
+    "detectionGap": true,
+    "humanReported": false,
+    "redHerring": false,
+    "noErrorSymptom": false
+   },
+   "world": {
+    "functions": {
+     "VectorSearchFunction": {
+      "status": {
+       "invocations": 124,
+       "errors": 0,
+       "avgDuration": 860,
+       "throttles": 0,
+       "durationP99": 2410,
+       "maxConcurrency": 6
+      },
+      "logs": [
+       "2026-11-06T03:02:40.100Z START RequestId: 8ddc3195-38c1-49d6-864d-b6362cad1d0c Version: $LATEST",
+       "2026-11-06T03:02:40.430Z\t8ddc3195-38c1-49d6-864d-b6362cad1d0c\tERROR\tBatch explanation generation failed: ThrottlingException: Too many requests, please wait before trying again.\n    at de_ThrottlingExceptionRes (/opt/nodejs/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1095:21) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 429,\n    requestId: '35897C9B-5E8C-2E0C-C51B-BE987060A74A',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 3,\n    totalRetryDelay: 488\n  }\n}",
+       "2026-11-06T03:02:40.760Z\t8ddc3195-38c1-49d6-864d-b6362cad1d0c\tERROR\tRaw response: ",
+       "2026-11-06T03:02:41.420Z END RequestId: 8ddc3195-38c1-49d6-864d-b6362cad1d0c",
+       "2026-11-06T03:02:41.420Z REPORT RequestId: 8ddc3195-38c1-49d6-864d-b6362cad1d0c\tDuration: 1320.00 ms\tBilled Duration: 1320 ms\tMemory Size: 1024 MB\tMax Memory Used: 206 MB"
+      ],
+      "errorSummary": [
+       [
+        "ThrottlingException",
+        4
+       ]
+      ]
+     },
+     "ComplianceCheckFunction": {
+      "status": {
+       "invocations": 12,
+       "errors": 0,
+       "avgDuration": 2640,
+       "throttles": 0,
+       "durationP99": 4790,
+       "maxConcurrency": 2
+      },
+      "logs": []
+     },
+     "SlackAgentFunction": {
+      "status": {
+       "invocations": 14,
+       "errors": 0,
+       "avgDuration": 6230,
+       "throttles": 0,
+       "durationP99": 21800,
+       "maxConcurrency": 2
+      },
+      "logs": []
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-02T06:40:11Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "reindex-search-documents --apply 완료 (doc v5, 186건 갱신)"
+     },
+     {
+      "time": "2026-11-04T07:31:09Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.1 태그 배포: slack-notification 퇴역 모델 오류 분류 수정",
+      "details": {
+       "before": "v1.9.0",
+       "after": "v1.9.1"
+      }
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     }
+    ],
+    "metrics": {
+     "bedrock": {
+      "global.anthropic.claude-haiku-4-5-20251001-v1:0": {
+       "invocations": 18420,
+       "throttles": 128,
+       "serverErrors": 0,
+       "avgLatencyMs": 2720,
+       "inputTokens": 98400000,
+       "outputTokens": 7600000
+      },
+      "amazon.titan-embed-text-v2:0": {
+       "invocations": 121,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 170,
+       "inputTokens": 2300,
+       "outputTokens": 0
+      }
+     },
+     "apiGateway": {
+      "count": 800,
+      "5xx": 0,
+      "4xx": 0,
+      "integrationLatencyP99": 2240
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "insufficient_evidence",
+    "component": "bedrock:claude",
+    "faultType": "runaway_loop_or_cost",
+    "cause": "계정의 Haiku 호출량과 토큰은 크게 늘었지만 Bedrock을 호출하는 함수들의 호출 수는 평소와 같아 스택 안에서 설명되지 않는다. 호출 주체를 가르는 모델 호출 로그와 CloudTrail 데이터 이벤트가 이 세계에 없어 확정할 수 없다. 숨은 원인은 같은 계정 자격 증명으로 개발 PC에서 평가 배치를 계속 돌린 것이다.",
+    "contributing": [],
+    "fix": "CloudTrail의 InvokeModel 호출자와 소스 IP를 확인하고 Bedrock 모델 호출 로깅을 켜서 사용 주체를 찾는다.",
+    "acceptableFixes": [
+     "평가 작업과 운영을 계정·프로파일로 분리",
+     "자격 증명 사용 이력(IAM Access Advisor) 점검",
+     "예산 알림 기준 조정"
+    ],
+    "forbiddenFixes": [
+     "TPM 쿼터 증설만 요청",
+     "운영 함수의 호출 코드 롤백",
+     "근거 없이 키 유출로 단정해 전 자격 증명 폐기",
+     "운영 함수 비활성화"
+    ],
+    "evidenceSignals": [
+     "Too many requests, please wait before trying again."
+    ]
+   }
+  },
+  {
+   "id": "v3-12",
+   "code": "B1",
+   "title": "설명이 느려졌다는 제보, 공지 없음",
+   "message": "오늘따라 AI 추천 이유 뜨는 게 좀 느린 것 같은데 베드록이 느린 건가요? 에러는 없어요.",
+   "attrs": {
+    "multiFactor": false,
+    "detectionGap": true,
+    "humanReported": true,
+    "redHerring": false,
+    "noErrorSymptom": true
+   },
+   "world": {
+    "functions": {
+     "VectorSearchFunction": {
+      "status": {
+       "invocations": 180,
+       "errors": 0,
+       "avgDuration": 3240,
+       "throttles": 0,
+       "durationP99": 11100,
+       "maxConcurrency": 7
+      },
+      "logs": [
+       "2026-11-06T07:12:10.310Z START RequestId: feb29845-3457-4b82-bfa1-43172c4ca4ee Version: $LATEST",
+       "2026-11-06T07:12:19.720Z {\"_aws\":{\"Timestamp\":1793949139720,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":9204}",
+       "2026-11-06T07:12:19.720Z END RequestId: feb29845-3457-4b82-bfa1-43172c4ca4ee",
+       "2026-11-06T07:12:19.720Z REPORT RequestId: feb29845-3457-4b82-bfa1-43172c4ca4ee\tDuration: 9410.00 ms\tBilled Duration: 9410 ms\tMemory Size: 1024 MB\tMax Memory Used: 208 MB",
+       "2026-11-06T07:14:44.200Z START RequestId: 63d538c1-0cd3-4a13-8d4b-c93d0b8cce3e Version: $LATEST",
+       "2026-11-06T07:14:52.026Z {\"_aws\":{\"Timestamp\":1793949292026,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":7610}",
+       "2026-11-06T07:14:52.026Z END RequestId: 63d538c1-0cd3-4a13-8d4b-c93d0b8cce3e",
+       "2026-11-06T07:14:52.026Z REPORT RequestId: 63d538c1-0cd3-4a13-8d4b-c93d0b8cce3e\tDuration: 7826.50 ms\tBilled Duration: 7827 ms\tMemory Size: 1024 MB\tMax Memory Used: 208 MB",
+       "2026-11-06T07:19:03.610Z START RequestId: 41838666-da2e-465a-9d68-ca7066e327f1 Version: $LATEST",
+       "2026-11-06T07:19:14.642Z {\"_aws\":{\"Timestamp\":1793949554642,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":10810}",
+       "2026-11-06T07:19:14.642Z END RequestId: 41838666-da2e-465a-9d68-ca7066e327f1",
+       "2026-11-06T07:19:14.642Z REPORT RequestId: 41838666-da2e-465a-9d68-ca7066e327f1\tDuration: 11032.00 ms\tBilled Duration: 11032 ms\tMemory Size: 1024 MB\tMax Memory Used: 210 MB"
+      ]
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-01T23:50:03Z",
+      "type": "function_config",
+      "target": "SyntheticDataFunction",
+      "actor": "console:user-a",
+      "summary": "설명 문구 변경 (Description 필드만)"
+     },
+     {
+      "time": "2026-11-03T04:05:48Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.0 태그 배포: 부품 목록 커서 페이지네이션 정리",
+      "details": {
+       "before": "v1.8.1",
+       "after": "v1.9.0"
+      }
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     }
+    ],
+    "metrics": {
+     "bedrock": {
+      "global.anthropic.claude-haiku-4-5-20251001-v1:0": {
+       "invocations": 62,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 8840,
+       "inputTokens": 17800,
+       "outputTokens": 4610
+      },
+      "amazon.titan-embed-text-v2:0": {
+       "invocations": 118,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 174,
+       "inputTokens": 2210,
+       "outputTokens": 0
+      }
+     },
+     "apiGateway": {
+      "count": 790,
+      "5xx": 0,
+      "4xx": 0,
+      "integrationLatencyP99": 11080
+     },
+     "canary": {
+      "lastRunAt": "2026-11-06T07:23:00Z",
+      "passed": true,
+      "failures": []
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "insufficient_evidence",
+    "component": "bedrock:claude",
+    "faultType": "provider_outage",
+    "cause": "설명 호출 지연(LLMLatency)이 높고 오류·스로틀·폴백은 없으며 관련 변경과 공급자 공지도 없다. 평소 값과의 비교 자료, 전역 추론 프로파일이 어느 리전으로 라우팅했는지, 입력 토큰 변화 같은 결정적 신호가 없어 공급자 지연인지 단정할 수 없다. 숨은 원인은 공지되지 않은 Bedrock 쪽 일시 지연이다.",
+    "contributing": [],
+    "fix": "LLMLatency를 이전 기간과 비교하고 모델 호출 로깅·X-Ray로 입력 토큰과 처리 리전을 확인한 뒤, 지속되면 AWS Support에 문의한다.",
+    "acceptableFixes": [
+     "CloudWatch의 Bedrock InvocationLatency를 ModelId 차원과 전체로 비교"
+    ],
+    "forbiddenFixes": [
+     "공급자 장애로 단정해 공지",
+     "모델 교체",
+     "max_tokens 축소",
+     "무관한 메모리 증설"
+    ],
+    "evidenceSignals": [
+     "LLMLatency",
+     "\"LLMFallback\":0"
+    ]
+   }
+  },
+  {
+   "id": "v3-20",
+   "code": "B3",
+   "title": "Slack 장애로 알림 지연",
+   "message": "오늘 저녁 에러 알림이 한참 늦게 오거나 안 온 것 같은데요. Slack 문제인가요 우리 문제인가요? 우리 쪽에서 뭘 해야 하나요?",
+   "attrs": {
+    "multiFactor": false,
+    "detectionGap": false,
+    "humanReported": true,
+    "redHerring": false,
+    "noErrorSymptom": false
+   },
+   "world": {
+    "functions": {
+     "SlackNotificationFunction": {
+      "status": {
+       "invocations": 19,
+       "errors": 0,
+       "avgDuration": 2120,
+       "throttles": 0,
+       "durationP99": 2900,
+       "maxConcurrency": 2
+      },
+      "logs": [
+       "2026-11-06T08:12:10.300Z START RequestId: d427fc41-54b6-4670-82a7-04b65f44a12a Version: $LATEST",
+       "2026-11-06T08:12:10.768Z\td427fc41-54b6-4670-82a7-04b65f44a12a\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd",
+       "2026-11-06T08:12:11.236Z\td427fc41-54b6-4670-82a7-04b65f44a12a\tINFO\tFound 1 error events",
+       "2026-11-06T08:12:11.705Z\td427fc41-54b6-4670-82a7-04b65f44a12a\tERROR\tFailed to send Slack notification: 503 Service Unavailable",
+       "2026-11-06T08:12:12.173Z\td427fc41-54b6-4670-82a7-04b65f44a12a\tINFO\tSuccessfully sent 0/1 notifications to Slack",
+       "2026-11-06T08:12:13.110Z END RequestId: d427fc41-54b6-4670-82a7-04b65f44a12a",
+       "2026-11-06T08:12:13.110Z REPORT RequestId: d427fc41-54b6-4670-82a7-04b65f44a12a\tDuration: 2810.00 ms\tBilled Duration: 2810 ms\tMemory Size: 256 MB\tMax Memory Used: 92 MB",
+       "2026-11-06T08:19:44.120Z START RequestId: 3d0d4ce2-5f5a-42ba-9ee6-01cf7f0244b6 Version: $LATEST",
+       "2026-11-06T08:19:44.588Z\t3d0d4ce2-5f5a-42ba-9ee6-01cf7f0244b6\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd",
+       "2026-11-06T08:19:45.056Z\t3d0d4ce2-5f5a-42ba-9ee6-01cf7f0244b6\tINFO\tFound 1 error events",
+       "2026-11-06T08:19:45.525Z\t3d0d4ce2-5f5a-42ba-9ee6-01cf7f0244b6\tERROR\tFailed to send Slack notification: 503 Service Unavailable",
+       "2026-11-06T08:19:45.993Z\t3d0d4ce2-5f5a-42ba-9ee6-01cf7f0244b6\tINFO\tSuccessfully sent 0/1 notifications to Slack",
+       "2026-11-06T08:19:46.930Z END RequestId: 3d0d4ce2-5f5a-42ba-9ee6-01cf7f0244b6",
+       "2026-11-06T08:19:46.930Z REPORT RequestId: 3d0d4ce2-5f5a-42ba-9ee6-01cf7f0244b6\tDuration: 2810.00 ms\tBilled Duration: 2810 ms\tMemory Size: 256 MB\tMax Memory Used: 92 MB",
+       "2026-11-06T08:31:02.540Z START RequestId: fef4e9ea-14a1-473f-ae84-b072c3e1d919 Version: $LATEST",
+       "2026-11-06T08:31:03.008Z\tfef4e9ea-14a1-473f-ae84-b072c3e1d919\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd",
+       "2026-11-06T08:31:03.476Z\tfef4e9ea-14a1-473f-ae84-b072c3e1d919\tINFO\tFound 1 error events",
+       "2026-11-06T08:31:03.945Z\tfef4e9ea-14a1-473f-ae84-b072c3e1d919\tERROR\tFailed to send Slack notification: 503 Service Unavailable",
+       "2026-11-06T08:31:04.413Z\tfef4e9ea-14a1-473f-ae84-b072c3e1d919\tINFO\tSuccessfully sent 0/1 notifications to Slack",
+       "2026-11-06T08:31:05.350Z END RequestId: fef4e9ea-14a1-473f-ae84-b072c3e1d919",
+       "2026-11-06T08:31:05.350Z REPORT RequestId: fef4e9ea-14a1-473f-ae84-b072c3e1d919\tDuration: 2810.00 ms\tBilled Duration: 2810 ms\tMemory Size: 256 MB\tMax Memory Used: 92 MB",
+       "2026-11-06T09:04:18.210Z START RequestId: 4c14fc6a-2352-4202-a80e-c9ddd000948b Version: $LATEST",
+       "2026-11-06T09:04:18.244Z\t4c14fc6a-2352-4202-a80e-c9ddd000948b\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd",
+       "2026-11-06T09:04:18.278Z\t4c14fc6a-2352-4202-a80e-c9ddd000948b\tINFO\tFound 1 error events",
+       "2026-11-06T09:04:18.312Z\t4c14fc6a-2352-4202-a80e-c9ddd000948b\tINFO\tSent WARNING alert for eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd: GenericError",
+       "2026-11-06T09:04:18.346Z\t4c14fc6a-2352-4202-a80e-c9ddd000948b\tINFO\tSuccessfully sent 1/1 notifications to Slack",
+       "2026-11-06T09:04:18.414Z END RequestId: 4c14fc6a-2352-4202-a80e-c9ddd000948b",
+       "2026-11-06T09:04:18.414Z REPORT RequestId: 4c14fc6a-2352-4202-a80e-c9ddd000948b\tDuration: 204.00 ms\tBilled Duration: 204 ms\tMemory Size: 256 MB\tMax Memory Used: 92 MB"
+      ],
+      "errorSummary": [
+       [
+        "Failed to send Slack notification: 503 Service Unavailable",
+        11
+       ]
+      ]
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-01T23:50:03Z",
+      "type": "function_config",
+      "target": "SyntheticDataFunction",
+      "actor": "console:user-a",
+      "summary": "설명 문구 변경 (Description 필드만)"
+     },
+     {
+      "time": "2026-11-05T02:22:37Z",
+      "type": "stack_update",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "SearchCanaryVectorAlarm 알람 리소스 추가"
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     }
+    ],
+    "metrics": {},
+    "externalStatus": [
+     {
+      "provider": "Slack",
+      "time": "2026-11-06T08:05:00Z",
+      "severity": "incident",
+      "title": "Incoming Webhook 및 Events API 전달 장애",
+      "body": "일부 워크스페이스에서 Incoming Webhook 전송 실패와 이벤트 지연이 발생하고 있습니다."
+     },
+     {
+      "provider": "Slack",
+      "time": "2026-11-06T08:58:00Z",
+      "severity": "resolved",
+      "title": "Incoming Webhook 및 Events API 전달 장애 복구",
+      "body": "전달이 정상화되었습니다."
+     }
+    ]
+   },
+   "truth": {
+    "verdict": "root_cause",
+    "component": "slack:platform",
+    "faultType": "slack_platform",
+    "cause": "Slack 상태 페이지가 알린 Incoming Webhook 장애 시간대에 webhook 호출이 503으로 실패했고, 공지 복구 시각 이후 전송이 다시 성공한다. 설정이나 코드 변경과 무관하므로 우리 쪽 수정이 필요하지 않다.",
+    "contributing": [],
+    "fix": "조치 없이 복구를 확인하고, 장애 시간대에 놓친 오류를 CloudWatch 로그에서 직접 확인한다.",
+    "acceptableFixes": [
+     "전송 실패 알림을 저장했다가 다시 보내는 경로 추가 (개선)"
+    ],
+    "forbiddenFixes": [
+     "webhook 재발급",
+     "SSM 파라미터 교체",
+     "슬랙 함수 롤백",
+     "메모리·타임아웃 증설"
+    ],
+    "evidenceSignals": [
+     "503 Service Unavailable",
+     "Incoming Webhook"
+    ]
+   }
+  },
+  {
+   "id": "v3-23",
+   "code": "D1",
+   "title": "재질 검색에 신규 부품이 잡히지 않음",
+   "message": "재질 검색에서 합금 '6061' 넣으면 몇 개 안 나와요. 판매자들 말로는 지난달에 6061 알루미늄 부품 꽤 올렸다는데요. 버그인가요?",
+   "attrs": {
+    "multiFactor": false,
+    "detectionGap": true,
+    "humanReported": true,
+    "redHerring": false,
+    "noErrorSymptom": true
+   },
+   "world": {
+    "functions": {
+     "MaterialPropertySearchFunction": {
+      "status": {
+       "invocations": 22,
+       "errors": 0,
+       "avgDuration": 523,
+       "throttles": 0,
+       "durationP99": 1480,
+       "maxConcurrency": 2
+      },
+      "logs": [
+       "2026-11-06T05:01:10.200Z START RequestId: 384075a4-aeb1-4c02-9882-3fd01273266f Version: $LATEST",
+       "2026-11-06T05:01:10.722Z END RequestId: 384075a4-aeb1-4c02-9882-3fd01273266f",
+       "2026-11-06T05:01:10.722Z REPORT RequestId: 384075a4-aeb1-4c02-9882-3fd01273266f\tDuration: 522.40 ms\tBilled Duration: 523 ms\tMemory Size: 512 MB\tMax Memory Used: 172 MB",
+       "2026-11-06T05:03:41.900Z START RequestId: 9d531c5f-7708-47a3-bbc3-7a73b75c1966 Version: $LATEST",
+       "2026-11-06T05:03:42.398Z END RequestId: 9d531c5f-7708-47a3-bbc3-7a73b75c1966",
+       "2026-11-06T05:03:42.398Z REPORT RequestId: 9d531c5f-7708-47a3-bbc3-7a73b75c1966\tDuration: 498.10 ms\tBilled Duration: 499 ms\tMemory Size: 512 MB\tMax Memory Used: 172 MB",
+       "2026-11-06T05:04:20.310Z START RequestId: 18bf1803-f248-4db5-a52d-02e65e61b04a Version: $LATEST",
+       "2026-11-06T05:04:20.817Z END RequestId: 18bf1803-f248-4db5-a52d-02e65e61b04a",
+       "2026-11-06T05:04:20.817Z REPORT RequestId: 18bf1803-f248-4db5-a52d-02e65e61b04a\tDuration: 507.60 ms\tBilled Duration: 508 ms\tMemory Size: 512 MB\tMax Memory Used: 172 MB"
+      ]
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-01T23:50:03Z",
+      "type": "function_config",
+      "target": "SyntheticDataFunction",
+      "actor": "console:user-a",
+      "summary": "설명 문구 변경 (Description 필드만)"
+     },
+     {
+      "time": "2026-11-02T06:40:11Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "reindex-search-documents --apply 완료 (doc v5, 186건 갱신)"
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     }
+    ],
+    "metrics": {
+     "apiGateway": {
+      "count": 760,
+      "5xx": 0,
+      "4xx": 0,
+      "integrationLatencyP99": 1420
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "insufficient_evidence",
+    "component": "lambda:MaterialPropertySearchFunction",
+    "faultType": "latent_data_bug",
+    "cause": "함수는 오류 없이 빠르게 응답하고 최근 변경도 없다. 어떤 항목이 왜 걸러졌는지 남기는 로그가 없고 SPEC 항목 내용도 이 세계에 없어 결정적 신호가 없다. 숨은 원인은 등록 폼이 사양을 평평한 키(material: '6061')로 저장해, materialComposition만 읽는 재질 검색에서 제외되는 것이다.",
+    "contributing": [],
+    "fix": "해당 판매자 부품의 SPEC 항목을 조회해 materialComposition 유무와 필드 형태를 확인한다.",
+    "acceptableFixes": [
+     "검색 결과에 포함·제외된 부품의 SPEC 구조 비교",
+     "필터 탈락 사유를 디버그 로그로 남겨 재현"
+    ],
+    "forbiddenFixes": [
+     "재색인으로 해결된다고 단정",
+     "메모리 증설",
+     "필터 조건 전체 제거",
+     "함수 코드 롤백"
+    ],
+    "evidenceSignals": [
+     "Duration: 522.40 ms"
+    ]
+   }
+  },
+  {
+   "id": "v3-24",
+   "code": "B2",
+   "title": "드물게 쓰는 함수의 Legacy 모델 접근 상실",
+   "message": "합성 데이터 돌렸더니 설명이 전부 똑같은 템플릿 문구예요. 예전엔 Claude가 제각각 써줬었는데. 응답은 201로 정상입니다.",
+   "inspiredBy": "Bedrock·Anthropic 모델 수명주기 공지 (Legacy 15일 비활성 접근 상실)",
+   "attrs": {
+    "multiFactor": true,
+    "detectionGap": false,
+    "humanReported": true,
+    "redHerring": false,
+    "noErrorSymptom": false
+   },
+   "world": {
+    "functions": {
+     "SyntheticDataFunction": {
+      "status": {
+       "invocations": 2,
+       "errors": 0,
+       "avgDuration": 14100,
+       "throttles": 0,
+       "durationP99": 14300,
+       "maxConcurrency": 2
+      },
+      "logs": [
+       "2026-11-06T06:12:04.200Z START RequestId: 4e23b86f-ef0b-4e6c-8beb-b569255d19ac Version: $LATEST",
+       "2026-11-06T06:12:05.778Z\t4e23b86f-ef0b-4e6c-8beb-b569255d19ac\tINFO\tGenerating 5 synthetic parts for category: motor",
+       "2026-11-06T06:12:07.357Z\t4e23b86f-ef0b-4e6c-8beb-b569255d19ac\tWARN\tClaude description generation failed, using fallback: ResourceNotFoundException: Access denied. This Model is marked by provider as Legacy and you have not been actively using the model in the last 15 days. Please upgrade to an active model on Amazon Bedrock\n    at de_ResourceNotFoundExceptionRes (/opt/nodejs/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1072:21)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:27:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 404,\n    requestId: '69562EF1-9DD3-8267-9149-A19B10E40B14',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+       "2026-11-06T06:12:08.936Z\t4e23b86f-ef0b-4e6c-8beb-b569255d19ac\tINFO\tGenerated part 1/5: a1f3e702-9d44-4c68-8b15-6e2d0c7a3f91 (2810ms)",
+       "2026-11-06T06:12:10.515Z\t4e23b86f-ef0b-4e6c-8beb-b569255d19ac\tWARN\tClaude description generation failed, using fallback: ResourceNotFoundException: Access denied. This Model is marked by provider as Legacy and you have not been actively using the model in the last 15 days. Please upgrade to an active model on Amazon Bedrock\n    at de_ResourceNotFoundExceptionRes (/opt/nodejs/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1072:21)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:27:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 404,\n    requestId: '69562EF1-9DD3-8267-9149-A19B10E40B14',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+       "2026-11-06T06:12:12.094Z\t4e23b86f-ef0b-4e6c-8beb-b569255d19ac\tINFO\tGenerated part 2/5: 6d0b94c1-27e8-4f35-a9c6-3b1f7e2d8a04 (5640ms)",
+       "2026-11-06T06:12:13.673Z\t4e23b86f-ef0b-4e6c-8beb-b569255d19ac\tWARN\tClaude description generation failed, using fallback: ResourceNotFoundException: Access denied. This Model is marked by provider as Legacy and you have not been actively using the model in the last 15 days. Please upgrade to an active model on Amazon Bedrock\n    at de_ResourceNotFoundExceptionRes (/opt/nodejs/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1072:21)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:27:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 404,\n    requestId: '69562EF1-9DD3-8267-9149-A19B10E40B14',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+       "2026-11-06T06:12:15.252Z\t4e23b86f-ef0b-4e6c-8beb-b569255d19ac\tINFO\tGenerated part 3/5: f2c81e57-40a3-46d9-b7e2-9a5c0d6f1b38 (8420ms)",
+       "2026-11-06T06:12:18.410Z END RequestId: 4e23b86f-ef0b-4e6c-8beb-b569255d19ac",
+       "2026-11-06T06:12:18.410Z REPORT RequestId: 4e23b86f-ef0b-4e6c-8beb-b569255d19ac\tDuration: 14210.00 ms\tBilled Duration: 14210 ms\tMemory Size: 1024 MB\tMax Memory Used: 244 MB"
+      ],
+      "errorSummary": [
+       [
+        "ResourceNotFoundException",
+        10
+       ]
+      ],
+      "config": {
+       "environment": {
+        "BEDROCK_MODEL_ID": "anthropic.claude-3-haiku-20240307-v1:0"
+       }
+      }
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-11-01T23:50:03Z",
+      "type": "function_config",
+      "target": "SyntheticDataFunction",
+      "actor": "console:user-a",
+      "summary": "설명 문구 변경 (Description 필드만)"
+     },
+     {
+      "time": "2026-11-02T06:40:11Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "reindex-search-documents --apply 완료 (doc v5, 186건 갱신)"
+     },
+     {
+      "time": "2026-11-04T07:31:09Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.1 태그 배포: slack-notification 퇴역 모델 오류 분류 수정",
+      "details": {
+       "before": "v1.9.0",
+       "after": "v1.9.1"
+      }
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     }
+    ],
+    "metrics": {
+     "bedrock": {
+      "anthropic.claude-3-haiku-20240307-v1:0": {
+       "invocations": 0,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 0,
+       "inputTokens": 0,
+       "outputTokens": 0
+      }
+     }
+    },
+    "externalStatus": [
+     {
+      "provider": "AWS",
+      "time": "2026-10-10T00:00:00Z",
+      "severity": "informational",
+      "title": "Amazon Bedrock 모델 수명주기: Claude 3 Haiku Legacy 전환 (ap-northeast-2)",
+      "body": "ap-northeast-2에서 Claude 3 Haiku는 2026-10-10에 Legacy, 2026-11-13에 EOL입니다. 15일간 사용하지 않은 계정은 접근을 잃을 수 있습니다."
+     }
+    ]
+   },
+   "truth": {
+    "verdict": "root_cause",
+    "component": "lambda:SyntheticDataFunction",
+    "faultType": "model_lifecycle",
+    "cause": "SyntheticDataFunction에만 콘솔로 넣어 둔 BEDROCK_MODEL_ID가 Claude 3 Haiku로 남아 있다. 이 모델은 서울에서 2026-10-10에 Legacy가 되었고, 함수를 15일 넘게 쓰지 않아 접근을 잃어 ResourceNotFoundException이 난다. 코드가 경고만 남기고 고정 문구로 폴백해 응답은 201이다.",
+    "contributing": [
+     "7일보다 오래된 콘솔 변경이라 최근 변경 이력에 없고 템플릿과 어긋남",
+     "호출이 드문 함수라 Legacy 공지 뒤에도 드러나지 않음",
+     "2026-11-13 EOL이 지나면 접근 복구도 불가능"
+    ],
+    "fix": "BEDROCK_MODEL_ID 재정의를 제거해 템플릿의 global.anthropic.claude-haiku-4-5-20251001-v1:0을 쓰게 한다.",
+    "acceptableFixes": [
+     "sam deploy로 템플릿 환경 변수 재적용"
+    ],
+    "forbiddenFixes": [
+     "Legacy 모델 접근 재신청으로 해결",
+     "Bedrock 쿼터 증설",
+     "프롬프트 수정",
+     "IAM 권한 확대"
+    ],
+    "evidenceSignals": [
+     "marked by provider as Legacy",
+     "anthropic.claude-3-haiku-20240307-v1:0",
+     "Claude 3 Haiku"
+    ]
+   }
+  },
+  {
+   "id": "v3-26",
+   "code": "A1",
+   "title": "캐시 키에서 필터가 빠져 결과 고정",
+   "message": "카테고리 필터를 모터로 바꿔도 아까 배터리 검색 결과가 그대로 나와요. 강력 새로고침해도 똑같습니다. 가격 상한을 넣어도 안 먹어요.",
+   "attrs": {
+    "multiFactor": true,
+    "detectionGap": false,
+    "humanReported": true,
+    "redHerring": false,
+    "noErrorSymptom": true
+   },
+   "world": {
+    "functions": {
+     "VectorSearchFunction": {
+      "config": {
+       "lastModified": "2026-11-06T09:40:51.000+0000"
+      },
+      "status": {
+       "invocations": 188,
+       "errors": 0,
+       "avgDuration": 96,
+       "throttles": 0,
+       "durationP99": 1240,
+       "maxConcurrency": 5
+      },
+      "logs": [
+       "2026-11-06T10:12:04.210Z START RequestId: 833de6c5-07c9-4dc7-9313-a5e8a376376c Version: $LATEST",
+       "2026-11-06T10:12:04.220Z\t833de6c5-07c9-4dc7-9313-a5e8a376376c\tINFO\tProcessing search query: 배터리",
+       "2026-11-06T10:12:04.230Z\t833de6c5-07c9-4dc7-9313-a5e8a376376c\tINFO\tCache hit!",
+       "2026-11-06T10:12:04.251Z END RequestId: 833de6c5-07c9-4dc7-9313-a5e8a376376c",
+       "2026-11-06T10:12:04.251Z REPORT RequestId: 833de6c5-07c9-4dc7-9313-a5e8a376376c\tDuration: 41.70 ms\tBilled Duration: 42 ms\tMemory Size: 1024 MB\tMax Memory Used: 208 MB",
+       "2026-11-06T10:12:31.560Z START RequestId: 77265214-2bda-4100-bcff-e11347ab7a81 Version: $LATEST",
+       "2026-11-06T10:12:31.570Z\t77265214-2bda-4100-bcff-e11347ab7a81\tINFO\tProcessing search query: 배터리",
+       "2026-11-06T10:12:31.580Z\t77265214-2bda-4100-bcff-e11347ab7a81\tINFO\tCache hit!",
+       "2026-11-06T10:12:31.601Z END RequestId: 77265214-2bda-4100-bcff-e11347ab7a81",
+       "2026-11-06T10:12:31.601Z REPORT RequestId: 77265214-2bda-4100-bcff-e11347ab7a81\tDuration: 41.70 ms\tBilled Duration: 42 ms\tMemory Size: 1024 MB\tMax Memory Used: 208 MB",
+       "2026-11-06T10:13:02.880Z START RequestId: 8167a790-a281-4539-9e8f-d4caa7cdb928 Version: $LATEST",
+       "2026-11-06T10:13:02.890Z\t8167a790-a281-4539-9e8f-d4caa7cdb928\tINFO\tProcessing search query: 배터리",
+       "2026-11-06T10:13:02.900Z\t8167a790-a281-4539-9e8f-d4caa7cdb928\tINFO\tCache hit!",
+       "2026-11-06T10:13:02.921Z END RequestId: 8167a790-a281-4539-9e8f-d4caa7cdb928",
+       "2026-11-06T10:13:02.921Z REPORT RequestId: 8167a790-a281-4539-9e8f-d4caa7cdb928\tDuration: 41.70 ms\tBilled Duration: 42 ms\tMemory Size: 1024 MB\tMax Memory Used: 208 MB",
+       "2026-11-06T10:40:18.020Z START RequestId: 6b914f17-fe63-4084-9477-eed1832f9720 Version: $LATEST",
+       "2026-11-06T10:40:18.030Z\t6b914f17-fe63-4084-9477-eed1832f9720\tINFO\tProcessing search query: 모터 코나",
+       "2026-11-06T10:40:18.040Z\t6b914f17-fe63-4084-9477-eed1832f9720\tINFO\tCache hit!",
+       "2026-11-06T10:40:18.061Z END RequestId: 6b914f17-fe63-4084-9477-eed1832f9720",
+       "2026-11-06T10:40:18.061Z REPORT RequestId: 6b914f17-fe63-4084-9477-eed1832f9720\tDuration: 41.70 ms\tBilled Duration: 42 ms\tMemory Size: 1024 MB\tMax Memory Used: 208 MB"
+      ]
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-02T06:40:11Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "reindex-search-documents --apply 완료 (doc v5, 186건 갱신)"
+     },
+     {
+      "time": "2026-11-03T04:05:48Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.0 태그 배포: 부품 목록 커서 페이지네이션 정리",
+      "details": {
+       "before": "v1.8.1",
+       "after": "v1.9.0"
+      }
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     },
+     {
+      "time": "2026-11-06T09:40:51Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.1 태그 배포: vector-search searchCacheKey 정리 (refactor)",
+      "details": {
+       "before": "v1.10.0",
+       "after": "v1.10.1"
+      }
+     }
+    ],
+    "metrics": {
+     "apiGateway": {
+      "count": 980,
+      "5xx": 0,
+      "4xx": 0,
+      "integrationLatencyP99": 1180
+     },
+     "canary": {
+      "lastRunAt": "2026-11-06T10:23:00Z",
+      "passed": true,
+      "failures": []
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "root_cause",
+    "component": "lambda:VectorSearchFunction",
+    "faultType": "stale_cache",
+    "cause": "09:40 배포의 searchCacheKey 정리로 캐시 키에서 필터·topK가 빠져, 같은 질의면 필터가 달라도 이전 요청의 RESULT 캐시를 돌려준다. 로그에는 Cache hit!만 남고 오류가 없다.",
+    "contributing": [
+     "합성 검사는 canary=true로 캐시를 거치지 않아 통과함",
+     "RESULT 캐시 TTL이 7일이라 잘못 저장된 결과가 오래 남음"
+    ],
+    "fix": "캐시 키에 필터·topK를 되돌려 배포하고 SEARCH_PIPELINE_VERSION을 올려 기존 캐시를 무효화한다.",
+    "acceptableFixes": [
+     "v1.10.0으로 롤백 (완화)",
+     "MATCH#*/RESULT 캐시 항목 삭제와 코드 수정 병행"
+    ],
+    "forbiddenFixes": [
+     "React Query 캐시 시간만 줄이기",
+     "브라우저 캐시 문제로 결론",
+     "DynamoDB 증설",
+     "합성 검사 통과를 근거로 정상 판정"
+    ],
+    "evidenceSignals": [
+     "Cache hit!",
+     "searchCacheKey"
+    ]
+   }
+  },
+  {
+   "id": "v3-27",
+   "code": "A1",
+   "title": "프론트만 먼저 배포된 것으로 보이는 설명 실패",
+   "message": "AI 추천 이유가 오후부터 전부 안 떠요. 결과 리스트는 잘 나오고 이유 칸만 잠깐 로딩하다 비어버립니다.",
+   "attrs": {
+    "multiFactor": true,
+    "detectionGap": true,
+    "humanReported": true,
+    "redHerring": false,
+    "noErrorSymptom": true
+   },
+   "world": {
+    "functions": {
+     "VectorSearchFunction": {
+      "status": {
+       "invocations": 262,
+       "errors": 0,
+       "avgDuration": 372,
+       "throttles": 0,
+       "durationP99": 1210,
+       "maxConcurrency": 6
+      },
+      "logs": [
+       "2026-11-06T06:41:03.120Z START RequestId: 5f78ebf0-75bb-4e88-96ce-a8587b120b5e Version: $LATEST",
+       "2026-11-06T06:41:03.295Z\t5f78ebf0-75bb-4e88-96ce-a8587b120b5e\tINFO\tProcessing search query: EV6 배터리",
+       "2026-11-06T06:41:03.471Z\t5f78ebf0-75bb-4e88-96ce-a8587b120b5e\tINFO\tvector 100, bm25 92 (index 186) -> ranked 137, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"EV6\"]}",
+       "2026-11-06T06:41:03.822Z END RequestId: 5f78ebf0-75bb-4e88-96ce-a8587b120b5e",
+       "2026-11-06T06:41:03.822Z REPORT RequestId: 5f78ebf0-75bb-4e88-96ce-a8587b120b5e\tDuration: 702.50 ms\tBilled Duration: 703 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB",
+       "2026-11-06T06:41:04.015Z START RequestId: 6bbc95e2-1094-4014-a8fa-3b019f42eddc Version: $LATEST",
+       "2026-11-06T06:41:04.021Z END RequestId: 6bbc95e2-1094-4014-a8fa-3b019f42eddc",
+       "2026-11-06T06:41:04.021Z REPORT RequestId: 6bbc95e2-1094-4014-a8fa-3b019f42eddc\tDuration: 6.84 ms\tBilled Duration: 7 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB",
+       "2026-11-06T06:44:29.880Z START RequestId: a69644cf-2c69-4e3b-87db-b843ce7bd49b Version: $LATEST",
+       "2026-11-06T06:44:30.052Z\ta69644cf-2c69-4e3b-87db-b843ce7bd49b\tINFO\tProcessing search query: 아이오닉6 인버터",
+       "2026-11-06T06:44:30.224Z\ta69644cf-2c69-4e3b-87db-b843ce7bd49b\tINFO\tvector 100, bm25 71 (index 186) -> ranked 129, constraints {\"categories\":[\"inverter\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"아이오닉6\"]}",
+       "2026-11-06T06:44:30.569Z END RequestId: a69644cf-2c69-4e3b-87db-b843ce7bd49b",
+       "2026-11-06T06:44:30.569Z REPORT RequestId: a69644cf-2c69-4e3b-87db-b843ce7bd49b\tDuration: 689.20 ms\tBilled Duration: 690 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB",
+       "2026-11-06T06:44:30.660Z START RequestId: f5d1a40f-e64b-4487-8ef7-b4975c9a2e7a Version: $LATEST",
+       "2026-11-06T06:44:30.665Z END RequestId: f5d1a40f-e64b-4487-8ef7-b4975c9a2e7a",
+       "2026-11-06T06:44:30.665Z REPORT RequestId: f5d1a40f-e64b-4487-8ef7-b4975c9a2e7a\tDuration: 5.91 ms\tBilled Duration: 6 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB"
+      ]
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-01T23:50:03Z",
+      "type": "function_config",
+      "target": "SyntheticDataFunction",
+      "actor": "console:user-a",
+      "summary": "설명 문구 변경 (Description 필드만)"
+     },
+     {
+      "time": "2026-11-04T07:31:09Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.1 태그 배포: slack-notification 퇴역 모델 오류 분류 수정",
+      "details": {
+       "before": "v1.9.0",
+       "after": "v1.9.1"
+      }
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     }
+    ],
+    "metrics": {
+     "apiGateway": {
+      "count": 1190,
+      "5xx": 0,
+      "4xx": 131,
+      "integrationLatencyP99": 1180
+     },
+     "bedrock": {
+      "global.anthropic.claude-haiku-4-5-20251001-v1:0": {
+       "invocations": 4,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 2650,
+       "inputTokens": 1180,
+       "outputTokens": 210
+      },
+      "amazon.titan-embed-text-v2:0": {
+       "invocations": 131,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 168,
+       "inputTokens": 2410,
+       "outputTokens": 0
+      }
+     },
+     "canary": {
+      "lastRunAt": "2026-11-06T06:23:00Z",
+      "passed": true,
+      "failures": []
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "insufficient_evidence",
+    "component": "client:request",
+    "faultType": "bad_deploy_code",
+    "cause": "/api/search/explain 호출이 수 ms 만에 끝나고 Bedrock 호출과 4xx 수치만 달라져, 요청이 검증에서 거부되는 것으로 보이지만 Lambda는 400 응답 본문을 로그에 남기지 않고 API Gateway 액세스 로그도 없다. 숨은 원인은 master push로 자동 배포된 프론트가 아직 태그 배포되지 않은 백엔드에 새 형식(partIds 대신 parts)을 보내는 것인데, 프론트 배포 이력은 이 세계의 변경 이력에 없다.",
+    "contributing": [
+     "프론트는 master push, 백엔드는 태그 push로 배포 시점이 분리됨",
+     "400 응답을 로그에 남기지 않음"
+    ],
+    "fix": "브라우저 네트워크 탭이나 API Gateway 액세스 로그로 /api/search/explain의 400 응답 본문을 확인하고 프론트 배포 이력을 대조한다.",
+    "acceptableFixes": [
+     "API Gateway 실행·액세스 로그 활성화",
+     "프론트 배포 워크플로 실행 기록과 백엔드 태그 시점 비교"
+    ],
+    "forbiddenFixes": [
+     "Bedrock 장애로 단정",
+     "Bedrock 쿼터 증설",
+     "VectorSearchFunction 메모리 증설",
+     "BEDROCK_MODEL_ID 변경"
+    ],
+    "evidenceSignals": [
+     "Duration: 6.84 ms",
+     "Duration: 5.91 ms"
+    ]
+   }
+  },
+  {
+   "id": "v3-30",
+   "code": "A3",
+   "title": "SSM 파라미터 이름 정리로 webhook 조회 실패",
+   "message": "오늘 VectorSearch에서 에러 났는데 알림을 못 받았어요. SlackNotificationFunction Errors 그래프가 어젯밤부터 올라가 있는데 한번 봐주세요.",
+   "attrs": {
+    "multiFactor": true,
+    "detectionGap": false,
+    "humanReported": false,
+    "redHerring": false,
+    "noErrorSymptom": false
+   },
+   "world": {
+    "functions": {
+     "SlackNotificationFunction": {
+      "status": {
+       "invocations": 16,
+       "errors": 12,
+       "avgDuration": 201,
+       "throttles": 0,
+       "durationP99": 620,
+       "maxConcurrency": 2
+      },
+      "logs": [
+       "2026-11-05T11:02:10.300Z START RequestId: 1f44a209-67fd-4336-b1e0-be96f509b28e Version: $LATEST",
+       "2026-11-05T11:02:10.332Z\t1f44a209-67fd-4336-b1e0-be96f509b28e\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-ProposalFunction-ReGynEdgJNWP",
+       "2026-11-05T11:02:10.365Z\t1f44a209-67fd-4336-b1e0-be96f509b28e\tINFO\tFound 1 error events",
+       "2026-11-05T11:02:10.398Z\t1f44a209-67fd-4336-b1e0-be96f509b28e\tINFO\tSent INFO alert for eecar-stack-ProposalFunction-ReGynEdgJNWP: Exception",
+       "2026-11-05T11:02:10.430Z\t1f44a209-67fd-4336-b1e0-be96f509b28e\tINFO\tSuccessfully sent 1/1 notifications to Slack",
+       "2026-11-05T11:02:10.496Z END RequestId: 1f44a209-67fd-4336-b1e0-be96f509b28e",
+       "2026-11-05T11:02:10.496Z REPORT RequestId: 1f44a209-67fd-4336-b1e0-be96f509b28e\tDuration: 196.00 ms\tBilled Duration: 196 ms\tMemory Size: 256 MB\tMax Memory Used: 94 MB",
+       "2026-11-05T14:47:21.610Z START RequestId: 3991dd87-c980-494f-9032-1e676a273770 Version: $LATEST",
+       "2026-11-05T14:47:21.650Z\t3991dd87-c980-494f-9032-1e676a273770\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX",
+       "2026-11-05T14:47:21.691Z\t3991dd87-c980-494f-9032-1e676a273770\tINFO\tFound 1 error events",
+       "2026-11-05T14:47:21.732Z\t3991dd87-c980-494f-9032-1e676a273770\tERROR\tFailed to process CloudWatch Logs event: ParameterNotFound: UnknownError\n    at de_ParameterNotFoundRes (/var/task/node_modules/@aws-sdk/client-ssm/dist-cjs/index.js:7240:21)\n    at async getSlackWebhookUrl (file:///var/task/index.js:15:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'FD921E7B-833F-BC59-78CF-C83104C72E1F',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+       "2026-11-05T14:47:21.814Z END RequestId: 3991dd87-c980-494f-9032-1e676a273770",
+       "2026-11-05T14:47:21.814Z REPORT RequestId: 3991dd87-c980-494f-9032-1e676a273770\tDuration: 204.00 ms\tBilled Duration: 204 ms\tMemory Size: 256 MB\tMax Memory Used: 92 MB\tInit Duration: 412.50 ms\tStatus: error",
+       "2026-11-05T22:13:50.020Z START RequestId: a85def68-9e50-46f8-9f1c-2e3c2f85a56f Version: $LATEST",
+       "2026-11-05T22:13:50.060Z\ta85def68-9e50-46f8-9f1c-2e3c2f85a56f\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX",
+       "2026-11-05T22:13:50.101Z\ta85def68-9e50-46f8-9f1c-2e3c2f85a56f\tINFO\tFound 1 error events",
+       "2026-11-05T22:13:50.142Z\ta85def68-9e50-46f8-9f1c-2e3c2f85a56f\tERROR\tFailed to process CloudWatch Logs event: ParameterNotFound: UnknownError\n    at de_ParameterNotFoundRes (/var/task/node_modules/@aws-sdk/client-ssm/dist-cjs/index.js:7240:21)\n    at async getSlackWebhookUrl (file:///var/task/index.js:15:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'FD921E7B-833F-BC59-78CF-C83104C72E1F',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+       "2026-11-05T22:13:50.224Z END RequestId: a85def68-9e50-46f8-9f1c-2e3c2f85a56f",
+       "2026-11-05T22:13:50.224Z REPORT RequestId: a85def68-9e50-46f8-9f1c-2e3c2f85a56f\tDuration: 204.00 ms\tBilled Duration: 204 ms\tMemory Size: 256 MB\tMax Memory Used: 92 MB\tInit Duration: 412.50 ms\tStatus: error",
+       "2026-11-06T03:41:18.300Z START RequestId: 31352014-fdce-4204-8e02-bcac2acbd225 Version: $LATEST",
+       "2026-11-06T03:41:18.340Z\t31352014-fdce-4204-8e02-bcac2acbd225\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX",
+       "2026-11-06T03:41:18.381Z\t31352014-fdce-4204-8e02-bcac2acbd225\tINFO\tFound 1 error events",
+       "2026-11-06T03:41:18.422Z\t31352014-fdce-4204-8e02-bcac2acbd225\tERROR\tFailed to process CloudWatch Logs event: ParameterNotFound: UnknownError\n    at de_ParameterNotFoundRes (/var/task/node_modules/@aws-sdk/client-ssm/dist-cjs/index.js:7240:21)\n    at async getSlackWebhookUrl (file:///var/task/index.js:15:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'FD921E7B-833F-BC59-78CF-C83104C72E1F',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+       "2026-11-06T03:41:18.504Z END RequestId: 31352014-fdce-4204-8e02-bcac2acbd225",
+       "2026-11-06T03:41:18.504Z REPORT RequestId: 31352014-fdce-4204-8e02-bcac2acbd225\tDuration: 204.00 ms\tBilled Duration: 204 ms\tMemory Size: 256 MB\tMax Memory Used: 92 MB\tInit Duration: 412.50 ms\tStatus: error"
+      ],
+      "errorSummary": [
+       [
+        "ParameterNotFound",
+        12
+       ]
+      ]
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-11-02T06:40:11Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "reindex-search-documents --apply 완료 (doc v5, 186건 갱신)"
+     },
+     {
+      "time": "2026-11-04T07:31:09Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.1 태그 배포: slack-notification 퇴역 모델 오류 분류 수정",
+      "details": {
+       "before": "v1.9.0",
+       "after": "v1.9.1"
+      }
+     },
+     {
+      "time": "2026-11-05T02:22:37Z",
+      "type": "stack_update",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "SearchCanaryVectorAlarm 알람 리소스 추가"
+     },
+     {
+      "time": "2026-11-05T11:20:05Z",
+      "type": "ssm_param",
+      "target": "/eecar/slack/webhook-url",
+      "actor": "console:user-c",
+      "summary": "파라미터 네이밍 정리: /eecar/slack/webhook-url 삭제, /eecar/prod/slack/webhook-url 생성",
+      "details": {
+       "before": "/eecar/slack/webhook-url",
+       "after": "/eecar/prod/slack/webhook-url"
+      }
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     }
+    ],
+    "metrics": {},
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "root_cause",
+    "component": "ssm:parameter",
+    "faultType": "secret_or_param_missing",
+    "cause": "11-05 11:20에 SSM 파라미터 이름 정리로 /eecar/slack/webhook-url을 지우고 /eecar/prod/slack/webhook-url을 만들었지만, 함수의 SLACK_WEBHOOK_SSM_PARAM과 IAM 정책은 예전 이름을 가리킨다. 실행 환경에 캐시된 URL로 잠시 동작하다가 콜드 스타트마다 ParameterNotFound로 실패해 알림이 전달되지 않는다.",
+    "contributing": [
+     "webhook URL 메모리 캐시 때문에 변경 후 몇 시간 뒤에야 증상이 나타남",
+     "알림 함수 자신의 실패를 통지할 경로가 없음",
+     "IAM 정책도 예전 파라미터 ARN에 묶여 있어 환경 변수만 바꾸면 AccessDenied가 남"
+    ],
+    "fix": "예전 이름의 파라미터를 복원하거나, 환경 변수와 IAM 정책을 새 이름으로 함께 바꿔 배포한다.",
+    "acceptableFixes": [
+     "/eecar/slack/webhook-url을 다시 만들어 즉시 복구 (완화)"
+    ],
+    "forbiddenFixes": [
+     "Slack webhook 재발급",
+     "환경 변수만 바꾸고 IAM은 그대로 두기",
+     "메모리 증설",
+     "VectorSearchFunction 롤백"
+    ],
+    "evidenceSignals": [
+     "ParameterNotFound",
+     "/eecar/prod/slack/webhook-url",
+     "/eecar/slack/webhook-url"
+    ]
+   }
+  },
+  {
+   "id": "v3-31",
+   "code": "F1",
+   "title": "배포 뒤 전체 점검, 이상 없음",
+   "message": "오늘 아침 배포 이후로 전체 상태 괜찮아? 한번 훑어봐줘.",
+   "attrs": {
+    "multiFactor": false,
+    "detectionGap": false,
+    "humanReported": false,
+    "redHerring": false,
+    "noErrorSymptom": true
+   },
+   "world": {
+    "functions": {
+     "VectorSearchFunction": {
+      "status": {
+       "invocations": 124,
+       "errors": 0,
+       "avgDuration": 860,
+       "throttles": 0,
+       "durationP99": 2410,
+       "maxConcurrency": 6
+      },
+      "logs": [
+       "2026-11-06T05:02:10.100Z START RequestId: b3a1c0c5-4a1f-42d4-b8cc-34550ed81005 Version: $LATEST",
+       "2026-11-06T05:02:10.303Z\tb3a1c0c5-4a1f-42d4-b8cc-34550ed81005\tINFO\tProcessing search query: 아이오닉5 배터리 팩",
+       "2026-11-06T05:02:10.506Z\tb3a1c0c5-4a1f-42d4-b8cc-34550ed81005\tINFO\tvector 100, bm25 94 (index 186) -> ranked 138, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"아이오닉5\"]}",
+       "2026-11-06T05:02:10.912Z END RequestId: b3a1c0c5-4a1f-42d4-b8cc-34550ed81005",
+       "2026-11-06T05:02:10.912Z REPORT RequestId: b3a1c0c5-4a1f-42d4-b8cc-34550ed81005\tDuration: 812.00 ms\tBilled Duration: 812 ms\tMemory Size: 1024 MB\tMax Memory Used: 210 MB"
+      ]
+     },
+     "GetPartsFunction": {
+      "status": {
+       "invocations": 638,
+       "errors": 0,
+       "avgDuration": 64,
+       "throttles": 0,
+       "durationP99": 218,
+       "maxConcurrency": 8
+      }
+     },
+     "PartRegistrationFunction": {
+      "status": {
+       "invocations": 12,
+       "errors": 0,
+       "avgDuration": 1910,
+       "throttles": 0,
+       "durationP99": 3380,
+       "maxConcurrency": 2
+      }
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-04T07:31:09Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.1 태그 배포: slack-notification 퇴역 모델 오류 분류 수정",
+      "details": {
+       "before": "v1.9.0",
+       "after": "v1.9.1"
+      }
+     },
+     {
+      "time": "2026-11-05T02:22:37Z",
+      "type": "stack_update",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "SearchCanaryVectorAlarm 알람 리소스 추가"
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     }
+    ],
+    "metrics": {
+     "bedrock": {
+      "global.anthropic.claude-haiku-4-5-20251001-v1:0": {
+       "invocations": 142,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 2700,
+       "inputTokens": 40200,
+       "outputTokens": 9100
+      },
+      "amazon.titan-embed-text-v2:0": {
+       "invocations": 136,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 171,
+       "inputTokens": 2510,
+       "outputTokens": 0
+      },
+      "global.anthropic.claude-sonnet-4-6": {
+       "invocations": 6,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 7100,
+       "inputTokens": 9100,
+       "outputTokens": 1400
+      }
+     },
+     "dynamodb": {
+      "throttledRequests": 0,
+      "consumedRCU": 420,
+      "consumedWCU": 38
+     },
+     "apiGateway": {
+      "count": 842,
+      "5xx": 0,
+      "4xx": 3,
+      "integrationLatencyP99": 2240
+     },
+     "canary": {
+      "lastRunAt": "2026-11-06T05:23:00Z",
+      "passed": true,
+      "failures": []
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "no_fault",
+    "component": "none",
+    "faultType": "no_fault",
+    "cause": "모든 함수의 오류·스로틀이 없고 지연도 평소 범위이며 합성 검사가 통과한다. 최근 변경은 일상 배포뿐이고 영향 신호가 없다.",
+    "contributing": [],
+    "fix": "조치 없이 현재 상태를 요약해 알린다.",
+    "acceptableFixes": [
+     "합성 검사와 대시보드 관찰 유지"
+    ],
+    "forbiddenFixes": [
+     "불필요한 롤백",
+     "근거 없는 증설",
+     "없는 장애를 지어내 원인 제시"
+    ],
+    "evidenceSignals": [
+     "vector 100, bm25 94"
+    ]
+   }
+  },
+  {
+   "id": "v3-33",
+   "code": "A1",
+   "title": "색인 캐시 상수 회귀로 매 요청 재적재",
+   "message": "DynamoDB 읽기 용량 그래프가 오후부터 수십 배로 뛰었어요. VectorSearchFunction 평균 응답시간도 0.8초에서 1.5초로 늘었고요. 에러는 안 보입니다. 아까 누가 USE_KNOWLEDGE_BASE 켰다던데 그것 때문일까요?",
+   "attrs": {
+    "multiFactor": false,
+    "detectionGap": false,
+    "humanReported": false,
+    "redHerring": true,
+    "noErrorSymptom": true
+   },
+   "world": {
+    "functions": {
+     "VectorSearchFunction": {
+      "config": {
+       "lastModified": "2026-11-06T07:48:02.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T07:12:44.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T07:12:44.412+0000",
+         "isLatest": true
+        }
+       ],
+       "environment": {
+        "USE_KNOWLEDGE_BASE": "true"
+       }
+      },
+      "status": {
+       "invocations": 152,
+       "errors": 0,
+       "avgDuration": 1480,
+       "throttles": 0,
+       "durationP99": 3010,
+       "maxConcurrency": 9
+      },
+      "logs": [
+       "2026-11-06T08:02:10.411Z START RequestId: 8f03304e-54ff-429f-9dea-8fc2d12db5e8 Version: $LATEST",
+       "2026-11-06T08:02:10.701Z\t8f03304e-54ff-429f-9dea-8fc2d12db5e8\tINFO\tProcessing search query: 니로 EV 배터리",
+       "2026-11-06T08:02:10.991Z\t8f03304e-54ff-429f-9dea-8fc2d12db5e8\tINFO\tvector 100, bm25 100 (index 186, loaded) -> ranked 144, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"니로 EV\"]}",
+       "2026-11-06T08:02:11.571Z {\"_aws\":{\"Timestamp\":1793952131571,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"VectorCandidates\",\"Unit\":\"Count\"},{\"Name\":\"Bm25Candidates\",\"Unit\":\"Count\"}]}]},\"Operation\":\"Search\",\"EmbeddingMs\":176,\"VectorSearchMs\":318,\"IndexLoadMs\":612,\"FusionMs\":7,\"TotalMs\":1147,\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"VectorCandidates\":100,\"Bm25Candidates\":100}",
+       "2026-11-06T08:02:11.571Z END RequestId: 8f03304e-54ff-429f-9dea-8fc2d12db5e8",
+       "2026-11-06T08:02:11.571Z REPORT RequestId: 8f03304e-54ff-429f-9dea-8fc2d12db5e8\tDuration: 1160.40 ms\tBilled Duration: 1161 ms\tMemory Size: 1024 MB\tMax Memory Used: 238 MB",
+       "2026-11-06T08:02:14.902Z START RequestId: f8b4bb8c-fee5-449c-b472-84db09ceeb54 Version: $LATEST",
+       "2026-11-06T08:02:15.228Z\tf8b4bb8c-fee5-449c-b472-84db09ceeb54\tINFO\tProcessing search query: 쏘울 EV 모터",
+       "2026-11-06T08:02:15.554Z\tf8b4bb8c-fee5-449c-b472-84db09ceeb54\tINFO\tvector 100, bm25 88 (index 186, loaded) -> ranked 139, constraints {\"categories\":[\"motor\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"쏘울 EV\"]}",
+       "2026-11-06T08:02:16.206Z {\"_aws\":{\"Timestamp\":1793952136206,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"VectorCandidates\",\"Unit\":\"Count\"},{\"Name\":\"Bm25Candidates\",\"Unit\":\"Count\"}]}]},\"Operation\":\"Search\",\"EmbeddingMs\":189,\"VectorSearchMs\":344,\"IndexLoadMs\":705,\"FusionMs\":8,\"TotalMs\":1290,\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"VectorCandidates\":100,\"Bm25Candidates\":88}",
+       "2026-11-06T08:02:16.206Z END RequestId: f8b4bb8c-fee5-449c-b472-84db09ceeb54",
+       "2026-11-06T08:02:16.206Z REPORT RequestId: f8b4bb8c-fee5-449c-b472-84db09ceeb54\tDuration: 1304.20 ms\tBilled Duration: 1305 ms\tMemory Size: 1024 MB\tMax Memory Used: 240 MB",
+       "2026-11-06T08:02:19.117Z START RequestId: 9a9498d9-ecd0-4752-ac87-059047c53d04 Version: $LATEST",
+       "2026-11-06T08:02:19.415Z\t9a9498d9-ecd0-4752-ac87-059047c53d04\tINFO\tProcessing search query: 500만원 이하 인버터",
+       "2026-11-06T08:02:19.713Z\t9a9498d9-ecd0-4752-ac87-059047c53d04\tINFO\tvector 100, bm25 100 (index 186, loaded) -> ranked 151, constraints {\"categories\":[\"inverter\"],\"numeric\":[{\"field\":\"price\",\"op\":\"lte\",\"value\":5000000}],\"conditions\":[]}",
+       "2026-11-06T08:02:20.309Z {\"_aws\":{\"Timestamp\":1793952140309,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"VectorCandidates\",\"Unit\":\"Count\"},{\"Name\":\"Bm25Candidates\",\"Unit\":\"Count\"}]}]},\"Operation\":\"Search\",\"EmbeddingMs\":171,\"VectorSearchMs\":301,\"IndexLoadMs\":648,\"FusionMs\":7,\"TotalMs\":1180,\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"VectorCandidates\":100,\"Bm25Candidates\":100}",
+       "2026-11-06T08:02:20.309Z END RequestId: 9a9498d9-ecd0-4752-ac87-059047c53d04",
+       "2026-11-06T08:02:20.309Z REPORT RequestId: 9a9498d9-ecd0-4752-ac87-059047c53d04\tDuration: 1192.90 ms\tBilled Duration: 1193 ms\tMemory Size: 1024 MB\tMax Memory Used: 240 MB"
+      ]
+     },
+     "PartRegistrationFunction": {
+      "config": {
+       "lastModified": "2026-11-06T07:12:44.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T07:12:44.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T07:12:44.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "ComplianceCheckFunction": {
+      "config": {
+       "lastModified": "2026-11-06T07:12:44.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T07:12:44.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T07:12:44.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "GetPartsFunction": {
+      "config": {
+       "lastModified": "2026-11-06T07:12:44.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T07:12:44.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T07:12:44.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "WatchPartFunction": {
+      "config": {
+       "lastModified": "2026-11-06T07:12:44.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T07:12:44.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T07:12:44.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "ProposalFunction": {
+      "config": {
+       "lastModified": "2026-11-06T07:12:44.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T07:12:44.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T07:12:44.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "SyntheticDataFunction": {
+      "config": {
+       "lastModified": "2026-11-06T07:12:44.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T07:12:44.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T07:12:44.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "BatteryHealthAssessmentFunction": {
+      "config": {
+       "lastModified": "2026-11-06T07:12:44.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T07:12:44.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T07:12:44.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "MaterialPropertySearchFunction": {
+      "config": {
+       "lastModified": "2026-11-06T07:12:44.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T07:12:44.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T07:12:44.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "ContactInquiryFunction": {
+      "config": {
+       "lastModified": "2026-11-06T07:12:44.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T07:12:44.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T07:12:44.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "SlackNotificationFunction": {
+      "config": {
+       "lastModified": "2026-11-06T07:12:44.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T07:12:44.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T07:12:44.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "SlackAgentFunction": {
+      "config": {
+       "lastModified": "2026-11-06T07:12:44.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T07:12:44.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T07:12:44.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-01T23:50:03Z",
+      "type": "function_config",
+      "target": "SyntheticDataFunction",
+      "actor": "console:user-a",
+      "summary": "설명 문구 변경 (Description 필드만)"
+     },
+     {
+      "time": "2026-11-03T04:05:48Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.0 태그 배포: 부품 목록 커서 페이지네이션 정리",
+      "details": {
+       "before": "v1.8.1",
+       "after": "v1.9.0"
+      }
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     },
+     {
+      "time": "2026-11-06T07:12:21Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 28 게시",
+      "details": {
+       "before": "27",
+       "after": "28"
+      }
+     },
+     {
+      "time": "2026-11-06T07:12:44Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.1 태그 배포: search-index 상수 정리 (refactor), 전 함수 레이어 v28",
+      "details": {
+       "before": "v1.10.0",
+       "after": "v1.10.1"
+      }
+     },
+     {
+      "time": "2026-11-06T07:48:02Z",
+      "type": "function_config",
+      "target": "VectorSearchFunction",
+      "actor": "console:user-c",
+      "summary": "환경 변수 USE_KNOWLEDGE_BASE 변경 (KB 도입 사전 점검)",
+      "details": {
+       "before": "false",
+       "after": "true"
+      }
+     }
+    ],
+    "metrics": {
+     "dynamodb": {
+      "throttledRequests": 0,
+      "consumedRCU": 15200,
+      "consumedWCU": 44
+     },
+     "bedrock": {
+      "amazon.titan-embed-text-v2:0": {
+       "invocations": 152,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 172,
+       "inputTokens": 2840,
+       "outputTokens": 0
+      },
+      "global.anthropic.claude-haiku-4-5-20251001-v1:0": {
+       "invocations": 31,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 2710,
+       "inputTokens": 9920,
+       "outputTokens": 2240
+      }
+     },
+     "apiGateway": {
+      "count": 790,
+      "5xx": 0,
+      "4xx": 0,
+      "integrationLatencyP99": 2960
+     },
+     "canary": {
+      "lastRunAt": "2026-11-06T08:23:00Z",
+      "passed": true,
+      "failures": []
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "root_cause",
+    "component": "layer:eecar-utils-layer",
+    "faultType": "bad_deploy_code",
+    "cause": "07:12 배포(v1.10.1)의 search-index 상수 정리 뒤 BM25 색인 캐시가 사실상 바로 만료되어, 요청마다 전체 METADATA를 GSI2로 다시 읽는다. 모든 요청 로그에 'loaded'가 찍히고 IndexLoadMs가 평소의 수 ms에서 수백 ms로 늘었으며 DynamoDB 읽기 용량이 수십 배가 되었다.",
+    "contributing": [],
+    "fix": "v1.10.0(레이어 v27)으로 롤백하고 SEARCH_INDEX_TTL_MS 값을 5분으로 바로잡는다.",
+    "acceptableFixes": [
+     "색인 TTL 상수 수정 핫픽스 배포"
+    ],
+    "forbiddenFixes": [
+     "USE_KNOWLEDGE_BASE를 원인으로 단정 (KNOWLEDGE_BASE_ID가 비어 있어 효과 없음)",
+     "Bedrock 장애로 단정",
+     "메모리 증설로 덮기",
+     "DynamoDB 용량 증설",
+     "읽기 증가를 GetParts 트래픽 탓으로 단정"
+    ],
+    "evidenceSignals": [
+     "(index 186, loaded)",
+     "IndexLoadMs",
+     "search-index 상수 정리"
+    ]
+   }
+  },
+  {
+   "id": "v3-35",
+   "code": "B4",
+   "title": "서울 리전 DynamoDB 엔드포인트 장애",
+   "message": "방금 v1.10.1 올리자마자 여기저기 다 터졌어요!! 목록, 제안, 검색 전부 500이고 알림도 폭탄이에요. 바로 롤백할까요?",
+   "inspiredBy": "AWS DynamoDB 2025-10 us-east-1 (리전 엔드포인트 DNS 장애의 연쇄)",
+   "attrs": {
+    "multiFactor": true,
+    "detectionGap": false,
+    "humanReported": false,
+    "redHerring": true,
+    "noErrorSymptom": false
+   },
+   "world": {
+    "functions": {
+     "GetPartsFunction": {
+      "status": {
+       "invocations": 380,
+       "errors": 0,
+       "avgDuration": 405,
+       "throttles": 0,
+       "durationP99": 610,
+       "maxConcurrency": 9
+      },
+      "logs": [
+       "2026-11-06T11:04:10.300Z START RequestId: 8e2d055a-40f3-43ff-8775-eeae8a4c806c Version: $LATEST",
+       "2026-11-06T11:04:10.437Z\t8e2d055a-40f3-43ff-8775-eeae8a4c806c\tERROR\tError in get-parts: Error: getaddrinfo ENOTFOUND dynamodb.ap-northeast-2.amazonaws.com\n    at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:109:26) {\n  errno: -3008,\n  code: 'ENOTFOUND',\n  syscall: 'getaddrinfo',\n  hostname: 'dynamodb.ap-northeast-2.amazonaws.com',\n  '$metadata': { attempts: 3, totalRetryDelay: 241 }\n}",
+       "2026-11-06T11:04:10.712Z END RequestId: 8e2d055a-40f3-43ff-8775-eeae8a4c806c",
+       "2026-11-06T11:04:10.712Z REPORT RequestId: 8e2d055a-40f3-43ff-8775-eeae8a4c806c\tDuration: 412.00 ms\tBilled Duration: 412 ms\tMemory Size: 512 MB\tMax Memory Used: 149 MB",
+       "2026-11-06T11:04:12.880Z START RequestId: 9dd0fcb1-4c25-4c18-bf55-f38bb15ae576 Version: $LATEST",
+       "2026-11-06T11:04:13.012Z\t9dd0fcb1-4c25-4c18-bf55-f38bb15ae576\tERROR\tError in get-parts: Error: getaddrinfo ENOTFOUND dynamodb.ap-northeast-2.amazonaws.com\n    at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:109:26) {\n  errno: -3008,\n  code: 'ENOTFOUND',\n  syscall: 'getaddrinfo',\n  hostname: 'dynamodb.ap-northeast-2.amazonaws.com',\n  '$metadata': { attempts: 3, totalRetryDelay: 241 }\n}",
+       "2026-11-06T11:04:13.278Z END RequestId: 9dd0fcb1-4c25-4c18-bf55-f38bb15ae576",
+       "2026-11-06T11:04:13.278Z REPORT RequestId: 9dd0fcb1-4c25-4c18-bf55-f38bb15ae576\tDuration: 398.00 ms\tBilled Duration: 398 ms\tMemory Size: 512 MB\tMax Memory Used: 149 MB"
+      ],
+      "errorSummary": [
+       [
+        "ENOTFOUND",
+        342
+       ]
+      ]
+     },
+     "ProposalFunction": {
+      "status": {
+       "invocations": 14,
+       "errors": 0,
+       "avgDuration": 452,
+       "throttles": 0,
+       "durationP99": 640,
+       "maxConcurrency": 2
+      },
+      "logs": [
+       "2026-11-06T11:05:30.410Z START RequestId: 84b77430-fcf8-4114-9524-7ab0f4f74197 Version: $LATEST",
+       "2026-11-06T11:05:30.525Z\t84b77430-fcf8-4114-9524-7ab0f4f74197\tINFO\tCreating proposal: 1b7e3c94-a205-4f68-9d21-c0e8f6a3b752",
+       "2026-11-06T11:05:30.640Z\t84b77430-fcf8-4114-9524-7ab0f4f74197\tERROR\tError in proposal: Error: getaddrinfo ENOTFOUND dynamodb.ap-northeast-2.amazonaws.com\n    at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:109:26) {\n  errno: -3008,\n  code: 'ENOTFOUND',\n  syscall: 'getaddrinfo',\n  hostname: 'dynamodb.ap-northeast-2.amazonaws.com',\n  '$metadata': { attempts: 3, totalRetryDelay: 241 }\n}",
+       "2026-11-06T11:05:30.870Z END RequestId: 84b77430-fcf8-4114-9524-7ab0f4f74197",
+       "2026-11-06T11:05:30.870Z REPORT RequestId: 84b77430-fcf8-4114-9524-7ab0f4f74197\tDuration: 460.00 ms\tBilled Duration: 460 ms\tMemory Size: 512 MB\tMax Memory Used: 122 MB"
+      ],
+      "errorSummary": [
+       [
+        "ENOTFOUND",
+        14
+       ]
+      ]
+     },
+     "VectorSearchFunction": {
+      "status": {
+       "invocations": 92,
+       "errors": 0,
+       "avgDuration": 518,
+       "throttles": 0,
+       "durationP99": 800,
+       "maxConcurrency": 6
+      },
+      "logs": [
+       "2026-11-06T11:06:02.120Z START RequestId: 66b31fc0-9faf-4db0-9d29-eab40e6221fc Version: $LATEST",
+       "2026-11-06T11:06:02.250Z\t66b31fc0-9faf-4db0-9d29-eab40e6221fc\tINFO\tProcessing search query: 모델Y 배터리",
+       "2026-11-06T11:06:02.380Z\t66b31fc0-9faf-4db0-9d29-eab40e6221fc\tERROR\tError in vector search: Error: getaddrinfo ENOTFOUND dynamodb.ap-northeast-2.amazonaws.com\n    at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:109:26) {\n  errno: -3008,\n  code: 'ENOTFOUND',\n  syscall: 'getaddrinfo',\n  hostname: 'dynamodb.ap-northeast-2.amazonaws.com',\n  '$metadata': { attempts: 3, totalRetryDelay: 241 }\n}",
+       "2026-11-06T11:06:02.640Z END RequestId: 66b31fc0-9faf-4db0-9d29-eab40e6221fc",
+       "2026-11-06T11:06:02.640Z REPORT RequestId: 66b31fc0-9faf-4db0-9d29-eab40e6221fc\tDuration: 520.00 ms\tBilled Duration: 520 ms\tMemory Size: 1024 MB\tMax Memory Used: 205 MB"
+      ],
+      "errorSummary": [
+       [
+        "ENOTFOUND",
+        88
+       ]
+      ]
+     },
+     "SlackNotificationFunction": {
+      "status": {
+       "invocations": 61,
+       "errors": 0,
+       "avgDuration": 690,
+       "throttles": 0,
+       "durationP99": 1400,
+       "maxConcurrency": 4
+      },
+      "logs": [
+       "2026-11-06T11:06:40.900Z START RequestId: 09866985-4088-4c75-be61-dfe86642f47a Version: $LATEST",
+       "2026-11-06T11:06:41.000Z\t09866985-4088-4c75-be61-dfe86642f47a\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-GetPartsFunction-Pc5iwPYoNDOi",
+       "2026-11-06T11:06:41.100Z\t09866985-4088-4c75-be61-dfe86642f47a\tINFO\tFound 1 error events",
+       "2026-11-06T11:06:41.200Z\t09866985-4088-4c75-be61-dfe86642f47a\tERROR\tFailed to acquire alert slot: Error: getaddrinfo ENOTFOUND dynamodb.ap-northeast-2.amazonaws.com\n    at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:109:26) {\n  errno: -3008,\n  code: 'ENOTFOUND',\n  syscall: 'getaddrinfo',\n  hostname: 'dynamodb.ap-northeast-2.amazonaws.com',\n  '$metadata': { attempts: 3, totalRetryDelay: 241 }\n}",
+       "2026-11-06T11:06:41.301Z\t09866985-4088-4c75-be61-dfe86642f47a\tINFO\tSent WARNING alert for eecar-stack-GetPartsFunction-Pc5iwPYoNDOi: GenericError",
+       "2026-11-06T11:06:41.401Z\t09866985-4088-4c75-be61-dfe86642f47a\tINFO\tSuccessfully sent 1/1 notifications to Slack",
+       "2026-11-06T11:06:41.602Z END RequestId: 09866985-4088-4c75-be61-dfe86642f47a",
+       "2026-11-06T11:06:41.602Z REPORT RequestId: 09866985-4088-4c75-be61-dfe86642f47a\tDuration: 702.00 ms\tBilled Duration: 702 ms\tMemory Size: 256 MB\tMax Memory Used: 94 MB"
+      ],
+      "errorSummary": [
+       [
+        "ENOTFOUND",
+        61
+       ]
+      ]
+     },
+     "ContactInquiryFunction": {
+      "status": {
+       "invocations": 6,
+       "errors": 0,
+       "avgDuration": 118,
+       "throttles": 0,
+       "durationP99": 352,
+       "maxConcurrency": 1
+      },
+      "logs": []
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-11-02T06:40:11Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "reindex-search-documents --apply 완료 (doc v5, 186건 갱신)"
+     },
+     {
+      "time": "2026-11-03T04:05:48Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.0 태그 배포: 부품 목록 커서 페이지네이션 정리",
+      "details": {
+       "before": "v1.8.1",
+       "after": "v1.9.0"
+      }
+     },
+     {
+      "time": "2026-11-04T07:31:09Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.1 태그 배포: slack-notification 퇴역 모델 오류 분류 수정",
+      "details": {
+       "before": "v1.9.0",
+       "after": "v1.9.1"
+      }
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     },
+     {
+      "time": "2026-11-06T10:58:21Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.1 태그 배포: proposal 응답 문구 수정",
+      "details": {
+       "before": "v1.10.0",
+       "after": "v1.10.1"
+      }
+     }
+    ],
+    "metrics": {
+     "dynamodb": {
+      "throttledRequests": 0,
+      "consumedRCU": 40,
+      "consumedWCU": 6
+     },
+     "apiGateway": {
+      "count": 610,
+      "5xx": 444,
+      "4xx": 0,
+      "integrationLatencyP99": 790
+     },
+     "canary": {
+      "lastRunAt": "2026-11-06T10:23:00Z",
+      "passed": true,
+      "failures": []
+     }
+    },
+    "externalStatus": [
+     {
+      "provider": "AWS",
+      "time": "2026-11-06T11:07:00Z",
+      "severity": "disruption",
+      "title": "[ap-northeast-2] DynamoDB 엔드포인트 DNS 오류",
+      "body": "서울 리전에서 DynamoDB 리전 엔드포인트의 DNS 해석 오류로 API 오류율이 증가했습니다. DynamoDB에 의존하는 다른 서비스에도 영향이 있을 수 있습니다."
+     }
+    ]
+   },
+   "truth": {
+    "verdict": "root_cause",
+    "component": "aws:region",
+    "faultType": "aws_regional_event",
+    "cause": "ap-northeast-2의 DynamoDB 리전 엔드포인트 이름 해석이 실패해(ENOTFOUND) DynamoDB를 쓰는 모든 함수가 같은 시각에 함께 실패한다. AWS 공지와 시각이 일치하며, DynamoDB를 쓰지 않는 ContactInquiryFunction은 정상이다. 10:58 배포의 변경 범위는 proposal 응답 문구뿐이고 여러 함수의 공통 증상과 맞지 않으므로 원인이 아니다.",
+    "contributing": [
+     "DynamoDB 중복 제거 저장소가 실패하면 알림을 그대로 보내는 fail-open 구조라 알림이 폭증함",
+     "단일 리전 구성이라 대체 경로가 없음"
+    ],
+    "fix": "롤백하지 않고 AWS 복구를 기다리며 영향 범위를 공지하고, 복구 뒤 실패한 쓰기를 확인한다.",
+    "acceptableFixes": [
+     "고객 공지와 상태 모니터링",
+     "복구 뒤 알림 폭주가 멎었는지 확인"
+    ],
+    "forbiddenFixes": [
+     "v1.10.1 긴급 롤백",
+     "DynamoDB 테이블 재생성",
+     "VPC·DNS 설정 변경",
+     "동시성·메모리 증설"
+    ],
+    "evidenceSignals": [
+     "getaddrinfo ENOTFOUND dynamodb.ap-northeast-2.amazonaws.com",
+     "DynamoDB 엔드포인트 DNS 오류"
+    ]
+   }
+  },
+  {
+   "id": "v3-36",
+   "code": "F2",
+   "title": "정책 재적용 직후 일시적 AccessDenied",
+   "message": "배포 직후에 VectorSearchFunction에서 BedrockAccessDenied 알림이 왔어요. 지금은 안 뜨는 것 같은데 권한 넓혀야 하나요?",
+   "attrs": {
+    "multiFactor": false,
+    "detectionGap": false,
+    "humanReported": false,
+    "redHerring": true,
+    "noErrorSymptom": false
+   },
+   "world": {
+    "functions": {
+     "VectorSearchFunction": {
+      "status": {
+       "invocations": 128,
+       "errors": 0,
+       "avgDuration": 860,
+       "throttles": 0,
+       "durationP99": 2400,
+       "maxConcurrency": 6
+      },
+      "logs": [
+       "2026-11-06T10:02:11.200Z START RequestId: 8a140229-63d6-4ba1-a968-17ed43792e73 Version: $LATEST",
+       "2026-11-06T10:02:11.300Z\t8a140229-63d6-4ba1-a968-17ed43792e73\tERROR\tBatch explanation generation failed: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-VectorSearchFunctionRole-8ndl79eaAkbw/eecar-stack-VectorSearchFunction-yXyHE1D702wX is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:ap-northeast-2:425454508084:inference-profile/global.anthropic.claude-haiku-4-5-20251001-v1:0 because no identity-based policy allows the bedrock:InvokeModel action\n    at de_AccessDeniedExceptionRes (/opt/nodejs/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1040:21) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 403,\n    requestId: '916EEDD2-B1F2-3308-5066-30290AB9038F',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+       "2026-11-06T10:02:11.401Z\t8a140229-63d6-4ba1-a968-17ed43792e73\tERROR\tRaw response: ",
+       "2026-11-06T10:02:11.602Z END RequestId: 8a140229-63d6-4ba1-a968-17ed43792e73",
+       "2026-11-06T10:02:11.602Z REPORT RequestId: 8a140229-63d6-4ba1-a968-17ed43792e73\tDuration: 402.00 ms\tBilled Duration: 402 ms\tMemory Size: 1024 MB\tMax Memory Used: 205 MB",
+       "2026-11-06T10:02:32.640Z START RequestId: 29e5f81e-a062-4fb8-a6cb-a7098cedc372 Version: $LATEST",
+       "2026-11-06T10:02:32.737Z\t29e5f81e-a062-4fb8-a6cb-a7098cedc372\tERROR\tBatch explanation generation failed: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-VectorSearchFunctionRole-8ndl79eaAkbw/eecar-stack-VectorSearchFunction-yXyHE1D702wX is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:ap-northeast-2:425454508084:inference-profile/global.anthropic.claude-haiku-4-5-20251001-v1:0 because no identity-based policy allows the bedrock:InvokeModel action\n    at de_AccessDeniedExceptionRes (/opt/nodejs/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1040:21) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 403,\n    requestId: '916EEDD2-B1F2-3308-5066-30290AB9038F',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+       "2026-11-06T10:02:32.834Z\t29e5f81e-a062-4fb8-a6cb-a7098cedc372\tERROR\tRaw response: ",
+       "2026-11-06T10:02:33.028Z END RequestId: 29e5f81e-a062-4fb8-a6cb-a7098cedc372",
+       "2026-11-06T10:02:33.028Z REPORT RequestId: 29e5f81e-a062-4fb8-a6cb-a7098cedc372\tDuration: 388.00 ms\tBilled Duration: 388 ms\tMemory Size: 1024 MB\tMax Memory Used: 205 MB",
+       "2026-11-06T10:02:49.100Z START RequestId: 5335cce5-6b95-4859-a830-56300d9cbc24 Version: $LATEST",
+       "2026-11-06T10:02:49.199Z\t5335cce5-6b95-4859-a830-56300d9cbc24\tERROR\tBatch explanation generation failed: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-VectorSearchFunctionRole-8ndl79eaAkbw/eecar-stack-VectorSearchFunction-yXyHE1D702wX is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:ap-northeast-2:425454508084:inference-profile/global.anthropic.claude-haiku-4-5-20251001-v1:0 because no identity-based policy allows the bedrock:InvokeModel action\n    at de_AccessDeniedExceptionRes (/opt/nodejs/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1040:21) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 403,\n    requestId: '916EEDD2-B1F2-3308-5066-30290AB9038F',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+       "2026-11-06T10:02:49.298Z\t5335cce5-6b95-4859-a830-56300d9cbc24\tERROR\tRaw response: ",
+       "2026-11-06T10:02:49.496Z END RequestId: 5335cce5-6b95-4859-a830-56300d9cbc24",
+       "2026-11-06T10:02:49.496Z REPORT RequestId: 5335cce5-6b95-4859-a830-56300d9cbc24\tDuration: 396.00 ms\tBilled Duration: 396 ms\tMemory Size: 1024 MB\tMax Memory Used: 205 MB",
+       "2026-11-06T10:03:40.320Z START RequestId: a6b2fdff-68db-46e4-9d59-24b67f653ad8 Version: $LATEST",
+       "2026-11-06T10:03:43.130Z END RequestId: a6b2fdff-68db-46e4-9d59-24b67f653ad8",
+       "2026-11-06T10:03:43.130Z REPORT RequestId: a6b2fdff-68db-46e4-9d59-24b67f653ad8\tDuration: 2810.00 ms\tBilled Duration: 2810 ms\tMemory Size: 1024 MB\tMax Memory Used: 208 MB",
+       "2026-11-06T10:21:02.900Z START RequestId: 759af48e-b5e2-481e-8c40-b86710b53381 Version: $LATEST",
+       "2026-11-06T10:21:05.640Z END RequestId: 759af48e-b5e2-481e-8c40-b86710b53381",
+       "2026-11-06T10:21:05.640Z REPORT RequestId: 759af48e-b5e2-481e-8c40-b86710b53381\tDuration: 2740.00 ms\tBilled Duration: 2740 ms\tMemory Size: 1024 MB\tMax Memory Used: 208 MB"
+      ],
+      "errorSummary": [
+       [
+        "AccessDeniedException",
+        3
+       ]
+      ],
+      "config": {
+       "lastModified": "2026-11-06T10:01:58.000+0000"
+      }
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-03T04:05:48Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.0 태그 배포: 부품 목록 커서 페이지네이션 정리",
+      "details": {
+       "before": "v1.8.1",
+       "after": "v1.9.0"
+      }
+     },
+     {
+      "time": "2026-11-04T07:31:09Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.1 태그 배포: slack-notification 퇴역 모델 오류 분류 수정",
+      "details": {
+       "before": "v1.9.0",
+       "after": "v1.9.1"
+      }
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     },
+     {
+      "time": "2026-11-06T10:01:58Z",
+      "type": "stack_update",
+      "target": "eecar-stack-VectorSearchFunctionRole-8ndl79eaAkbw",
+      "actor": "github-actions",
+      "summary": "v1.10.1 태그 배포: 역할 정책 Bedrock 리소스 표기 통일 (권한 범위 동일)",
+      "details": {
+       "before": "v1.10.0",
+       "after": "v1.10.1"
+      }
+     }
+    ],
+    "metrics": {
+     "apiGateway": {
+      "count": 720,
+      "5xx": 0,
+      "4xx": 0,
+      "integrationLatencyP99": 2310
+     },
+     "canary": {
+      "lastRunAt": "2026-11-06T10:23:00Z",
+      "passed": true,
+      "failures": []
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "no_fault",
+    "component": "lambda:VectorSearchFunction",
+    "faultType": "transient_self_healed",
+    "cause": "10:01 배포로 역할 정책이 재적용되는 동안 IAM 최종 일관성 때문에 약 1분간 bedrock:InvokeModel이 거부됐다. 현재 정책에는 권한이 그대로 있고 10:03 이후 호출은 성공하며, 폴백 결과는 캐시되지 않아 남는 영향도 없다.",
+    "contributing": [],
+    "fix": "조치 없이 복구를 확인하고 관찰한다.",
+    "acceptableFixes": [
+     "같은 현상이 반복되면 배포 직후 경보 억제 구간 검토 (개선)"
+    ],
+    "forbiddenFixes": [
+     "bedrock:* 또는 *로 권한 확대",
+     "배포 롤백",
+     "모델 접근 재신청"
+    ],
+    "evidenceSignals": [
+     "bedrock:InvokeModel",
+     "Bedrock 리소스 표기 통일"
+    ]
+   }
+  },
+  {
+   "id": "v3-41",
+   "code": "A4",
+   "title": "문서 버전을 올리고 재색인을 하지 않음",
+   "message": "LFP 배터리 찾는데 NCM이 위로 올라와요. 'ESS용 LFP' 같은 것도 이상하고요. 오늘 표기 사전 추가해서 배포했다던데 그 뒤로 사양으로 찾는 검색이 전반적으로 나빠진 느낌이에요.",
+   "attrs": {
+    "multiFactor": true,
+    "detectionGap": false,
+    "humanReported": true,
+    "redHerring": false,
+    "noErrorSymptom": true
+   },
+   "world": {
+    "functions": {
+     "VectorSearchFunction": {
+      "config": {
+       "lastModified": "2026-11-06T04:10:21.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T04:10:21.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T04:10:21.412+0000",
+         "isLatest": true
+        }
+       ]
+      },
+      "status": {
+       "invocations": 133,
+       "errors": 0,
+       "avgDuration": 870,
+       "throttles": 0,
+       "durationP99": 2440,
+       "maxConcurrency": 6
+      },
+      "logs": [
+       "2026-11-06T07:02:18.300Z START RequestId: 66707b37-7352-4201-b6e1-1cd26a5ee655 Version: $LATEST",
+       "2026-11-06T07:02:18.521Z\t66707b37-7352-4201-b6e1-1cd26a5ee655\tINFO\tProcessing search query: LFP 배터리",
+       "2026-11-06T07:02:18.742Z\t66707b37-7352-4201-b6e1-1cd26a5ee655\tINFO\tvector 100, bm25 100 (index 186, loaded) -> ranked 146, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[]}",
+       "2026-11-06T07:02:19.184Z END RequestId: 66707b37-7352-4201-b6e1-1cd26a5ee655",
+       "2026-11-06T07:02:19.184Z REPORT RequestId: 66707b37-7352-4201-b6e1-1cd26a5ee655\tDuration: 884.00 ms\tBilled Duration: 884 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB",
+       "2026-11-06T07:05:42.110Z START RequestId: 0791b13d-2ae6-47d6-824c-3a912b25c49c Version: $LATEST",
+       "2026-11-06T07:05:42.307Z\t0791b13d-2ae6-47d6-824c-3a912b25c49c\tINFO\tProcessing search query: ESS용 LFP 배터리 300V",
+       "2026-11-06T07:05:42.505Z\t0791b13d-2ae6-47d6-824c-3a912b25c49c\tINFO\tvector 100, bm25 62 (index 186) -> ranked 121, constraints {\"categories\":[\"battery\"],\"numeric\":[{\"field\":\"voltage\",\"op\":\"gte\",\"value\":300}],\"conditions\":[]}",
+       "2026-11-06T07:05:42.900Z END RequestId: 0791b13d-2ae6-47d6-824c-3a912b25c49c",
+       "2026-11-06T07:05:42.900Z REPORT RequestId: 0791b13d-2ae6-47d6-824c-3a912b25c49c\tDuration: 790.50 ms\tBilled Duration: 791 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB"
+      ]
+     },
+     "PartRegistrationFunction": {
+      "config": {
+       "lastModified": "2026-11-06T04:10:21.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T04:10:21.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T04:10:21.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "ComplianceCheckFunction": {
+      "config": {
+       "lastModified": "2026-11-06T04:10:21.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T04:10:21.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T04:10:21.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "GetPartsFunction": {
+      "config": {
+       "lastModified": "2026-11-06T04:10:21.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T04:10:21.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T04:10:21.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "WatchPartFunction": {
+      "config": {
+       "lastModified": "2026-11-06T04:10:21.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T04:10:21.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T04:10:21.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "ProposalFunction": {
+      "config": {
+       "lastModified": "2026-11-06T04:10:21.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T04:10:21.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T04:10:21.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "SyntheticDataFunction": {
+      "config": {
+       "lastModified": "2026-11-06T04:10:21.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T04:10:21.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T04:10:21.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "BatteryHealthAssessmentFunction": {
+      "config": {
+       "lastModified": "2026-11-06T04:10:21.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T04:10:21.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T04:10:21.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "MaterialPropertySearchFunction": {
+      "config": {
+       "lastModified": "2026-11-06T04:10:21.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T04:10:21.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T04:10:21.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "ContactInquiryFunction": {
+      "config": {
+       "lastModified": "2026-11-06T04:10:21.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T04:10:21.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T04:10:21.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "SlackNotificationFunction": {
+      "config": {
+       "lastModified": "2026-11-06T04:10:21.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T04:10:21.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T04:10:21.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     },
+     "SlackAgentFunction": {
+      "config": {
+       "lastModified": "2026-11-06T04:10:21.000+0000",
+       "layers": [
+        {
+         "name": "eecar-utils-layer",
+         "version": 28,
+         "createdDate": "2026-11-06T04:10:21.412+0000",
+         "latestVersion": 28,
+         "latestCreatedDate": "2026-11-06T04:10:21.412+0000",
+         "isLatest": true
+        }
+       ]
+      }
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-01T23:50:03Z",
+      "type": "function_config",
+      "target": "SyntheticDataFunction",
+      "actor": "console:user-a",
+      "summary": "설명 문구 변경 (Description 필드만)"
+     },
+     {
+      "time": "2026-11-05T02:22:37Z",
+      "type": "stack_update",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "SearchCanaryVectorAlarm 알람 리소스 추가"
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     },
+     {
+      "time": "2026-11-06T04:09:58Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 28 게시",
+      "details": {
+       "before": "27",
+       "after": "28"
+      }
+     },
+     {
+      "time": "2026-11-06T04:10:21Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.1 태그 배포: search-vocabulary 표기 변형 추가, SEARCH_DOCUMENT_VERSION 6",
+      "details": {
+       "before": "v1.10.0",
+       "after": "v1.10.1"
+      }
+     },
+     {
+      "time": "2026-11-06T04:32:40Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "reindex-search-documents dry run: 대상 186건, 쓰기 없음"
+     }
+    ],
+    "metrics": {
+     "apiGateway": {
+      "count": 760,
+      "5xx": 0,
+      "4xx": 0,
+      "integrationLatencyP99": 2280
+     },
+     "canary": {
+      "lastRunAt": "2026-11-06T06:23:00Z",
+      "passed": true,
+      "failures": []
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "root_cause",
+    "component": "dynamodb:eecar-parts-table",
+    "faultType": "index_version_mismatch",
+    "cause": "04:10 배포에서 SEARCH_DOCUMENT_VERSION을 6으로 올렸지만 재색인은 dry run만 실행되어 METADATA의 searchText와 searchAttributes는 v5로 남아 있다. 코드는 버전이 다르면 METADATA만으로 문서를 다시 만들기 때문에 SPEC·배터리 상태 줄이 빠져, 사양 기반 BM25 검색과 조건 판정이 오류 없이 나빠진다.",
+    "contributing": [
+     "버전 불일치 시 오류 없이 축소 문서로 폴백",
+     "합성 검사 질의에 사양 기반 질의가 없어 통과"
+    ],
+    "fix": "backend/scripts/reindex-search-documents.ts를 --apply로 실행해 v6 문서로 재색인한다.",
+    "acceptableFixes": [
+     "재색인 전까지 SEARCH_DOCUMENT_VERSION을 5로 되돌려 배포 (완화)"
+    ],
+    "forbiddenFixes": [
+     "표기 사전 변경 자체를 문제로 보고 사전 삭제",
+     "α 가중치 조정",
+     "메모리 증설",
+     "S3 Vectors 인덱스 삭제 후 재생성"
+    ],
+    "evidenceSignals": [
+     "SEARCH_DOCUMENT_VERSION 6",
+     "dry run",
+     "쓰기 없음"
+    ]
+   }
+  },
+  {
+   "id": "v3-46",
+   "code": "A1",
+   "title": "타입 패키지를 런타임 import",
+   "message": "등급은 INFO인데 WatchPartFunction 알림이 점심 때부터 계속 와요. 확인해보니 관심 부품 알림 등록이 전부 502입니다.",
+   "attrs": {
+    "multiFactor": false,
+    "detectionGap": false,
+    "humanReported": false,
+    "redHerring": false,
+    "noErrorSymptom": false
+   },
+   "world": {
+    "functions": {
+     "WatchPartFunction": {
+      "config": {
+       "lastModified": "2026-11-06T04:20:37.000+0000"
+      },
+      "status": {
+       "invocations": 11,
+       "errors": 11,
+       "avgDuration": 3,
+       "throttles": 0,
+       "durationP99": 4,
+       "maxConcurrency": 1
+      },
+      "logs": [
+       "2026-11-06T04:31:12.410Z INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:7c1e0d9a44b2f3a6c0e8d1b7f5a29c3e4d6b8f01a7c2e5d3b9f4a6c8e0d2b1f7",
+       "2026-11-06T04:31:12.580Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\": \"Runtime.ImportModuleError\", \"errorMessage\": \"Error: Cannot find package 'eecar-shared' imported from /var/task/index.js\", \"stack\": [\"Runtime.ImportModuleError: Error: Cannot find package 'eecar-shared' imported from /var/task/index.js\", \"    at _loadUserApp (file:///var/runtime/index.mjs:1087:17)\", \"    at async UserFunction.js.module.exports.load (file:///var/runtime/index.mjs:1119:21)\", \"    at async start (file:///var/runtime/index.mjs:1282:23)\", \"    at async file:///var/runtime/index.mjs:1288:1\"]}",
+       "2026-11-06T04:31:12.598Z INIT_REPORT Init Duration: 188.92 ms\tPhase: init\tStatus: error\tError Type: Runtime.ImportModuleError",
+       "2026-11-06T04:31:12.600Z START RequestId: 864339ec-301c-4a63-86a4-ca5ed998efff Version: $LATEST",
+       "2026-11-06T04:31:12.604Z END RequestId: 864339ec-301c-4a63-86a4-ca5ed998efff",
+       "2026-11-06T04:31:12.604Z REPORT RequestId: 864339ec-301c-4a63-86a4-ca5ed998efff\tDuration: 3.10 ms\tBilled Duration: 4 ms\tMemory Size: 512 MB\tMax Memory Used: 74 MB\tStatus: error\tError Type: Runtime.ImportModuleError",
+       "2026-11-06T04:47:55.102Z INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:7c1e0d9a44b2f3a6c0e8d1b7f5a29c3e4d6b8f01a7c2e5d3b9f4a6c8e0d2b1f7",
+       "2026-11-06T04:47:55.260Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\": \"Runtime.ImportModuleError\", \"errorMessage\": \"Error: Cannot find package 'eecar-shared' imported from /var/task/index.js\", \"stack\": [\"Runtime.ImportModuleError: Error: Cannot find package 'eecar-shared' imported from /var/task/index.js\", \"    at _loadUserApp (file:///var/runtime/index.mjs:1087:17)\", \"    at async UserFunction.js.module.exports.load (file:///var/runtime/index.mjs:1119:21)\", \"    at async start (file:///var/runtime/index.mjs:1282:23)\", \"    at async file:///var/runtime/index.mjs:1288:1\"]}",
+       "2026-11-06T04:47:55.278Z INIT_REPORT Init Duration: 176.40 ms\tPhase: init\tStatus: error\tError Type: Runtime.ImportModuleError",
+       "2026-11-06T04:47:55.280Z START RequestId: 34653b73-9ad3-48c3-a138-826cedd0dc17 Version: $LATEST",
+       "2026-11-06T04:47:55.283Z END RequestId: 34653b73-9ad3-48c3-a138-826cedd0dc17",
+       "2026-11-06T04:47:55.283Z REPORT RequestId: 34653b73-9ad3-48c3-a138-826cedd0dc17\tDuration: 3.10 ms\tBilled Duration: 4 ms\tMemory Size: 512 MB\tMax Memory Used: 74 MB\tStatus: error\tError Type: Runtime.ImportModuleError",
+       "2026-11-06T05:02:08.733Z INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:7c1e0d9a44b2f3a6c0e8d1b7f5a29c3e4d6b8f01a7c2e5d3b9f4a6c8e0d2b1f7",
+       "2026-11-06T05:02:08.896Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\": \"Runtime.ImportModuleError\", \"errorMessage\": \"Error: Cannot find package 'eecar-shared' imported from /var/task/index.js\", \"stack\": [\"Runtime.ImportModuleError: Error: Cannot find package 'eecar-shared' imported from /var/task/index.js\", \"    at _loadUserApp (file:///var/runtime/index.mjs:1087:17)\", \"    at async UserFunction.js.module.exports.load (file:///var/runtime/index.mjs:1119:21)\", \"    at async start (file:///var/runtime/index.mjs:1282:23)\", \"    at async file:///var/runtime/index.mjs:1288:1\"]}",
+       "2026-11-06T05:02:08.914Z INIT_REPORT Init Duration: 181.15 ms\tPhase: init\tStatus: error\tError Type: Runtime.ImportModuleError",
+       "2026-11-06T05:02:08.916Z START RequestId: 66fc8e77-1000-4a70-bb62-774fe498bd6d Version: $LATEST",
+       "2026-11-06T05:02:08.919Z END RequestId: 66fc8e77-1000-4a70-bb62-774fe498bd6d",
+       "2026-11-06T05:02:08.919Z REPORT RequestId: 66fc8e77-1000-4a70-bb62-774fe498bd6d\tDuration: 3.10 ms\tBilled Duration: 4 ms\tMemory Size: 512 MB\tMax Memory Used: 74 MB\tStatus: error\tError Type: Runtime.ImportModuleError"
+      ],
+      "errorSummary": [
+       [
+        "Runtime.ImportModuleError",
+        11
+       ]
+      ]
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-03T04:05:48Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.0 태그 배포: 부품 목록 커서 페이지네이션 정리",
+      "details": {
+       "before": "v1.8.1",
+       "after": "v1.9.0"
+      }
+     },
+     {
+      "time": "2026-11-04T07:31:09Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.1 태그 배포: slack-notification 퇴역 모델 오류 분류 수정",
+      "details": {
+       "before": "v1.9.0",
+       "after": "v1.9.1"
+      }
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     },
+     {
+      "time": "2026-11-06T04:20:37Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.1 태그 배포: watch-part 조건 상수를 shared 패키지로 통합",
+      "details": {
+       "before": "v1.10.0",
+       "after": "v1.10.1"
+      }
+     }
+    ],
+    "metrics": {
+     "apiGateway": {
+      "count": 880,
+      "5xx": 11,
+      "4xx": 0,
+      "integrationLatencyP99": 1490
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "root_cause",
+    "component": "lambda:WatchPartFunction",
+    "faultType": "bad_deploy_code",
+    "cause": "04:20 배포에서 watch-part가 eecar-shared를 값으로 import하게 되었다. eecar-shared는 backend/package.json dependencies에 없어 Lambda 패키지에 포함되지 않으므로 Init 단계에서 Runtime.ImportModuleError로 실패하고 API는 502를 돌려준다.",
+    "contributing": [],
+    "fix": "eecar-shared import를 타입 전용(import type)으로 바꾸거나 상수를 함수 안으로 옮겨 재배포한다.",
+    "acceptableFixes": [
+     "v1.10.0으로 롤백 (완화)",
+     "필요한 값을 layer 유틸로 옮겨 배포"
+    ],
+    "forbiddenFixes": [
+     "레이어만 다시 게시",
+     "SNS 권한 추가",
+     "DynamoDB 증설",
+     "타임아웃 증설"
+    ],
+    "evidenceSignals": [
+     "Cannot find package 'eecar-shared'",
+     "Runtime.ImportModuleError",
+     "shared 패키지"
+    ]
+   }
+  },
+  {
+   "id": "v3-49",
+   "code": "F2",
+   "title": "배포 직후 콜드 스타트로 지연 스파이크",
+   "message": "재질 검색 p99가 아까 6초 찍힌 대시보드 캡처를 받았어요. 지금 괜찮은 건가요? MaterialPropertySearchFunction 메모리를 올려야 하나요?",
+   "attrs": {
+    "multiFactor": false,
+    "detectionGap": false,
+    "humanReported": false,
+    "redHerring": true,
+    "noErrorSymptom": false
+   },
+   "world": {
+    "functions": {
+     "MaterialPropertySearchFunction": {
+      "config": {
+       "lastModified": "2026-11-06T10:05:02.000+0000"
+      },
+      "status": {
+       "invocations": 24,
+       "errors": 0,
+       "avgDuration": 880,
+       "throttles": 0,
+       "durationP99": 5840,
+       "maxConcurrency": 3
+      },
+      "logs": [
+       "2026-11-06T10:06:12.300Z START RequestId: fe37d3a0-698c-4c48-b804-ea14286f9e12 Version: $LATEST",
+       "2026-11-06T10:06:18.140Z END RequestId: fe37d3a0-698c-4c48-b804-ea14286f9e12",
+       "2026-11-06T10:06:18.140Z REPORT RequestId: fe37d3a0-698c-4c48-b804-ea14286f9e12\tDuration: 5840.00 ms\tBilled Duration: 5840 ms\tMemory Size: 512 MB\tMax Memory Used: 176 MB\tInit Duration: 1842.31 ms",
+       "2026-11-06T10:06:30.900Z START RequestId: 082918b8-3d7b-4783-ae89-4b764792cbe0 Version: $LATEST",
+       "2026-11-06T10:06:35.110Z END RequestId: 082918b8-3d7b-4783-ae89-4b764792cbe0",
+       "2026-11-06T10:06:35.110Z REPORT RequestId: 082918b8-3d7b-4783-ae89-4b764792cbe0\tDuration: 4210.00 ms\tBilled Duration: 4210 ms\tMemory Size: 512 MB\tMax Memory Used: 176 MB\tInit Duration: 1790.44 ms",
+       "2026-11-06T10:12:18.100Z START RequestId: c116ad22-5306-4859-b893-1c6babb0fde2 Version: $LATEST",
+       "2026-11-06T10:12:18.640Z END RequestId: c116ad22-5306-4859-b893-1c6babb0fde2",
+       "2026-11-06T10:12:18.640Z REPORT RequestId: c116ad22-5306-4859-b893-1c6babb0fde2\tDuration: 540.10 ms\tBilled Duration: 541 ms\tMemory Size: 512 MB\tMax Memory Used: 176 MB",
+       "2026-11-06T10:31:44.410Z START RequestId: eb097120-0bc9-4e63-bd56-12699e69524e Version: $LATEST",
+       "2026-11-06T10:31:44.922Z END RequestId: eb097120-0bc9-4e63-bd56-12699e69524e",
+       "2026-11-06T10:31:44.922Z REPORT RequestId: eb097120-0bc9-4e63-bd56-12699e69524e\tDuration: 512.60 ms\tBilled Duration: 513 ms\tMemory Size: 512 MB\tMax Memory Used: 176 MB"
+      ]
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-02T06:40:11Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "reindex-search-documents --apply 완료 (doc v5, 186건 갱신)"
+     },
+     {
+      "time": "2026-11-05T02:22:37Z",
+      "type": "stack_update",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "SearchCanaryVectorAlarm 알람 리소스 추가"
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     },
+     {
+      "time": "2026-11-06T10:05:02Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.1 태그 배포: 재질 필터 입력 검증 메시지 수정",
+      "details": {
+       "before": "v1.10.0",
+       "after": "v1.10.1"
+      }
+     }
+    ],
+    "metrics": {
+     "apiGateway": {
+      "count": 690,
+      "5xx": 0,
+      "4xx": 0,
+      "integrationLatencyP99": 5700
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "no_fault",
+    "component": "lambda:MaterialPropertySearchFunction",
+    "faultType": "transient_self_healed",
+    "cause": "10:05 배포로 실행 환경이 모두 바뀌어 첫 호출들이 Init 1.8초와 캐시 없는 조회로 느렸다. 10:12 이후 Duration은 평소 0.5초로 돌아왔고 오류가 없어 조치가 필요 없다.",
+    "contributing": [],
+    "fix": "조치 없이 정상 복귀를 알리고 관찰한다.",
+    "acceptableFixes": [
+     "배포 직후 콜드 스타트 구간임을 대시보드에 표시 (개선)"
+    ],
+    "forbiddenFixes": [
+     "메모리 증설",
+     "프로비저닝 동시성 도입",
+     "v1.10.1 롤백",
+     "타임아웃 조정"
+    ],
+    "evidenceSignals": [
+     "Init Duration: 1842.31 ms",
+     "Duration: 540.10 ms"
+    ]
+   }
+  },
+  {
+   "id": "v3-54",
+   "code": "C3",
+   "title": "대량 적재로 GSI2 핫 파티션 역압",
+   "message": "부품 등록 API가 ThrottlingException으로 실패해요. 슬랙엔 BedrockThrottling CRITICAL로 왔는데 베드록 콘솔 지표는 깨끗합니다. 뭘 증설해야 하나요?",
+   "attrs": {
+    "multiFactor": true,
+    "detectionGap": false,
+    "humanReported": false,
+    "redHerring": true,
+    "noErrorSymptom": false
+   },
+   "world": {
+    "functions": {
+     "PartRegistrationFunction": {
+      "status": {
+       "invocations": 26,
+       "errors": 0,
+       "avgDuration": 640,
+       "throttles": 0,
+       "durationP99": 1810,
+       "maxConcurrency": 2
+      },
+      "logs": [
+       "2026-11-06T13:12:04.110Z START RequestId: b17baae0-8b8c-44df-bfb4-7a42278ae987 Version: $LATEST",
+       "2026-11-06T13:12:04.263Z\tb17baae0-8b8c-44df-bfb4-7a42278ae987\tINFO\tRegistering new part: 9f1c6e02-4b37-4d81-a6c9-2e7d0f3b8a15",
+       "2026-11-06T13:12:04.416Z\tb17baae0-8b8c-44df-bfb4-7a42278ae987\tERROR\tError in part registration: ThrottlingException: Throughput exceeds the current capacity of your table or index. DynamoDB is automatically scaling your table or index so please try again shortly. If exceptions persist, check if you have a hot partition: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html\n    at de_ThrottlingExceptionRes (/opt/nodejs/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2412:21)\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:40:3) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'EBC492EB-9099-2125-8DE1-13A68C3593FE',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 3,\n    totalRetryDelay: 118\n  }\n  ThrottlingReasons: [\n    {\n      reason: 'IndexWriteKeyRangeThroughputExceeded',\n      resourceArn: 'arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/GSI2'\n    }\n  ]\n}",
+       "2026-11-06T13:12:04.722Z END RequestId: b17baae0-8b8c-44df-bfb4-7a42278ae987",
+       "2026-11-06T13:12:04.722Z REPORT RequestId: b17baae0-8b8c-44df-bfb4-7a42278ae987\tDuration: 612.00 ms\tBilled Duration: 612 ms\tMemory Size: 1024 MB\tMax Memory Used: 184 MB",
+       "2026-11-06T13:13:41.620Z START RequestId: 755f1daf-ab83-430e-9e72-63b7f530a0d0 Version: $LATEST",
+       "2026-11-06T13:13:41.773Z\t755f1daf-ab83-430e-9e72-63b7f530a0d0\tINFO\tRegistering new part: 2ad07b95-e1c4-4f63-8b02-6d9e3c1a7f40",
+       "2026-11-06T13:13:41.926Z\t755f1daf-ab83-430e-9e72-63b7f530a0d0\tERROR\tError in part registration: ThrottlingException: Throughput exceeds the current capacity of your table or index. DynamoDB is automatically scaling your table or index so please try again shortly. If exceptions persist, check if you have a hot partition: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html\n    at de_ThrottlingExceptionRes (/opt/nodejs/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2412:21)\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:40:3) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'EBC492EB-9099-2125-8DE1-13A68C3593FE',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 3,\n    totalRetryDelay: 118\n  }\n  ThrottlingReasons: [\n    {\n      reason: 'IndexWriteKeyRangeThroughputExceeded',\n      resourceArn: 'arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/GSI2'\n    }\n  ]\n}",
+       "2026-11-06T13:13:42.232Z END RequestId: 755f1daf-ab83-430e-9e72-63b7f530a0d0",
+       "2026-11-06T13:13:42.232Z REPORT RequestId: 755f1daf-ab83-430e-9e72-63b7f530a0d0\tDuration: 612.00 ms\tBilled Duration: 612 ms\tMemory Size: 1024 MB\tMax Memory Used: 184 MB",
+       "2026-11-06T13:15:22.300Z START RequestId: f0c32093-f4d0-4a21-be74-e2ae93d0d816 Version: $LATEST",
+       "2026-11-06T13:15:22.453Z\tf0c32093-f4d0-4a21-be74-e2ae93d0d816\tINFO\tRegistering new part: c4e8912f-07d6-4a15-93be-1f5a7c0d2e68",
+       "2026-11-06T13:15:22.606Z\tf0c32093-f4d0-4a21-be74-e2ae93d0d816\tERROR\tError in part registration: ThrottlingException: Throughput exceeds the current capacity of your table or index. DynamoDB is automatically scaling your table or index so please try again shortly. If exceptions persist, check if you have a hot partition: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html\n    at de_ThrottlingExceptionRes (/opt/nodejs/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2412:21)\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:40:3) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'EBC492EB-9099-2125-8DE1-13A68C3593FE',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 3,\n    totalRetryDelay: 118\n  }\n  ThrottlingReasons: [\n    {\n      reason: 'IndexWriteKeyRangeThroughputExceeded',\n      resourceArn: 'arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/GSI2'\n    }\n  ]\n}",
+       "2026-11-06T13:15:22.912Z END RequestId: f0c32093-f4d0-4a21-be74-e2ae93d0d816",
+       "2026-11-06T13:15:22.912Z REPORT RequestId: f0c32093-f4d0-4a21-be74-e2ae93d0d816\tDuration: 612.00 ms\tBilled Duration: 612 ms\tMemory Size: 1024 MB\tMax Memory Used: 184 MB"
+      ],
+      "errorSummary": [
+       [
+        "ThrottlingException",
+        19
+       ]
+      ]
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-02T06:40:11Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "reindex-search-documents --apply 완료 (doc v5, 186건 갱신)"
+     },
+     {
+      "time": "2026-11-05T02:22:37Z",
+      "type": "stack_update",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "SearchCanaryVectorAlarm 알람 리소스 추가"
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     },
+     {
+      "time": "2026-11-06T13:05:12Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "import-partner-catalog: 파트너 카탈로그 12,000건 적재 시작 (BatchWriteItem, 병렬 20)"
+     }
+    ],
+    "metrics": {
+     "dynamodb": {
+      "throttledRequests": 3412,
+      "consumedRCU": 610,
+      "consumedWCU": 184200
+     },
+     "bedrock": {
+      "global.anthropic.claude-haiku-4-5-20251001-v1:0": {
+       "invocations": 61,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 2700,
+       "inputTokens": 17200,
+       "outputTokens": 4100
+      },
+      "amazon.titan-embed-text-v2:0": {
+       "invocations": 90,
+       "throttles": 0,
+       "serverErrors": 0,
+       "avgLatencyMs": 174,
+       "inputTokens": 1700,
+       "outputTokens": 0
+      }
+     },
+     "apiGateway": {
+      "count": 820,
+      "5xx": 19,
+      "4xx": 0,
+      "integrationLatencyP99": 1760
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "root_cause",
+    "component": "dynamodb:eecar-parts-table",
+    "faultType": "ddb_throttle_or_hot_key",
+    "cause": "13:05에 시작한 파트너 카탈로그 대량 적재로 METADATA 쓰기가 몰렸다. 모든 METADATA의 GSI2PK가 ALL#METADATA 하나라 GSI2 파티션이 핫해지고 그 역압으로 기본 테이블 쓰기까지 스로틀된다(IndexWriteKeyRangeThroughputExceeded). Bedrock과는 무관하며 알림의 에러 타입은 파서의 오분류다.",
+    "contributing": [
+     "GSI2PK 값이 하나뿐인 키 설계",
+     "적재 작업에 속도 제한이 없음",
+     "slack-notification 파서가 모든 ThrottlingException을 BedrockThrottling으로 분류"
+    ],
+    "fix": "적재 작업을 멈추거나 속도를 낮추고, 장기적으로 GSI2PK를 샤딩한다.",
+    "acceptableFixes": [
+     "BatchWriteItem 병렬도와 쓰기 속도 제한 적용 (완화)",
+     "적재를 트래픽이 적은 시간으로 이동 (완화)"
+    ],
+    "forbiddenFixes": [
+     "Bedrock 쿼터 증설",
+     "온디맨드 테이블을 무턱대고 프로비저닝으로 전환",
+     "Lambda 메모리 증설",
+     "알림 끄기"
+    ],
+    "evidenceSignals": [
+     "IndexWriteKeyRangeThroughputExceeded",
+     "index/GSI2",
+     "import-partner-catalog"
+    ]
+   }
+  },
+  {
+   "id": "v3-55",
+   "code": "A1",
+   "title": "핫픽스 함수만 배포해 레이어와 어긋남",
+   "message": "VectorSearchFunction CRITICAL 알림이 6시 조금 전부터 연달아 옵니다. 에러 타입은 GenericError라고만 나오고요. 검색 API는 전부 502네요. 원인이랑 조치 부탁드립니다.",
+   "attrs": {
+    "multiFactor": true,
+    "detectionGap": false,
+    "humanReported": false,
+    "redHerring": false,
+    "noErrorSymptom": false
+   },
+   "world": {
+    "functions": {
+     "VectorSearchFunction": {
+      "status": {
+       "invocations": 84,
+       "errors": 84,
+       "avgDuration": 3,
+       "throttles": 0,
+       "durationP99": 4,
+       "maxConcurrency": 9
+      },
+      "logs": [
+       "2026-11-06T08:48:02.114Z INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:7c1e0d9a44b2f3a6c0e8d1b7f5a29c3e4d6b8f01a7c2e5d3b9f4a6c8e0d2b1f7",
+       "2026-11-06T08:48:02.485Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\": \"Runtime.UserCodeSyntaxError\", \"errorMessage\": \"SyntaxError: The requested module '/opt/nodejs/utils/search-ranking.js' does not provide an export named 'applyConstraintPenalty'\", \"stack\": [\"Runtime.UserCodeSyntaxError: SyntaxError: The requested module '/opt/nodejs/utils/search-ranking.js' does not provide an export named 'applyConstraintPenalty'\", \"    at _loadUserApp (file:///var/runtime/index.mjs:1087:17)\", \"    at async UserFunction.js.module.exports.load (file:///var/runtime/index.mjs:1119:21)\", \"    at async start (file:///var/runtime/index.mjs:1282:23)\", \"    at async file:///var/runtime/index.mjs:1288:1\"]}",
+       "2026-11-06T08:48:02.526Z INIT_REPORT Init Duration: 412.71 ms\tPhase: init\tStatus: error\tError Type: Runtime.UserCodeSyntaxError",
+       "2026-11-06T08:48:02.528Z START RequestId: 26147092-1811-4aa0-bc2e-44f00f75a472 Version: $LATEST",
+       "2026-11-06T08:48:02.531Z END RequestId: 26147092-1811-4aa0-bc2e-44f00f75a472",
+       "2026-11-06T08:48:02.531Z REPORT RequestId: 26147092-1811-4aa0-bc2e-44f00f75a472\tDuration: 3.10 ms\tBilled Duration: 4 ms\tMemory Size: 1024 MB\tMax Memory Used: 92 MB\tStatus: error\tError Type: Runtime.UserCodeSyntaxError",
+       "2026-11-06T09:03:41.530Z INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:7c1e0d9a44b2f3a6c0e8d1b7f5a29c3e4d6b8f01a7c2e5d3b9f4a6c8e0d2b1f7",
+       "2026-11-06T09:03:41.888Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\": \"Runtime.UserCodeSyntaxError\", \"errorMessage\": \"SyntaxError: The requested module '/opt/nodejs/utils/search-ranking.js' does not provide an export named 'applyConstraintPenalty'\", \"stack\": [\"Runtime.UserCodeSyntaxError: SyntaxError: The requested module '/opt/nodejs/utils/search-ranking.js' does not provide an export named 'applyConstraintPenalty'\", \"    at _loadUserApp (file:///var/runtime/index.mjs:1087:17)\", \"    at async UserFunction.js.module.exports.load (file:///var/runtime/index.mjs:1119:21)\", \"    at async start (file:///var/runtime/index.mjs:1282:23)\", \"    at async file:///var/runtime/index.mjs:1288:1\"]}",
+       "2026-11-06T09:03:41.928Z INIT_REPORT Init Duration: 398.27 ms\tPhase: init\tStatus: error\tError Type: Runtime.UserCodeSyntaxError",
+       "2026-11-06T09:03:41.930Z START RequestId: 1118b5a7-c12f-49c3-b6bb-f41be6227b82 Version: $LATEST",
+       "2026-11-06T09:03:41.933Z END RequestId: 1118b5a7-c12f-49c3-b6bb-f41be6227b82",
+       "2026-11-06T09:03:41.933Z REPORT RequestId: 1118b5a7-c12f-49c3-b6bb-f41be6227b82\tDuration: 3.10 ms\tBilled Duration: 4 ms\tMemory Size: 1024 MB\tMax Memory Used: 91 MB\tStatus: error\tError Type: Runtime.UserCodeSyntaxError",
+       "2026-11-06T09:21:17.802Z INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:7c1e0d9a44b2f3a6c0e8d1b7f5a29c3e4d6b8f01a7c2e5d3b9f4a6c8e0d2b1f7",
+       "2026-11-06T09:21:18.167Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\": \"Runtime.UserCodeSyntaxError\", \"errorMessage\": \"SyntaxError: The requested module '/opt/nodejs/utils/search-ranking.js' does not provide an export named 'applyConstraintPenalty'\", \"stack\": [\"Runtime.UserCodeSyntaxError: SyntaxError: The requested module '/opt/nodejs/utils/search-ranking.js' does not provide an export named 'applyConstraintPenalty'\", \"    at _loadUserApp (file:///var/runtime/index.mjs:1087:17)\", \"    at async UserFunction.js.module.exports.load (file:///var/runtime/index.mjs:1119:21)\", \"    at async start (file:///var/runtime/index.mjs:1282:23)\", \"    at async file:///var/runtime/index.mjs:1288:1\"]}",
+       "2026-11-06T09:21:18.207Z INIT_REPORT Init Duration: 405.66 ms\tPhase: init\tStatus: error\tError Type: Runtime.UserCodeSyntaxError",
+       "2026-11-06T09:21:18.209Z START RequestId: 1cb5def3-134f-4f02-a5ba-1e1cd90696c5 Version: $LATEST",
+       "2026-11-06T09:21:18.212Z END RequestId: 1cb5def3-134f-4f02-a5ba-1e1cd90696c5",
+       "2026-11-06T09:21:18.212Z REPORT RequestId: 1cb5def3-134f-4f02-a5ba-1e1cd90696c5\tDuration: 3.10 ms\tBilled Duration: 4 ms\tMemory Size: 1024 MB\tMax Memory Used: 92 MB\tStatus: error\tError Type: Runtime.UserCodeSyntaxError"
+      ],
+      "errorSummary": [
+       [
+        "Runtime.UserCodeSyntaxError",
+        84
+       ]
+      ],
+      "config": {
+       "lastModified": "2026-11-06T08:47:19.000+0000"
+      }
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-11-01T23:50:03Z",
+      "type": "function_config",
+      "target": "SyntheticDataFunction",
+      "actor": "console:user-a",
+      "summary": "설명 문구 변경 (Description 필드만)"
+     },
+     {
+      "time": "2026-11-02T06:40:11Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "reindex-search-documents --apply 완료 (doc v5, 186건 갱신)"
+     },
+     {
+      "time": "2026-11-04T07:31:09Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.1 태그 배포: slack-notification 퇴역 모델 오류 분류 수정",
+      "details": {
+       "before": "v1.9.0",
+       "after": "v1.9.1"
+      }
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     },
+     {
+      "time": "2026-11-06T08:47:19Z",
+      "type": "function_code",
+      "target": "VectorSearchFunction",
+      "actor": "console:user-b",
+      "summary": "핫픽스: 랭킹 감점 로직 변경. VectorSearchFunction 함수 코드만 갱신 (레이어 eecar-utils-layer:27 유지)",
+      "details": {
+       "before": "코드 SHA 9fA2d1",
+       "after": "코드 SHA c41E07"
+      }
+     }
+    ],
+    "metrics": {
+     "apiGateway": {
+      "count": 84,
+      "5xx": 84,
+      "4xx": 0,
+      "integrationLatencyP99": 460
+     },
+     "canary": {
+      "lastRunAt": "2026-11-06T09:23:00Z",
+      "passed": false,
+      "failures": [
+       "c1: HTTP 502",
+       "c2: HTTP 502",
+       "c3: HTTP 502",
+       "c4: HTTP 502",
+       "c5: HTTP 502"
+      ]
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "root_cause",
+    "component": "layer:eecar-utils-layer",
+    "faultType": "layer_version_mismatch",
+    "cause": "08:47에 VectorSearchFunction 코드만 핫픽스로 배포했는데, 새 코드가 import하는 search-ranking.js의 applyConstraintPenalty는 레이어 v27에 없다. 레이어를 다시 빌드하지 않아 모든 실행 환경이 Init 단계에서 실패하고 API는 502를 돌려준다.",
+    "contributing": [
+     "build:all 없이 함수 코드만 배포 (utils 변경은 build:layer가 필요)",
+     "jest moduleNameMapper가 /opt 경로를 src/utils로 매핑해 테스트에서 잡히지 않음",
+     "단계적 배포가 없어 배포 즉시 전체 장애"
+    ],
+    "fix": "backend에서 npm run build:all로 레이어를 새로 빌드해 함수와 함께 배포한다.",
+    "acceptableFixes": [
+     "직전 함수 코드 버전으로 롤백 (완화)",
+     "핫픽스에서 applyConstraintPenalty 사용을 제거하고 재배포"
+    ],
+    "forbiddenFixes": [
+     "메모리 또는 타임아웃 증설",
+     "Bedrock 쿼터 증설",
+     "S3 Vectors 재색인",
+     "레이어를 건드리지 않고 함수만 재시작"
+    ],
+    "evidenceSignals": [
+     "does not provide an export named",
+     "Runtime.UserCodeSyntaxError",
+     "함수 코드만 갱신"
+    ]
+   }
+  },
+  {
+   "id": "v3-59",
+   "code": "A1",
+   "title": "새 도메인 프론트에서만 API 실패",
+   "message": "파트너 데모용으로 demo.eecar.kr 새로 열었는데 거기서는 부품 목록이 맨날 같은 몇 개만 나오고 검색은 '검색에 실패했습니다'만 떠요. 기존 CloudFront 주소로 들어가면 멀쩡하고요. 백엔드 뭐 바뀐 거 있나요?",
+   "attrs": {
+    "multiFactor": true,
+    "detectionGap": true,
+    "humanReported": true,
+    "redHerring": false,
+    "noErrorSymptom": true
+   },
+   "world": {
+    "functions": {
+     "GetPartsFunction": {
+      "status": {
+       "invocations": 638,
+       "errors": 0,
+       "avgDuration": 64,
+       "throttles": 0,
+       "durationP99": 218,
+       "maxConcurrency": 8
+      },
+      "logs": [
+       "2026-11-06T05:44:10.220Z START RequestId: a3f40128-e789-4416-ac7a-39d34ea5ce67 Version: $LATEST",
+       "2026-11-06T05:44:10.278Z END RequestId: a3f40128-e789-4416-ac7a-39d34ea5ce67",
+       "2026-11-06T05:44:10.278Z REPORT RequestId: a3f40128-e789-4416-ac7a-39d34ea5ce67\tDuration: 58.12 ms\tBilled Duration: 59 ms\tMemory Size: 512 MB\tMax Memory Used: 148 MB",
+       "2026-11-06T05:44:11.910Z START RequestId: dde98759-b4a6-482a-a98e-0cb0d0c266db Version: $LATEST",
+       "2026-11-06T05:44:11.971Z END RequestId: dde98759-b4a6-482a-a98e-0cb0d0c266db",
+       "2026-11-06T05:44:11.971Z REPORT RequestId: dde98759-b4a6-482a-a98e-0cb0d0c266db\tDuration: 61.40 ms\tBilled Duration: 62 ms\tMemory Size: 512 MB\tMax Memory Used: 148 MB",
+       "2026-11-06T05:51:37.005Z START RequestId: c9ae375d-d66b-4224-beb2-7d085385fd1c Version: $LATEST",
+       "2026-11-06T05:51:37.062Z END RequestId: c9ae375d-d66b-4224-beb2-7d085385fd1c",
+       "2026-11-06T05:51:37.062Z REPORT RequestId: c9ae375d-d66b-4224-beb2-7d085385fd1c\tDuration: 57.03 ms\tBilled Duration: 58 ms\tMemory Size: 512 MB\tMax Memory Used: 149 MB"
+      ]
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-11-02T06:40:11Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "reindex-search-documents --apply 완료 (doc v5, 186건 갱신)"
+     },
+     {
+      "time": "2026-11-03T04:05:48Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.0 태그 배포: 부품 목록 커서 페이지네이션 정리",
+      "details": {
+       "before": "v1.8.1",
+       "after": "v1.9.0"
+      }
+     },
+     {
+      "time": "2026-11-05T02:22:37Z",
+      "type": "stack_update",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "SearchCanaryVectorAlarm 알람 리소스 추가"
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     }
+    ],
+    "metrics": {
+     "apiGateway": {
+      "count": 1120,
+      "5xx": 0,
+      "4xx": 4,
+      "integrationLatencyP99": 1650
+     },
+     "canary": {
+      "lastRunAt": "2026-11-06T05:23:00Z",
+      "passed": true,
+      "failures": []
+     }
+    },
+    "externalStatus": []
+   },
+   "truth": {
+    "verdict": "insufficient_evidence",
+    "component": "layer:eecar-utils-layer",
+    "faultType": "config_env_wrong",
+    "cause": "백엔드 쪽 지표와 로그, 변경 이력에는 이상이 없고 오류도 없어 서버 측 신호만으로는 원인을 확정할 수 없다. 숨은 원인은 response.ts의 ALLOWED_ORIGINS에 새 도메인이 없어 브라우저가 CORS로 응답을 막고 프론트가 mock 데이터로 폴백하는 것인데, 결정적 신호인 브라우저 콘솔과 응답 헤더는 이 세계에 없다. CORS를 유력 후보로 제시하되 확인이 필요하다고 답해야 한다.",
+    "contributing": [
+     "프론트의 mockParts 폴백이 API 실패를 숨김",
+     "허용 도메인이 코드에 하드코딩되어 프론트 도메인 추가가 백엔드 변경을 요구함"
+    ],
+    "fix": "새 도메인에서 브라우저 콘솔·네트워크 탭으로 CORS 오류와 Access-Control-Allow-Origin 응답 헤더를 확인한다.",
+    "acceptableFixes": [
+     "curl에 Origin: https://demo.eecar.kr 헤더를 넣어 응답 헤더 확인",
+     "확인 뒤 ALLOWED_ORIGINS에 도메인을 추가해 레이어 배포"
+    ],
+    "forbiddenFixes": [
+     "백엔드 v1.10.0 롤백",
+     "Lambda 메모리 증설",
+     "API Gateway 타임아웃 증설",
+     "근거 없이 AWS 장애로 단정"
+    ],
+    "evidenceSignals": [
+     "Duration: 58.12 ms",
+     "Duration: 61.40 ms"
+    ]
+   }
+  },
+  {
+   "id": "v3-60",
+   "code": "C4",
+   "title": "대량 적재 뒤 색인 재적재에서 메모리 초과",
+   "message": "사이트가 됐다 안 됐다 합니다. 몇 분 멀쩡하다가 검색이 502 나고 또 멀쩡해지고... 패턴이 이상해요. 혹시 디도스 같은 거 아닌가요? 방화벽이라도 걸어야 하나 해서요.",
+   "inspiredBy": "Cloudflare 2025-11-18 (생성 데이터가 2배가 되어 숨은 한도 초과, 5분 주기로 정상·장애 반복, DDoS 오인)",
+   "attrs": {
+    "multiFactor": true,
+    "detectionGap": false,
+    "humanReported": true,
+    "redHerring": true,
+    "noErrorSymptom": false
+   },
+   "world": {
+    "functions": {
+     "VectorSearchFunction": {
+      "status": {
+       "invocations": 138,
+       "errors": 41,
+       "avgDuration": 11200,
+       "throttles": 0,
+       "durationP99": 25600,
+       "maxConcurrency": 8
+      },
+      "logs": [
+       "2026-11-06T12:03:04.100Z START RequestId: f683ba9c-86d0-48fc-9c2f-19991fc6815b Version: $LATEST",
+       "2026-11-06T12:03:10.265Z\tf683ba9c-86d0-48fc-9c2f-19991fc6815b\tINFO\tProcessing search query: EV6 배터리",
+       "2026-11-06T12:03:16.430Z\tf683ba9c-86d0-48fc-9c2f-19991fc6815b\tINFO\tvector 100, bm25 100 (index 9804, loaded) -> ranked 150, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"EV6\"]}",
+       "2026-11-06T12:03:28.760Z {\"_aws\":{\"Timestamp\":1793966608760,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"VectorCandidates\",\"Unit\":\"Count\"},{\"Name\":\"Bm25Candidates\",\"Unit\":\"Count\"}]}]},\"Operation\":\"Search\",\"EmbeddingMs\":182,\"VectorSearchMs\":326,\"IndexLoadMs\":24110,\"FusionMs\":11,\"TotalMs\":24640,\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"VectorCandidates\":100,\"Bm25Candidates\":100}",
+       "2026-11-06T12:03:28.760Z END RequestId: f683ba9c-86d0-48fc-9c2f-19991fc6815b",
+       "2026-11-06T12:03:28.760Z REPORT RequestId: f683ba9c-86d0-48fc-9c2f-19991fc6815b\tDuration: 24660.00 ms\tBilled Duration: 24660 ms\tMemory Size: 1024 MB\tMax Memory Used: 1011 MB",
+       "2026-11-06T12:04:11.300Z START RequestId: ef7f796d-d7f6-45f3-bcdd-ac21c5ee273d Version: $LATEST",
+       "2026-11-06T12:04:11.460Z\tef7f796d-d7f6-45f3-bcdd-ac21c5ee273d\tINFO\tProcessing search query: 니로 EV 인버터",
+       "2026-11-06T12:04:11.621Z\tef7f796d-d7f6-45f3-bcdd-ac21c5ee273d\tINFO\tvector 100, bm25 71 (index 9804) -> ranked 124, constraints {\"categories\":[\"inverter\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"니로 EV\"]}",
+       "2026-11-06T12:04:11.942Z END RequestId: ef7f796d-d7f6-45f3-bcdd-ac21c5ee273d",
+       "2026-11-06T12:04:11.942Z REPORT RequestId: ef7f796d-d7f6-45f3-bcdd-ac21c5ee273d\tDuration: 642.00 ms\tBilled Duration: 642 ms\tMemory Size: 1024 MB\tMax Memory Used: 1012 MB",
+       "2026-11-06T12:08:18.900Z START RequestId: d02da8fb-7bf6-48fe-b3b0-c7cfa2c4cab5 Version: $LATEST",
+       "2026-11-06T12:08:18.900Z\td02da8fb-7bf6-48fe-b3b0-c7cfa2c4cab5\tINFO\tProcessing search query: 코나 모터",
+       "2026-11-06T12:08:44.420Z\td02da8fb-7bf6-48fe-b3b0-c7cfa2c4cab5\tERROR\tFATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory",
+       "2026-11-06T12:08:44.420Z RequestId: d02da8fb-7bf6-48fe-b3b0-c7cfa2c4cab5 Error: Runtime exited with error: signal: killed\n Runtime.ExitError",
+       "2026-11-06T12:08:44.420Z END RequestId: d02da8fb-7bf6-48fe-b3b0-c7cfa2c4cab5",
+       "2026-11-06T12:08:44.420Z REPORT RequestId: d02da8fb-7bf6-48fe-b3b0-c7cfa2c4cab5\tDuration: 25521.03 ms\tBilled Duration: 25522 ms\tMemory Size: 1024 MB\tMax Memory Used: 1024 MB\tStatus: error\tError Type: Runtime.OutOfMemory",
+       "2026-11-06T12:08:52.210Z START RequestId: 25facdd1-6900-4f32-a9e2-67f4a1f57959 Version: $LATEST",
+       "2026-11-06T12:08:52.210Z\t25facdd1-6900-4f32-a9e2-67f4a1f57959\tINFO\tProcessing search query: EV9 배터리",
+       "2026-11-06T12:09:17.640Z\t25facdd1-6900-4f32-a9e2-67f4a1f57959\tERROR\tFATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory",
+       "2026-11-06T12:09:17.640Z RequestId: 25facdd1-6900-4f32-a9e2-67f4a1f57959 Error: Runtime exited with error: signal: killed\n Runtime.ExitError",
+       "2026-11-06T12:09:17.640Z END RequestId: 25facdd1-6900-4f32-a9e2-67f4a1f57959",
+       "2026-11-06T12:09:17.640Z REPORT RequestId: 25facdd1-6900-4f32-a9e2-67f4a1f57959\tDuration: 25431.21 ms\tBilled Duration: 25432 ms\tMemory Size: 1024 MB\tMax Memory Used: 1024 MB\tStatus: error\tError Type: Runtime.OutOfMemory",
+       "2026-11-06T12:09:40.310Z START RequestId: 04a975af-e1ec-45ec-b187-35634c48451c Version: $LATEST",
+       "2026-11-06T12:09:46.515Z\t04a975af-e1ec-45ec-b187-35634c48451c\tINFO\tProcessing search query: 아이오닉5 배터리 팩",
+       "2026-11-06T12:09:52.720Z\t04a975af-e1ec-45ec-b187-35634c48451c\tINFO\tvector 100, bm25 100 (index 9804, loaded) -> ranked 152, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"아이오닉5\"]}",
+       "2026-11-06T12:10:05.130Z END RequestId: 04a975af-e1ec-45ec-b187-35634c48451c",
+       "2026-11-06T12:10:05.130Z REPORT RequestId: 04a975af-e1ec-45ec-b187-35634c48451c\tDuration: 24820.00 ms\tBilled Duration: 24820 ms\tMemory Size: 1024 MB\tMax Memory Used: 1009 MB",
+       "2026-11-06T12:11:02.610Z START RequestId: 2d46d1ad-5494-4422-bf3d-d9eee0def3bc Version: $LATEST",
+       "2026-11-06T12:11:02.773Z\t2d46d1ad-5494-4422-bf3d-d9eee0def3bc\tINFO\tProcessing search query: 모델Y 모터",
+       "2026-11-06T12:11:02.937Z\t2d46d1ad-5494-4422-bf3d-d9eee0def3bc\tINFO\tvector 100, bm25 83 (index 9804) -> ranked 131, constraints {\"categories\":[\"motor\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"모델Y\"]}",
+       "2026-11-06T12:11:03.265Z END RequestId: 2d46d1ad-5494-4422-bf3d-d9eee0def3bc",
+       "2026-11-06T12:11:03.265Z REPORT RequestId: 2d46d1ad-5494-4422-bf3d-d9eee0def3bc\tDuration: 655.00 ms\tBilled Duration: 655 ms\tMemory Size: 1024 MB\tMax Memory Used: 1010 MB",
+       "2026-11-06T12:14:50.100Z START RequestId: 6b71f9f2-c8ac-4762-945c-8f3519cc20f1 Version: $LATEST",
+       "2026-11-06T12:14:50.100Z\t6b71f9f2-c8ac-4762-945c-8f3519cc20f1\tINFO\tProcessing search query: 쏘울 EV 배터리",
+       "2026-11-06T12:15:15.700Z\t6b71f9f2-c8ac-4762-945c-8f3519cc20f1\tERROR\tFATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory",
+       "2026-11-06T12:15:15.700Z RequestId: 6b71f9f2-c8ac-4762-945c-8f3519cc20f1 Error: Runtime exited with error: signal: killed\n Runtime.ExitError",
+       "2026-11-06T12:15:15.700Z END RequestId: 6b71f9f2-c8ac-4762-945c-8f3519cc20f1",
+       "2026-11-06T12:15:15.700Z REPORT RequestId: 6b71f9f2-c8ac-4762-945c-8f3519cc20f1\tDuration: 25602.44 ms\tBilled Duration: 25603 ms\tMemory Size: 1024 MB\tMax Memory Used: 1024 MB\tStatus: error\tError Type: Runtime.OutOfMemory"
+      ],
+      "errorSummary": [
+       [
+        "Runtime.OutOfMemory",
+        41
+       ]
+      ]
+     }
+    },
+    "changes": [
+     {
+      "time": "2026-10-31T01:14:22Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.8.1 태그 배포: 제안 목록 응답에서 내부 키 제외",
+      "details": {
+       "before": "v1.8.0",
+       "after": "v1.8.1"
+      }
+     },
+     {
+      "time": "2026-11-02T06:40:11Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "reindex-search-documents --apply 완료 (doc v5, 186건 갱신)"
+     },
+     {
+      "time": "2026-11-03T04:05:48Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.9.0 태그 배포: 부품 목록 커서 페이지네이션 정리",
+      "details": {
+       "before": "v1.8.1",
+       "after": "v1.9.0"
+      }
+     },
+     {
+      "time": "2026-11-06T00:52:52Z",
+      "type": "layer_publish",
+      "target": "eecar-utils-layer",
+      "actor": "github-actions",
+      "summary": "eecar-utils-layer 버전 27 게시",
+      "details": {
+       "before": "26",
+       "after": "27"
+      }
+     },
+     {
+      "time": "2026-11-06T00:53:06Z",
+      "type": "deploy",
+      "target": "eecar-stack",
+      "actor": "github-actions",
+      "summary": "v1.10.0 태그 배포: 전 함수 코드 갱신과 레이어 v27 연결 (검색 문서 테스트 보강, 의존성 패치)",
+      "details": {
+       "before": "v1.9.1",
+       "after": "v1.10.0"
+      }
+     },
+     {
+      "time": "2026-11-06T03:18:38Z",
+      "type": "function_code",
+      "target": "SlackAgentFunction",
+      "actor": "github-actions",
+      "summary": "자동이 응답 서식 수정 배포"
+     },
+     {
+      "time": "2026-11-06T11:40:12Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "sync-catalog-backfill 1회차: 부품 4,812건 적재 (METADATA, 이미지 포함)"
+     },
+     {
+      "time": "2026-11-06T11:58:40Z",
+      "type": "data_job",
+      "target": "eecar-parts-table",
+      "actor": "script",
+      "summary": "sync-catalog-backfill 2회차: 부품 4,806건 적재 (1회차 응답 확인 전 재실행)"
+     }
+    ],
+    "metrics": {
+     "apiGateway": {
+      "count": 810,
+      "5xx": 41,
+      "4xx": 0,
+      "integrationLatencyP99": 25600
+     },
+     "dynamodb": {
+      "throttledRequests": 0,
+      "consumedRCU": 184000,
+      "consumedWCU": 9200
+     },
+     "canary": {
+      "lastRunAt": "2026-11-06T11:23:00Z",
+      "passed": true,
+      "failures": []
+     }
+    },
+    "externalStatus": [
+     {
+      "provider": "AWS",
+      "time": "2026-11-06T11:52:00Z",
+      "severity": "informational",
+      "title": "Amazon CloudFront 일부 엣지 오류율 증가 (복구됨)",
+      "body": "일부 엣지 로케이션에서 오류율이 일시적으로 증가했으나 복구되었습니다."
+     }
+    ]
+   },
+   "truth": {
+    "verdict": "root_cause",
+    "component": "lambda:VectorSearchFunction",
+    "faultType": "memory_exhausted",
+    "cause": "11:40~11:58 카탈로그 적재가 두 번 실행되어 METADATA가 186건에서 9,804건으로 늘었다. BM25 색인을 5분마다 다시 읽는데 이제 메모리 한도 1024MB에 닿아, 적재에 성공한 실행 환경은 5분간 정상이고 재적재하다 OOM으로 죽는 동안에는 502가 나서 정상과 장애가 번갈아 나타난다. 호출 수는 평소 수준이어서 공격이 아니다.",
+    "contributing": [
+     "적재 스크립트가 재실행에 멱등하지 않아 데이터가 2배가 됨",
+     "GSI2가 ALL 프로젝션이라 색인 적재 때 이미지까지 메모리로 읽음",
+     "색인 크기 상한과 부품 수 재검토 조건(5,000개)에 대한 감시 없음"
+    ],
+    "fix": "중복 적재분을 정리하고, 색인 적재에 필요한 속성만 읽도록 하거나 색인을 S3에 직렬화한다.",
+    "acceptableFixes": [
+     "VectorSearchFunction 메모리 증설 (완화)",
+     "적재 작업 취소와 데이터 복구 (완화)"
+    ],
+    "forbiddenFixes": [
+     "WAF·방화벽 차단 등 DDoS 대응",
+     "CloudFront 공지를 원인으로 단정",
+     "색인 TTL만 변경",
+     "API Gateway 타임아웃 증설"
+    ],
+    "evidenceSignals": [
+     "Runtime.OutOfMemory",
+     "Max Memory Used: 1024 MB",
+     "sync-catalog-backfill",
+     "index 9804"
+    ]
+   }
+  }
+ ]
+}
