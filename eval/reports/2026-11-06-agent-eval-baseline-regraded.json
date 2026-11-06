@@ -1,0 +1,4706 @@
+{
+  "meta": {
+    "date": "2026-11-06",
+    "model": "routing(default)",
+    "runs": 3
+  },
+  "summary": {
+    "scenarios": 20,
+    "runsPerScenario": 3,
+    "passAt1": 0.7166666666666667,
+    "passHatK": 0.7,
+    "cause": 0.8166666666666667,
+    "fix": 0.8333333333333334,
+    "noWrongClaim": 0.9166666666666666,
+    "tools": 1,
+    "evidence": 0.85,
+    "avgTurns": 2.316666666666667,
+    "avgToolCalls": 3.2333333333333334,
+    "avgInputTokens": 8427.033333333333,
+    "avgOutputTokens": 951.9833333333333,
+    "avgCostUsd": 0.013186950000000003,
+    "totalCostUsd": 0.7912170000000002,
+    "avgLatencyMs": 7132.433333333333,
+    "maxTurnsRuns": 0,
+    "errorRuns": 0
+  },
+  "byScenario": [
+    {
+      "id": "s01",
+      "title": "퇴역(Legacy) 모델 접근 거부 (C-09 실제 장애)",
+      "source": "prod-log",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    },
+    {
+      "id": "s02",
+      "title": "ERROR로 찍힌 Node 버전 경고 (장애 아님)",
+      "source": "prod-log",
+      "passRate": 0,
+      "passAll": false,
+      "runs": 3
+    },
+    {
+      "id": "s03",
+      "title": "Bedrock 호출 스로틀링",
+      "source": "format-based",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    },
+    {
+      "id": "s04",
+      "title": "Lambda 타임아웃",
+      "source": "format-based",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    },
+    {
+      "id": "s05",
+      "title": "DynamoDB 처리량 초과",
+      "source": "format-based",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    },
+    {
+      "id": "s06",
+      "title": "IAM 권한 부족",
+      "source": "format-based",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    },
+    {
+      "id": "s07",
+      "title": "클라이언트의 잘못된 JSON (서버 문제 아님)",
+      "source": "format-based",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    },
+    {
+      "id": "s08",
+      "title": "Lambda Layer 모듈 누락 (배포 불일치)",
+      "source": "format-based",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    },
+    {
+      "id": "s09",
+      "title": "SSM 파라미터 없음",
+      "source": "format-based",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    },
+    {
+      "id": "s10",
+      "title": "S3 객체 없음 (벡터 manifest)",
+      "source": "format-based",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    },
+    {
+      "id": "s11",
+      "title": "잘못된 모델 ID",
+      "source": "format-based",
+      "passRate": 0,
+      "passAll": false,
+      "runs": 3
+    },
+    {
+      "id": "s12",
+      "title": "계정 토큰 쿼터 소진 (A-12 경험 기반)",
+      "source": "format-based",
+      "passRate": 0,
+      "passAll": false,
+      "runs": 3
+    },
+    {
+      "id": "s13",
+      "title": "중복 제거용 조건부 쓰기 실패 (정상 동작)",
+      "source": "format-based",
+      "passRate": 0,
+      "passAll": false,
+      "runs": 3
+    },
+    {
+      "id": "s14",
+      "title": "정상 상태 (거짓 경보 방지)",
+      "source": "format-based",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    },
+    {
+      "id": "s15",
+      "title": "에러 없는 결과 0건 (C-06 유형의 조용한 장애)",
+      "source": "format-based",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    },
+    {
+      "id": "s16",
+      "title": "콜드 스타트 지연",
+      "source": "format-based",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    },
+    {
+      "id": "s17",
+      "title": "메모리 부족으로 런타임 종료",
+      "source": "format-based",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    },
+    {
+      "id": "s18",
+      "title": "Slack 3초 제한 초과로 인한 재시도 (C-13 유형)",
+      "source": "format-based",
+      "passRate": 0,
+      "passAll": false,
+      "runs": 3
+    },
+    {
+      "id": "s19",
+      "title": "존재하지 않는 함수 (지어내기 방지)",
+      "source": "format-based",
+      "passRate": 0.3333333333333333,
+      "passAll": false,
+      "runs": 3
+    },
+    {
+      "id": "s20",
+      "title": "스로틀링과 무관한 경고가 섞인 로그 (주원인 식별)",
+      "source": "format-based",
+      "passRate": 1,
+      "passAll": true,
+      "runs": 3
+    }
+  ],
+  "results": [
+    {
+      "id": "s01",
+      "run": 0,
+      "source": "prod-log",
+      "title": "퇴역(Legacy) 모델 접근 거부 (C-09 실제 장애)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "Legacy",
+          "레거시",
+          "model access",
+          "30일"
+        ],
+        "fix": [
+          "모델 ID",
+          "최신 모델",
+          "활성 모델",
+          "업그레이드",
+          "변경"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "🚨 **원인 파악됨!** \n\n문제는 **Bedrock 모델 액세스 제한**입니다. 자세한 분석 결과입니다:\n\n## 📊 현황\n- **에러 타입**: `ResourceNotFoundException`\n- **발생 빈도**: 지난 24시간 24회\n- **영향 부분**: \n  - ❌ Query expansion (쿼리 확장)\n  - ❌ Batch explanation generation (AI 설명 생성)\n\n## 🔴 근본 원인\n```\n\"This Model is marked by provider as Legacy and you have not been \nactively using the model in the last 30 days\"\n```\n\n**사용 중인 Bedrock 모델이 레거시 모델로 표시되어 있으며, 30일 이상 미사용으로 인해 액세스가 차단된 상태입니다.**\n\n## ✅ 해결 방법\n\n**1. Bedrock 모델 업그레이드** (권장)\n   - AWS Bedrock 콘솔에서 현재 사용 중인 모델 확인\n   - 최신 활성 모델로 변경 (예: Claude 3.5 Sonnet)\n   - 코드에서 모델 ID 업데이트\n\n**2. 긴급 임시 조치**\n   - Bedrock 콘솔 → Model access → 해당 모델 재활성화 요청\n   - AWS 지원팀에 모델 액세스 복구 요청\n\n**3. 코드 수정** (VectorSearchFunction)\n   ```javascript\n   // 변경 전\n   const modelId = \"anthropic.claude-2\"; // 레거시 모델\n   \n   // 변경 후\n   const modelId = \"anthropic.claude-3-5-sonnet-20241022\"; // 최신 모델\n   ```\n\n**4. 향후 예방**\n   - 모니터링 설정: Bedrock API 호출 실패 시 CloudWatch 알람\n   - 월 1회 이상 모델 사용 보장 (또는 온디맨드 모델 사용)\n\n어떤 모델을 현재 사용 중이신가요? 🤔 구체적인 업그레이드 가이드를 제공해드릴 수 있습니다!",
+      "metrics": {
+        "runId": "e034d745-e662-4136-bcec-a45cbf045a27",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7263,
+        "outputTokens": 980,
+        "estimatedCostUsd": 0.012163,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 931
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 96
+          }
+        ],
+        "latencyMs": 5599
+      }
+    },
+    {
+      "id": "s01",
+      "run": 1,
+      "source": "prod-log",
+      "title": "퇴역(Legacy) 모델 접근 거부 (C-09 실제 장애)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "Legacy",
+          "모델 접근",
+          "model access",
+          "30일"
+        ],
+        "fix": [
+          "모델 ID",
+          "활성 모델",
+          "변경"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "🚨 **원인을 찾았습니다!** \n\n## 문제 분석\n\n**에러 타입**: `ResourceNotFoundException` (Bedrock 모델 접근 불가)\n\n**근본 원인**: \n- VectorSearchFunction에서 사용 중인 Bedrock 모델이 **Legacy(구형) 모델**로 표시됨\n- 지난 30일간 활발히 사용하지 않아 자동 비활성화됨\n- AI 설명 생성 단계에서 Bedrock 호출 실패 → 유사도 기반 매칭 결과만 반환\n\n**영향 범위**:\n- Query expansion (검색어 확장) 실패\n- Batch explanation generation (AI 설명 생성) 실패\n- 지난 24시간 동안 24건의 에러 발생\n\n---\n\n## 🔧 해결 방법\n\n**1단계: Bedrock 모델 활성화**\n   - AWS Bedrock 콘솔 접속\n   - 사용 중인 모델 확인 (claude-3-sonnet 등)\n   - \"Model access\" → 해당 모델 재활성화\n\n**2단계: VectorSearchFunction 코드 수정**\n   ```javascript\n   // vectorSearchFunction.js\n   // Bedrock 모델 ID를 명시적으로 지정\n   const bedrockClient = new BedrockRuntimeClient({ region: 'ap-northeast-2' });\n   \n   // 활성 모델로 변경 (예시)\n   const modelId = 'anthropic.claude-3-sonnet-20240229-v1:0'; // 최신 활성 모델\n   \n   // 에러 핸들링 추가\n   try {\n     const explanationResponse = await bedrockClient.invokeModel({\n       modelId: modelId,\n       body: JSON.stringify(payload)\n     });\n   } catch (error) {\n     if (error.name === 'ResourceNotFoundException') {\n       console.error('Bedrock 모델 비활성화 - 관리자에게 알림 필요');\n       // Fallback: 유사도만 반환하되, 경고 메시지 추가\n       return { results: similarityResults, warning: 'AI 설명 생성 불가' };\n     }\n   }\n   ```\n\n**3단계: 모니터링 추가**\n   - CloudWatch 알람 설정: ResourceNotFoundException 발생 시 즉시 알림\n   - 정기적인 Bedrock 모델 상태 체크\n\n---\n\n## ✅ 권장 조치 순서\n1. **즉시**: Bedrock 콘솔에서 모델 재활성화\n2. **1시간 내**: VectorSearchFunction 배포 (에러 핸들링 추가)\n3. **당일**: CloudWatch 알람 설정\n4. **주간**: 팀 공유 - Bedrock 모델 관리 프로세스 수립\n\n혹시 Bedrock 콘솔 접근에 문제가 있거나, 코드 수정에 도움이 필요하시면 말씀해주세요! 💪",
+      "metrics": {
+        "runId": "a89bfde3-1ee1-4f64-8012-1cc9d10c4f1c",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7254,
+        "outputTokens": 1190,
+        "estimatedCostUsd": 0.013204,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 1,
+            "resultChars": 2
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 931
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 96
+          }
+        ],
+        "latencyMs": 6659
+      }
+    },
+    {
+      "id": "s01",
+      "run": 2,
+      "source": "prod-log",
+      "title": "퇴역(Legacy) 모델 접근 거부 (C-09 실제 장애)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "Legacy",
+          "모델 접근",
+          "30일"
+        ],
+        "fix": [
+          "활성 모델",
+          "업그레이드",
+          "변경"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "원인을 찾았습니다! 🎯 **Bedrock 모델 접근 권한 문제**입니다.\n\n## 문제 분석 📊\n\n| 항목 | 내용 |\n|------|------|\n| **에러 타입** | ResourceNotFoundException |\n| **발생 위치** | Query expansion & Batch explanation generation |\n| **근본 원인** | Legacy 모델 미사용 상태 |\n| **발생 빈도** | 최근 24시간 24회 |\n\n## 상세 원인 🔴\n\n```\n❌ Bedrock 모델이 \"Legacy\"로 표시됨\n❌ 지난 30일간 미사용 상태\n❌ 모델 접근 권한 자동 해제됨\n→ AI 설명 생성 단계에서 실패\n→ 유사도 기반 매칭만 반환\n```\n\n## 해결 방법 ✅\n\n**1. Bedrock 모델 업그레이드 (우선순위: 높음)**\n   - AWS Bedrock 콘솔 접속\n   - 현재 사용 중인 모델 확인 (Claude, Llama 등)\n   - Legacy 모델 → 최신 버전으로 변경\n   - 모델 접근 권한 재활성화\n\n**2. VectorSearchFunction 코드 수정**\n   - **파일**: `VectorSearchFunction/index.js`\n   - 변경 사항:\n   ```javascript\n   // 에러 처리 추가\n   try {\n     const explanation = await bedrockClient.invokeModel({...});\n     return { matches, explanation };\n   } catch (error) {\n     if (error.name === 'ResourceNotFoundException') {\n       console.warn('Bedrock 모델 접근 불가 - 폴백 처리');\n       return { matches, explanation: '유사도 기반 매칭' };\n     }\n     throw error;\n   }\n   ```\n\n**3. 모니터링 강화**\n   - CloudWatch 알람 설정 (ResourceNotFoundException 감지)\n   - Slack 알림 활성화 (SlackNotificationFunction)\n\n**4. 즉시 임시 조치**\n   - 다른 활성 모델로 대체 (예: Claude 3.5 Sonnet)\n   - 배치 설명 생성 비활성화 (응답 속도 개선)\n\n---\n\n**다음 단계**: \n- Bedrock 콘솔에서 모델 상태 확인 후 업그레이드 진행\n- 완료 후 함수 재배포 필요\n- 테스트 후 결과 알려주세요! 🚀\n\n혹시 Bedrock 콘솔 접근이 어렵거나 추가 정보가 필요하신가요?",
+      "metrics": {
+        "runId": "4ad78dfe-94ef-49a0-8a5f-c7451be7096d",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7247,
+        "outputTokens": 1098,
+        "estimatedCostUsd": 0.012737,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 931
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 96
+          }
+        ],
+        "latencyMs": 6870
+      }
+    },
+    {
+      "id": "s02",
+      "run": 0,
+      "source": "prod-log",
+      "title": "ERROR로 찍힌 Node 버전 경고 (장애 아님)",
+      "cause": false,
+      "fix": false,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": false,
+      "pass": false,
+      "matched": {
+        "cause": [],
+        "fix": [],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "SlackNotificationFunction"
+        }
+      ],
+      "response": "좋은 소식입니다! 😊 **SlackNotificationFunction은 현재 정상 상태**입니다.\n\n**📊 현황:**\n- ✅ 최근 30분 에러 로그: **없음**\n- ✅ 지난 24시간 호출 수: **100회**\n- ✅ 에러율: **0%**\n- ✅ 평균 응답시간: **250ms** (정상 범위)\n\n**가능한 원인:**\n1. 이미 해결된 일시적 에러일 수 있습니다\n2. 다른 함수의 에러일 수도 있습니다\n3. 과거 로그에 남아있는 것일 수 있습니다\n\n**확인 방법:**\n- 혹시 다른 Lambda 함수에서 에러가 발생했는지 확인해드릴까요?\n- 특정 시간대의 에러를 더 자세히 조회해야 하나요?\n\n어느 함수를 확인해드릴까요? 🔍",
+      "metrics": {
+        "runId": "36a38bf5-a868-48b6-8a35-bbacfc77a2c3",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6755,
+        "outputTokens": 500,
+        "estimatedCostUsd": 0.009255,
+        "toolCalls": 2,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 1,
+            "resultChars": 2
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 105
+          }
+        ],
+        "latencyMs": 3735
+      }
+    },
+    {
+      "id": "s02",
+      "run": 1,
+      "source": "prod-log",
+      "title": "ERROR로 찍힌 Node 버전 경고 (장애 아님)",
+      "cause": false,
+      "fix": false,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": false,
+      "pass": false,
+      "matched": {
+        "cause": [],
+        "fix": [],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "SlackNotificationFunction"
+        }
+      ],
+      "response": "좋은 소식입니다! 😊 **현재 SlackNotificationFunction은 정상 작동 중입니다.**\n\n### 📊 함수 상태 요약\n| 항목 | 상태 |\n|------|------|\n| **호출 수** | 100회 |\n| **에러 수** | 0건 |\n| **에러율** | 0% ✅ |\n| **평균 응답시간** | 250ms |\n\n### 🔍 최근 1시간 로그\n- **ERROR 로그**: 없음 ✅\n- **에러 요약 (24시간)**: 없음 ✅\n\n---\n\n**결론**: 현재 SlackNotificationFunction은 **완벽하게 정상 작동 중**이며, 최근 에러가 없는 상태입니다. \n\n혹시 이전에 본 ERROR 로그가 있었다면:\n- 📌 **이미 해결된 상황**일 가능성\n- 📌 **다른 함수의 에러**일 가능성\n- 📌 **특정 시점의 일시적 오류**일 가능성\n\n다른 함수들도 확인이 필요하신가요? 아니면 구체적인 에러 메시지가 있으시면 알려주세요! 🚀",
+      "metrics": {
+        "runId": "0babb4ca-441c-4e2c-830b-c66783f06b10",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6826,
+        "outputTokens": 617,
+        "estimatedCostUsd": 0.009911,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 105
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 4149
+      }
+    },
+    {
+      "id": "s02",
+      "run": 2,
+      "source": "prod-log",
+      "title": "ERROR로 찍힌 Node 버전 경고 (장애 아님)",
+      "cause": false,
+      "fix": false,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": false,
+      "pass": false,
+      "matched": {
+        "cause": [],
+        "fix": [],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "SlackNotificationFunction"
+        }
+      ],
+      "response": "좋은 소식입니다! 😊 **SlackNotificationFunction은 현재 정상 상태**입니다.\n\n## 📊 현재 상태 요약\n\n| 항목 | 상태 |\n|------|------|\n| **에러율** | 0% ✅ |\n| **최근 30분 ERROR 로그** | 없음 ✅ |\n| **24시간 에러 요약** | 없음 ✅ |\n| **호출 수** | 100회 |\n| **평균 응답시간** | 250ms |\n\n## 💡 확인 사항\n\n1. **혹시 다른 함수의 에러는 아닐까요?** \n   - 어느 함수에서 에러가 발생했는지 알려주시면 더 자세히 분석해드립니다.\n\n2. **과거에 본 에러라면?**\n   - 에러 메시지나 타입을 알려주시면 과거 해결 사례를 찾아드립니다.\n\n혹시 구체적인 에러 메시지나 다른 함수명이 있으신가요? 🤔",
+      "metrics": {
+        "runId": "bf5f93c7-12a6-40ee-bf1f-7e793b58e352",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6885,
+        "outputTokens": 628,
+        "estimatedCostUsd": 0.010025,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 105
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 3685
+      }
+    },
+    {
+      "id": "s03",
+      "run": 0,
+      "source": "format-based",
+      "title": "Bedrock 호출 스로틀링",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "Throttl",
+          "throttl",
+          "rate limit"
+        ],
+        "fix": [
+          "재시도",
+          "retry",
+          "백오프",
+          "quota",
+          "동시성"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "## ✅ 해결책 (우선순위 순)\n\n### 🔴 **우선순위 1 - 즉시 적용 (지수 백오프)**\nBedrock API 호출 시 자동 재시도 로직 추가:\n\n```javascript\n// VectorSearchFunction - index.js\nconst { BedrockRuntimeClient, InvokeModelCommand } = require(\"@aws-sdk/client-bedrock-runtime\");\n\nasync function invokeBedrockWithRetry(params, maxRetries = 3) {\n  let lastError;\n  \n  for (let attempt = 0; attempt < maxRetries; attempt++) {\n    try {\n      const client = new BedrockRuntimeClient({ region: \"us-east-1\" });\n      const response = await client.send(new InvokeModelCommand(params));\n      return response;\n    } catch (error) {\n      if (error.name === 'ThrottlingException') {\n        const waitTime = Math.pow(2, attempt) * 1000; // 1초, 2초, 4초\n        console.log(`Throttled. Retrying in ${waitTime}ms... (Attempt ${attempt + 1}/${maxRetries})`);\n        await new Promise(resolve => setTimeout(resolve, waitTime));\n        lastError = error;\n      } else {\n        throw error; // 다른 에러는 즉시 throw\n      }\n    }\n  }\n  throw lastError;\n}\n```\n\n### 🟡 **우선순위 2 - 단기 개선**\n1. **동시 요청 제한**: Lambda 동시성 설정 검토\n2. **배치 처리**: 여러 벡터 검색을 한 번에 처리\n3. **캐싱 추가**: 동일 검색어 결과를 DynamoDB/ElastiCache에 캐싱\n\n### 🟢 **우선순위 3 - 중기 계획**\n- AWS Bedrock 할당량 증설 요청\n- Rate Limiting 클라이언트 측 구현\n\n## 💡 추가 확인 사항\n1. **현재 Bedrock 할당량**: AWS Console → Bedrock → Quotas 확인\n2. **동시 호출 패턴**: 오후에 특정 시간대에 집중되는지 확인\n3. **클라이언트 재시도**: 클라이언트 측에서 이미 재시도하고 있는지 확인\n\n해결책을 적용하신 후 결과를 알려주시면, 성공 사례로 저장해서 나중에 유사 에러 발생 시 빠르게 대응할 수 있도록 하겠습니다! 🚀",
+      "metrics": {
+        "runId": "edce8421-0bbd-4353-b82a-d607b9476ff2",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11865,
+        "outputTokens": 1277,
+        "estimatedCostUsd": 0.018250000000000002,
+        "toolCalls": 4,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 526
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 402
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 4417,
+            "resultChars": 940
+          }
+        ],
+        "latencyMs": 14379
+      }
+    },
+    {
+      "id": "s03",
+      "run": 1,
+      "source": "format-based",
+      "title": "Bedrock 호출 스로틀링",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "Throttl",
+          "throttl",
+          "호출 한도",
+          "rate limit"
+        ],
+        "fix": [
+          "백오프",
+          "backoff"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "아! 문제가 명확하네요! 🎯 **Bedrock API Throttling** 이 원인입니다.\n\n## 📊 현황 분석\n- **에러율**: 11.9% (310회 중 37회 실패)\n- **에러 타입**: `BedrockThrottlingException` - API 호출 한도 초과\n- **평균 응답시간**: 2.6초 (다소 높음)\n- **발생 시점**: 오늘 오후 1시 57분부터 계속 발생 중\n\n## 🔍 원인\nBedrock의 Embeddings API 요청이 한도를 초과했습니다. VectorSearch가 동시에 많은 벡터 생성 요청을 보내고 있는 것 같습니다.\n\n## ✅ 해결책 (우선순위 순)\n\n**1. 즉시 조치 (5분 내)**\n   - Bedrock Embeddings API의 Rate Limit 상향 요청 (AWS Support)\n   - 또는 현재 요청 대기열 확인 및 불필요한 호출 중단\n\n**2. 단기 해결 (30분 내) - 코드 수정**\n   ```javascript\n   // VectorSearchFunction.js - 지수 백오프 추가\n   const exponentialBackoff = async (fn, maxRetries = 3) => {\n     for (let i = 0; i < maxRetries; i++) {\n       try {\n         return await fn();\n       } catch (error) {\n         if (error.name === 'ThrottlingException' && i < maxRetries - 1) {\n           const delay = Math.pow(2, i) * 1000; // 1s, 2s, 4s\n           await new Promise(resolve => setTimeout(resolve, delay));\n         } else {\n           throw error;\n         }\n       }\n     }\n   };\n   ```\n\n**3. 중기 해결 (1시간 내)**\n   - 벡터 생성 요청을 배치 처리로 변경\n   - 동시 호출 수 제한 (예: 최대 5개 동시 요청)\n   - 캐싱 전략 도입 (자주 검색되는 벡터는 메모리에 저장)\n\n**4. 장기 개선**\n   - S3 Vectors에 미리 생성된 벡터 저장 (실시간 생성 최소화)\n   - PartRegistrationFunction에서 벡터 미리 생성\n\n혹시 오늘 오후에 **대량의 부품 등록**이나 **배치 검색**이 있었나요? 📈",
+      "metrics": {
+        "runId": "6fffed54-737d-4ae9-a692-62d14be2c741",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7196,
+        "outputTokens": 1056,
+        "estimatedCostUsd": 0.012476000000000001,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 526
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 402
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 5844
+      }
+    },
+    {
+      "id": "s03",
+      "run": 2,
+      "source": "format-based",
+      "title": "Bedrock 호출 스로틀링",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "Throttl",
+          "throttl",
+          "호출 한도"
+        ],
+        "fix": [
+          "재시도",
+          "retry",
+          "백오프",
+          "캐시"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "## 📊 현황 분석\n\n| 항목 | 수치 |\n|------|------|\n| **총 호출 수** | 310회 |\n| **에러 발생** | 37회 (11.9% 에러율) ⚠️ |\n| **평균 응답시간** | 2,600ms |\n| **에러 원인** | **Bedrock API Throttling** |\n\n---\n\n## 🔴 **근본 원인**\n\nBedrock의 벡터 임베딩 API 호출 한도를 초과했습니다. 오후부터 요청량이 증가하면서 API 레이트 리밋에 걸린 상태입니다.\n\n---\n\n## ✅ **즉시 해결책 (우선순위순)**\n\n### 1️⃣ **지수 백오프 재시도 로직 추가** (가장 빠른 해결)\n```javascript\n// VectorSearchFunction.js\nconst sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));\n\nasync function vectorSearchWithRetry(query, maxRetries = 3) {\n  for (let attempt = 0; attempt < maxRetries; attempt++) {\n    try {\n      return await bedrockClient.callEmbedding(query);\n    } catch (error) {\n      if (error.name === 'ThrottlingException' && attempt < maxRetries - 1) {\n        const delay = Math.pow(2, attempt) * 1000; // 1s, 2s, 4s\n        console.log(`Retry after ${delay}ms...`);\n        await sleep(delay);\n      } else {\n        throw error;\n      }\n    }\n  }\n}\n```\n\n### 2️⃣ **동시 요청 제한** (병렬 처리 조절)\n```javascript\nconst pLimit = require('p-limit');\nconst limit = pLimit(5); // 동시 요청 5개로 제한\n\n// 대량 요청 처리 시\nconst results = await Promise.all(\n  queries.map(q => limit(() => vectorSearchWithRetry(q)))\n);\n```\n\n### 3️⃣ **응답 캐싱** (API 호출 횟수 감소)\n```javascript\nconst NodeCache = require('node-cache');\nconst cache = new NodeCache({ stdTTL: 3600 }); // 1시간 캐시\n\nasync function cachedVectorSearch(query) {\n  const cached = cache.get(query);\n  if (cached) return cached;\n  \n  const result = await vectorSearchWithRetry(query);\n  cache.set(query, result);\n  return result;\n}\n```\n\n---\n\n## 🛠️ **추가 조치**\n\n- **Lambda 메모리**: 현재 상태 확인 후 필요시 증가 (응답시간 단축)\n- **Bedrock 할당량**: AWS 콘솔에서 할당량 증설 요청 검토\n- **모니터링**: CloudWatch 알람 설정 (에러율 > 10%)\n\n---\n\n## ❓ **다음 단계**\n\n1. 위의 **재시도 로직**을 먼저 적용해보시겠어요?\n2. 아니면 **배치 처리 방식**으로 변경하고 싶으신가요?\n3. 현재 **요청 패턴** (시간대별 요청량)을 알려주시면 더 정확한 처방을 드릴 수 있습니다! 📈",
+      "metrics": {
+        "runId": "3181c08f-5037-412b-b9e7-b00e6e3eaee8",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11773,
+        "outputTokens": 1403,
+        "estimatedCostUsd": 0.018788,
+        "toolCalls": 4,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 526
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 402
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 4755,
+            "resultChars": 878
+          }
+        ],
+        "latencyMs": 12841
+      }
+    },
+    {
+      "id": "s04",
+      "run": 0,
+      "source": "format-based",
+      "title": "Lambda 타임아웃",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "타임아웃",
+          "timeout",
+          "Timeout",
+          "30초"
+        ],
+        "fix": [
+          "최적화"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "## 🎯 **해결책 제시**\n\n**원인**: VectorSearchFunction이 Bedrock API 호출 또는 S3 벡터 검색에서 시간을 너무 오래 소비하고 있습니다.\n\n### 📋 **즉시 조치 사항:**\n\n1. **Lambda 메모리 증가** 💾\n   - 현재 메모리 → 1024MB 이상으로 증가\n   - 더 많은 CPU 할당으로 처리 속도 향상\n\n2. **타임아웃 설정 조정** ⏱️\n   - Lambda 타임아웃: 30초 → **60초**로 증가\n   - 단기 해결책이지만 근본 원인 해결 필요\n\n3. **Bedrock 호출 최적화** 🚀\n   - 배치 요청 크기 조절\n   - 지수 백오프(Exponential Backoff) 구현\n   - 동시 요청 수 제한 (throttling 방지)\n\n4. **코드 최적화** 💻\n   ```python\n   # lambda_function.py 수정 제안\n   \n   # 1. 캐싱 추가\n   from functools import lru_cache\n   \n   @lru_cache(maxsize=1000)\n   def search_vectors(query_embedding):\n       # 벡터 검색 로직\n       pass\n   \n   # 2. 병렬 처리 개선\n   import concurrent.futures\n   with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:\n       results = executor.map(search_function, queries)\n   \n   # 3. 타임아웃 처리 추가\n   try:\n       result = await asyncio.wait_for(\n           search_function(query),\n           timeout=25  # 30초 제한보다 5초 여유\n       )\n   except asyncio.TimeoutError:\n       logger.warning(f\"Search timeout for query: {query}\")\n       return partial_results or []\n   ```\n\n5. **S3 벡터 인덱싱 확인** 📦\n   - S3 Vectors 쿼리 성능 확인\n   - 인덱스 최적화 필요 여부 검토\n\n### 🔍 **추가 모니터링**\n- CloudWatch에서 Duration 메트릭 추적\n- 쿼리 복잡도별 성능 분석\n- Bedrock API 호출 횟수 모니터링\n\n**어떤 조치부터 시작하시겠어요?** 메모리 증가가 가장 빠른 임시 해결책이고, 코드 최적화가 근본적인 해결책입니다! 💪",
+      "metrics": {
+        "runId": "a2b6a670-7847-43d4-8129-853dc49179a8",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11731,
+        "outputTokens": 1370,
+        "estimatedCostUsd": 0.018581,
+        "toolCalls": 5,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 287
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 225
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 83
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 4504,
+            "resultChars": 735
+          }
+        ],
+        "latencyMs": 12612
+      }
+    },
+    {
+      "id": "s04",
+      "run": 1,
+      "source": "format-based",
+      "title": "Lambda 타임아웃",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "타임아웃",
+          "timeout",
+          "Timeout",
+          "시간 초과",
+          "30초"
+        ],
+        "fix": [
+          "타임아웃 증가",
+          "비동기",
+          "병목",
+          "최적화"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "## 🎯 **문제 진단 결과**\n\n**주요 원인:**\n1. **Lambda 타임아웃**: 30초 제한에 걸림 (평균 28.5초 소요)\n2. **Bedrock 벡터 검색 성능 저하**: 쿼리 처리가 느림\n3. **S3 Vectors 조회 병목**: 대량 데이터 처리 시간 초과\n\n---\n\n## ✅ **해결 방안 (우선순위순)**\n\n### **1️⃣ 즉시 조치 - Lambda 타임아웃 증가**\n```python\n# lambda_function.py\nimport json\nimport boto3\nfrom aws_lambda_powertools import Logger\n\nlogger = Logger()\nbedrock_client = boto3.client('bedrock-runtime')\ns3_client = boto3.client('s3')\n\ndef lambda_handler(event, context):\n    # 타임아웃 여유 확보\n    context.get_remaining_time_in_millis()  # 모니터링\n    \n    # 벡터 검색 쿼리 최적화\n    query_vector = event.get('query_vector')\n    \n    # 필터 조건 추가 (검색 범위 축소)\n    search_params = {\n        'indexName': 'vector-index',\n        'queryVector': query_vector,\n        'topK': 10,  # 결과 수 제한\n        'filters': {\n            'category': event.get('category'),  # 카테고리 필터\n            'timestamp': {'$gte': event.get('min_date')}  # 날짜 필터\n        }\n    }\n    \n    return search_params\n```\n\n**CloudFormation 설정 변경:**\n```yaml\nVectorSearchFunction:\n  Type: AWS::Lambda::Function\n  Properties:\n    Timeout: 60  # 30초 → 60초로 증가\n    MemorySize: 1024  # 512MB → 1GB로 증가 (CPU 성능 향상)\n    EphemeralStorage:\n      Size: 10240  # 10GB (임시 저장소)\n```\n\n### **2️⃣ 벡터 검색 최적화**\n```python\ndef optimized_vector_search(query_vector, category=None, limit=10):\n    \"\"\"최적화된 벡터 검색\"\"\"\n    \n    # 1. 필터 조건으로 검색 범위 축소\n    filters = {}\n    if category:\n        filters['category'] = category\n    \n    # 2. 필요한 필드만 반환 (네트워크 오버헤드 감소)\n    projection = ['id', 'name', 'score']\n    \n    # 3. 배치 처리 (대량 검색 시)\n    search_params = {\n        'indexName': 'vector-index',\n        'queryVector': query_vector,\n        'topK': limit,\n        'filters': filters,\n        'projection': projection\n    }\n    \n    return search_params\n```\n\n### **3️⃣ 비동기 처리 + 캐싱**\n```python\nimport asyncio\nfrom functools import lru_cache\nimport hashlib\n\n@lru_cache(maxsize=1000)\ndef cache_vector_search(query_hash, category):\n    \"\"\"자주 검색되는 쿼리 캐싱\"\"\"\n    pass\n\nasync def async_vector_search(queries):\n    \"\"\"비동기 병렬 검색\"\"\"\n    tasks = [\n        search_single_query(q) \n        for q in queries\n    ]\n    results = await asyncio.gather(*tasks)\n    return results\n```\n\n### **4️⃣ 배치 처리 구현**\n```python\ndef batch_vector_search(query_vectors, batch_size=5):\n    \"\"\"배치 단위로 검색 (부하 분산)\"\"\"\n    results = []\n    \n    for i in range(0, len(query_vectors), batch_size):\n        batch = query_vectors[i:i+batch_size]\n        \n        # 배치 검색\n        batch_results = bedrock_client.search_vectors(\n            vectors=batch,\n            topK=10\n        )\n        \n        results.extend(batch_results)\n        \n        # 다음 배치 전 딜레이 (Bedrock 스로틀링 방지)\n        time.sleep(0.5)\n    \n    return results\n```\n\n---\n\n## 📊 **권장 우선순위**\n\n| 조치 | 난이도 | 효과 | 소요시간 |\n|------|--------|------|---------|\n| **타임아웃 60초 + 메모리 1GB** | ⭐ | 즉시 개선 | 5분 |\n| **검색 필터/프로젝션 추가** | ⭐⭐ | 30-40% 단축 | 30분 |\n| **캐싱 + 배치 처리** | ⭐⭐⭐ | 50-60% 단축 | 2시간 |\n\n---\n\n**지금 바로 시작할 것:**\n1. Lambda 타임아웃을 60초로 설정 ⏱️\n2. 메모리를 1GB로 증가 💾\n3. 검색 필터 조건 추가 🔍\n\n이 조치만으로도 대부분의 타임아웃이 해결될 거예요! 🚀\n\n혹시 특정 쿼리가 특히 느린가요? 그렇다면 더 구체적인 최적화를 도와드릴 수 있습니다!",
+      "metrics": {
+        "runId": "9de71980-eae7-4368-bc75-839f6ff06bc6",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11547,
+        "outputTokens": 2103,
+        "estimatedCostUsd": 0.022062,
+        "toolCalls": 5,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 287
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 225
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 3388,
+            "resultChars": 417
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 83
+          }
+        ],
+        "latencyMs": 14433
+      }
+    },
+    {
+      "id": "s04",
+      "run": 2,
+      "source": "format-based",
+      "title": "Lambda 타임아웃",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "타임아웃",
+          "timeout",
+          "Timeout",
+          "시간 초과",
+          "30초"
+        ],
+        "fix": [
+          "비동기",
+          "병목",
+          "지연",
+          "최적화"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "## 🎯 **문제 진단 완료**\n\n### 원인 분석:\n1. **Lambda 타임아웃**: 30초 제한에 거의 근접 (평균 28.5초)\n2. **Bedrock 벡터 검색 성능 저하**: 임베딩 생성 또는 벡터 유사도 계산이 느림\n3. **S3 Vectors 접근 지연**: 대량의 벡터 데이터 조회 시간 초과\n\n---\n\n## ✅ **해결책 (우선순위순)**\n\n### 1️⃣ **Lambda 타임아웃 시간 증가** (즉시 적용)\n```\n현재: 30초 → 권장: 60초 이상\nCloudFormation/SAM 설정:\nTimeout: 60\n```\n\n### 2️⃣ **Bedrock 호출 최적화**\n- **지수 백오프 재시도 로직** 추가\n- **배치 크기 조절**: 한 번에 검색하는 벡터 수 제한\n- **임베딩 캐싱**: 자주 검색되는 쿼리 결과 캐시\n\n### 3️⃣ **쿼리 성능 개선**\n```python\n# 검색 범위 축소 예시\nsearch_params = {\n    \"maxResults\": 10,  # 상위 10개만 반환\n    \"filters\": {...}   # 필터 조건으로 데이터 사전 필터링\n}\n```\n\n### 4️⃣ **비동기 처리 도입**\n- 동기 호출 → 비동기 + SQS 큐 활용\n- 사용자에게 즉시 응답, 백그라운드에서 처리\n\n### 5️⃣ **모니터링 강화**\n- CloudWatch 메트릭: Bedrock API 응답 시간 추적\n- X-Ray로 병목 지점 식별\n\n---\n\n**가장 빠른 임시 해결책**: Lambda 타임아웃을 60초로 증가시키고, 동시에 쿼리 최적화를 진행하세요! 🚀\n\n혹시 VectorSearchFunction의 코드를 보여주실 수 있나요? 더 구체적인 최적화 방안을 제시해드릴 수 있습니다!",
+      "metrics": {
+        "runId": "b06e5b9c-2d62-4c25-a2ba-bb81bdb801c7",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11650,
+        "outputTokens": 1264,
+        "estimatedCostUsd": 0.01797,
+        "toolCalls": 5,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 287
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 225
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 4080,
+            "resultChars": 518
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 83
+          }
+        ],
+        "latencyMs": 11573
+      }
+    },
+    {
+      "id": "s05",
+      "run": 0,
+      "source": "format-based",
+      "title": "DynamoDB 처리량 초과",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "처리량",
+          "throughput",
+          "Throughput",
+          "ProvisionedThroughputExceeded",
+          "프로비저닝"
+        ],
+        "fix": [
+          "온디맨드",
+          "용량",
+          "백오프",
+          "재시도"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "GetPartsFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "GetPartsFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "GetPartsFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "GetPartsFunction"
+        }
+      ],
+      "response": "## 🔍 분석 결과\n\n**문제 원인**: DynamoDB 프로비저닝된 처리량 초과 ⚠️\n\n| 지표 | 값 |\n|------|-----|\n| 24시간 호출 수 | 1,200회 |\n| 에러 발생 | 64회 (5.33% 에러율) |\n| 평균 응답시간 | 380ms |\n| 에러 타입 | `ProvisionedThroughputExceededException` |\n\n**피크 시간 특징**: \n- 01:58~02:00 UTC 시간대에 집중 발생\n- 부품 조회 요청이 DynamoDB 테이블의 읽기 용량을 초과\n\n---\n\n## ✅ 해결책 (우선순위 순)\n\n### 1️⃣ **즉시 조치** - DynamoDB 용량 증가\n```\nAWS Console → DynamoDB → 부품 테이블 → 용량 설정\n- 읽기 용량 단위(RCU) 증가 (현재 → 권장값 확인)\n- 또는 온디맨드 요금제로 전환 (변동이 큰 경우 권장)\n```\n\n### 2️⃣ **단기 개선** - 지수 백오프 재시도 로직 추가\n```javascript\n// GetPartsFunction 코드 수정\nconst retryConfig = {\n  maxRetries: 3,\n  baseDelay: 100, // ms\n  maxDelay: 5000\n};\n\nasync function queryWithRetry(params) {\n  for (let i = 0; i < retryConfig.maxRetries; i++) {\n    try {\n      return await dynamodb.query(params).promise();\n    } catch (error) {\n      if (error.code === 'ProvisionedThroughputExceededException' && i < retryConfig.maxRetries - 1) {\n        const delay = Math.min(\n          retryConfig.baseDelay * Math.pow(2, i),\n          retryConfig.maxDelay\n        );\n        await new Promise(r => setTimeout(r, delay));\n      } else {\n        throw error;\n      }\n    }\n  }\n}\n```\n\n### 3️⃣ **중기 최적화** - 쿼리 성능 개선\n- 부품 목록 캐싱 (CloudFront/ElastiCache 활용)\n- 배치 쿼리 최적화\n- 인덱스 검토 및 추가\n\n### 4️⃣ **모니터링 강화**\n- CloudWatch 알람 설정 (RCU 사용률 > 80%)\n- 피크 시간대 자동 스케일링 정책 구성\n\n---\n\n**다음 단계**: \n1. DynamoDB 테이블명과 현재 RCU 설정값을 알려주시면 더 구체적인 권장값을 제시해드리겠습니다.\n2. 해결 후 결과를 공유해주시면 사례를 저장하여 향후 참고하겠습니다. 📚",
+      "metrics": {
+        "runId": "764daff2-62f0-43ae-bd44-a74f2a6bed83",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11544,
+        "outputTokens": 1354,
+        "estimatedCostUsd": 0.018314,
+        "toolCalls": 5,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 391
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 559
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 109
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 4044,
+            "resultChars": 314
+          }
+        ],
+        "latencyMs": 11817
+      }
+    },
+    {
+      "id": "s05",
+      "run": 1,
+      "source": "format-based",
+      "title": "DynamoDB 처리량 초과",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "throughput",
+          "Throughput",
+          "용량 초과",
+          "capacity",
+          "프로비저닝"
+        ],
+        "fix": [
+          "온디맨드",
+          "용량",
+          "capacity",
+          "재시도"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "GetPartsFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "GetPartsFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "GetPartsFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "GetPartsFunction"
+        }
+      ],
+      "response": "## 📊 분석 결과\n\n**문제 원인**: 🔴 **DynamoDB 프로비저닝 용량 초과**\n- 24시간 동안 1,200건 호출 중 **64건 실패 (5.33% 에러율)**\n- 피크 시간에 DynamoDB 읽기 용량 한계 도달\n- 평균 응답시간: 380ms (정상이지만 피크 시간에 급증)\n\n---\n\n## ✅ 해결책 (우선순위 순)\n\n### **1순위: 온디맨드 청구 모드로 변경** ⭐ (가장 빠른 해결)\n```bash\naws dynamodb update-table \\\n  --table-name parts-table \\\n  --billing-mode PAY_PER_REQUEST\n```\n- 즉시 적용 가능\n- 트래픽에 자동 스케일링\n- 비용은 약간 증가하지만 안정성 우선\n\n### **2순위: 프로비저닝 용량 증가** (비용 최적화 필요 시)\n```bash\naws dynamodb update-table \\\n  --table-name parts-table \\\n  --provisioned-throughput ReadCapacityUnits=500,WriteCapacityUnits=100\n```\n\n### **3순위: 애플리케이션 레벨 최적화**\n- **캐싱 추가**: ElastiCache(Redis) 도입으로 반복 조회 감소\n- **쿼리 최적화**: 필요한 속성만 조회 (`ProjectionExpression`)\n- **재시도 로직**: Exponential backoff 구현\n\n### **4순위: 인덱스 활용**\n- GSI(Global Secondary Index) 생성으로 쿼리 효율 개선\n\n---\n\n## 🎯 즉시 조치 권장사항\n\n1. **지금 바로**: 온디맨드 모드로 변경 (1분 소요)\n2. **병행**: GetPartsFunction 코드에 재시도 로직 추가\n3. **모니터링**: CloudWatch에서 `ConsumedReadCapacityUnits` 추적\n\n혹시 더 자세한 정보나 코드 변경이 필요하신가요? 😊",
+      "metrics": {
+        "runId": "778d9d3d-6757-4b32-bf47-d6fcca262f93",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 12089,
+        "outputTokens": 1181,
+        "estimatedCostUsd": 0.017994000000000003,
+        "toolCalls": 5,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 391
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 109
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 559
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 5491,
+            "resultChars": 1112
+          }
+        ],
+        "latencyMs": 12352
+      }
+    },
+    {
+      "id": "s05",
+      "run": 2,
+      "source": "format-based",
+      "title": "DynamoDB 처리량 초과",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "throughput",
+          "Throughput",
+          "ProvisionedThroughputExceeded"
+        ],
+        "fix": [
+          "온디맨드",
+          "용량",
+          "캐시"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "GetPartsFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "GetPartsFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "GetPartsFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "GetPartsFunction"
+        }
+      ],
+      "response": "## 📊 문제 분석 결과\n\n**상황 요약:**\n- 🔴 **에러율**: 5.33% (1,200 호출 중 64건 실패)\n- ⚠️ **원인**: DynamoDB `ProvisionedThroughputExceededException`\n- 📈 **평균 응답시간**: 380ms (정상)\n- ⏰ **발생 시간**: 피크 시간대 (02:00 UTC)\n\n---\n\n## 🔧 즉시 조치 (1순위)\n\n### 1️⃣ **DynamoDB 읽기 용량 증가** ⭐ 가장 빠른 해결\n```\nAWS Console → DynamoDB → 부품 테이블 → 용량 탭\n├─ 읽기 용량 (RCU) 현재값 → 2-3배 증가\n└─ 예: 100 RCU → 300 RCU\n```\n\n### 2️⃣ **온디맨드 모드 전환** (권장)\n```\n테이블 설정 → 청구 모드 변경 → 온디맨드\n장점: 트래픽 자동 스케일링, 피크 시간 대응\n```\n\n---\n\n## 💡 중기 최적화 (병행 추천)\n\n### 3️⃣ **GetPartsFunction 코드 최적화**\n```javascript\n// ❌ 비효율적 (전체 스캔)\nconst params = { TableName: 'Parts' };\nconst result = await dynamodb.scan(params).promise();\n\n// ✅ 개선 (필요한 속성만)\nconst params = {\n  TableName: 'Parts',\n  ProjectionExpression: 'partId, partName, price', // 필요한 컬럼만\n  Limit: 100 // 페이지네이션\n};\n```\n\n### 4️⃣ **캐싱 레이어 추가**\n- ElastiCache (Redis) 도입\n- 자주 조회되는 부품 목록 캐시\n- TTL: 5-10분\n\n---\n\n## 📋 추천 조치 순서\n\n| 우선순위 | 조치 | 소요시간 | 효과 |\n|---------|------|---------|------|\n| 1️⃣ | RCU 증가 | 5분 | 즉시 해결 |\n| 2️⃣ | 온디맨드 모드 검토 | 10분 | 장기 안정성 |\n| 3️⃣ | 코드 최적화 | 1-2시간 | 비용 절감 |\n| 4️⃣ | 캐싱 구현 | 1-2일 | 성능 대폭 개선 |\n\n---\n\n**다음 단계:** \n1. 먼저 RCU를 증가시켜 즉시 장애를 해결하시고\n2. 그 후 온디맨드 모드 전환을 검토해주세요\n\n혹시 더 자세한 설정이나 코드 예시가 필요하신가요? 😊",
+      "metrics": {
+        "runId": "3f23dab8-6608-41a0-b20e-8bb401fe8a16",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 12058,
+        "outputTokens": 1422,
+        "estimatedCostUsd": 0.019167999999999998,
+        "toolCalls": 5,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 391
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 559
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 109
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 5353,
+            "resultChars": 924
+          }
+        ],
+        "latencyMs": 13825
+      }
+    },
+    {
+      "id": "s06",
+      "run": 0,
+      "source": "format-based",
+      "title": "IAM 권한 부족",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "권한",
+          "AccessDenied",
+          "IAM",
+          "정책"
+        ],
+        "fix": [
+          "bedrock:InvokeModel",
+          "정책 추가",
+          "IAM 역할",
+          "역할에"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "PartRegistrationFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "PartRegistrationFunction"
+        }
+      ],
+      "response": "🔍 **문제 원인 파악됨!**\n\n**AccessDeniedException** 에러네요! PartRegistrationFunction의 IAM 역할이 Bedrock 임베딩 모델 호출 권한이 없습니다.\n\n### 📊 현황\n- **에러 타입**: AccessDeniedException\n- **발생 횟수**: 지난 24시간 14회\n- **원인**: `bedrock:InvokeModel` 권한 부족\n- **영향**: 부품 등록 시 임베딩 생성 단계에서 100% 실패\n\n### ✅ 해결 방법\n\n**1단계: IAM 정책 추가 (필수)**\n```json\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"bedrock:InvokeModel\"\n      ],\n      \"Resource\": [\n        \"arn:aws:bedrock:ap-northeast-2::foundation-model/amazon.titan-embed-text-v2:0\"\n      ]\n    }\n  ]\n}\n```\n\n**2단계: 적용 방법**\n- AWS CloudFormation 스택 업데이트 (권장)\n- 또는 IAM 콘솔에서 `eecar-stack-PartRegistrationFunctionRole-1A2B3C` 역할에 직접 정책 추가\n\n**3단계: 검증**\n```bash\n# 정책 적용 후 테스트\naws lambda invoke \\\n  --function-name PartRegistrationFunction \\\n  --payload '{\"partName\":\"test\",\"description\":\"test\"}' \\\n  response.json\n```\n\n**4단계: 모니터링**\n- 부품 등록 재시도 후 에러율 확인\n- 정상 작동 시 임베딩이 S3 Vectors에 저장됨\n\n---\n\n혹시 CloudFormation으로 스택을 관리하고 계신가요? 그렇다면 template 파일에서 정책 수정을 도와드릴 수 있습니다! 🚀",
+      "metrics": {
+        "runId": "7b049805-b27e-4bfa-a4d2-7c04566aec4e",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7089,
+        "outputTokens": 885,
+        "estimatedCostUsd": 0.011514,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 504
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 92
+          }
+        ],
+        "latencyMs": 5119
+      }
+    },
+    {
+      "id": "s06",
+      "run": 1,
+      "source": "format-based",
+      "title": "IAM 권한 부족",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "권한",
+          "IAM",
+          "정책"
+        ],
+        "fix": [
+          "bedrock:InvokeModel",
+          "권한 추가",
+          "Policies",
+          "IAM 역할",
+          "역할에"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "PartRegistrationFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "PartRegistrationFunction"
+        }
+      ],
+      "response": "아! 🔍 문제를 찾았습니다! **IAM 권한 부족**이 원인입니다.\n\n## 🚨 현재 상황\n- **에러율**: 100% (14개 요청 모두 실패)\n- **원인**: `bedrock:InvokeModel` 권한 없음\n- **영향**: Bedrock의 Titan 임베딩 모델 호출 불가\n\n## ✅ 해결 방법\n\n### 1️⃣ **IAM 역할에 Bedrock 권한 추가**\nPartRegistrationFunctionRole에 다음 정책을 추가해야 합니다:\n\n```json\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"bedrock:InvokeModel\"\n      ],\n      \"Resource\": \"arn:aws:bedrock:ap-northeast-2::foundation-model/amazon.titan-embed-text-v2:0\"\n    }\n  ]\n}\n```\n\n### 2️⃣ **CloudFormation/SAM 템플릿 수정** (권장)\n```yaml\nPartRegistrationFunctionRole:\n  Type: AWS::IAM::Role\n  Properties:\n    AssumeRolePolicyDocument:\n      Version: '2012-10-17'\n      Statement:\n        - Effect: Allow\n          Principal:\n            Service: lambda.amazonaws.com\n          Action: sts:AssumeRole\n    ManagedPolicyArns:\n      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole\n    Policies:\n      - PolicyName: BedrockInvokePolicy\n        PolicyDocument:\n          Version: '2012-10-17'\n          Statement:\n            - Effect: Allow\n              Action:\n                - bedrock:InvokeModel\n              Resource: \n                - \"arn:aws:bedrock:ap-northeast-2::foundation-model/amazon.titan-embed-text-v2:0\"\n            - Effect: Allow\n              Action:\n                - s3:PutObject\n                - s3:GetObject\n              Resource: \"arn:aws:s3:::your-vectors-bucket/*\"\n```\n\n### 3️⃣ **권한 적용 후 테스트**\nAWS 콘솔에서 IAM 정책 수정 후, Lambda 함수를 다시 호출해보세요.\n\n혹시 S3 벡터 저장 권한도 필요하신가요? 그렇다면 위 템플릿의 S3 권한 부분도 함께 추가하시면 됩니다! 📝\n\n해결되셨으면 알려주세요 - 이 사례를 저장해서 나중에 참고하겠습니다! 💾",
+      "metrics": {
+        "runId": "4cf42a4c-fcf0-4cfe-ac68-91b817fc9499",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7240,
+        "outputTokens": 1066,
+        "estimatedCostUsd": 0.012570000000000001,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 504
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 572
+          }
+        ],
+        "latencyMs": 5627
+      }
+    },
+    {
+      "id": "s06",
+      "run": 2,
+      "source": "format-based",
+      "title": "IAM 권한 부족",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "권한",
+          "IAM",
+          "정책"
+        ],
+        "fix": [
+          "bedrock:InvokeModel",
+          "정책 추가",
+          "Policies",
+          "IAM 역할"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "PartRegistrationFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "PartRegistrationFunction"
+        }
+      ],
+      "response": "🔍 **문제 분석 완료!**\n\n에러 원인은 **IAM 권한 부족**입니다! 😅\n\nPartRegistrationFunction이 Bedrock의 Titan 임베딩 모델을 호출할 권한이 없네요.\n\n## 🛠️ 해결 방법\n\n**1단계: IAM 역할 정책 추가**\n```json\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"bedrock:InvokeModel\"\n      ],\n      \"Resource\": [\n        \"arn:aws:bedrock:ap-northeast-2::foundation-model/amazon.titan-embed-text-v2:0\"\n      ]\n    }\n  ]\n}\n```\n\n**2단계: 적용 방법**\n- AWS Console → IAM → Roles → `eecar-stack-PartRegistrationFunctionRole-1A2B3C`\n- 또는 CloudFormation/SAM 템플릿에 정책 추가:\n\n```yaml\nPartRegistrationFunctionRole:\n  Type: AWS::IAM::Role\n  Properties:\n    AssumeRolePolicyDocument: ...\n    ManagedPolicyArns:\n      - arn:aws:iam::aws:policy/AWSLambdaBasicExecutionRole\n    Policies:\n      - PolicyName: BedrockInvokePolicy\n        PolicyDocument:\n          Version: '2012-10-17'\n          Statement:\n            - Effect: Allow\n              Action:\n                - bedrock:InvokeModel\n              Resource:\n                - arn:aws:bedrock:ap-northeast-2::foundation-model/amazon.titan-embed-text-v2:0\n```\n\n**3단계: 검증**\n- 정책 적용 후 부품 등록 재시도\n- 성공하면 에러율이 0%로 떨어질 거예요 ✅\n\n혹시 정책 추가 후에도 문제가 지속되면 말씀해주세요! 🚀",
+      "metrics": {
+        "runId": "358f2986-eedc-4cd9-9308-20683be417d7",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7236,
+        "outputTokens": 860,
+        "estimatedCostUsd": 0.011536000000000001,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 504
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 572
+          }
+        ],
+        "latencyMs": 4654
+      }
+    },
+    {
+      "id": "s07",
+      "run": 0,
+      "source": "format-based",
+      "title": "클라이언트의 잘못된 JSON (서버 문제 아님)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "클라이언트",
+          "invalid JSON",
+          "Invalid JSON",
+          "요청 형식"
+        ],
+        "fix": [
+          "400",
+          "Content-Type",
+          "application/json",
+          "클라이언트",
+          "검증",
+          "형식"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "좋습니다! 🎯 원인을 찾았습니다. 이것은 **코드 버그가 아니라 요청 형식 문제**입니다!\n\n## 📊 현황\n- **에러 타입**: SyntaxError (JSON 파싱 실패)\n- **발생 빈도**: 24시간 동안 9회\n- **주요 원인**: \n  - `query=배터리` 형식 (URL-encoded query string)\n  - 빈 JSON body\n\n## 🔧 문제 분석\n\n**문제 1**: URL Query String 형식\n```\n❌ 잘못된 요청: query=배터리\n✅ 올바른 요청: {\"query\": \"배터리\"}\n```\n\n**문제 2**: 빈 body 전송\n```\n❌ Content-Type: application/json 헤더만 있고 body 없음\n✅ 반드시 JSON body 포함\n```\n\n## ✅ 해결 방법\n\n**1. 클라이언트 코드 수정** (요청 형식)\n```python\n# ❌ 잘못된 방식\nresponse = requests.get('https://.../vector-search?query=배터리')\n\n# ✅ 올바른 방식\nresponse = requests.post(\n    'https://.../vector-search',\n    json={\"query\": \"배터리\"},\n    headers={\"Content-Type\": \"application/json\"}\n)\n```\n\n**2. Lambda 함수 요청 검증 강화** (선택사항)\n```python\n# event body 파싱 전 검증\nif not event.get('body'):\n    return {\n        'statusCode': 400,\n        'body': json.dumps({'error': 'Empty request body'})\n    }\n\ntry:\n    body = json.loads(event['body'])\nexcept json.JSONDecodeError as e:\n    return {\n        'statusCode': 400,\n        'body': json.dumps({'error': f'Invalid JSON: {str(e)}'})\n    }\n```\n\n**3. API Gateway 설정 확인**\n- Content-Type 검증 활성화\n- Request Validator 설정 확인\n\n---\n\n혹시 **API 호출 코드**를 보여주실 수 있나요? 그러면 더 정확한 수정 방법을 제시해드릴 수 있습니다! 📝",
+      "metrics": {
+        "runId": "b6e4c73c-340d-431b-ad85-02ae9afdcb83",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7052,
+        "outputTokens": 956,
+        "estimatedCostUsd": 0.011832,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 362
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 81
+          }
+        ],
+        "latencyMs": 5387
+      }
+    },
+    {
+      "id": "s07",
+      "run": 1,
+      "source": "format-based",
+      "title": "클라이언트의 잘못된 JSON (서버 문제 아님)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "클라이언트",
+          "JSON 형식",
+          "요청 형식"
+        ],
+        "fix": [
+          "Content-Type",
+          "application/json",
+          "클라이언트",
+          "형식"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "좋은 소식입니다! 😊 **코드 버그가 아니라 요청 형식 문제입니다!**\n\n## 🎯 원인 분석\n\n로그를 보면:\n- `\"query=배터리\"` ← **URL 인코딩 형식** (쿼리 스트링)\n- `Unexpected end of JSON input` ← **JSON 파싱 실패**\n\n**문제:** VectorSearchFunction이 **JSON 바디**를 기대하는데, **URL 쿼리 파라미터** 형식으로 요청이 들어오고 있습니다.\n\n## ✅ 해결 방법\n\n### 1️⃣ **클라이언트 요청 형식 변경** (권장)\n```json\n// ❌ 잘못된 형식\nGET /search?query=배터리\n\n// ✅ 올바른 형식\nPOST /search\nContent-Type: application/json\n\n{\n  \"query\": \"배터리\",\n  \"limit\": 10\n}\n```\n\n### 2️⃣ **Lambda 핸들러 개선** (선택사항)\n현재 핸들러가 URL 쿼리 파라미터를 지원하도록 수정:\n\n```python\n# handler.py\ndef lambda_handler(event, context):\n    try:\n        # JSON 바디 또는 쿼리 파라미터 모두 지원\n        if event.get('body'):\n            body = json.loads(event['body'])\n        else:\n            body = event.get('queryStringParameters', {})\n        \n        query = body.get('query')\n        # ... 나머지 로직\n```\n\n## 📋 체크리스트\n- [ ] API 클라이언트가 JSON 형식으로 요청하는지 확인\n- [ ] Content-Type: application/json 헤더 포함 확인\n- [ ] 요청 바디에 올바른 JSON 구조 확인\n\n혹시 **API Gateway 설정**이나 **클라이언트 코드**를 확인해 볼 수 있을까요? 더 정확한 원인을 파악할 수 있습니다! 🔧",
+      "metrics": {
+        "runId": "dfc75254-629c-4710-b606-fd4ba7b73466",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7041,
+        "outputTokens": 902,
+        "estimatedCostUsd": 0.011550999999999999,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 362
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 81
+          }
+        ],
+        "latencyMs": 5349
+      }
+    },
+    {
+      "id": "s07",
+      "run": 2,
+      "source": "format-based",
+      "title": "클라이언트의 잘못된 JSON (서버 문제 아님)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "클라이언트",
+          "요청 형식"
+        ],
+        "fix": [
+          "Content-Type",
+          "application/json",
+          "클라이언트",
+          "형식"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "아! 🎯 **코드 버그가 아니라 요청 형식 문제입니다!**\n\n로그를 보니 명확한 원인이 보입니다:\n\n## 🚨 문제 분석\n\n| 항목 | 내용 |\n|------|------|\n| **에러** | `SyntaxError: Unexpected token 'q'` |\n| **원인** | `query=배터리` (URL 쿼리 파라미터) → JSON으로 파싱 시도 |\n| **발생 횟수** | 24시간 내 9회 |\n\n## ✅ 해결책\n\n**1. 요청 형식 확인**\n```\n❌ 잘못된 형식:\nGET /vector-search?query=배터리\n\n✅ 올바른 형식:\nPOST /vector-search\nContent-Type: application/json\n\n{\n  \"query\": \"배터리\"\n}\n```\n\n**2. Lambda 핸들러 코드 확인 (handler.js)**\n```javascript\n// ❌ 현재 (잘못된 방식)\nconst body = JSON.parse(event.body); // URL 파라미터를 JSON으로 파싱\n\n// ✅ 수정 (올바른 방식)\nconst body = event.body ? JSON.parse(event.body) : {};\nconst query = body.query || event.queryStringParameters?.query;\n```\n\n**3. API Gateway 설정 확인**\n- Content-Type이 `application/json`으로 설정되어 있는지 확인\n- 요청 매핑 템플릿에서 body를 올바르게 전달하는지 확인\n\n## 📋 체크리스트\n\n- [ ] 클라이언트에서 POST 요청으로 변경\n- [ ] JSON 본문에 `query` 필드 포함\n- [ ] Content-Type: application/json 헤더 추가\n- [ ] API Gateway 매핑 템플릿 검토\n\n혹시 더 구체적인 요청 코드를 보여주실 수 있나요? 정확한 수정 방안을 제시해드리겠습니다! 💡",
+      "metrics": {
+        "runId": "33519b4f-629f-4bf0-b360-4a06881c70a9",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7032,
+        "outputTokens": 886,
+        "estimatedCostUsd": 0.011462,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 362
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 81
+          }
+        ],
+        "latencyMs": 8166
+      }
+    },
+    {
+      "id": "s08",
+      "run": 0,
+      "source": "format-based",
+      "title": "Lambda Layer 모듈 누락 (배포 불일치)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "ImportModuleError",
+          "module",
+          "search-ranking"
+        ],
+        "fix": [
+          "재배포",
+          "배포"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "**원인을 찾았습니다!** 🎯\n\n| 항목 | 상태 |\n|------|------|\n| 호출 수 | 58건 |\n| 실패율 | **100%** ❌ |\n| 에러 타입 | `Runtime.ImportModuleError` |\n\n## 🔴 핵심 문제\n```\nCannot find module '/opt/nodejs/utils/search-ranking.js'\n```\n\n배포 시 **`search-ranking.js` 파일이 Lambda 패키지에 포함되지 않았습니다!**\n\n---\n\n## ✅ 해결 방법\n\n### 1️⃣ **즉시 조치 (긴급)**\n- 배포 패키지 확인: `utils/search-ranking.js` 파일이 포함되어 있는지 검증\n- 파일이 있다면 → 경로 오류 (상대경로 vs 절대경로)\n- 파일이 없다면 → 배포 스크립트에서 누락됨\n\n### 2️⃣ **배포 스크립트 점검**\n`package.json` 또는 빌드 설정에서:\n```javascript\n// ❌ 잘못된 예\n\"files\": [\"index.js\", \"node_modules\"]\n\n// ✅ 올바른 예\n\"files\": [\"index.js\", \"utils/\", \"node_modules\"]\n```\n\n### 3️⃣ **index.js 경로 확인**\n```javascript\n// ❌ 잘못된 경로\nconst ranking = require('/opt/nodejs/utils/search-ranking.js');\n\n// ✅ 올바른 경로\nconst ranking = require('./utils/search-ranking.js');\n```\n\n### 4️⃣ **재배포 체크리스트**\n- [ ] `utils/search-ranking.js` 파일 존재 확인\n- [ ] 배포 패키지에 utils 디렉토리 포함 확인\n- [ ] 로컬에서 `npm start` 또는 테스트 실행 성공 확인\n- [ ] CloudFormation/SAM 배포 스크립트 재검토\n\n---\n\n**지금 바로 확인해주세요!** 파일이 있는데도 실패하면 알려주세요. 더 자세히 분석해드리겠습니다. 💪",
+      "metrics": {
+        "runId": "31085254-bc65-41d3-a997-2302b3db0819",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7199,
+        "outputTokens": 933,
+        "estimatedCostUsd": 0.011864,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 469
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 611
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 5369
+      }
+    },
+    {
+      "id": "s08",
+      "run": 1,
+      "source": "format-based",
+      "title": "Lambda Layer 모듈 누락 (배포 불일치)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "ImportModuleError",
+          "모듈",
+          "module",
+          "Layer",
+          "레이어",
+          "search-ranking"
+        ],
+        "fix": [
+          "Layer",
+          "레이어",
+          "재배포",
+          "배포"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "🎯 **원인 파악됨!** \n\n## 문제 상황\n- **에러율**: 100% (58개 호출 모두 실패)\n- **에러 타입**: `Runtime.ImportModuleError`\n- **구체적 원인**: `/opt/nodejs/utils/search-ranking.js` 모듈을 찾을 수 없음\n\n## 🔍 근본 원인 분석\n\n배포 시 다음 중 하나가 발생했을 가능성이 높습니다:\n\n1. **빌드 과정에서 파일 누락** \n   - `search-ranking.js` 파일이 배포 패키지에 포함되지 않음\n   - `.gitignore` 또는 빌드 스크립트에서 실수로 제외됨\n\n2. **경로 설정 오류**\n   - 코드에서 참조하는 경로와 실제 배포된 경로가 다름\n   - 상대 경로 문제\n\n3. **레이어 또는 의존성 설정 누락**\n   - 파일이 Lambda Layer에 있어야 하는데 누락됨\n\n## ✅ 해결 방법 (우선순위 순)\n\n### 1️⃣ **배포 패키지 확인** (즉시)\n```bash\n# 배포된 함수의 코드 구조 확인\naws lambda get-function --function-name VectorSearchFunction --query 'Code.Location'\n\n# 로컬에서 패키지 확인\nunzip -l deployment-package.zip | grep search-ranking.js\n```\n\n### 2️⃣ **파일 포함 및 재배포**\n```bash\n# index.js 있는 디렉토리 구조 확인\nls -la src/utils/search-ranking.js\n\n# 빌드 스크립트 수정 (package.json 또는 build.sh)\n# utils 폴더가 포함되도록 확인\n```\n\n### 3️⃣ **코드 수정** (index.js)\n```javascript\n// 현재 (오류)\nconst searchRanking = require('/opt/nodejs/utils/search-ranking.js');\n\n// 변경 (상대 경로 사용)\nconst searchRanking = require('./utils/search-ranking.js');\n// 또는\nconst searchRanking = require('../utils/search-ranking.js');\n```\n\n### 4️⃣ **배포 스크립트 확인**\n```bash\n# 배포 시 모든 필요한 파일이 포함되는지 확인\n# 예: zip -r deployment.zip . -x \"node_modules/*\" \"*.git*\"\n```\n\n---\n\n**지금 바로 할 일:**\n1. 로컬 프로젝트에서 `search-ranking.js` 파일 위치 확인\n2. 배포 스크립트에서 utils 폴더 포함 여부 확인\n3. 경로 수정 후 재배포\n\n혹시 배포 스크립트나 프로젝트 구조를 보여주실 수 있나요? 더 구체적으로 도와드리겠습니다! 🚀",
+      "metrics": {
+        "runId": "c550f95d-41c4-4b2b-8a62-17b2e48086ca",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7238,
+        "outputTokens": 1207,
+        "estimatedCostUsd": 0.013273,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 611
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 469
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 6926
+      }
+    },
+    {
+      "id": "s08",
+      "run": 2,
+      "source": "format-based",
+      "title": "Lambda Layer 모듈 누락 (배포 불일치)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "ImportModuleError",
+          "모듈",
+          "module",
+          "search-ranking"
+        ],
+        "fix": [
+          "배포"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "🎯 **원인 파악 완료!**\n\n**에러: `Runtime.ImportModuleError`**\n- 모듈을 찾을 수 없음: `/opt/nodejs/utils/search-ranking.js`\n- 에러율: **100%** (58건 모두 실패)\n\n---\n\n## 🔧 **해결책**\n\n이것은 배포 패키지 문제입니다. 다음 중 하나를 확인하세요:\n\n### 1️⃣ **배포 패키지 재확인**\n```bash\n# 로컬에서 패키지 구조 확인\nunzip -l lambda-deployment.zip | grep search-ranking.js\n\n# 또는 배포 전 확인\nls -la src/utils/search-ranking.js\n```\n\n### 2️⃣ **가능한 원인들**\n- ❌ `search-ranking.js` 파일이 배포 패키지에 포함되지 않음\n- ❌ 경로 오류 (상대 경로 vs 절대 경로)\n- ❌ 최근 배포에서 파일이 삭제됨\n- ❌ 빌드 스크립트 오류로 utils 폴더가 누락됨\n\n### 3️⃣ **즉시 해결 방법**\n```bash\n# 1. 로컬 빌드 재확인\nnpm install\nnpm run build\n\n# 2. 배포 패키지 생성\nzip -r lambda-deployment.zip . -x \"node_modules/*\" \"*.git*\"\n\n# 3. Lambda 업데이트\naws lambda update-function-code \\\n  --function-name VectorSearchFunction \\\n  --zip-file fileb://lambda-deployment.zip\n```\n\n### 4️⃣ **근본 원인 확인**\n- 최근 배포 전 코드 변경사항 확인\n- `package.json` 또는 빌드 설정 변경 여부\n- CI/CD 파이프라인에서 파일 제외 설정 확인\n\n---\n\n**해결되면 알려주세요! 그럼 이 사례를 저장해서 나중에 참고하겠습니다.** ✅",
+      "metrics": {
+        "runId": "9adf6c01-70cf-4f9a-845b-cc01b21a39bc",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7192,
+        "outputTokens": 886,
+        "estimatedCostUsd": 0.011622,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 611
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 469
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 5341
+      }
+    },
+    {
+      "id": "s09",
+      "run": 0,
+      "source": "format-based",
+      "title": "SSM 파라미터 없음",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "파라미터",
+          "SSM",
+          "webhook-url"
+        ],
+        "fix": [
+          "SSM",
+          "Parameter Store"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "😱 **심각한 문제를 발견했습니다!**\n\n## 🔴 현황 분석\n\n| 항목 | 상태 |\n|------|------|\n| **에러율** | 100% (33/33 호출 모두 실패) |\n| **평균 응답시간** | 210ms |\n| **주요 원인** | ❌ SSM Parameter 없음 |\n\n## 🎯 근본 원인\n\n**AWS Systems Manager Parameter Store에서 Slack Webhook URL을 찾을 수 없습니다!**\n\n```\nParameter: /eecar/slack/webhook-url\nStatus: ❌ NOT FOUND\n```\n\n## ✅ 해결 방법 (3단계)\n\n### 1️⃣ **SSM Parameter 확인 및 생성**\nAWS Console → Systems Manager → Parameter Store에서:\n```bash\n# 파라미터명: /eecar/slack/webhook-url\n# 타입: SecureString (보안 권장)\n# 값: https://hooks.slack.com/services/YOUR/WEBHOOK/URL\n```\n\n### 2️⃣ **Lambda IAM 권한 확인**\nSlackNotificationFunction의 IAM Role에 다음 권한 추가:\n```json\n{\n  \"Effect\": \"Allow\",\n  \"Action\": [\n    \"ssm:GetParameter\"\n  ],\n  \"Resource\": \"arn:aws:ssm:*:*:parameter/eecar/slack/webhook-url\"\n}\n```\n\n### 3️⃣ **함수 재배포 및 테스트**\n- Parameter 생성 후 Lambda 함수 재시작\n- 테스트 메시지 전송 확인\n\n---\n\n**이미 Parameter를 생성했다면, 함수 이름이나 리전을 확인해주세요!** 혹시 다른 정보가 필요하신가요? 🚀",
+      "metrics": {
+        "runId": "8b4ba842-24c3-4a2e-ae24-e750c43bd184",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7142,
+        "outputTokens": 827,
+        "estimatedCostUsd": 0.011277,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 371
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 302
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 5138
+      }
+    },
+    {
+      "id": "s09",
+      "run": 1,
+      "source": "format-based",
+      "title": "SSM 파라미터 없음",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "ParameterNotFound",
+          "파라미터",
+          "SSM",
+          "webhook-url"
+        ],
+        "fix": [
+          "SSM",
+          "파라미터 생성",
+          "put-parameter",
+          "Parameter Store"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "SlackNotificationFunction"
+        }
+      ],
+      "response": "😱 문제를 찾았습니다! **매우 심각한 상태**네요.\n\n## 현황 요약\n- **에러율**: 100% (33건 중 33건 모두 실패)\n- **에러 타입**: `ParameterNotFound`\n- **원인**: AWS Parameter Store에서 Slack Webhook URL을 찾을 수 없음\n\n## 🔴 구체적 문제\n```\nParameter /eecar/slack/webhook-url not found\n```\n\nSlackNotificationFunction이 AWS Systems Manager Parameter Store에서 Slack Webhook URL을 조회하려고 하는데, **해당 파라미터가 존재하지 않습니다**.\n\n## ✅ 해결 방법\n\n1. **AWS Systems Manager Parameter Store 확인**\n   - AWS Console → Systems Manager → Parameter Store\n   - `/eecar/slack/webhook-url` 파라미터 존재 여부 확인\n\n2. **파라미터 생성 (없는 경우)**\n   ```bash\n   aws ssm put-parameter \\\n     --name \"/eecar/slack/webhook-url\" \\\n     --value \"YOUR_SLACK_WEBHOOK_URL\" \\\n     --type \"SecureString\" \\\n     --region ap-northeast-2\n   ```\n\n3. **Lambda IAM 권한 확인**\n   - SlackNotificationFunction의 IAM 역할이 `ssm:GetParameter` 권한 보유 확인\n\n4. **파라미터 생성 후 Lambda 재배포**\n   - 함수 코드 업데이트 없이 자동으로 정상화됨\n\n혹시 Slack Webhook URL이 있으신가요? 그럼 바로 파라미터 생성해드릴 수 있습니다! 📝",
+      "metrics": {
+        "runId": "f34ab290-b8c3-4bad-adf7-9c97ee7fee21",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7121,
+        "outputTokens": 732,
+        "estimatedCostUsd": 0.010780999999999999,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 371
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 302
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 88
+          }
+        ],
+        "latencyMs": 4426
+      }
+    },
+    {
+      "id": "s09",
+      "run": 2,
+      "source": "format-based",
+      "title": "SSM 파라미터 없음",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "ParameterNotFound",
+          "파라미터",
+          "SSM",
+          "webhook-url"
+        ],
+        "fix": [
+          "SSM",
+          "파라미터 생성",
+          "put-parameter",
+          "Parameter Store"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "SlackNotificationFunction"
+        }
+      ],
+      "response": "😱 **문제 발견!** SlackNotificationFunction이 완전히 작동 불능 상태입니다.\n\n## 📊 현황\n- **에러율**: 100% (33건 모두 실패)\n- **에러 타입**: `ParameterNotFound`\n- **원인**: AWS Systems Manager Parameter Store에서 `/eecar/slack/webhook-url` 파라미터를 찾을 수 없음\n\n## 🔧 해결 방법\n\n**1단계: AWS Systems Manager Parameter Store 확인**\n```bash\n# AWS CLI로 파라미터 확인\naws ssm get-parameter --name /eecar/slack/webhook-url --region ap-northeast-2\n```\n\n**2단계: 파라미터 생성 (없으면)**\n```bash\n# Slack Webhook URL 저장\naws ssm put-parameter \\\n  --name /eecar/slack/webhook-url \\\n  --value \"YOUR_SLACK_WEBHOOK_URL\" \\\n  --type \"SecureString\" \\\n  --region ap-northeast-2\n```\n\n**3단계: Lambda 실행 역할 권한 확인**\n- IAM 역할에 다음 권한 필요:\n  - `ssm:GetParameter`\n  - `kms:Decrypt` (SecureString 사용 시)\n\n**4단계: 함수 재배포**\n```bash\n# 파라미터 생성 후 함수 재배포\nsam deploy --guided\n```\n\n## ⚠️ 체크리스트\n- [ ] Slack Webhook URL이 Parameter Store에 저장되어 있는가?\n- [ ] Lambda 실행 역할이 SSM 접근 권한을 가지고 있는가?\n- [ ] 파라미터 이름이 정확한가? (`/eecar/slack/webhook-url`)\n\n혹시 Slack Webhook URL을 새로 발급받아야 하나요? 아니면 이미 저장되어 있는데 접근 권한 문제인가요? 🤔",
+      "metrics": {
+        "runId": "e67ae05e-20b0-44f1-9cfe-7cb2b0245ee0",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7151,
+        "outputTokens": 832,
+        "estimatedCostUsd": 0.011311,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 302
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 371
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 88
+          }
+        ],
+        "latencyMs": 4530
+      }
+    },
+    {
+      "id": "s10",
+      "run": 0,
+      "source": "format-based",
+      "title": "S3 객체 없음 (벡터 manifest)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "NoSuchKey",
+          "manifest",
+          "S3"
+        ],
+        "fix": [
+          "manifest",
+          "생성"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "좋아요! 원인을 찾았습니다! 🎯\n\n## 🔴 문제점\n**S3에서 `vectors-manifest.json` 파일을 찾을 수 없습니다!**\n\n에러 로그:\n```\nFailed to load vectors manifest: NoSuchKey: The specified key does not exist. \nKey: vectors-manifest.json\n```\n\n## ✅ 해결 방법\n\n1. **S3 벡터 저장소 확인**\n   - S3 버킷의 경로를 확인하세요\n   - `vectors-manifest.json` 파일이 실제로 존재하는지 확인\n   - 파일명이 정확한지 확인 (대소문자 구분)\n\n2. **PartRegistrationFunction 실행 확인**\n   - 부품 등록 시 벡터가 생성되고 저장되는지 확인\n   - 최근에 부품이 등록되었는지 확인\n\n3. **VectorSearchFunction 코드 확인**\n   - S3 경로 설정 확인:\n   ```python\n   # 예상되는 형태\n   VECTORS_BUCKET = os.getenv('VECTORS_BUCKET')\n   MANIFEST_KEY = 'vectors-manifest.json'\n   ```\n\n4. **환경 변수 확인**\n   - Lambda 환경 변수에서 `VECTORS_BUCKET` 설정 확인\n   - S3 버킷 이름이 정확한지 확인\n\n5. **IAM 권한 확인**\n   - Lambda 실행 역할이 S3 읽기 권한을 가지고 있는지 확인\n\n---\n\n**추가 정보가 필요하신가요?**\n- S3 버킷 이름이 뭔가요?\n- 최근에 부품 등록이 정상적으로 되었나요?\n- 에러 발생 시점이 언제부터인가요?",
+      "metrics": {
+        "runId": "a33e0e92-4c69-4969-b398-c42f4cbe91aa",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6937,
+        "outputTokens": 830,
+        "estimatedCostUsd": 0.011087,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 99
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 214
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 4909
+      }
+    },
+    {
+      "id": "s10",
+      "run": 1,
+      "source": "format-based",
+      "title": "S3 객체 없음 (벡터 manifest)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "manifest",
+          "S3"
+        ],
+        "fix": [
+          "업로드",
+          "manifest",
+          "생성"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "🔍 **문제 원인 파악됨!**\n\n로그에서 핵심 이슈를 발견했습니다:\n\n| 항목 | 상태 |\n|------|------|\n| 에러율 | 0% (실행은 정상) |\n| 평균 응답시간 | 260ms (정상) |\n| **주요 문제** | ⚠️ `vectors-manifest.json` 파일 없음 |\n\n---\n\n## 🎯 근본 원인\n\n1. **S3 벡터 데이터 누락** \n   - `vectors-manifest.json`이 S3에 없어서 벡터 인덱스를 로드할 수 없음\n   - 결과적으로 검색 대상 벡터가 0개 → 0건 결과\n\n2. **데이터 파이프라인 문제**\n   - PartRegistrationFunction에서 임베딩이 생성되지 않았거나\n   - S3에 업로드되지 않은 상태\n\n---\n\n## ✅ 해결 방법\n\n**1단계: 부품 데이터 재등록**\n```bash\n# PartRegistrationFunction 실행 확인\naws lambda invoke --function-name PartRegistrationFunction \\\n  --payload '{\"parts\":[...]}' response.json\n```\n\n**2단계: S3 벡터 파일 확인**\n```bash\n# S3에 벡터 파일이 있는지 확인\naws s3 ls s3://your-bucket/vectors/\n# 다음 파일들이 있어야 함:\n# - vectors-manifest.json\n# - vectors-*.bin\n```\n\n**3단계: VectorSearchFunction 설정 확인**\n- 환경변수 `VECTORS_BUCKET`과 `VECTORS_PREFIX` 확인\n- S3 경로가 올바른지 검증\n\n**4단계: 임베딩 생성 확인**\n```bash\n# PartRegistrationFunction 로그 확인\naws logs tail /aws/lambda/PartRegistrationFunction --follow\n```\n\n---\n\n## 💡 추가 확인 사항\n\n혹시 다음 중 하나라도 해당되나요?\n- ✋ 최근에 부품 데이터를 등록하지 않았나요?\n- ✋ S3 버킷 이름이나 경로가 변경되었나요?\n- ✋ PartRegistrationFunction에서 에러가 발생했나요?\n\n더 자세한 분석을 위해 **PartRegistrationFunction의 로그**를 함께 확인해볼까요? 🔧",
+      "metrics": {
+        "runId": "73ad933a-7288-495c-8f1f-62e83be39e09",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7019,
+        "outputTokens": 1030,
+        "estimatedCostUsd": 0.012169,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 1,
+            "resultChars": 99
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 367
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 5706
+      }
+    },
+    {
+      "id": "s10",
+      "run": 2,
+      "source": "format-based",
+      "title": "S3 객체 없음 (벡터 manifest)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "NoSuchKey",
+          "manifest",
+          "매니페스트",
+          "S3"
+        ],
+        "fix": [
+          "manifest",
+          "생성"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "좋습니다! 🔍 원인을 찾았습니다!\n\n## 🚨 주요 문제점\n**S3에서 `vectors-manifest.json` 파일을 찾을 수 없습니다!**\n\n이것이 검색 결과 0건의 근본 원인입니다. 벡터 매니페스트 파일이 없으면 임베딩 데이터에 접근할 수 없어서 검색이 작동하지 않습니다.\n\n## ✅ 해결 방법\n\n1. **S3 벡터 저장소 확인**\n   - S3 버킷 경로 확인: `s3://[bucket-name]/vectors/`\n   - `vectors-manifest.json` 파일이 존재하는지 확인\n   - 파일 경로가 정확한지 검증\n\n2. **PartRegistrationFunction 확인**\n   - 부품 등록 시 임베딩이 제대로 생성되고 있는지 확인\n   - 벡터 매니페스트 파일이 정상적으로 생성되었는지 확인\n\n3. **VectorSearchFunction 코드 검토** (src/lambda/VectorSearchFunction/index.js)\n   ```javascript\n   // S3 경로 확인\n   const manifestKey = 'vectors/vectors-manifest.json'; // 경로 확인\n   \n   // 에러 핸들링 추가\n   try {\n     const manifest = await s3.getObject({\n       Bucket: process.env.VECTOR_BUCKET,\n       Key: manifestKey\n     }).promise();\n   } catch (error) {\n     if (error.code === 'NoSuchKey') {\n       console.error('Manifest file not found. Run PartRegistrationFunction first.');\n     }\n     throw error;\n   }\n   ```\n\n4. **데이터 초기화**\n   - 부품 데이터가 등록되어 있는지 확인\n   - 필요시 PartRegistrationFunction을 실행하여 임베딩 재생성\n\n5. **환경 변수 확인**\n   - `VECTOR_BUCKET` 환경 변수가 올바르게 설정되었는지 확인\n   - S3 버킷 접근 권한 확인\n\n혹시 최근에 부품을 등록하셨나요? 아니면 S3 벡터 저장소를 초기화하셨나요? 🤔",
+      "metrics": {
+        "runId": "f6f7a7d3-9a65-4ccf-8087-9831b8195479",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6962,
+        "outputTokens": 993,
+        "estimatedCostUsd": 0.011927,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 214
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 99
+          }
+        ],
+        "latencyMs": 5685
+      }
+    },
+    {
+      "id": "s11",
+      "run": 0,
+      "source": "format-based",
+      "title": "잘못된 모델 ID",
+      "cause": false,
+      "fix": false,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": false,
+      "pass": false,
+      "matched": {
+        "cause": [],
+        "fix": [],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "흥미롭네요! 🤔 SlackNotificationFunction 자체는 에러가 없는데, 답을 못 하고 있다는 것이군요.\n\n**문제 진단:**\n- SlackNotificationFunction은 정상 작동 중 (에러율 0%)\n- 실제 문제는 **Bedrock 모델 변경**과 관련된 것 같습니다\n- 아마도 **VectorSearchFunction** 또는 **PartRegistrationFunction** 같은 Bedrock을 사용하는 함수에서 문제가 있을 수 있습니다\n\n좀 더 구체적으로 알아보겠습니다:\n\n**질문 몇 가지:**\n1. 🤖 **어떤 모델로 변경**하셨나요? (예: Claude 3.5 Sonnet, Haiku 등)\n2. 📝 **구체적인 증상**은? \n   - Slack에 답변이 안 오나요?\n   - 에러 메시지가 나오나요?\n   - 무한 대기 상태인가요?\n3. 🔍 **어느 함수가 SlackAgent를 호출**하나요?\n\n이 정보를 주시면 더 정확한 진단과 해결책을 제시할 수 있습니다! 💡",
+      "metrics": {
+        "runId": "edfb34a5-6b48-4a64-b8ee-7f7a5d697d80",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6889,
+        "outputTokens": 680,
+        "estimatedCostUsd": 0.010289,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 105
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 4301
+      }
+    },
+    {
+      "id": "s11",
+      "run": 1,
+      "source": "format-based",
+      "title": "잘못된 모델 ID",
+      "cause": false,
+      "fix": false,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": false,
+      "pass": false,
+      "matched": {
+        "cause": [],
+        "fix": [],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "흥미롭네요! 🤔 SlackNotificationFunction 자체는 정상적으로 작동하고 있습니다. \n\n**현재 상황:**\n- ✅ 함수 호출: 100회\n- ✅ 에러율: 0%\n- ✅ 평균 응답시간: 250ms\n\n문제가 \"SlackAgent\"라고 하셨는데, 이는 아마도 **Bedrock의 Agent 기능**을 사용하는 것 같습니다. 모델을 바꾼 후 답을 못 한다면 다음 원인들이 가능합니다:\n\n## 🔍 예상 원인\n\n1. **모델 호환성 문제**\n   - 새 모델의 instruction format이 다를 수 있음\n   - Tool calling 형식 변경\n\n2. **Bedrock API 호출 문제**\n   - 모델 변경 후 throttling 발생\n   - 권한/설정 미반영\n\n3. **Tool 정의 불일치**\n   - 새 모델이 기존 tool schema를 인식 못함\n\n## 💡 확인이 필요한 정보\n\n다음을 알려주시면 더 정확한 진단이 가능합니다:\n\n- 📝 **변경된 모델명** (예: claude-3-5-sonnet → claude-3-opus)\n- 🔧 **에러 메시지** (있으면)\n- 📊 **구체적인 증상** (응답 안 함? 에러 반환? 엉뚱한 답변?)\n- 🗂️ **SlackAgent 코드 위치** (어느 함수에 구현되어 있는지)\n\n이 정보들을 주시면 `analyze_error`로 정확한 원인을 찾아드리겠습니다! 🚀",
+      "metrics": {
+        "runId": "b687862e-1c07-4981-8a04-4951bfc48d80",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6886,
+        "outputTokens": 829,
+        "estimatedCostUsd": 0.011031,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 1,
+            "resultChars": 105
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 6326
+      }
+    },
+    {
+      "id": "s11",
+      "run": 2,
+      "source": "format-based",
+      "title": "잘못된 모델 ID",
+      "cause": false,
+      "fix": false,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": false,
+      "pass": false,
+      "matched": {
+        "cause": [],
+        "fix": [],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "**더 정확한 진단을 위해 다음 정보를 알려주세요:** 📝\n\n1. **어떤 모델로 변경했나요?** (예: Claude 3.5 Sonnet → Claude 3 Opus)\n2. **SlackAgent가 구체적으로 어떻게 응답 못하나요?**\n   - 응답 없음?\n   - 에러 메시지 표시?\n   - 타임아웃?\n3. **변경 전에는 정상 작동했나요?**\n\n이 정보가 있으면 더 정확하게 원인을 찾아드릴 수 있습니다! 🔍",
+      "metrics": {
+        "runId": "8492eef9-ba50-4907-9ba0-d719ac2a0816",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 10922,
+        "outputTokens": 784,
+        "estimatedCostUsd": 0.014842,
+        "toolCalls": 5,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 105
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 100
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 5960
+      }
+    },
+    {
+      "id": "s12",
+      "run": 0,
+      "source": "format-based",
+      "title": "계정 토큰 쿼터 소진 (A-12 경험 기반)",
+      "cause": true,
+      "fix": false,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": false,
+      "matched": {
+        "cause": [
+          "일일",
+          "토큰 한도"
+        ],
+        "fix": [],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "## 🚨 문제 분석 결과\n\n**상황:**\n- **에러 타입**: `BedrockThrottlingException` (일일 토큰 한도 초과)\n- **발생 빈도**: 24시간 동안 **150건** 연속 실패\n- **원인**: Sonnet 모델로 변경 후 토큰 사용량이 급증했을 가능성\n\n---\n\n## ✅ 해결책\n\n**1. 즉시 조치 (긴급)**\n   - Bedrock API 요청에 **지수 백오프(Exponential Backoff)** 적용\n   - 초기 대기: 1초 → 2초 → 4초 → 8초...\n\n**2. 토큰 사용량 최적화**\n   - 프롬프트 길이 단축\n   - 배치 처리 크기 조절 (한 번에 여러 요청 → 나누어 처리)\n   - 불필요한 설명 생성 비활성화\n\n**3. Bedrock 설정 검토**\n   - 일일 토큰 한도 증설 요청 (AWS Support)\n   - 요청 레이트 제한 설정\n\n**4. 모니터링**\n   - CloudWatch에서 토큰 사용량 대시보드 구성\n   - 임계값 알람 설정 (일일 사용량 80% 도달 시)\n\n---\n\n혹시 **Sonnet으로 변경한 코드**를 보여주실 수 있나요? 더 구체적인 최적화 방안을 제시해드릴 수 있습니다! 💡",
+      "metrics": {
+        "runId": "a3bef283-68f1-46c0-aea0-7d4c869619b4",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11083,
+        "outputTokens": 873,
+        "estimatedCostUsd": 0.015448,
+        "toolCalls": 4,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 449
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 101
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 91
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 4386,
+            "resultChars": 382
+          }
+        ],
+        "latencyMs": 10409
+      }
+    },
+    {
+      "id": "s12",
+      "run": 1,
+      "source": "format-based",
+      "title": "계정 토큰 쿼터 소진 (A-12 경험 기반)",
+      "cause": true,
+      "fix": false,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": false,
+      "matched": {
+        "cause": [
+          "tokens per day",
+          "일일",
+          "토큰 한도"
+        ],
+        "fix": [],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "## 🚨 문제 분석 결과\n\n**Sonnet으로 바꾼 후 `BedrockThrottlingException` 발생!**\n\n| 항목 | 내용 |\n|------|------|\n| 에러 타입 | `ThrottlingException: Too many tokens per day` |\n| 발생 횟수 | 24시간 동안 **150회** |\n| 원인 | Bedrock API 일일 토큰 한도 초과 |\n| 마지막 발생 | 2026-11-06 02:02:49 UTC |\n\n---\n\n## 💡 해결 방안 (우선순위 순)\n\n### 🔴 **즉시 조치 (1순위)**\n1. **배치 크기 감소** - 한 번에 처리하는 항목 수를 줄이기\n   ```python\n   # 변경 전: batch_size = 100\n   # 변경 후: batch_size = 10-20\n   ```\n\n2. **요청 간 지연 추가** - 배치 요청 사이에 대기 시간 삽입\n   ```python\n   import time\n   time.sleep(1)  # 배치마다 1초 대기\n   ```\n\n### 🟡 **단기 개선 (2순위)**\n3. **지수 백오프 재시도 로직** 구현\n4. **응답 캐싱** - 동일 쿼리 결과 재사용\n5. **Bedrock 구독 플랜 업그레이드** 검토\n\n### 🟢 **장기 개선 (3순위)**\n6. **프롬프트 최적화** - 불필요한 토큰 제거\n7. **비동기 처리** - 시간대별로 요청 분산\n\n---\n\n혹시 Sonnet으로 바꾸면서 **배치 크기를 늘렸거나 프롬프트가 길어졌나요?** 그렇다면 그 부분을 먼저 확인해보시는 게 좋겠습니다! 🎯",
+      "metrics": {
+        "runId": "1bf30262-1a8b-48cc-9aad-34e68da0ab54",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11513,
+        "outputTokens": 1082,
+        "estimatedCostUsd": 0.016923,
+        "toolCalls": 5,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 449
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 101
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 4711,
+            "resultChars": 661
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 91
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 11410
+      }
+    },
+    {
+      "id": "s12",
+      "run": 2,
+      "source": "format-based",
+      "title": "계정 토큰 쿼터 소진 (A-12 경험 기반)",
+      "cause": false,
+      "fix": false,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": false,
+      "matched": {
+        "cause": [],
+        "fix": [],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "이번이 첫 사례네요. 위 해결책을 적용하신 후 결과를 알려주시면 **성공 사례로 저장**해드리겠습니다! ✅\n\n혹시 추가로 필요한 정보나 코드 리뷰가 필요하신가요?",
+      "metrics": {
+        "runId": "87df1e1f-457f-49ce-af9e-4e77af337639",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11267,
+        "outputTokens": 935,
+        "estimatedCostUsd": 0.015942,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 449
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 101
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 6348
+      }
+    },
+    {
+      "id": "s13",
+      "run": 0,
+      "source": "format-based",
+      "title": "중복 제거용 조건부 쓰기 실패 (정상 동작)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": false,
+      "tools": true,
+      "evidence": true,
+      "pass": false,
+      "matched": {
+        "cause": [
+          "정상 동작"
+        ],
+        "fix": [
+          "정상"
+        ],
+        "wrong": [
+          "심각",
+          "문제가 있는 것"
+        ]
+      },
+      "calls": [
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        }
+      ],
+      "response": "⚠️ **상황 분석**\n\n- **에러 발생 건수**: 24시간 동안 **380건** (심각함!)\n- **에러 타입**: `ConditionalCheckFailedException` (DynamoDB 조건부 쓰기 실패)\n- **패턴**: \"Duplicate alert suppressed\" 메시지 → 중복 알림 억제 로직에서 발생\n\n---\n\n## 🎯 원인 분석\n\n이 에러는 **DynamoDB의 조건부 쓰기(Conditional Write)가 실패**할 때 발생합니다. 로그를 보니 **중복 알림 억제 로직**에서 문제가 있는 것 같습니다:\n\n```\n문제: 동시에 여러 요청이 같은 errorHash에 대해 쓰기를 시도\n→ 첫 번째만 성공, 나머지는 ConditionalCheckFailedException 발생\n```\n\n---\n\n## ✅ 해결 방안\n\n**1️⃣ DynamoDB 조건 완화**\n```javascript\n// SlackNotificationFunction - 변경 전\ntry {\n  await dynamodb.putItem({\n    TableName: 'AlertSuppression',\n    Item: { errorHash, timestamp },\n    ConditionExpression: 'attribute_not_exists(errorHash)' // ← 너무 엄격함\n  }).promise();\n} catch (e) {\n  // ConditionalCheckFailedException 발생\n}\n\n// 변경 후 - 에러 무시하기\ntry {\n  await dynamodb.putItem({\n    TableName: 'AlertSuppression',\n    Item: { errorHash, timestamp, ttl: Math.floor(Date.now()/1000) + 3600 },\n    ConditionExpression: 'attribute_not_exists(errorHash)'\n  }).promise();\n} catch (e) {\n  if (e.code !== 'ConditionalCheckFailedException') throw e;\n  // 중복이면 무시 (정상 동작)\n}\n```\n\n**2️⃣ 배치 처리로 동시성 감소**\n- 여러 알림을 모아서 한 번에 처리\n\n**3️⃣ DynamoDB 온디맨드 모드 확인**\n- 테이블이 프로비저닝 모드라면 온디맨드로 변경\n\n**4️⃣ TTL 설정**\n- 중복 억제 레코드에 TTL 추가 (위 코드 참고)\n\n---\n\n## 📊 현재 상태\n- ✅ 알림은 정상 발송되고 있음 (ConditionalCheckFailedException은 예상된 동작)\n- ⚠️ 하지만 **로그 노이즈가 심함** → 에러 처리 개선 필요\n\n**이 문제를 해결하면 로그가 훨씬 깔끔해질 거예요!** 🚀",
+      "metrics": {
+        "runId": "cd9853dd-d79d-4e78-b1ec-b7c1ebc8cb46",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7029,
+        "outputTokens": 1092,
+        "estimatedCostUsd": 0.012489,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 103
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 411
+          }
+        ],
+        "latencyMs": 6143
+      }
+    },
+    {
+      "id": "s13",
+      "run": 1,
+      "source": "format-based",
+      "title": "중복 제거용 조건부 쓰기 실패 (정상 동작)",
+      "cause": false,
+      "fix": true,
+      "noWrongClaim": false,
+      "tools": true,
+      "evidence": true,
+      "pass": false,
+      "matched": {
+        "cause": [],
+        "fix": [
+          "정상"
+        ],
+        "wrong": [
+          "동시성 문제"
+        ]
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "SlackNotificationFunction"
+        }
+      ],
+      "response": "좋습니다! 📊 **상황 분석 완료**:\n\n## 🔴 문제 요약\n- **에러 타입**: ConditionalCheckFailedException (24시간 380건)\n- **원인**: DynamoDB의 **조건식 검사 실패** (조건부 업데이트 실패)\n- **현상**: 중복 알림을 억제하려고 할 때 발생 중\n\n## 🎯 근본 원인\nSlackNotificationFunction이 **중복 알림 억제 로직**에서 DynamoDB에 조건부 업데이트를 시도하는데, 다음 중 하나가 발생:\n1. **동시성 문제**: 같은 에러에 대해 여러 함수가 동시에 업데이트 시도\n2. **TTL 만료**: 기존 항목이 TTL로 삭제되었는데 조건식이 여전히 체크\n3. **속성 누락**: 조건식이 요구하는 속성이 없음\n\n## ✅ 해결책\n\n### 1️⃣ **즉시 조치** (코드 수정)\n```python\n# SlackNotificationFunction.py\ntry:\n    # 중복 억제 항목 업데이트 시도\n    dynamodb.update_item(\n        TableName='AlertSuppression',\n        Key={'errorHash': error_hash},\n        UpdateExpression='SET suppressedCount = suppressedCount + :inc, lastSeen = :now',\n        ConditionExpression='attribute_exists(errorHash)',\n        ExpressionAttributeValues={\n            ':inc': 1,\n            ':now': int(time.time())\n        }\n    )\nexcept ConditionalCheckFailedException:\n    # 조건 실패 시 새로 생성 (멱등성 보장)\n    dynamodb.put_item(\n        TableName='AlertSuppression',\n        Item={\n            'errorHash': error_hash,\n            'suppressedCount': 1,\n            'lastSeen': int(time.time()),\n            'TTL': int(time.time()) + 86400  # 24시간\n        }\n    )\n```\n\n### 2️⃣ **DynamoDB 스키마 검토**\n- `AlertSuppression` 테이블의 TTL 설정 확인\n- 조건식 재검토 (필요하면 단순화)\n\n### 3️⃣ **모니터링 개선**\n- ConditionalCheckFailedException은 **정상 범위**일 수 있음 (중복 억제 로직이 작동 중)\n- 실제 Slack 메시지 전송 실패 여부 확인 필요\n\n---\n\n**질문**: \n1. Slack 메시지는 정상적으로 전송되고 있나요? 📨\n2. 아니면 메시지 전송도 실패하고 있나요? ❌",
+      "metrics": {
+        "runId": "549bb64c-a542-440a-92fe-9864581b2496",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11398,
+        "outputTokens": 1293,
+        "estimatedCostUsd": 0.017862999999999997,
+        "toolCalls": 4,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 411
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 103
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 4863,
+            "resultChars": 607
+          }
+        ],
+        "latencyMs": 12289
+      }
+    },
+    {
+      "id": "s13",
+      "run": 2,
+      "source": "format-based",
+      "title": "중복 제거용 조건부 쓰기 실패 (정상 동작)",
+      "cause": false,
+      "fix": false,
+      "noWrongClaim": false,
+      "tools": true,
+      "evidence": true,
+      "pass": false,
+      "matched": {
+        "cause": [],
+        "fix": [],
+        "wrong": [
+          "근본 원인 해결"
+        ]
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "SlackNotificationFunction"
+        }
+      ],
+      "response": "## 📊 분석 결과\n\n**상황 요약:**\n- 🚨 **24시간 동안 380건의 ConditionalCheckFailedException 발생**\n- 중복 알림 억제 로직에서 DynamoDB 조건식 실패 중\n- 현재는 에러를 억제하고 있지만 근본 원인 해결 필요\n\n---\n\n## 🔧 권장 해결책\n\n### 1️⃣ **즉시 조치 - 에러 핸들링 강화**\n```python\n# SlackNotificationFunction - error_handler.py\nimport time\nfrom botocore.exceptions import ClientError\n\ndef update_alert_status(table, alert_id, status):\n    max_retries = 3\n    for attempt in range(max_retries):\n        try:\n            table.update_item(\n                Key={'alertId': alert_id},\n                UpdateExpression='SET #status = :status, #ts = :ts',\n                ExpressionAttributeNames={\n                    '#status': 'status',\n                    '#ts': 'lastUpdated'\n                },\n                ExpressionAttributeValues={\n                    ':status': status,\n                    ':ts': int(time.time())\n                },\n                ConditionExpression='attribute_exists(alertId)',  # 단순화\n                ReturnValues='UPDATED_NEW'\n            )\n            return True\n        except ClientError as e:\n            if e.response['Error']['Code'] == 'ConditionalCheckFailedException':\n                if attempt < max_retries - 1:\n                    time.sleep(2 ** attempt)  # 지수 백오프\n                    continue\n                else:\n                    logger.error(f\"Failed after retries. AlertId: {alert_id}\")\n                    return False\n            raise\n```\n\n### 2️⃣ **중기 개선 - 중복 억제 로직 재설계**\n- **TTL 기반 임시 저장소** 도입 (Redis/ElastiCache)\n- **Idempotency Key** 사용으로 중복 요청 자체 방지\n- 복잡한 조건식 단순화\n\n### 3️⃣ **모니터링 추가**\n```python\n# CloudWatch 메트릭\ncloudwatch.put_metric_data(\n    Namespace='EECAR/SlackNotification',\n    MetricData=[\n        {\n            'MetricName': 'ConditionalCheckFailureRate',\n            'Value': (failures / total_attempts) * 100,\n            'Unit': 'Percent'\n        }\n    ]\n)\n```\n\n---\n\n## ❓ 추가 정보 필요\n\n1. **현재 DynamoDB 테이블의 조건식**이 어떻게 구성되어 있나요?\n2. **동시 요청 패턴**은 어떻게 되나요? (초당 몇 개?)\n3. **중복 알림 억제 목적**이 정확히 뭔가요? (같은 에러 반복 방지?)\n\n이 정보들이 있으면 더 정확한 해결책을 제시할 수 있습니다! 💪",
+      "metrics": {
+        "runId": "bf4b3276-6d90-4201-9280-1ff645637313",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11361,
+        "outputTokens": 1290,
+        "estimatedCostUsd": 0.017811,
+        "toolCalls": 4,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 411
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 103
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 5099,
+            "resultChars": 710
+          }
+        ],
+        "latencyMs": 12432
+      }
+    },
+    {
+      "id": "s14",
+      "run": 0,
+      "source": "format-based",
+      "title": "정상 상태 (거짓 경보 방지)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "정상",
+          "에러 없",
+          "0건",
+          "0%",
+          "양호",
+          "안정"
+        ],
+        "fix": [
+          "정상",
+          "안정"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "좋은 소식입니다! 👍 **VectorSearchFunction이 정상 운영 중입니다.**\n\n**📊 상태 요약:**\n- ✅ **호출 수**: 520회\n- ✅ **에러율**: 0% (에러 없음!)\n- ✅ **평균 응답시간**: 330ms (양호)\n- ✅ **에러 발생**: 0건\n\n**현재 상황:**\nVectorSearchFunction은 안정적으로 작동하고 있으며, 에러가 전혀 발생하지 않고 있습니다. 응답 시간도 합리적인 수준입니다. 🚀\n\n혹시 특정 기간의 상세 로그를 확인하고 싶으시거나, 다른 함수들의 상태도 궁금하신가요?",
+      "metrics": {
+        "runId": "4c32c3ca-0562-4699-ba92-0de1bc0765f9",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6582,
+        "outputTokens": 332,
+        "estimatedCostUsd": 0.008242,
+        "toolCalls": 1,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 100
+          }
+        ],
+        "latencyMs": 2792
+      }
+    },
+    {
+      "id": "s14",
+      "run": 1,
+      "source": "format-based",
+      "title": "정상 상태 (거짓 경보 방지)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "정상",
+          "에러 없",
+          "0건",
+          "0%",
+          "양호",
+          "안정"
+        ],
+        "fix": [
+          "정상",
+          "안정"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "좋은 소식입니다! ✅ **VectorSearchFunction 상태가 정상입니다!**\n\n📊 **현재 상태 요약:**\n- **호출 수**: 520회\n- **에러 수**: 0건 (에러율 0%)\n- **평균 응답시간**: 330ms\n\n**상태 평가:**\n- ✨ 에러 없이 안정적으로 운영 중\n- ⚡ 응답시간도 양호한 수준\n- 🎯 Bedrock + S3 벡터 검색이 정상 작동\n\n혹시 특정 시간대의 성능이 궁금하거나, 최근 에러 로그를 확인하고 싶으시면 말씀해주세요! 📈",
+      "metrics": {
+        "runId": "89758406-a409-4fd5-acaf-7304eb9fcbd9",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6582,
+        "outputTokens": 312,
+        "estimatedCostUsd": 0.008142,
+        "toolCalls": 1,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 100
+          }
+        ],
+        "latencyMs": 2732
+      }
+    },
+    {
+      "id": "s14",
+      "run": 2,
+      "source": "format-based",
+      "title": "정상 상태 (거짓 경보 방지)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "정상",
+          "0건",
+          "0%",
+          "양호",
+          "안정"
+        ],
+        "fix": [
+          "정상",
+          "안정"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "좋은 소식입니다! ✅ **VectorSearchFunction 상태가 정상입니다.**\n\n**📊 상태 요약:**\n- **호출 수**: 520회 (안정적인 사용)\n- **에러율**: 0% (완벽함!)\n- **평균 응답시간**: 330ms (양호)\n- **에러 발생**: 0건\n\n**💡 평가:**\nVectorSearchFunction은 현재 매우 안정적으로 운영 중입니다. Bedrock 벡터 검색과 S3 Vectors 연동이 잘 작동하고 있네요! \n\n혹시 다른 함수들의 상태도 궁금하신가요? 아니면 특정 함수에서 문제가 발생했다면 말씀해주세요. 저는 언제든 도와드릴 준비가 되어있습니다! 🚀",
+      "metrics": {
+        "runId": "41b67f1a-3ee5-4478-be54-42e249ec6a48",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6582,
+        "outputTokens": 351,
+        "estimatedCostUsd": 0.008337,
+        "toolCalls": 1,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 100
+          }
+        ],
+        "latencyMs": 3189
+      }
+    },
+    {
+      "id": "s15",
+      "run": 0,
+      "source": "format-based",
+      "title": "에러 없는 결과 0건 (C-06 유형의 조용한 장애)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "필터",
+          "filter",
+          "#METADATA",
+          "SK"
+        ],
+        "fix": [
+          "필터",
+          "filter",
+          "SK",
+          "조건",
+          "수정",
+          "METADATA"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "BatteryHealthAssessmentFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "BatteryHealthAssessmentFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "BatteryHealthAssessmentFunction"
+        }
+      ],
+      "response": "💡 **원인 파악됨!** 문제는 **SK(Sort Key) 필터 조건 불일치**입니다!\n\n## 🎯 핵심 문제\n- 함수가 `SK ends with #METADATA` 조건으로 검색 중\n- 실제 데이터는 `BATTERY#METADATA` 형식\n- 필터 조건이 너무 엄격해서 매칭 안 됨\n\n## ✅ 해결책\n\n### 1️⃣ **DynamoDB 필터 조건 수정** (우선순위 높음)\n```python\n# BatteryHealthAssessmentFunction 코드 수정\n# 현재 (잘못된 것):\nresponse = table.query(\n    KeyConditionExpression='PK = :pk AND SK = :sk',\n    FilterExpression='attribute_exists(#status)',\n    ExpressionAttributeNames={'#status': 'status'}\n)\n\n# 변경 (올바른 것):\nresponse = table.query(\n    KeyConditionExpression='PK = :pk',\n    FilterExpression='contains(SK, :metadata)',\n    ExpressionAttributeValues={':pk': 'BATTERY', ':metadata': 'METADATA'}\n)\n```\n\n### 2️⃣ **데이터 확인**\n- DynamoDB 테이블에 실제로 배터리 데이터가 있는지 확인\n- 데이터 형식: `BATTERY#<ID>#METADATA` 같은 구조인지 검증\n\n### 3️⃣ **테스트 데이터 추가** (필요시)\n```python\n# 테스트 레코드 삽입\ntable.put_item(Item={\n    'PK': 'BATTERY',\n    'SK': 'BATTERY#001#METADATA',\n    'health_status': 'GOOD',\n    'capacity': 85\n})\n```\n\n### 4️⃣ **로깅 강화**\n```python\n# 쿼리 전에 로그 추가\nprint(f\"Query PK: {pk}, Filter: {filter_expression}\")\nprint(f\"Results count: {len(response['Items'])}\")\n```\n\n---\n\n**어느 부분부터 확인해보시겠어요?** \n- 🔧 코드 수정할 준비 됐나요?\n- 📊 DynamoDB 테이블 데이터 구조를 먼저 확인하고 싶나요?",
+      "metrics": {
+        "runId": "b0883dd5-e237-4c98-9ef0-e2016273ec9a",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11362,
+        "outputTokens": 1142,
+        "estimatedCostUsd": 0.017072,
+        "toolCalls": 4,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 110
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 290
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 7743,
+            "resultChars": 615
+          }
+        ],
+        "latencyMs": 14308
+      }
+    },
+    {
+      "id": "s15",
+      "run": 1,
+      "source": "format-based",
+      "title": "에러 없는 결과 0건 (C-06 유형의 조용한 장애)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "0건",
+          "필터",
+          "#METADATA",
+          "SK",
+          "스캔"
+        ],
+        "fix": [
+          "필터",
+          "SK",
+          "조건",
+          "키",
+          "METADATA"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "BatteryHealthAssessmentFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "BatteryHealthAssessmentFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "흥미롭네요! 🔍 에러는 없지만 **0건 스캔**이 되고 있습니다. 로그를 보면 `SK ends with #METADATA` 필터로 스캔하는데 아무것도 안 나오고 있네요.\n\n**원인 분석:**\n\n| 항목 | 상태 |\n|------|------|\n| 함수 실행 | ✅ 정상 (88회 호출, 0 에러) |\n| 응답 시간 | ✅ 정상 (140ms) |\n| **데이터 조회** | ❌ **0건 반환** |\n\n**가능한 원인들:**\n\n1. **📊 데이터 부재** - DynamoDB 테이블에 배터리 데이터가 없거나 부품 등록 시 배터리 정보가 저장되지 않음\n2. **🔑 스키마 불일치** - Sort Key(SK) 형식이 `#METADATA`로 끝나지 않음\n3. **🏷️ 파티션 키 문제** - 쿼리가 잘못된 PK로 조회 중\n4. **🔐 IAM 권한** - 테이블 접근 권한은 있지만 특정 항목 읽기 제한\n\n**확인할 사항:**\n\n1️⃣ **PartRegistrationFunction** 로그 확인 - 배터리 데이터가 제대로 저장되는지 확인\n```\nSELECT * FROM DynamoDB \nWHERE SK LIKE '%#METADATA'\n```\n\n2️⃣ **테이블 스캔 테스트** - AWS Console에서 직접 DynamoDB 데이터 확인\n\n3️⃣ **쿼리 조건 검토** - BatteryHealthAssessmentFunction의 쿼리 로직 확인\n\n**다음 단계:**\n- PartRegistrationFunction의 최근 로그를 확인하시겠어요?\n- 아니면 DynamoDB 테이블에 실제 배터리 데이터가 있는지 확인하고 싶으신가요?\n\n어느 쪽이 더 도움될까요? 🤔",
+      "metrics": {
+        "runId": "6ab24761-796f-4fbc-b28a-064301b57e9d",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7079,
+        "outputTokens": 965,
+        "estimatedCostUsd": 0.011904,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 110
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 290
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 5820
+      }
+    },
+    {
+      "id": "s15",
+      "run": 2,
+      "source": "format-based",
+      "title": "에러 없는 결과 0건 (C-06 유형의 조용한 장애)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "0건",
+          "필터",
+          "#METADATA",
+          "SK",
+          "스캔"
+        ],
+        "fix": [
+          "필터",
+          "SK",
+          "조건",
+          "METADATA"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "BatteryHealthAssessmentFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "BatteryHealthAssessmentFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "오! 🎯 문제를 찾았습니다! \n\n**핵심 원인:**\n- ✅ 함수 자체는 정상 작동 (에러율 0%, 평균 응답시간 140ms)\n- ❌ **DynamoDB 스캔 결과가 0건** - \"Scanned 0 battery items\"\n- ❌ **필터 조건 문제**: `SK ends with #METADATA` 조건으로 스캔 중\n\n**가능한 원인들:**\n\n| 원인 | 확인 방법 |\n|------|---------|\n| 1️⃣ **배터리 데이터 자체가 없음** | DynamoDB 테이블에 배터리 항목이 존재하는지 확인 |\n| 2️⃣ **Sort Key 형식 오류** | `#METADATA` 접미사가 올바르게 저장되지 않았을 수 있음 |\n| 3️⃣ **쿼리 필터 로직 버그** | SK 필터 조건이 너무 제한적 |\n| 4️⃣ **데이터 파티션 문제** | 배터리 데이터가 다른 파티션에 저장됨 |\n\n**추천 해결책:**\n\n1. **DynamoDB 테이블 직접 확인**\n   ```\n   - 테이블명 확인\n   - 배터리 관련 항목 개수 확인\n   - Sort Key 형식 검증 (실제로 #METADATA로 끝나는지)\n   ```\n\n2. **쿼리 로직 검토** (코드 변경 필요)\n   ```python\n   # 현재: SK ends with #METADATA (너무 제한적)\n   # 개선: \n   - SK 필터 조건 완화\n   - 또는 GSI 활용으로 배터리 타입별 검색\n   - 또는 전체 스캔 후 필터링\n   ```\n\n3. **PartRegistrationFunction 확인**\n   - 배터리 데이터가 제대로 등록되고 있는지 확인\n   - 임베딩 생성 시 Sort Key가 올바르게 설정되는지 검증\n\n**즉시 확인해주세요:**\n- DynamoDB 테이블에 배터리 데이터가 몇 건 있는지?\n- Sort Key 형식이 정확히 어떻게 되어있는지?\n\n알려주시면 더 구체적인 해결책을 제시해드릴 수 있습니다! 💪",
+      "metrics": {
+        "runId": "358c1333-d709-468d-8ce8-f605baffbab8",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7057,
+        "outputTokens": 1052,
+        "estimatedCostUsd": 0.012317,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 110
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 290
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 6555
+      }
+    },
+    {
+      "id": "s16",
+      "run": 0,
+      "source": "format-based",
+      "title": "콜드 스타트 지연",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "cold start",
+          "Cold Start",
+          "Init Duration",
+          "초기화"
+        ],
+        "fix": [
+          "워밍",
+          "초기화 시간",
+          "SnapStart"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "**원인 발견! 🎯**\n\n로그를 보니 명확하네요:\n\n| 요청 | 실행 시간 | 특징 |\n|------|---------|------|\n| **첫 번째** | **2,310ms** ⚠️ | **Init Duration: 1,450ms** |\n| 두 번째 | 280ms | 정상 |\n| 세 번째 | 301ms | 정상 |\n\n**문제점:**\n- 첫 요청에서 **1.45초의 초기화 시간(Cold Start)** 발생\n- Bedrock 클라이언트 초기화 + S3 Vectors 로딩 시간\n\n**해결책:**\n\n1. **🔥 Lambda 워밍업 (가장 효과적)**\n   - CloudWatch Events로 매 5분마다 더미 요청 발송\n   - 또는 EventBridge로 아침 업무 시작 전에 미리 워밍\n\n2. **메모리 증가**\n   - 현재 1024MB → 1536MB 이상으로 변경\n   - CPU 성능 향상 → 초기화 속도 개선\n\n3. **코드 최적화**\n   - Bedrock 클라이언트를 전역 변수로 선언 (재사용)\n   - S3 Vectors 캐싱 구현\n\n4. **Lambda SnapStart 활용** (Java 런타임만 지원)\n   - 초기화 상태 스냅샷 저장 → 복원 속도 향상\n\n**추천:** 1번 + 2번 조합이 가장 효과적입니다! 🚀\n\n구체적인 설정이 필요하신가요?",
+      "metrics": {
+        "runId": "83c86714-2260-41f0-937a-ae14eea87406",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7064,
+        "outputTokens": 697,
+        "estimatedCostUsd": 0.010549,
+        "toolCalls": 2,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 99
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 677
+          }
+        ],
+        "latencyMs": 5831
+      }
+    },
+    {
+      "id": "s16",
+      "run": 1,
+      "source": "format-based",
+      "title": "콜드 스타트 지연",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "Init Duration",
+          "초기화"
+        ],
+        "fix": [
+          "Provisioned Concurrency",
+          "워밍",
+          "번들",
+          "초기화 시간"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "**정확히 맞췄어요!** 🎯 문제가 명확합니다:\n\n## 원인 분석\n\n| 항목 | 수치 | 의미 |\n|------|------|------|\n| **첫 요청 (req-0)** | 2,310ms | **Init Duration: 1,450ms** ⚠️ |\n| **두 번째 요청 (req-1)** | 280ms | 정상 속도 ✅ |\n| **세 번째 요청 (req-2)** | 301ms | 정상 속도 ✅ |\n\n첫 요청에서 **1.45초**가 초기화(Init)에 소비되고 있습니다!\n\n## 🔧 해결 방법 (우선순위 순)\n\n### 1️⃣ **Lambda 메모리 증가** (가장 효과적)\n```\n현재: 1024 MB → 권장: 2048 MB 이상\n```\n- 메모리가 높을수록 CPU 할당량이 증가 → 초기화 속도 향상\n- 비용 증가는 미미하지만 성능 개선 효과 큼\n\n### 2️⃣ **Provisioned Concurrency 설정**\n- 항상 워밍된 인스턴스 유지\n- 아침 업무 시간 전에 자동 스케일링\n\n### 3️⃣ **코드 최적화**\n- Bedrock 클라이언트 초기화 시간 단축\n- 불필요한 라이브러리 제거\n\n### 4️⃣ **Lambda 레이어 최적화**\n- 사용하지 않는 의존성 제거\n- 번들 크기 축소\n\n## 💡 추가 팁\n아침 첫 검색 전에 **더미 요청**을 보내서 미리 워밍하는 것도 좋은 방법입니다!\n\n혹시 메모리 증가 후에도 문제가 지속되면 말씀해주세요. 더 자세히 분석해드리겠습니다! 🚀",
+      "metrics": {
+        "runId": "8549bc86-9755-4127-ab99-c512f86db5f1",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7093,
+        "outputTokens": 854,
+        "estimatedCostUsd": 0.011363,
+        "toolCalls": 2,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 99
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 677
+          }
+        ],
+        "latencyMs": 5502
+      }
+    },
+    {
+      "id": "s16",
+      "run": 2,
+      "source": "format-based",
+      "title": "콜드 스타트 지연",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "cold start",
+          "Cold Start",
+          "Init Duration",
+          "초기화"
+        ],
+        "fix": [
+          "Provisioned Concurrency",
+          "워밍",
+          "warm"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "VectorSearchFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "VectorSearchFunction"
+        }
+      ],
+      "response": "아! 원인을 찾았습니다! 🎯\n\n## 문제 분석\n\n**첫 번째 요청 (02:01:18)**\n- ⏱️ **총 소요시간: 2,310ms**\n- 🔧 **Init Duration: 1,450ms** ← **이게 문제!**\n\n**두 번째 이후 요청들**\n- ⏱️ **소요시간: 280~300ms** (약 8배 빠름)\n\n## 원인 🔍\n\n**Cold Start 현상**입니다! 아침에 처음 요청이 들어올 때:\n1. Lambda 컨테이너가 새로 시작됨\n2. Bedrock 클라이언트 초기화 (약 1.4초)\n3. S3 Vectors 연결 설정\n4. 의존성 로드\n\n이후 요청들은 **Warm 상태**에서 실행되어 빠릅니다.\n\n## 해결책 💡\n\n**1단계: Lambda 메모리 증가** (가장 효과적)\n```yaml\n# serverless.yml 또는 CloudFormation\nVectorSearchFunction:\n  MemorySize: 1024 → 3008 (최대)\n  # 메모리 증가 = CPU 증가 = 초기화 속도 향상\n```\n\n**2단계: Provisioned Concurrency 설정**\n```yaml\nProvisionedConcurrentExecutions: 1\n# 항상 1개의 Warm 인스턴스 유지\n```\n\n**3단계: CloudWatch Events로 주기적 워밍**\n```json\n{\n  \"Schedule\": \"cron(0 8 * * ? *)\",  // 매일 8시\n  \"Target\": \"VectorSearchFunction\",\n  \"Input\": {\"action\": \"warmup\"}\n}\n```\n\n**4단계: 코드 최적화** (PartRegistrationFunction.py)\n```python\n# Bedrock 클라이언트를 글로벌 변수로 선언\nbedrock_client = None\n\ndef lambda_handler(event, context):\n    global bedrock_client\n    if bedrock_client is None:\n        bedrock_client = boto3.client('bedrock-runtime')\n    # ... 나머지 코드\n```\n\n## 추천 우선순위\n1️⃣ **메모리 증가** (비용 미미, 효과 큼)\n2️⃣ **Provisioned Concurrency** (비용 증가, 완벽한 해결)\n3️⃣ **정기 워밍** (비용 적음, 예측 가능한 시간만 해결)\n\n어떤 방식으로 진행하시겠어요? 😊",
+      "metrics": {
+        "runId": "84bf1b50-92ea-4316-95ce-e6c89e1b4a18",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7094,
+        "outputTokens": 994,
+        "estimatedCostUsd": 0.012064,
+        "toolCalls": 2,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 99
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 677
+          }
+        ],
+        "latencyMs": 6277
+      }
+    },
+    {
+      "id": "s17",
+      "run": 0,
+      "source": "format-based",
+      "title": "메모리 부족으로 런타임 종료",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "메모리"
+        ],
+        "fix": [
+          "메모리 증가",
+          "배치"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "SyntheticDataFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "SyntheticDataFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "SyntheticDataFunction"
+        }
+      ],
+      "response": "## 🎯 해결책 (우선순위 순)\n\n### 1️⃣ **메모리 증가** (가장 가능성 높음)\n```\n현재 상태: 41초 실행 후 강제 종료\n→ Lambda 메모리 설정 확인 및 증가 필요\n```\n- **SyntheticDataFunction 메모리**: 현재 설정 확인\n- **권장**: 최소 1024MB → 3008MB로 증가\n- 메모리 증가 = CPU 성능 향상 = 더 빠른 처리\n\n### 2️⃣ **타임아웃 설정 확인**\n```\n현재 실행 시간: 41초\n→ 타임아웃이 60초 이하로 설정되어 있을 가능성\n```\n- **타임아웃 설정**: 최소 5분(300초) 이상으로 증가\n- 대량 데이터 생성 시 충분한 시간 필요\n\n### 3️⃣ **배치 처리로 변경** (근본적 해결)\n```python\n# ❌ 현재 (한 번에 모든 데이터 생성)\ndef handler(event, context):\n    generate_all_synthetic_data(10000)  # 한 번에 10,000개\n\n# ✅ 개선 (배치 단위로 나누어 처리)\ndef handler(event, context):\n    batch_size = 100\n    total = 10000\n    for i in range(0, total, batch_size):\n        generate_batch(batch_size)\n        # 메모리 정리\n        gc.collect()\n```\n\n### 4️⃣ **메모리 누수 확인**\n- 생성된 데이터를 제때 S3에 저장하고 메모리에서 해제하는지 확인\n- 임베딩 생성 후 변수 명시적 삭제 필요\n\n---\n\n**즉시 조치 사항:**\n1. Lambda 메모리를 **3008MB**로 증가\n2. 타임아웃을 **300초(5분)** 이상으로 설정\n3. 배치 크기를 **100~200개 단위**로 나누어 처리\n\n이 중 어느 것부터 시작하시겠어요? 🚀",
+      "metrics": {
+        "runId": "5be2d81f-8750-4674-bfb9-a793150ea666",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11253,
+        "outputTokens": 1197,
+        "estimatedCostUsd": 0.017238,
+        "toolCalls": 4,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 256
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 191
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 4425,
+            "resultChars": 377
+          }
+        ],
+        "latencyMs": 11846
+      }
+    },
+    {
+      "id": "s17",
+      "run": 1,
+      "source": "format-based",
+      "title": "메모리 부족으로 런타임 종료",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "메모리",
+          "signal: killed"
+        ],
+        "fix": [
+          "메모리 증가",
+          "배치",
+          "분할"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "SyntheticDataFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "SyntheticDataFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "SyntheticDataFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "SyntheticDataFunction"
+        }
+      ],
+      "response": "## 📊 분석 결과\n\n**문제**: `signal: killed` = **메모리 부족으로 인한 강제 종료**\n- 에러율: **100%** (6번 모두 실패)\n- 평균 실행 시간: **41초** (타임아웃 전에 메모리 초과)\n\n---\n\n## ✅ 해결책 (우선순위 순)\n\n### 1️⃣ **Lambda 메모리 증가** (즉시 효과)\n```\n현재 메모리 → 3008 MB (또는 최대값)으로 증가\n비용 증가: 약 10-15%\n```\n\n### 2️⃣ **배치 처리 구현** (근본 해결)\n```python\n# SyntheticDataFunction 수정\ndef lambda_handler(event, context):\n    batch_size = 100  # 한 번에 100개씩\n    total_count = event.get('count', 1000)\n    \n    for i in range(0, total_count, batch_size):\n        current_batch = min(batch_size, total_count - i)\n        generate_batch(current_batch)\n        # 메모리 정리\n        gc.collect()\n```\n\n### 3️⃣ **메모리 누수 점검**\n- Bedrock API 응답 객체 제대로 해제되는지 확인\n- S3 업로드 후 메모리 정리 (`del` 또는 `gc.collect()`)\n- 생성된 데이터 구조 최적화\n\n### 4️⃣ **Step Functions 활용** (대량 생성 시 권장)\n```\nSyntheticDataFunction을 Step Functions로 체이닝\n→ 각 배치마다 새로운 Lambda 인스턴스 사용\n→ 메모리 누적 방지\n```\n\n### 5️⃣ **타임아웃 설정 확인**\n- 현재 타임아웃 값 확인 (기본 3초 → 최소 60초 필요)\n\n---\n\n## 🎯 즉시 시도할 것\n\n**1단계**: Lambda 메모리를 **3008 MB**로 증가\n**2단계**: 대량 생성 요청을 **100개 단위 배치**로 분할\n**3단계**: 배치 사이에 `gc.collect()` 추가\n\n해결되면 저에게 알려주세요! 성공 사례로 저장하겠습니다. 💾",
+      "metrics": {
+        "runId": "2f2fd341-28a1-415c-b565-b1fe1f7b7dc0",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11333,
+        "outputTokens": 1251,
+        "estimatedCostUsd": 0.017588,
+        "toolCalls": 5,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 256
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 191
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 79
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 5230,
+            "resultChars": 372
+          }
+        ],
+        "latencyMs": 12893
+      }
+    },
+    {
+      "id": "s17",
+      "run": 2,
+      "source": "format-based",
+      "title": "메모리 부족으로 런타임 종료",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "메모리",
+          "memory",
+          "Memory",
+          "OOM"
+        ],
+        "fix": [
+          "메모리 증가",
+          "배치"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "SyntheticDataFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "SyntheticDataFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "SyntheticDataFunction"
+        },
+        {
+          "name": "analyze_error",
+          "functionName": "SyntheticDataFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "완벽하게 파악했습니다! 💡 **메모리 부족으로 인한 OOM(Out of Memory) 현상**입니다.\n\n## 🔍 문제 원인\n- **Runtime.ExitError**: 프로세스가 강제 종료됨 (메모리 초과)\n- **평균 실행 시간 41초**: 대량 데이터 처리 중 메모리 누수\n- **100% 에러율**: 모든 대량 생성 요청이 실패\n\n## ✅ 즉시 해결책 (우선순위)\n\n### 1️⃣ **Lambda 메모리 증가** (가장 중요)\n```\n현재: 256MB → 변경: 2GB (또는 최소 1GB)\n```\n- AWS Console → Lambda → SyntheticDataFunction → 구성 → 메모리 수정\n\n### 2️⃣ **타임아웃 설정 증가**\n```\n현재: 기본값(3분) → 변경: 600초(10분)\n```\n\n### 3️⃣ **코드 최적화** (lambda_function.py)\n```python\nimport gc\nimport logging\n\ndef lambda_handler(event, context):\n    try:\n        # 배치 크기 감소로 분산 처리\n        batch_size = 100  # 기존 1000 → 100으로 축소\n        \n        for i in range(0, total_count, batch_size):\n            chunk = data[i:i+batch_size]\n            process_chunk(chunk)\n            \n            # 주기적 메모리 정리\n            gc.collect()\n            \n        return {\"status\": \"success\"}\n    \n    except Exception as e:\n        logging.error(f\"Error: {e}\")\n        return {\"error\": str(e)}, 500\n```\n\n### 4️⃣ **스트리밍 처리 방식으로 변경**\n- 전체 데이터를 메모리에 로드하지 않고 청크 단위로 처리\n- S3에 직접 스트리밍 저장\n\n### 5️⃣ **동시 실행 제한**\n```\nConcurrency 설정 → 1~3으로 제한 (메모리 누적 방지)\n```\n\n---\n\n**추천 순서**: 1번 → 2번 → 3번 순으로 진행하시면 됩니다! 🚀\n\n혹시 현재 생성하려는 데이터 규모가 어느 정도인가요? (건수/크기) 그러면 더 정확한 메모리 설정값을 제안해드릴 수 있습니다!",
+      "metrics": {
+        "runId": "93534415-6c55-4abc-b804-05d51e32d298",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 11752,
+        "outputTokens": 1282,
+        "estimatedCostUsd": 0.018161999999999998,
+        "toolCalls": 5,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 256
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 191
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 79
+          },
+          {
+            "name": "analyze_error",
+            "ok": true,
+            "latencyMs": 4909,
+            "resultChars": 972
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 12747
+      }
+    },
+    {
+      "id": "s18",
+      "run": 0,
+      "source": "format-based",
+      "title": "Slack 3초 제한 초과로 인한 재시도 (C-13 유형)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": false,
+      "pass": false,
+      "matched": {
+        "cause": [
+          "재시도",
+          "retry"
+        ],
+        "fix": [
+          "비동기",
+          "ack",
+          "SQS",
+          "큐"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "## 🔍 분석 결과\n\n**현재 상태:**\n- ✅ 에러율: 0% (공식 에러 없음)\n- ✅ 평균 응답시간: 250ms (정상)\n- ✅ 호출 수: 100회 (정상 작동)\n\n**문제 원인 분석:**\n\n중복 응답이나 응답 누락이 에러로 기록되지 않는 경우는 보통:\n\n1. **Idempotency Key 미설정** ⚠️\n   - Slack API 중복 호출 시 중복 메시지 발송\n   - 해결: Request ID를 Idempotency Key로 사용\n\n2. **Lambda 재시도 정책 문제** ⚠️\n   - EventBridge/SQS 트리거 재시도로 중복 발송\n   - 해결: 재시도 정책 검토 필요\n\n3. **Slack API 타임아웃** ⚠️\n   - 응답 대기 중 타임아웃 → 재시도 → 중복 발송\n   - 해결: 타임아웃 값 증가, 비동기 처리\n\n4. **메시지 큐 중복** ⚠️\n   - SQS/SNS에서 중복 메시지 처리\n   - 해결: 메시지 그룹 ID 설정\n\n## 🛠️ 권장 조치\n\n**즉시 확인 사항:**\n1. SlackNotificationFunction의 트리거 설정 확인\n2. 재시도 정책 (Retry Policy) 검토\n3. Slack API 호출 로그 확인\n\n**코드 개선 제안:**\n```python\n# SlackNotificationFunction에 추가\nimport hashlib\nimport json\n\ndef send_slack_message(message):\n    # Idempotency Key 생성\n    idempotency_key = hashlib.md5(\n        json.dumps(message, sort_keys=True).encode()\n    ).hexdigest()\n    \n    headers = {\n        'Idempotency-Key': idempotency_key\n    }\n    # Slack API 호출 시 headers 포함\n```\n\n더 자세한 정보가 필요하신가요? 특정 트리거 설정이나 코드를 공유해주시면 더 정확히 분석해드릴 수 있습니다! 🎯",
+      "metrics": {
+        "runId": "33ff33f6-58e9-4fde-bb4e-00f48e720162",
+        "turns": 3,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 3
+        },
+        "inputTokens": 10862,
+        "outputTokens": 1215,
+        "estimatedCostUsd": 0.016937,
+        "toolCalls": 5,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 105
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 6827
+      }
+    },
+    {
+      "id": "s18",
+      "run": 1,
+      "source": "format-based",
+      "title": "Slack 3초 제한 초과로 인한 재시도 (C-13 유형)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": false,
+      "pass": false,
+      "matched": {
+        "cause": [
+          "재시도"
+        ],
+        "fix": [
+          "비동기",
+          "ack",
+          "큐",
+          "멱등",
+          "중복 처리"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "SlackNotificationFunction"
+        }
+      ],
+      "response": "흥미롭네요! 📊 공식 에러 로그에는 문제가 없는데, 사용자 경험상 중복 또는 누락이 발생한다는 것이군요.\n\n이런 증상은 보통 다음과 같은 원인들이 있습니다:\n\n**🔍 의심되는 원인:**\n\n1. **중복 트리거** - Lambda가 여러 번 호출되거나 이벤트 소스에서 중복 발송\n2. **타임아웃 후 재시도** - 함수가 타임아웃되어 자동 재시도되는 중\n3. **Slack API 응답 지연** - 응답 확인 전에 재시도 로직 작동\n4. **비동기 처리 문제** - 메시지 큐에서 중복 처리\n\n**✅ 해결 방안:**\n\n1. **Lambda 타임아웃 설정 확인** - 현재 평균 250ms이므로 여유 있는지 확인\n2. **이벤트 소스 매핑 확인** - 중복 호출 설정 검토\n3. **멱등성(Idempotency) 구현** - Slack 메시지 ID 기반 중복 제거\n4. **DLQ(Dead Letter Queue) 확인** - 실패한 메시지 재처리 확인\n\n더 자세히 확인하려면:\n- **CloudWatch 메트릭** (호출 횟수 vs 성공 횟수 비교)\n- **Slack API 로그** (메시지 전송 기록)\n- **Lambda 동시성 설정** 확인\n\n어떤 부분을 먼저 살펴볼까요? 🎯",
+      "metrics": {
+        "runId": "50f4beee-06a1-4a31-94b8-fded300b7de0",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6893,
+        "outputTokens": 783,
+        "estimatedCostUsd": 0.010808,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 105
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 4695
+      }
+    },
+    {
+      "id": "s18",
+      "run": 2,
+      "source": "format-based",
+      "title": "Slack 3초 제한 초과로 인한 재시도 (C-13 유형)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": false,
+      "pass": false,
+      "matched": {
+        "cause": [
+          "재시도"
+        ],
+        "fix": [
+          "비동기",
+          "ack",
+          "SQS",
+          "멱등"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "SlackNotificationFunction"
+        }
+      ],
+      "response": "흥미롭네요! 🔍 공식 에러 로그에는 아무것도 없지만, 사용자 경험상 문제가 있다는 것이군요. 이는 **중복 발송 또는 타이밍 이슈**일 가능성이 높습니다.\n\n**가능한 원인들:**\n\n1. **중복 호출** 🔄\n   - SQS/SNS 재시도 메커니즘으로 인한 중복 트리거\n   - Lambda 동시 실행으로 인한 중복 발송\n\n2. **비동기 처리 문제** ⏱️\n   - Slack API 응답 대기 중 타임아웃\n   - 답변이 도착했지만 클라이언트가 못 받음\n\n3. **네트워크 지연** 🌐\n   - Slack API 호출 지연\n   - 응답 전송 실패\n\n**해결 방안:**\n\n```yaml\n1️⃣ 멱등성(Idempotency) 추가\n   - Slack 메시지 ID를 DynamoDB에 저장\n   - 동일 ID 재전송 시 무시\n\n2️⃣ 타임아웃 설정 확인\n   - SlackNotificationFunction 타임아웃: 30초 이상?\n   - Slack API 호출 재시도 정책 검토\n\n3️⃣ 로깅 강화\n   - 모든 Slack 호출 시점 기록\n   - 응답 상태 코드 저장\n```\n\n**코드 예시 (Python):**\n```python\n# SlackNotificationFunction에 추가\nimport hashlib\nimport boto3\n\ndynamodb = boto3.resource('dynamodb')\ntable = dynamodb.Table('SlackMessageLog')\n\ndef send_slack_notification(message):\n    message_hash = hashlib.md5(message.encode()).hexdigest()\n    \n    # 중복 확인\n    response = table.get_item(Key={'messageId': message_hash})\n    if 'Item' in response:\n        print(f\"Duplicate message detected: {message_hash}\")\n        return\n    \n    # Slack 발송\n    result = slack_client.chat_postMessage(...)\n    \n    # 기록 저장\n    table.put_item(Item={'messageId': message_hash, 'timestamp': int(time.time())})\n```\n\n더 자세한 로그를 보려면 **최근 몇 시간 동안의 구체적인 메시지 타임스탬프**를 알려주시면, 더 정확한 분석이 가능합니다! 📊",
+      "metrics": {
+        "runId": "96928283-56d1-4655-9c4a-edba903df91f",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6868,
+        "outputTokens": 986,
+        "estimatedCostUsd": 0.011798,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 105
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 5530
+      }
+    },
+    {
+      "id": "s19",
+      "run": 0,
+      "source": "format-based",
+      "title": "존재하지 않는 함수 (지어내기 방지)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "존재 여부",
+          "함수명이 정확하지",
+          "데이터가 없"
+        ],
+        "fix": [
+          "함수명",
+          "확인",
+          "목록"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "PaymentFunction"
+        }
+      ],
+      "response": "조회 결과를 보니 **PaymentFunction**에 대한 데이터가 없네요. 📊\n\n**가능한 원인:**\n- 🔍 함수명이 정확하지 않을 수 있습니다\n- 📉 최근 호출 기록이 없을 수 있습니다\n- ⏰ 조회 기간 내 실행되지 않았을 수 있습니다\n\n**확인 사항:**\n1. **정확한 함수명** - EECAR 프로젝트의 Lambda 함수 목록에서 PaymentFunction이 있는지 확인해주세요\n2. **함수 존재 여부** - AWS Lambda 콘솔에서 함수가 배포되어 있는지 확인\n\n혹시 다음 함수들 중 하나를 의도하셨나요?\n- **ProposalFunction** (거래 제안)\n- **ContactInquiryFunction** (문의 처리)\n\n정확한 함수명을 알려주시면 바로 에러율을 확인해드리겠습니다! 🚀",
+      "metrics": {
+        "runId": "b9a3bb06-17d1-4165-ab94-692a78509535",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6580,
+        "outputTokens": 412,
+        "estimatedCostUsd": 0.00864,
+        "toolCalls": 1,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 91
+          }
+        ],
+        "latencyMs": 2857
+      }
+    },
+    {
+      "id": "s19",
+      "run": 1,
+      "source": "format-based",
+      "title": "존재하지 않는 함수 (지어내기 방지)",
+      "cause": false,
+      "fix": true,
+      "noWrongClaim": false,
+      "tools": true,
+      "evidence": true,
+      "pass": false,
+      "matched": {
+        "cause": [],
+        "fix": [
+          "함수명",
+          "확인"
+        ],
+        "wrong": [
+          "정상 상태",
+          "에러가 발생하지 않았"
+        ]
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "PaymentFunction"
+        }
+      ],
+      "response": "📊 **PaymentFunction 상태 조회 결과**\n\n| 항목 | 값 |\n|------|-----|\n| 함수명 | PaymentFunction |\n| 호출 수 | 0 |\n| 에러 수 | 0 |\n| **에러율** | **0%** ✅ |\n| 평균 응답시간 | 0ms |\n\n**현재 상황:**\n- PaymentFunction은 아직 호출 기록이 없습니다\n- 에러가 발생하지 않았으므로 정상 상태입니다 ✨\n\n혹시 다른 기간의 데이터를 확인하고 싶으신가요? 또는 다른 Lambda 함수의 상태를 확인해드릴까요? 😊",
+      "metrics": {
+        "runId": "f452ee3d-c545-4068-b173-9762f9279ae0",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6572,
+        "outputTokens": 309,
+        "estimatedCostUsd": 0.008117000000000001,
+        "toolCalls": 1,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 91
+          }
+        ],
+        "latencyMs": 2309
+      }
+    },
+    {
+      "id": "s19",
+      "run": 2,
+      "source": "format-based",
+      "title": "존재하지 않는 함수 (지어내기 방지)",
+      "cause": false,
+      "fix": true,
+      "noWrongClaim": false,
+      "tools": true,
+      "evidence": true,
+      "pass": false,
+      "matched": {
+        "cause": [],
+        "fix": [
+          "함수명",
+          "확인"
+        ],
+        "wrong": [
+          "에러가 없는 상태"
+        ]
+      },
+      "calls": [
+        {
+          "name": "get_function_status",
+          "functionName": "PaymentFunction"
+        }
+      ],
+      "response": "📊 **PaymentFunction 상태 조회 결과**\n\n| 항목 | 값 |\n|------|-----|\n| 함수명 | PaymentFunction |\n| 호출 수 | 0 |\n| 에러 수 | 0 |\n| **에러율** | **0%** ✅ |\n| 평균 응답시간 | 0ms |\n\n**현황:**\n- 지난 24시간 동안 PaymentFunction이 호출되지 않았습니다.\n- 에러가 없는 상태입니다.\n\n혹시 다른 기간의 데이터를 확인하고 싶으신가요? 또는 다른 Lambda 함수의 상태를 확인해드릴 수 있습니다! 📈",
+      "metrics": {
+        "runId": "cff4f162-d4e7-46b9-b8bd-8aefb9933fb6",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 6572,
+        "outputTokens": 305,
+        "estimatedCostUsd": 0.008097,
+        "toolCalls": 1,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 1,
+            "resultChars": 91
+          }
+        ],
+        "latencyMs": 2258
+      }
+    },
+    {
+      "id": "s20",
+      "run": 0,
+      "source": "format-based",
+      "title": "스로틀링과 무관한 경고가 섞인 로그 (주원인 식별)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "처리량",
+          "throughput",
+          "Throughput",
+          "용량",
+          "ProvisionedThroughputExceeded"
+        ],
+        "fix": [
+          "재시도",
+          "백오프",
+          "backoff",
+          "용량",
+          "온디맨드",
+          "on-demand"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "get_logs",
+          "functionName": "MaterialPropertySearchFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "MaterialPropertySearchFunction"
+        },
+        {
+          "name": "recall_memory"
+        }
+      ],
+      "response": "명확한 원인을 찾았습니다! 🎯\n\n## 🚨 MaterialPropertySearchFunction 실패 원인\n\n### **주요 문제: DynamoDB 처리량 초과**\n- **에러 타입**: `ProvisionedThroughputExceededException`\n- **발생 빈도**: 지난 24시간 동안 **21회** 발생\n- **최근 발생**: 2026-11-06 02:05:26 UTC\n\n### 📊 상세 분석\n현재 DynamoDB 테이블의 프로비저닝된 처리량이 검색 요청을 감당하지 못하고 있습니다.\n\n---\n\n## ✅ 해결 방안 (우선순위 순)\n\n1. **DynamoDB 용량 확인**\n   - 현재 테이블의 Read/Write 용량 확인\n   - 온디맨드(On-Demand) 모드로 변경 검토\n\n2. **배치 크기 최적화** (코드 수정)\n   - 한 번에 조회하는 항목 수 감소\n   - 쿼리 필터 조건 개선\n\n3. **재시도 로직 강화**\n   - 지수 백오프(Exponential Backoff) 적용\n   - 최대 재시도 횟수 설정\n\n4. **Node.js 버전 업데이트**\n   - AWS SDK v3 호환성 경고 해결\n   - Node.js 22 이상으로 업그레이드\n\n---\n\n더 자세한 해결책이 필요하신가요? 특정 코드 수정안이나 DynamoDB 설정 변경을 도와드릴 수 있습니다! 💪",
+      "metrics": {
+        "runId": "6befbe39-5136-4ddc-bbea-c11cd307fa23",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7192,
+        "outputTokens": 783,
+        "estimatedCostUsd": 0.011106999999999999,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 1,
+            "resultChars": 825
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 203
+          },
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          }
+        ],
+        "latencyMs": 4444
+      }
+    },
+    {
+      "id": "s20",
+      "run": 1,
+      "source": "format-based",
+      "title": "스로틀링과 무관한 경고가 섞인 로그 (주원인 식별)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "처리량",
+          "throughput",
+          "Throughput",
+          "용량",
+          "ProvisionedThroughputExceeded"
+        ],
+        "fix": [
+          "재시도",
+          "백오프",
+          "backoff",
+          "용량",
+          "온디맨드"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "MaterialPropertySearchFunction"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "MaterialPropertySearchFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "MaterialPropertySearchFunction"
+        }
+      ],
+      "response": "문제를 파악했습니다! 🚨 **MaterialPropertySearchFunction**이 실패하는 주요 원인은:\n\n## 🔴 **주요 문제: DynamoDB 용량 초과**\n\n| 지표 | 수치 |\n|------|------|\n| 에러율 | **15%** (21/140 호출) |\n| 에러 타입 | **ProvisionedThroughputExceededException** |\n| 평균 응답시간 | 700ms |\n\n### 📊 상세 분석\n\n1. **DynamoDB 스로틀링** (주요 원인)\n   - 테이블의 프로비저닝된 처리량이 현재 요청을 감당하지 못함\n   - 자동 스케일링 중이지만 충분하지 않은 상태\n\n2. **Node.js 버전 경고** (부수적)\n   - AWS SDK v3가 2027년 1월 이후 Node >=22 요구\n   - 현재 런타임 버전 확인 필요\n\n### ✅ **해결 방안**\n\n1. **DynamoDB 용량 즉시 조정**\n   - 온디맨드 청구 모드로 변경 (권장)\n   - 또는 프로비저닝된 용량 증가 (읽기/쓰기 용량 단위 상향)\n\n2. **쿼리 최적화**\n   - 배치 처리 크기 조절\n   - 불필요한 스캔 제거 → 쿼리 사용\n\n3. **지수 백오프 재시도 로직 추가**\n   ```javascript\n   // 코드 변경 제안 (MaterialPropertySearchFunction)\n   const maxRetries = 3;\n   const backoffMultiplier = 2;\n   ```\n\n4. **Node.js 런타임 업그레이드**\n   - Lambda 런타임을 Node.js 22.x로 업데이트\n\n이 중 **DynamoDB 온디맨드 모드 전환**이 가장 빠른 해결책입니다! 💡\n\n구체적인 설정 변경을 도와드릴까요?",
+      "metrics": {
+        "runId": "8fdb377f-1f75-4361-8c66-5627badb8c18",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7376,
+        "outputTokens": 965,
+        "estimatedCostUsd": 0.012201,
+        "toolCalls": 4,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 825
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 340
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 203
+          }
+        ],
+        "latencyMs": 5410
+      }
+    },
+    {
+      "id": "s20",
+      "run": 2,
+      "source": "format-based",
+      "title": "스로틀링과 무관한 경고가 섞인 로그 (주원인 식별)",
+      "cause": true,
+      "fix": true,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": true,
+      "matched": {
+        "cause": [
+          "처리량",
+          "throughput",
+          "Throughput",
+          "용량",
+          "ProvisionedThroughputExceeded"
+        ],
+        "fix": [
+          "재시도",
+          "백오프",
+          "backoff",
+          "용량",
+          "온디맨드",
+          "on-demand",
+          "인덱스"
+        ],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "recall_memory"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "MaterialPropertySearchFunction"
+        },
+        {
+          "name": "get_error_summary",
+          "functionName": "MaterialPropertySearchFunction"
+        }
+      ],
+      "response": "문제를 찾았습니다! 🚨 **MaterialPropertySearchFunction**이 실패하는 주요 원인은:\n\n## 🎯 주요 원인\n**DynamoDB 용량 초과** - `ProvisionedThroughputExceededException`\n- 지난 24시간 동안 **21건의 에러** 발생\n- 테이블의 프로비저닝된 처리량이 현재 요청을 감당하지 못함\n\n## 📊 에러 분포\n| 에러 타입 | 발생 횟수 | 최근 발생 |\n|---------|---------|---------|\n| ProvisionedThroughputExceededException | 21건 | 2026-11-06 02:05 |\n| NodeVersionSupportWarning | 1건 | 2026-11-06 02:05 |\n\n## ✅ 해결 방법\n\n1. **즉시 조치 (단기)**\n   - DynamoDB 테이블의 프로비저닝된 읽기/쓰기 용량 증가\n   - 또는 온디맨드(On-Demand) 모드로 전환 검토\n\n2. **코드 개선 (중기)**\n   - 지수 백오프(Exponential Backoff) 재시도 로직 추가\n   - 배치 요청 크기 최적화\n\n3. **아키텍처 개선 (장기)**\n   - DynamoDB 쿼리 최적화 (인덱스 활용)\n   - 캐싱 레이어 추가 (ElastiCache 등)\n\n4. **Node.js 버전 업그레이드**\n   - AWS SDK v3 호환성을 위해 Node 22 이상 사용 권장\n\n더 자세한 분석이 필요하신가요? 📋",
+      "metrics": {
+        "runId": "1a38a23d-59cc-4d0f-8a88-7e595eceeabd",
+        "turns": 2,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 2
+        },
+        "inputTokens": 7192,
+        "outputTokens": 806,
+        "estimatedCostUsd": 0.011222,
+        "toolCalls": 3,
+        "toolErrors": 0,
+        "tools": [
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 2
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 825
+          },
+          {
+            "name": "get_error_summary",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 203
+          }
+        ],
+        "latencyMs": 4801
+      }
+    }
+  ]
+}
