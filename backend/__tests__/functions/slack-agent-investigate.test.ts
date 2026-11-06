@@ -204,25 +204,60 @@ describe('orchestrator with submit_diagnosis', () => {
     expect(seen[0]).toEqual(['get_recent_changes', 'submit_diagnosis']);
   });
 
-  it('forces a tool call on every turn and the submission on the last turn when a diagnosis is required', async () => {
+  const submit = (verdict: string) => ({ toolUse: { toolUseId: 'end', name: 'submit_diagnosis', input: { verdict, summary: '요약입니다.' } } });
+  const reply = (content: unknown[]) => ({ output: { message: { role: 'assistant', content } }, usage }) as unknown as ConverseCommandOutput;
+
+  it('lets the model investigate and forces the submission when it tries to end with text', async () => {
     const choices: unknown[] = [];
+    const lastUser: string[] = [];
+    const replies = [
+      reply([{ toolUse: { toolUseId: 't1', name: 'get_recent_changes', input: {} } }]),
+      reply([{ text: '변경 이력을 보니 배포가 원인 같습니다.' }]),
+      reply([submit('hypothesis')]),
+    ];
     const converse = jest.fn(async (input: ConverseCommandInput) => {
       choices.push(input.toolConfig?.toolChoice);
-      const last = choices.length === 10;
-      const toolUse = last
-        ? { toolUseId: 'end', name: 'submit_diagnosis', input: { verdict: 'insufficient_evidence', summary: '근거가 부족합니다.' } }
-        : { toolUseId: `t${choices.length}`, name: 'get_recent_changes', input: {} };
-      return { output: { message: { role: 'assistant', content: [{ toolUse }] } }, usage } as unknown as ConverseCommandOutput;
+      const last = input.messages?.[input.messages.length - 1];
+      lastUser.push(String(last?.content?.[0]?.text ?? ''));
+      return replies.shift()!;
     });
     const executeTool = jest.fn(async () => ({ success: true, data: { changes: [] } }));
     const result = await runReActAgent('원인 찾아줘', { userId: 'U', channelId: 'C' }, {
       converse, executeTool, emit: false, modelOverride: HAIKU, toolNames: ['get_recent_changes', 'submit_diagnosis'], requireDiagnosis: true,
     });
-    expect(choices[0]).toEqual({ any: {} });
-    expect(choices[8]).toEqual({ any: {} });
+    expect(choices).toEqual([undefined, undefined, { tool: { name: 'submit_diagnosis' } }]);
+    expect(lastUser[2]).toContain('submit_diagnosis');
+    expect(result.diagnosis).toMatchObject({ verdict: 'hypothesis' });
+    expect(result.metrics.stopReason).toBe('final');
+  });
+
+  it('forces the submission on the last turn so a long run still ends with a diagnosis', async () => {
+    const choices: unknown[] = [];
+    const converse = jest.fn(async (input: ConverseCommandInput) => {
+      choices.push(input.toolConfig?.toolChoice);
+      return choices.length === 10
+        ? reply([submit('insufficient_evidence')])
+        : reply([{ toolUse: { toolUseId: `t${choices.length}`, name: 'get_recent_changes', input: {} } }]);
+    });
+    const executeTool = jest.fn(async () => ({ success: true, data: { changes: [] } }));
+    const result = await runReActAgent('원인 찾아줘', { userId: 'U', channelId: 'C' }, {
+      converse, executeTool, emit: false, modelOverride: HAIKU, toolNames: ['get_recent_changes', 'submit_diagnosis'], requireDiagnosis: true,
+    });
+    expect(choices[8]).toBeUndefined();
     expect(choices[9]).toEqual({ tool: { name: 'submit_diagnosis' } });
     expect(result.diagnosis).toMatchObject({ verdict: 'insufficient_evidence' });
-    expect(result.metrics.stopReason).toBe('final');
+  });
+
+  it('tells the model the current time only when given', async () => {
+    const systems: string[] = [];
+    const converse = jest.fn(async (input: ConverseCommandInput) => {
+      systems.push(String(input.system?.[0]?.text ?? ''));
+      return reply([{ text: '정상입니다.' }]);
+    });
+    await runReActAgent('상태', { userId: 'U', channelId: 'C' }, { converse, emit: false, modelOverride: HAIKU, systemPrompt: '기본', currentTime: '2026-11-06T10:10:00.000Z' });
+    await runReActAgent('상태', { userId: 'U', channelId: 'C' }, { converse, emit: false, modelOverride: HAIKU, systemPrompt: '기본' });
+    expect(systems[0]).toContain('2026-11-06T10:10:00.000Z');
+    expect(systems[1]).toBe('기본');
   });
 
   it('leaves the tool choice to the model by default', async () => {

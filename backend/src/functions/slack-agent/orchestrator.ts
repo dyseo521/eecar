@@ -18,7 +18,7 @@ import {
 import { AgentStep, ToolResult } from './types.js';
 import { JADONG_SYSTEM_PROMPT } from './prompts/system.js';
 import { PRODUCTION_TOOL_NAMES, TOOLS, executeTool } from './tools/index.js';
-import { Diagnosis, renderDiagnosis } from './tools/diagnosis.js';
+import { Diagnosis, renderDiagnosis, DIAGNOSIS_FINALIZE_PROMPT, currentTimeSection } from './tools/diagnosis.js';
 import { emitMetrics } from '/opt/nodejs/utils/emf.js';
 
 const bedrockClient = new BedrockRuntimeClient({ region: 'ap-northeast-2' });
@@ -71,9 +71,12 @@ export interface AgentDeps {
   toolNames?: string[];
   /**
    * 구조화 진단으로만 끝나게 한다 (A-40). 프롬프트로 요청하면 Haiku 4.5는 60회 중 1회만 제출했다(dev 측정).
-   * 매 턴 도구 호출을 강제하고, 마지막 턴에는 제출을 강제해 한도에 닿아도 빈손으로 끝나지 않게 한다.
+   * 조사는 모델에 맡기고, 텍스트로 끝내려는 시점과 마지막 턴에만 제출을 강제한다.
+   * 매 턴 도구 호출을 강제하면 평균 턴과 비용이 2배가 됐고 판정 결과는 나아지지 않았다.
    */
   requireDiagnosis?: boolean;
+  /** 시스템 프롬프트에 넣을 현재 시각(ISO). 평가에서는 시나리오 시계를 쓴다 */
+  currentTime?: string;
 }
 
 // 기본 모델과 복잡한 분석용 모델 (template.yaml에서 주입, 퇴역 모델 하드코딩 제거: DECISION_LOG A-11)
@@ -168,6 +171,7 @@ export async function runReActAgent(
   // 도구 호출과 함께 쓴 분석 텍스트. 마지막 턴이 짧은 마무리만 쓰면 이것을 앞에 붙인다 (A-35)
   let lastAnalysis = '';
   let diagnosis: Diagnosis | undefined;
+  let finalizing = false;
 
   // Bedrock Converse API용 도구 정의
   const offered = deps.toolNames ?? PRODUCTION_TOOL_NAMES;
@@ -190,12 +194,12 @@ export async function runReActAgent(
       const modelId = deps.modelOverride ?? selectModel(userMessage, turnCount);
       const response = await converse({
         modelId,
-        system: [{ text: deps.systemPrompt ?? JADONG_SYSTEM_PROMPT }],
+        system: [{ text: (deps.systemPrompt ?? JADONG_SYSTEM_PROMPT) + (deps.currentTime ? currentTimeSection(deps.currentTime) : '') }],
         messages,
         toolConfig: {
           tools,
-          ...(deps.requireDiagnosis
-            ? { toolChoice: turnCount === MAX_TURNS ? { tool: { name: 'submit_diagnosis' } } : { any: {} } }
+          ...(deps.requireDiagnosis && (finalizing || turnCount === MAX_TURNS)
+            ? { toolChoice: { tool: { name: 'submit_diagnosis' } } }
             : {}),
         },
         inferenceConfig: {
@@ -298,6 +302,13 @@ export async function runReActAgent(
         });
 
         // 다음 턴으로 계속
+        continue;
+      }
+
+      // 구조화 진단이 필요하면 텍스트로 끝내지 않고 제출을 받는다 (앞의 분석은 대화에 남아 있다)
+      if (textResponse && deps.requireDiagnosis && !finalizing) {
+        finalizing = true;
+        messages.push({ role: 'user', content: [{ text: DIAGNOSIS_FINALIZE_PROMPT }] });
         continue;
       }
 

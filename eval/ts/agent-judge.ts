@@ -16,7 +16,8 @@
  */
 import { readFileSync, writeFileSync } from 'fs';
 import { BedrockRuntimeClient, ConverseCommand } from '@aws-sdk/client-bedrock-runtime';
-import { makeTools } from './agent-eval.js';
+import { makeTools, scenarioClock } from './agent-eval.js';
+import { currentTimeSection } from '../../backend/src/functions/slack-agent/tools/diagnosis.js';
 
 const args = process.argv.slice(2);
 const all = (name: string) => args.flatMap((a, i) => (a === `--${name}` ? [args[i + 1]] : []));
@@ -183,7 +184,7 @@ async function main(): Promise<void> {
       if (!truth) continue;
       const evidence = await fullEvidence(scenario, r.steps);
       const head = `## 사용자 질문\n${scenario.message}\n\n## 정답 요지\n- 원인: ${truth.cause}\n- 올바른 조치(한 가지 예): ${truth.fix}\n\n`;
-      const c = await callTool(CAUSE_RUBRIC, `${head}## 도우미가 원래 아는 정보 (시스템 프롬프트)\n${promptFor(variant)}\n\n## 도우미가 조회한 자료\n${evidence}\n\n## 진단 도우미의 답변\n${r.response}`, CAUSE_TOOL);
+      const c = await callTool(CAUSE_RUBRIC, `${head}## 도우미가 원래 아는 정보 (시스템 프롬프트)\n${promptFor(variant)}${variant === 'candidate' ? currentTimeSection(scenarioClock(scenario)) : ''}\n\n## 도우미가 조회한 자료\n${evidence}\n\n## 진단 도우미의 답변\n${r.response}`, CAUSE_TOOL);
       const f = await callTool(FIX_RUBRIC, `${head}## 진단 도우미의 답변\n${r.response}`, FIX_TOOL);
       inTok += c.inTok + f.inTok; outTok += c.outTok + f.outTok;
       const fix = fixLabel(f.input);
