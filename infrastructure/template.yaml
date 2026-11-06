@@ -135,10 +135,19 @@ Resources:
                 - !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*'
                 - 'arn:aws:bedrock:*::foundation-model/*'
                 - 'arn:aws:bedrock:::foundation-model/*'
+            # 규정 준수 검사 비동기 호출 (이전에는 모든 함수에 열려 있었다)
             - Effect: Allow
               Action:
                 - lambda:InvokeFunction
-              Resource: '*'
+              Resource: !GetAtt ComplianceCheckFunction.Arn
+            # 등록한 부품의 벡터를 S3 Vectors 색인에 넣는다. 이 권한이 없어 PutVectors가 AccessDenied로 실패했고,
+            # 오류는 잡아서 로그만 남겨 새 부품이 벡터 검색에 잡히지 않았다 (DECISION_LOG A-37)
+            - Effect: Allow
+              Action:
+                - s3vectors:PutVectors
+              Resource:
+                - 'arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628'
+                - 'arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/parts-vectors'
       Environment:
         Variables:
           COMPLIANCE_FUNCTION_NAME: !Ref ComplianceCheckFunction
