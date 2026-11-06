@@ -167,13 +167,30 @@ function isKnown(name: string): string | undefined {
 const LEVEL = (m: string): 'ERROR' | 'WARN' | 'INFO' =>
   /error|exception|fatal/i.test(m) ? 'ERROR' : /warn/i.test(m) ? 'WARN' : 'INFO';
 
+const ISO_PREFIX = /^\d{4}-\d{2}-\d{2}T[\d:.]+Z/;
+/**
+ * 시각이 없는 이전 시나리오(v1·v2) 로그와 기본 시계로 쓰는 고정 시각.
+ * 실행 시각을 쓰면 v3 로그 앞에 모순되는 시각이 붙고, 판정 때 다시 실행한 결과와도 달라져
+ * 시간 순서를 판단할 수 없었고 "시각을 지어냈다"는 허위 오진이 나왔다 (E-34).
+ */
+const FIXED_CLOCK = Date.parse('2026-11-06T12:00:00Z');
+
 function logEntries(lines: string[]) {
-  const now = Date.now();
-  return lines.map((message, i) => ({
-    timestamp: new Date(now - (lines.length - i) * 60_000).toISOString(),
-    message: `${new Date(now - (lines.length - i) * 60_000).toISOString()}\treq-${i}\t${message}`,
-    level: LEVEL(message),
-  }));
+  return lines.map((message, i) => {
+    const own = ISO_PREFIX.exec(message)?.[0];
+    const timestamp = own ?? new Date(FIXED_CLOCK - (lines.length - i) * 60_000).toISOString();
+    return { timestamp, message: own ? message : `${timestamp}\treq-${i}\t${message}`, level: LEVEL(message) };
+  });
+}
+
+/** 시나리오의 "지금": 로그와 변경 이력에서 가장 늦은 시각의 5분 뒤. 시각이 없으면 고정 시각 */
+export function scenarioClock(scenario: Scenario): string {
+  normalizeScenario(scenario);
+  const times = [
+    ...Object.values(scenario.functions).flatMap(f => (f.logs ?? []).map(l => ISO_PREFIX.exec(l)?.[0])),
+    ...(scenario.world?.changes ?? []).map(c => c.time),
+  ].map(t => (t ? Date.parse(t) : NaN)).filter(t => !Number.isNaN(t));
+  return new Date(times.length ? Math.max(...times) + 5 * 60_000 : FIXED_CLOCK).toISOString();
 }
 
 function healthy(name: string) {
@@ -219,12 +236,13 @@ export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, 
         }
         if (found?.fixture.status) {
           const s = found.fixture.status;
-          const lastErrorLine = (found.fixture.logs ?? []).find(l => LEVEL(l) === 'ERROR');
+          const errorLines = (found.fixture.logs ?? []).filter(l => LEVEL(l) === 'ERROR');
+          const lastErrorLine = errorLines[errorLines.length - 1];
           return {
             success: true,
             data: {
               functionName: fn, ...baseStatus(s), errorRate: s.invocations ? (s.errors / s.invocations) * 100 : 0,
-              ...(s.errors > 0 && lastErrorLine ? { lastError: { message: lastErrorLine, timestamp: new Date().toISOString() } } : {}),
+              ...(s.errors > 0 && lastErrorLine ? { lastError: { message: lastErrorLine, timestamp: ISO_PREFIX.exec(lastErrorLine)?.[0] ?? new Date(FIXED_CLOCK).toISOString() } } : {}),
             },
           };
         }
@@ -251,7 +269,8 @@ export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, 
       }
       case 'get_error_summary': {
         const rows = found?.fixture.errorSummary ?? [];
-        return { success: true, data: rows.map(([errorType, count]) => ({ errorType, count, lastOccurred: new Date().toISOString() })) };
+        const lastOccurred = logEntries(found?.fixture.logs ?? []).filter(e => e.level === 'ERROR').pop()?.timestamp ?? scenarioClock(scenario);
+        return { success: true, data: rows.map(([errorType, count]) => ({ errorType, count, lastOccurred })) };
       }
       case 'recall_memory':
         return { success: true, data: [] };
@@ -354,6 +373,8 @@ async function main(): Promise<void> {
         outcome = await runReActAgent(scenario.message, { userId: 'eval', channelId: 'eval' }, {
           executeTool: makeTools(scenario, calls, analyzeError, variant === 'baseline'), emit: false, modelOverride: model,
           ...baselineDeps,
+          // 운영 v1.9.1에는 현재 시각이 없다. 후보에만 넣는다
+          ...(variant === 'candidate' ? { currentTime: scenarioClock(scenario) } : {}),
         });
       } finally {
         console.log = originalLog;

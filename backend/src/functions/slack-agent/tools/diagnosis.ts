@@ -70,6 +70,21 @@ export const SUBMIT_DIAGNOSIS_TOOL: Tool = {
   },
 };
 
+/**
+ * 조사를 마친 뒤 제출을 강제할 때 함께 주는 지시 (A-40).
+ * dev에서 근거 부족 사례의 대부분을 root_cause로 단정했다. 결론을 쓰는 시점에 판정 기준을 다시 확인하게 한다.
+ */
+export const DIAGNOSIS_FINALIZE_PROMPT = `조사 결과를 submit_diagnosis로 제출하세요. 제출 전에 확인하세요.
+- root_cause는 증상을 직접 설명하는 도구 결과를 evidence에 옮길 수 있을 때만 씁니다. 시각이 비슷한 변경이 있다는 것만으로는 hypothesis입니다.
+- 호출 주체나 요청 내용처럼 원인을 가르는 신호를 볼 수 없으면 insufficient_evidence입니다.
+- 오류가 이미 멈췄고 지금 정상이면 no_fault입니다. 마지막 오류 시각과 현재 시각을 비교하세요.
+- 원인을 확인하지 못했으면 fix.action에는 코드·설정 변경이 아니라 다음에 확인할 것을 씁니다.
+- evidence와 cause에는 도구 결과에 있는 값만 씁니다.`;
+
+/** 시스템 프롬프트에 붙이는 현재 시각. 없으면 모델은 "최근"이나 "이미 회복됨"을 판단할 기준이 없다 (A-40) */
+export const currentTimeSection = (iso: string): string =>
+  `\n\n# 현재 시각\n${iso} (UTC). 로그와 변경 이력의 시각도 UTC다. "최근"과 "이미 회복됨"은 이 시각을 기준으로 판단한다.`;
+
 const VERDICT_LABEL: Record<string, string> = {
   root_cause: '🎯 원인 확인',
   hypothesis: '🔍 가설 (확인 필요)',
