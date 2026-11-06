@@ -1,0 +1,1400 @@
+{
+  "exportedAt": "2026-11-06T03:35:19.064Z",
+  "functions": {
+    "VectorSearchFunction": {
+      "config": {
+        "functionName": "VectorSearchFunction",
+        "found": true,
+        "runtime": "nodejs24.x",
+        "handler": "index.handler",
+        "timeoutSec": 60,
+        "memoryMB": 1024,
+        "ephemeralStorageMB": 512,
+        "architecture": "x86_64",
+        "lastModified": "2026-11-06T00:53:03.000+0000",
+        "state": "Active",
+        "lastUpdateStatus": "Successful",
+        "environment": {
+          "DOCUMENTS_BUCKET_NAME": "eecar-documents-425454508084",
+          "KNOWLEDGE_BASE_ID": "",
+          "SNS_TOPIC_ARN": "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications",
+          "PARTS_TABLE_NAME": "eecar-parts-table",
+          "S3_VECTORS_INDEX": "parts-vectors",
+          "S3_VECTORS_BUCKET": "eecar-vectors-index-12234628",
+          "USE_S3_VECTORS": "true",
+          "VECTORS_BUCKET_NAME": "eecar-vectors-425454508084",
+          "USE_KNOWLEDGE_BASE": "false",
+          "QUERY_EXPANSION_ENABLED": "false",
+          "BEDROCK_MODEL_ID": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+        },
+        "layers": [
+          {
+            "name": "eecar-utils-layer",
+            "version": 27,
+            "createdDate": "2026-11-06T00:52:52.734+0000",
+            "latestVersion": 27,
+            "latestCreatedDate": "2026-11-06T00:52:52.734+0000",
+            "isLatest": true
+          }
+        ],
+        "roleName": "eecar-stack-VectorSearchFunctionRole-8ndl79eaAkbw"
+      },
+      "permissions": {
+        "functionName": "VectorSearchFunction",
+        "found": true,
+        "roleName": "eecar-stack-VectorSearchFunctionRole-8ndl79eaAkbw",
+        "statements": [
+          {
+            "policy": "VectorSearchFunctionRolePolicy0",
+            "effect": "Allow",
+            "actions": [
+              "dynamodb:GetItem",
+              "dynamodb:DeleteItem",
+              "dynamodb:PutItem",
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:UpdateItem",
+              "dynamodb:BatchWriteItem",
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable",
+              "dynamodb:ConditionCheckItem"
+            ],
+            "resources": [
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table",
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*"
+            ]
+          },
+          {
+            "policy": "VectorSearchFunctionRolePolicy1",
+            "effect": "Allow",
+            "actions": [
+              "s3:GetObject",
+              "s3:ListBucket",
+              "s3:GetBucketLocation",
+              "s3:GetObjectVersion",
+              "s3:GetLifecycleConfiguration"
+            ],
+            "resources": [
+              "arn:aws:s3:::eecar-vectors-425454508084",
+              "arn:aws:s3:::eecar-vectors-425454508084/*"
+            ]
+          },
+          {
+            "policy": "VectorSearchFunctionRolePolicy2",
+            "effect": "Allow",
+            "actions": [
+              "bedrock:InvokeModel",
+              "bedrock:InvokeModelWithResponseStream"
+            ],
+            "resources": [
+              "arn:aws:bedrock:ap-northeast-2:425454508084:inference-profile/*",
+              "arn:aws:bedrock:*::foundation-model/*",
+              "arn:aws:bedrock:::foundation-model/*"
+            ]
+          },
+          {
+            "policy": "VectorSearchFunctionRolePolicy2",
+            "effect": "Allow",
+            "actions": [
+              "s3vectors:QueryVectors",
+              "s3vectors:GetVectors",
+              "s3vectors:ListIndexes",
+              "s3vectors:GetIndex"
+            ],
+            "resources": [
+              "arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628",
+              "arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/parts-vectors"
+            ]
+          },
+          {
+            "policy": "VectorSearchFunctionRolePolicy2",
+            "effect": "Allow",
+            "actions": [
+              "bedrock:Retrieve",
+              "bedrock:RetrieveAndGenerate"
+            ],
+            "resources": [
+              "arn:aws:bedrock:ap-northeast-2:425454508084:knowledge-base/*"
+            ]
+          },
+          {
+            "policy": "AWSXrayWriteOnlyAccess",
+            "effect": "Allow",
+            "actions": [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "xray:GetSamplingRules",
+              "xray:GetSamplingTargets",
+              "xray:GetSamplingStatisticSummaries"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "AWSLambdaBasicExecutionRole",
+            "effect": "Allow",
+            "actions": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ]
+      }
+    },
+    "PartRegistrationFunction": {
+      "config": {
+        "functionName": "PartRegistrationFunction",
+        "found": true,
+        "runtime": "nodejs24.x",
+        "handler": "index.handler",
+        "timeoutSec": 60,
+        "memoryMB": 1024,
+        "ephemeralStorageMB": 512,
+        "architecture": "x86_64",
+        "lastModified": "2026-11-06T00:53:06.000+0000",
+        "state": "Active",
+        "lastUpdateStatus": "Successful",
+        "environment": {
+          "COMPLIANCE_FUNCTION_NAME": "eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd",
+          "DOCUMENTS_BUCKET_NAME": "eecar-documents-425454508084",
+          "KNOWLEDGE_BASE_ID": "",
+          "SNS_TOPIC_ARN": "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications",
+          "PARTS_TABLE_NAME": "eecar-parts-table",
+          "S3_VECTORS_INDEX": "parts-vectors",
+          "S3_VECTORS_BUCKET": "eecar-vectors-index-12234628",
+          "USE_S3_VECTORS": "true",
+          "VECTORS_BUCKET_NAME": "eecar-vectors-425454508084",
+          "USE_KNOWLEDGE_BASE": "false",
+          "QUERY_EXPANSION_ENABLED": "false",
+          "BEDROCK_MODEL_ID": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+        },
+        "layers": [
+          {
+            "name": "eecar-utils-layer",
+            "version": 27,
+            "createdDate": "2026-11-06T00:52:52.734+0000",
+            "latestVersion": 27,
+            "latestCreatedDate": "2026-11-06T00:52:52.734+0000",
+            "isLatest": true
+          }
+        ],
+        "roleName": "eecar-stack-PartRegistrationFunctionRole-HqattZHu26oP"
+      },
+      "permissions": {
+        "functionName": "PartRegistrationFunction",
+        "found": true,
+        "roleName": "eecar-stack-PartRegistrationFunctionRole-HqattZHu26oP",
+        "statements": [
+          {
+            "policy": "PartRegistrationFunctionRolePolicy0",
+            "effect": "Allow",
+            "actions": [
+              "dynamodb:GetItem",
+              "dynamodb:DeleteItem",
+              "dynamodb:PutItem",
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:UpdateItem",
+              "dynamodb:BatchWriteItem",
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable",
+              "dynamodb:ConditionCheckItem"
+            ],
+            "resources": [
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table",
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*"
+            ]
+          },
+          {
+            "policy": "PartRegistrationFunctionRolePolicy1",
+            "effect": "Allow",
+            "actions": [
+              "s3:GetObject",
+              "s3:ListBucket",
+              "s3:GetBucketLocation",
+              "s3:GetObjectVersion",
+              "s3:PutObject",
+              "s3:PutObjectAcl",
+              "s3:GetLifecycleConfiguration",
+              "s3:PutLifecycleConfiguration",
+              "s3:DeleteObject"
+            ],
+            "resources": [
+              "arn:aws:s3:::eecar-vectors-425454508084",
+              "arn:aws:s3:::eecar-vectors-425454508084/*"
+            ]
+          },
+          {
+            "policy": "PartRegistrationFunctionRolePolicy2",
+            "effect": "Allow",
+            "actions": [
+              "bedrock:InvokeModel",
+              "bedrock:InvokeModelWithResponseStream"
+            ],
+            "resources": [
+              "arn:aws:bedrock:ap-northeast-2:425454508084:inference-profile/*",
+              "arn:aws:bedrock:*::foundation-model/*",
+              "arn:aws:bedrock:::foundation-model/*"
+            ]
+          },
+          {
+            "policy": "PartRegistrationFunctionRolePolicy2",
+            "effect": "Allow",
+            "actions": [
+              "lambda:InvokeFunction"
+            ],
+            "resources": [
+              "arn:aws:lambda:ap-northeast-2:425454508084:function:eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd"
+            ]
+          },
+          {
+            "policy": "PartRegistrationFunctionRolePolicy2",
+            "effect": "Allow",
+            "actions": [
+              "s3vectors:PutVectors"
+            ],
+            "resources": [
+              "arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628",
+              "arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/parts-vectors"
+            ]
+          },
+          {
+            "policy": "AWSXrayWriteOnlyAccess",
+            "effect": "Allow",
+            "actions": [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "xray:GetSamplingRules",
+              "xray:GetSamplingTargets",
+              "xray:GetSamplingStatisticSummaries"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "AWSLambdaBasicExecutionRole",
+            "effect": "Allow",
+            "actions": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ]
+      }
+    },
+    "ComplianceCheckFunction": {
+      "config": {
+        "functionName": "ComplianceCheckFunction",
+        "found": true,
+        "runtime": "nodejs24.x",
+        "handler": "index.handler",
+        "timeoutSec": 30,
+        "memoryMB": 512,
+        "ephemeralStorageMB": 512,
+        "architecture": "x86_64",
+        "lastModified": "2026-11-06T00:52:56.000+0000",
+        "state": "Active",
+        "lastUpdateStatus": "Successful",
+        "environment": {
+          "DOCUMENTS_BUCKET_NAME": "eecar-documents-425454508084",
+          "KNOWLEDGE_BASE_ID": "",
+          "SNS_TOPIC_ARN": "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications",
+          "PARTS_TABLE_NAME": "eecar-parts-table",
+          "S3_VECTORS_INDEX": "parts-vectors",
+          "S3_VECTORS_BUCKET": "eecar-vectors-index-12234628",
+          "USE_S3_VECTORS": "true",
+          "VECTORS_BUCKET_NAME": "eecar-vectors-425454508084",
+          "USE_KNOWLEDGE_BASE": "false",
+          "QUERY_EXPANSION_ENABLED": "false",
+          "BEDROCK_MODEL_ID": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+        },
+        "layers": [
+          {
+            "name": "eecar-utils-layer",
+            "version": 27,
+            "createdDate": "2026-11-06T00:52:52.734+0000",
+            "latestVersion": 27,
+            "latestCreatedDate": "2026-11-06T00:52:52.734+0000",
+            "isLatest": true
+          }
+        ],
+        "roleName": "eecar-stack-ComplianceCheckFunctionRole-xbXyccpNGbWj"
+      },
+      "permissions": {
+        "functionName": "ComplianceCheckFunction",
+        "found": true,
+        "roleName": "eecar-stack-ComplianceCheckFunctionRole-xbXyccpNGbWj",
+        "statements": [
+          {
+            "policy": "ComplianceCheckFunctionRolePolicy0",
+            "effect": "Allow",
+            "actions": [
+              "s3:GetObject",
+              "s3:ListBucket",
+              "s3:GetBucketLocation",
+              "s3:GetObjectVersion",
+              "s3:GetLifecycleConfiguration"
+            ],
+            "resources": [
+              "arn:aws:s3:::eecar-documents-425454508084",
+              "arn:aws:s3:::eecar-documents-425454508084/*"
+            ]
+          },
+          {
+            "policy": "ComplianceCheckFunctionRolePolicy1",
+            "effect": "Allow",
+            "actions": [
+              "sns:Publish"
+            ],
+            "resources": [
+              "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications"
+            ]
+          },
+          {
+            "policy": "ComplianceCheckFunctionRolePolicy2",
+            "effect": "Allow",
+            "actions": [
+              "bedrock:InvokeModel",
+              "bedrock:InvokeModelWithResponseStream"
+            ],
+            "resources": [
+              "arn:aws:bedrock:ap-northeast-2:425454508084:inference-profile/*",
+              "arn:aws:bedrock:*::foundation-model/*",
+              "arn:aws:bedrock:::foundation-model/*"
+            ]
+          },
+          {
+            "policy": "AWSXrayWriteOnlyAccess",
+            "effect": "Allow",
+            "actions": [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "xray:GetSamplingRules",
+              "xray:GetSamplingTargets",
+              "xray:GetSamplingStatisticSummaries"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "AWSLambdaBasicExecutionRole",
+            "effect": "Allow",
+            "actions": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ]
+      }
+    },
+    "GetPartsFunction": {
+      "config": {
+        "functionName": "GetPartsFunction",
+        "found": true,
+        "runtime": "nodejs24.x",
+        "handler": "index.handler",
+        "timeoutSec": 30,
+        "memoryMB": 512,
+        "ephemeralStorageMB": 512,
+        "architecture": "x86_64",
+        "lastModified": "2026-11-06T00:52:56.000+0000",
+        "state": "Active",
+        "lastUpdateStatus": "Successful",
+        "environment": {
+          "DOCUMENTS_BUCKET_NAME": "eecar-documents-425454508084",
+          "KNOWLEDGE_BASE_ID": "",
+          "SNS_TOPIC_ARN": "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications",
+          "PARTS_TABLE_NAME": "eecar-parts-table",
+          "S3_VECTORS_INDEX": "parts-vectors",
+          "S3_VECTORS_BUCKET": "eecar-vectors-index-12234628",
+          "USE_S3_VECTORS": "true",
+          "VECTORS_BUCKET_NAME": "eecar-vectors-425454508084",
+          "USE_KNOWLEDGE_BASE": "false",
+          "QUERY_EXPANSION_ENABLED": "false",
+          "BEDROCK_MODEL_ID": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+        },
+        "layers": [
+          {
+            "name": "eecar-utils-layer",
+            "version": 27,
+            "createdDate": "2026-11-06T00:52:52.734+0000",
+            "latestVersion": 27,
+            "latestCreatedDate": "2026-11-06T00:52:52.734+0000",
+            "isLatest": true
+          }
+        ],
+        "roleName": "eecar-stack-GetPartsFunctionRole-jrlvazVqsSho"
+      },
+      "permissions": {
+        "functionName": "GetPartsFunction",
+        "found": true,
+        "roleName": "eecar-stack-GetPartsFunctionRole-jrlvazVqsSho",
+        "statements": [
+          {
+            "policy": "GetPartsFunctionRolePolicy0",
+            "effect": "Allow",
+            "actions": [
+              "dynamodb:GetItem",
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable"
+            ],
+            "resources": [
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table",
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*"
+            ]
+          },
+          {
+            "policy": "AWSXrayWriteOnlyAccess",
+            "effect": "Allow",
+            "actions": [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "xray:GetSamplingRules",
+              "xray:GetSamplingTargets",
+              "xray:GetSamplingStatisticSummaries"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "AWSLambdaBasicExecutionRole",
+            "effect": "Allow",
+            "actions": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ]
+      }
+    },
+    "WatchPartFunction": {
+      "config": {
+        "functionName": "WatchPartFunction",
+        "found": true,
+        "runtime": "nodejs24.x",
+        "handler": "index.handler",
+        "timeoutSec": 30,
+        "memoryMB": 512,
+        "ephemeralStorageMB": 512,
+        "architecture": "x86_64",
+        "lastModified": "2026-11-06T00:52:56.000+0000",
+        "state": "Active",
+        "lastUpdateStatus": "Successful",
+        "environment": {
+          "DOCUMENTS_BUCKET_NAME": "eecar-documents-425454508084",
+          "KNOWLEDGE_BASE_ID": "",
+          "SNS_TOPIC_ARN": "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications",
+          "PARTS_TABLE_NAME": "eecar-parts-table",
+          "S3_VECTORS_INDEX": "parts-vectors",
+          "S3_VECTORS_BUCKET": "eecar-vectors-index-12234628",
+          "USE_S3_VECTORS": "true",
+          "VECTORS_BUCKET_NAME": "eecar-vectors-425454508084",
+          "USE_KNOWLEDGE_BASE": "false",
+          "QUERY_EXPANSION_ENABLED": "false",
+          "BEDROCK_MODEL_ID": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+        },
+        "layers": [
+          {
+            "name": "eecar-utils-layer",
+            "version": 27,
+            "createdDate": "2026-11-06T00:52:52.734+0000",
+            "latestVersion": 27,
+            "latestCreatedDate": "2026-11-06T00:52:52.734+0000",
+            "isLatest": true
+          }
+        ],
+        "roleName": "eecar-stack-WatchPartFunctionRole-PaWFHWYXP402"
+      },
+      "permissions": {
+        "functionName": "WatchPartFunction",
+        "found": true,
+        "roleName": "eecar-stack-WatchPartFunctionRole-PaWFHWYXP402",
+        "statements": [
+          {
+            "policy": "WatchPartFunctionRolePolicy0",
+            "effect": "Allow",
+            "actions": [
+              "dynamodb:GetItem",
+              "dynamodb:DeleteItem",
+              "dynamodb:PutItem",
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:UpdateItem",
+              "dynamodb:BatchWriteItem",
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable",
+              "dynamodb:ConditionCheckItem"
+            ],
+            "resources": [
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table",
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*"
+            ]
+          },
+          {
+            "policy": "WatchPartFunctionRolePolicy1",
+            "effect": "Allow",
+            "actions": [
+              "sns:Publish"
+            ],
+            "resources": [
+              "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications"
+            ]
+          },
+          {
+            "policy": "AWSXrayWriteOnlyAccess",
+            "effect": "Allow",
+            "actions": [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "xray:GetSamplingRules",
+              "xray:GetSamplingTargets",
+              "xray:GetSamplingStatisticSummaries"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "AWSLambdaBasicExecutionRole",
+            "effect": "Allow",
+            "actions": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ]
+      }
+    },
+    "ProposalFunction": {
+      "config": {
+        "functionName": "ProposalFunction",
+        "found": true,
+        "runtime": "nodejs24.x",
+        "handler": "index.handler",
+        "timeoutSec": 30,
+        "memoryMB": 512,
+        "ephemeralStorageMB": 512,
+        "architecture": "x86_64",
+        "lastModified": "2026-11-06T00:52:56.000+0000",
+        "state": "Active",
+        "lastUpdateStatus": "Successful",
+        "environment": {
+          "DOCUMENTS_BUCKET_NAME": "eecar-documents-425454508084",
+          "KNOWLEDGE_BASE_ID": "",
+          "SNS_TOPIC_ARN": "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications",
+          "PARTS_TABLE_NAME": "eecar-parts-table",
+          "S3_VECTORS_INDEX": "parts-vectors",
+          "S3_VECTORS_BUCKET": "eecar-vectors-index-12234628",
+          "USE_S3_VECTORS": "true",
+          "VECTORS_BUCKET_NAME": "eecar-vectors-425454508084",
+          "USE_KNOWLEDGE_BASE": "false",
+          "QUERY_EXPANSION_ENABLED": "false",
+          "BEDROCK_MODEL_ID": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+        },
+        "layers": [
+          {
+            "name": "eecar-utils-layer",
+            "version": 27,
+            "createdDate": "2026-11-06T00:52:52.734+0000",
+            "latestVersion": 27,
+            "latestCreatedDate": "2026-11-06T00:52:52.734+0000",
+            "isLatest": true
+          }
+        ],
+        "roleName": "eecar-stack-ProposalFunctionRole-iY7UEsytI37s"
+      },
+      "permissions": {
+        "functionName": "ProposalFunction",
+        "found": true,
+        "roleName": "eecar-stack-ProposalFunctionRole-iY7UEsytI37s",
+        "statements": [
+          {
+            "policy": "ProposalFunctionRolePolicy0",
+            "effect": "Allow",
+            "actions": [
+              "dynamodb:GetItem",
+              "dynamodb:DeleteItem",
+              "dynamodb:PutItem",
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:UpdateItem",
+              "dynamodb:BatchWriteItem",
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable",
+              "dynamodb:ConditionCheckItem"
+            ],
+            "resources": [
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table",
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*"
+            ]
+          },
+          {
+            "policy": "ProposalFunctionRolePolicy1",
+            "effect": "Allow",
+            "actions": [
+              "sns:Publish"
+            ],
+            "resources": [
+              "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications"
+            ]
+          },
+          {
+            "policy": "AWSXrayWriteOnlyAccess",
+            "effect": "Allow",
+            "actions": [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "xray:GetSamplingRules",
+              "xray:GetSamplingTargets",
+              "xray:GetSamplingStatisticSummaries"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "AWSLambdaBasicExecutionRole",
+            "effect": "Allow",
+            "actions": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ]
+      }
+    },
+    "SyntheticDataFunction": {
+      "config": {
+        "functionName": "SyntheticDataFunction",
+        "found": true,
+        "runtime": "nodejs24.x",
+        "handler": "index.handler",
+        "timeoutSec": 120,
+        "memoryMB": 1024,
+        "ephemeralStorageMB": 512,
+        "architecture": "x86_64",
+        "lastModified": "2026-11-06T00:52:56.000+0000",
+        "state": "Active",
+        "lastUpdateStatus": "Successful",
+        "environment": {
+          "DOCUMENTS_BUCKET_NAME": "eecar-documents-425454508084",
+          "KNOWLEDGE_BASE_ID": "",
+          "SNS_TOPIC_ARN": "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications",
+          "PARTS_TABLE_NAME": "eecar-parts-table",
+          "S3_VECTORS_INDEX": "parts-vectors",
+          "S3_VECTORS_BUCKET": "eecar-vectors-index-12234628",
+          "USE_S3_VECTORS": "true",
+          "VECTORS_BUCKET_NAME": "eecar-vectors-425454508084",
+          "USE_KNOWLEDGE_BASE": "false",
+          "QUERY_EXPANSION_ENABLED": "false",
+          "BEDROCK_MODEL_ID": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+        },
+        "layers": [
+          {
+            "name": "eecar-utils-layer",
+            "version": 27,
+            "createdDate": "2026-11-06T00:52:52.734+0000",
+            "latestVersion": 27,
+            "latestCreatedDate": "2026-11-06T00:52:52.734+0000",
+            "isLatest": true
+          }
+        ],
+        "roleName": "eecar-stack-SyntheticDataFunctionRole-0DD1VHMs7Ayk"
+      },
+      "permissions": {
+        "functionName": "SyntheticDataFunction",
+        "found": true,
+        "roleName": "eecar-stack-SyntheticDataFunctionRole-0DD1VHMs7Ayk",
+        "statements": [
+          {
+            "policy": "SyntheticDataFunctionRolePolicy0",
+            "effect": "Allow",
+            "actions": [
+              "dynamodb:GetItem",
+              "dynamodb:DeleteItem",
+              "dynamodb:PutItem",
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:UpdateItem",
+              "dynamodb:BatchWriteItem",
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable",
+              "dynamodb:ConditionCheckItem"
+            ],
+            "resources": [
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table",
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*"
+            ]
+          },
+          {
+            "policy": "SyntheticDataFunctionRolePolicy1",
+            "effect": "Allow",
+            "actions": [
+              "s3:GetObject",
+              "s3:ListBucket",
+              "s3:GetBucketLocation",
+              "s3:GetObjectVersion",
+              "s3:PutObject",
+              "s3:PutObjectAcl",
+              "s3:GetLifecycleConfiguration",
+              "s3:PutLifecycleConfiguration",
+              "s3:DeleteObject"
+            ],
+            "resources": [
+              "arn:aws:s3:::eecar-vectors-425454508084",
+              "arn:aws:s3:::eecar-vectors-425454508084/*"
+            ]
+          },
+          {
+            "policy": "SyntheticDataFunctionRolePolicy2",
+            "effect": "Allow",
+            "actions": [
+              "bedrock:InvokeModel",
+              "bedrock:InvokeModelWithResponseStream"
+            ],
+            "resources": [
+              "arn:aws:bedrock:ap-northeast-2:425454508084:inference-profile/*",
+              "arn:aws:bedrock:*::foundation-model/*",
+              "arn:aws:bedrock:::foundation-model/*"
+            ]
+          },
+          {
+            "policy": "SyntheticDataFunctionRolePolicy2",
+            "effect": "Allow",
+            "actions": [
+              "s3vectors:PutVectors"
+            ],
+            "resources": [
+              "arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628",
+              "arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/parts-vectors"
+            ]
+          },
+          {
+            "policy": "AWSXrayWriteOnlyAccess",
+            "effect": "Allow",
+            "actions": [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "xray:GetSamplingRules",
+              "xray:GetSamplingTargets",
+              "xray:GetSamplingStatisticSummaries"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "AWSLambdaBasicExecutionRole",
+            "effect": "Allow",
+            "actions": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ]
+      }
+    },
+    "BatteryHealthAssessmentFunction": {
+      "config": {
+        "functionName": "BatteryHealthAssessmentFunction",
+        "found": true,
+        "runtime": "nodejs24.x",
+        "handler": "index.handler",
+        "timeoutSec": 30,
+        "memoryMB": 512,
+        "ephemeralStorageMB": 512,
+        "architecture": "x86_64",
+        "lastModified": "2026-11-06T00:52:56.000+0000",
+        "state": "Active",
+        "lastUpdateStatus": "Successful",
+        "environment": {
+          "DOCUMENTS_BUCKET_NAME": "eecar-documents-425454508084",
+          "KNOWLEDGE_BASE_ID": "",
+          "SNS_TOPIC_ARN": "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications",
+          "PARTS_TABLE_NAME": "eecar-parts-table",
+          "S3_VECTORS_INDEX": "parts-vectors",
+          "S3_VECTORS_BUCKET": "eecar-vectors-index-12234628",
+          "USE_S3_VECTORS": "true",
+          "VECTORS_BUCKET_NAME": "eecar-vectors-425454508084",
+          "USE_KNOWLEDGE_BASE": "false",
+          "QUERY_EXPANSION_ENABLED": "false",
+          "BEDROCK_MODEL_ID": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+        },
+        "layers": [
+          {
+            "name": "eecar-utils-layer",
+            "version": 27,
+            "createdDate": "2026-11-06T00:52:52.734+0000",
+            "latestVersion": 27,
+            "latestCreatedDate": "2026-11-06T00:52:52.734+0000",
+            "isLatest": true
+          }
+        ],
+        "roleName": "eecar-stack-BatteryHealthAssessmentFunctionRole-QDGnoDxeHzlV"
+      },
+      "permissions": {
+        "functionName": "BatteryHealthAssessmentFunction",
+        "found": true,
+        "roleName": "eecar-stack-BatteryHealthAssessmentFunctionRole-QDGnoDxeHzlV",
+        "statements": [
+          {
+            "policy": "BatteryHealthAssessmentFunctionRolePolicy0",
+            "effect": "Allow",
+            "actions": [
+              "dynamodb:GetItem",
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable"
+            ],
+            "resources": [
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table",
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*"
+            ]
+          },
+          {
+            "policy": "AWSXrayWriteOnlyAccess",
+            "effect": "Allow",
+            "actions": [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "xray:GetSamplingRules",
+              "xray:GetSamplingTargets",
+              "xray:GetSamplingStatisticSummaries"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "AWSLambdaBasicExecutionRole",
+            "effect": "Allow",
+            "actions": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ]
+      }
+    },
+    "MaterialPropertySearchFunction": {
+      "config": {
+        "functionName": "MaterialPropertySearchFunction",
+        "found": true,
+        "runtime": "nodejs24.x",
+        "handler": "index.handler",
+        "timeoutSec": 30,
+        "memoryMB": 512,
+        "ephemeralStorageMB": 512,
+        "architecture": "x86_64",
+        "lastModified": "2026-11-06T00:52:56.000+0000",
+        "state": "Active",
+        "lastUpdateStatus": "Successful",
+        "environment": {
+          "DOCUMENTS_BUCKET_NAME": "eecar-documents-425454508084",
+          "KNOWLEDGE_BASE_ID": "",
+          "SNS_TOPIC_ARN": "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications",
+          "PARTS_TABLE_NAME": "eecar-parts-table",
+          "S3_VECTORS_INDEX": "parts-vectors",
+          "S3_VECTORS_BUCKET": "eecar-vectors-index-12234628",
+          "USE_S3_VECTORS": "true",
+          "VECTORS_BUCKET_NAME": "eecar-vectors-425454508084",
+          "USE_KNOWLEDGE_BASE": "false",
+          "QUERY_EXPANSION_ENABLED": "false",
+          "BEDROCK_MODEL_ID": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+        },
+        "layers": [
+          {
+            "name": "eecar-utils-layer",
+            "version": 27,
+            "createdDate": "2026-11-06T00:52:52.734+0000",
+            "latestVersion": 27,
+            "latestCreatedDate": "2026-11-06T00:52:52.734+0000",
+            "isLatest": true
+          }
+        ],
+        "roleName": "eecar-stack-MaterialPropertySearchFunctionRole-62CSY7HjLhGi"
+      },
+      "permissions": {
+        "functionName": "MaterialPropertySearchFunction",
+        "found": true,
+        "roleName": "eecar-stack-MaterialPropertySearchFunctionRole-62CSY7HjLhGi",
+        "statements": [
+          {
+            "policy": "MaterialPropertySearchFunctionRolePolicy0",
+            "effect": "Allow",
+            "actions": [
+              "dynamodb:GetItem",
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable"
+            ],
+            "resources": [
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table",
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*"
+            ]
+          },
+          {
+            "policy": "AWSXrayWriteOnlyAccess",
+            "effect": "Allow",
+            "actions": [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "xray:GetSamplingRules",
+              "xray:GetSamplingTargets",
+              "xray:GetSamplingStatisticSummaries"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "AWSLambdaBasicExecutionRole",
+            "effect": "Allow",
+            "actions": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ]
+      }
+    },
+    "ContactInquiryFunction": {
+      "config": {
+        "functionName": "ContactInquiryFunction",
+        "found": true,
+        "runtime": "nodejs24.x",
+        "handler": "index.handler",
+        "timeoutSec": 30,
+        "memoryMB": 512,
+        "ephemeralStorageMB": 512,
+        "architecture": "x86_64",
+        "lastModified": "2026-11-06T00:52:56.000+0000",
+        "state": "Active",
+        "lastUpdateStatus": "Successful",
+        "environment": {
+          "DOCUMENTS_BUCKET_NAME": "eecar-documents-425454508084",
+          "KNOWLEDGE_BASE_ID": "",
+          "SNS_TOPIC_ARN": "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications",
+          "PARTS_TABLE_NAME": "eecar-parts-table",
+          "S3_VECTORS_INDEX": "parts-vectors",
+          "S3_VECTORS_BUCKET": "eecar-vectors-index-12234628",
+          "USE_S3_VECTORS": "true",
+          "VECTORS_BUCKET_NAME": "eecar-vectors-425454508084",
+          "USE_KNOWLEDGE_BASE": "false",
+          "QUERY_EXPANSION_ENABLED": "false",
+          "BEDROCK_MODEL_ID": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+        },
+        "layers": [
+          {
+            "name": "eecar-utils-layer",
+            "version": 27,
+            "createdDate": "2026-11-06T00:52:52.734+0000",
+            "latestVersion": 27,
+            "latestCreatedDate": "2026-11-06T00:52:52.734+0000",
+            "isLatest": true
+          }
+        ],
+        "roleName": "eecar-stack-ContactInquiryFunctionRole-yTkugjZUgwvD"
+      },
+      "permissions": {
+        "functionName": "ContactInquiryFunction",
+        "found": true,
+        "roleName": "eecar-stack-ContactInquiryFunctionRole-yTkugjZUgwvD",
+        "statements": [
+          {
+            "policy": "ContactInquiryFunctionRolePolicy0",
+            "effect": "Allow",
+            "actions": [
+              "sns:Publish"
+            ],
+            "resources": [
+              "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications"
+            ]
+          },
+          {
+            "policy": "AWSXrayWriteOnlyAccess",
+            "effect": "Allow",
+            "actions": [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "xray:GetSamplingRules",
+              "xray:GetSamplingTargets",
+              "xray:GetSamplingStatisticSummaries"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "AWSLambdaBasicExecutionRole",
+            "effect": "Allow",
+            "actions": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ]
+      }
+    },
+    "SlackNotificationFunction": {
+      "config": {
+        "functionName": "SlackNotificationFunction",
+        "found": true,
+        "runtime": "nodejs24.x",
+        "handler": "index.handler",
+        "timeoutSec": 10,
+        "memoryMB": 256,
+        "ephemeralStorageMB": 512,
+        "architecture": "x86_64",
+        "lastModified": "2026-11-06T00:52:56.000+0000",
+        "state": "Active",
+        "lastUpdateStatus": "Successful",
+        "environment": {
+          "DOCUMENTS_BUCKET_NAME": "eecar-documents-425454508084",
+          "KNOWLEDGE_BASE_ID": "",
+          "SNS_TOPIC_ARN": "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications",
+          "PARTS_TABLE_NAME": "eecar-parts-table",
+          "S3_VECTORS_INDEX": "parts-vectors",
+          "S3_VECTORS_BUCKET": "eecar-vectors-index-12234628",
+          "USE_S3_VECTORS": "true",
+          "VECTORS_BUCKET_NAME": "eecar-vectors-425454508084",
+          "USE_KNOWLEDGE_BASE": "false",
+          "QUERY_EXPANSION_ENABLED": "false",
+          "BEDROCK_MODEL_ID": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+          "SLACK_WEBHOOK_SSM_PARAM": "/eecar/slack/webhook-url"
+        },
+        "layers": [
+          {
+            "name": "eecar-utils-layer",
+            "version": 27,
+            "createdDate": "2026-11-06T00:52:52.734+0000",
+            "latestVersion": 27,
+            "latestCreatedDate": "2026-11-06T00:52:52.734+0000",
+            "isLatest": true
+          }
+        ],
+        "roleName": "eecar-stack-SlackNotificationFunctionRole-8P4lsCMRjFFO"
+      },
+      "permissions": {
+        "functionName": "SlackNotificationFunction",
+        "found": true,
+        "roleName": "eecar-stack-SlackNotificationFunctionRole-8P4lsCMRjFFO",
+        "statements": [
+          {
+            "policy": "SlackNotificationFunctionRolePolicy0",
+            "effect": "Allow",
+            "actions": [
+              "dynamodb:GetItem",
+              "dynamodb:DeleteItem",
+              "dynamodb:PutItem",
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:UpdateItem",
+              "dynamodb:BatchWriteItem",
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable",
+              "dynamodb:ConditionCheckItem"
+            ],
+            "resources": [
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table",
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*"
+            ]
+          },
+          {
+            "policy": "SlackNotificationFunctionRolePolicy1",
+            "effect": "Allow",
+            "actions": [
+              "ssm:GetParameter"
+            ],
+            "resources": [
+              "arn:aws:ssm:ap-northeast-2:425454508084:parameter/eecar/slack/webhook-url"
+            ]
+          },
+          {
+            "policy": "SlackNotificationFunctionRolePolicy2",
+            "effect": "Allow",
+            "actions": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "AWSXrayWriteOnlyAccess",
+            "effect": "Allow",
+            "actions": [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "xray:GetSamplingRules",
+              "xray:GetSamplingTargets",
+              "xray:GetSamplingStatisticSummaries"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "AWSLambdaBasicExecutionRole",
+            "effect": "Allow",
+            "actions": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ]
+      }
+    },
+    "SlackAgentFunction": {
+      "config": {
+        "functionName": "SlackAgentFunction",
+        "found": true,
+        "runtime": "nodejs24.x",
+        "handler": "index.handler",
+        "timeoutSec": 60,
+        "memoryMB": 1024,
+        "ephemeralStorageMB": 512,
+        "architecture": "x86_64",
+        "lastModified": "2026-11-06T03:18:38.000+0000",
+        "state": "Active",
+        "lastUpdateStatus": "Successful",
+        "environment": {
+          "BEDROCK_KB_ID_SSM_PARAM": "/eecar/bedrock/kb-id",
+          "KNOWLEDGE_BASE_ID": "",
+          "S3_VECTORS_BUCKET": "eecar-vectors-index-12234628",
+          "USE_S3_VECTORS": "true",
+          "QUERY_EXPANSION_ENABLED": "false",
+          "DOCUMENTS_BUCKET_NAME": "eecar-documents-425454508084",
+          "SNS_TOPIC_ARN": "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications",
+          "PARTS_TABLE_NAME": "eecar-parts-table",
+          "SLACK_BOT_TOKEN_SSM_PARAM": "/eecar/slack/bot-token",
+          "S3_VECTORS_INDEX": "parts-vectors",
+          "VECTORS_BUCKET_NAME": "eecar-vectors-425454508084",
+          "USE_KNOWLEDGE_BASE": "false",
+          "SLACK_SIGNING_SECRET_SSM_PARAM": "/eecar/slack/signing-secret",
+          "AGENT_COMPLEX_MODEL_ID": "global.anthropic.claude-sonnet-4-6",
+          "BEDROCK_MODEL_ID": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+          "AGENT_MODEL_ID": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+          "S3_VECTORS_MEMORY_INDEX": "jadong-memories"
+        },
+        "layers": [
+          {
+            "name": "eecar-utils-layer",
+            "version": 27,
+            "createdDate": "2026-11-06T00:52:52.734+0000",
+            "latestVersion": 27,
+            "latestCreatedDate": "2026-11-06T00:52:52.734+0000",
+            "isLatest": true
+          }
+        ],
+        "roleName": "eecar-stack-SlackAgentFunctionRole-NwDKuLOZm9ly"
+      },
+      "permissions": {
+        "functionName": "SlackAgentFunction",
+        "found": true,
+        "roleName": "eecar-stack-SlackAgentFunctionRole-NwDKuLOZm9ly",
+        "statements": [
+          {
+            "policy": "SlackAgentFunctionRolePolicy0",
+            "effect": "Allow",
+            "actions": [
+              "dynamodb:GetItem",
+              "dynamodb:DeleteItem",
+              "dynamodb:PutItem",
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:UpdateItem",
+              "dynamodb:BatchWriteItem",
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable",
+              "dynamodb:ConditionCheckItem"
+            ],
+            "resources": [
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table",
+              "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*"
+            ]
+          },
+          {
+            "policy": "SlackAgentFunctionRolePolicy1",
+            "effect": "Allow",
+            "actions": [
+              "ssm:GetParameter"
+            ],
+            "resources": [
+              "arn:aws:ssm:ap-northeast-2:425454508084:parameter/eecar/slack/bot-token",
+              "arn:aws:ssm:ap-northeast-2:425454508084:parameter/eecar/slack/signing-secret",
+              "arn:aws:ssm:ap-northeast-2:425454508084:parameter/eecar/bedrock/kb-id"
+            ]
+          },
+          {
+            "policy": "SlackAgentFunctionRolePolicy2",
+            "effect": "Allow",
+            "actions": [
+              "logs:DescribeLogGroups",
+              "logs:DescribeLogStreams",
+              "logs:GetLogEvents",
+              "logs:FilterLogEvents",
+              "logs:StartQuery",
+              "logs:GetQueryResults"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "SlackAgentFunctionRolePolicy3",
+            "effect": "Allow",
+            "actions": [
+              "cloudwatch:GetMetricData",
+              "cloudwatch:GetMetricStatistics",
+              "cloudwatch:ListMetrics"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "SlackAgentFunctionRolePolicy4",
+            "effect": "Allow",
+            "actions": [
+              "lambda:ListFunctions"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "SlackAgentFunctionRolePolicy5",
+            "effect": "Allow",
+            "actions": [
+              "lambda:InvokeFunction"
+            ],
+            "resources": [
+              "arn:aws:lambda:ap-northeast-2:425454508084:function:eecar-stack-SlackAgentFunction-*"
+            ]
+          },
+          {
+            "policy": "SlackAgentFunctionRolePolicy6",
+            "effect": "Allow",
+            "actions": [
+              "bedrock:InvokeModel",
+              "bedrock:InvokeModelWithResponseStream"
+            ],
+            "resources": [
+              "arn:aws:bedrock:ap-northeast-2:425454508084:inference-profile/*",
+              "arn:aws:bedrock:*::foundation-model/*",
+              "arn:aws:bedrock:::foundation-model/*"
+            ]
+          },
+          {
+            "policy": "SlackAgentFunctionRolePolicy7",
+            "effect": "Allow",
+            "actions": [
+              "s3vectors:QueryVectors",
+              "s3vectors:GetVectors",
+              "s3vectors:PutVectors",
+              "s3vectors:DeleteVectors"
+            ],
+            "resources": [
+              "arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628",
+              "arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/jadong-memories",
+              "arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/parts-vectors",
+              "arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/eecar-codebase"
+            ]
+          },
+          {
+            "policy": "SlackAgentFunctionRolePolicy8",
+            "effect": "Allow",
+            "actions": [
+              "bedrock:Retrieve",
+              "bedrock:RetrieveAndGenerate"
+            ],
+            "resources": [
+              "arn:aws:bedrock:ap-northeast-2:425454508084:knowledge-base/*"
+            ]
+          },
+          {
+            "policy": "AWSXrayWriteOnlyAccess",
+            "effect": "Allow",
+            "actions": [
+              "xray:PutTraceSegments",
+              "xray:PutTelemetryRecords",
+              "xray:GetSamplingRules",
+              "xray:GetSamplingTargets",
+              "xray:GetSamplingStatisticSummaries"
+            ],
+            "resources": [
+              "*"
+            ]
+          },
+          {
+            "policy": "AWSLambdaBasicExecutionRole",
+            "effect": "Allow",
+            "actions": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "resources": [
+              "*"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

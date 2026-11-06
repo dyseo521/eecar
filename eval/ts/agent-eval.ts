@@ -12,6 +12,9 @@
  *
  *   ... agent-eval.ts --regrade eval/reports/<파일>.json   # 저장된 응답을 현재 채점 규칙으로 다시 채점 (모델 호출 없음)
  *   ... agent-eval.ts --scenarios eval/agent/holdout_scenarios.json --tag holdout
+ *   ... agent-eval.ts --variant shipped   # v1.9.1 재현 (설정·권한 도구와 한도 런북 이전, A-38)
+ *
+ * 세계 상태: 함수 설정·권한의 기본값은 운영 스냅숏(eval/agent/world-default.json)이고, 시나리오는 다른 부분만 덮어쓴다.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
@@ -20,6 +23,31 @@ interface Fixture {
   status?: { invocations: number; errors: number; avgDuration: number };
   logs?: string[];
   errorSummary?: Array<[string, number]>;
+  /** 기본 설정에서 바꾼 부분. environment는 키 단위로 합치고(null은 삭제), 나머지 필드는 바꿔 끼운다 */
+  config?: Record<string, unknown> & { environment?: Record<string, string | null> };
+  /** statements가 있으면 기본 권한 목록을 통째로 바꾼다 */
+  permissions?: { statements?: unknown[] };
+}
+
+interface WorldFunction { config: Record<string, unknown> & { environment?: Record<string, string> }; permissions: Record<string, unknown> }
+const WORLD: Record<string, WorldFunction> = JSON.parse(readFileSync('eval/agent/world-default.json', 'utf-8')).functions;
+
+/** 운영 도구(get_function_config / get_function_permissions)와 같은 형태로 세계 상태를 돌려준다 */
+function worldConfig(known: string, fixture?: Fixture): Record<string, unknown> {
+  const base = WORLD[known]?.config ?? { functionName: known, found: true };
+  const override = fixture?.config ?? {};
+  const environment: Record<string, string> = { ...(base.environment ?? {}) };
+  for (const [k, v] of Object.entries(override.environment ?? {})) {
+    if (v === null) delete environment[k];
+    else environment[k] = v;
+  }
+  const { environment: _ignored, ...rest } = override;
+  return { ...base, ...rest, environment };
+}
+
+function worldPermissions(known: string, fixture?: Fixture): Record<string, unknown> {
+  const base = WORLD[known]?.permissions ?? { functionName: known, found: true, statements: [] };
+  return fixture?.permissions?.statements ? { ...base, statements: fixture.permissions.statements } : base;
 }
 
 interface Scenario {
@@ -28,6 +56,7 @@ interface Scenario {
   title: string;
   message: string;
   functions: Record<string, Fixture>;
+  category?: string;
   label: { cause: string[]; fix: string[]; mustNot: string[]; tools: string[] };
 }
 
@@ -126,6 +155,13 @@ function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, legacyT
           invocations: 0, errors: 0, errorRate: 0, avgDuration: 0,
         } };
       }
+      case 'get_function_config':
+      case 'get_function_permissions': {
+        const known = isKnown(fn);
+        if (!known) return { success: true, data: { functionName: fn, found: false, note: `'${fn}' 함수를 스택에서 찾지 못했습니다. 함수 이름을 확인하세요.` } };
+        const data = name === 'get_function_config' ? worldConfig(known, found?.fixture) : worldPermissions(known, found?.fixture);
+        return { success: true, data: { ...data, functionName: fn } };
+      }
       case 'get_error_summary': {
         const rows = found?.fixture.errorSummary ?? [];
         return { success: true, data: rows.map(([errorType, count]) => ({ errorType, count, lastOccurred: new Date().toISOString() })) };
@@ -156,8 +192,10 @@ function grade(scenario: Scenario, response: string, calls: Call[]) {
   const names = calls.map(c => c.name);
   const toolsOk = scenario.label.tools.every(group => group.split('|').some(t => names.includes(t)));
   // 증거 조건: 고정 데이터가 있는 함수를 실제로 조회했어야 한다 (엉뚱한 함수를 보고 짐작한 답을 거른다)
+  // 전체 상태 조회(get_function_status 'all')는 모든 함수를 보므로 증거로 인정한다 (E-30에서 찾은 채점 결함, h12)
   const targets = Object.keys(scenario.functions);
-  const evidence = targets.length === 0 || calls.some(c => c.functionName && findFixture(scenario, c.functionName) !== undefined);
+  const evidence = targets.length === 0 || calls.some(c => c.functionName && (
+    findFixture(scenario, c.functionName) !== undefined || (c.name === 'get_function_status' && c.functionName === 'all')));
   return {
     cause: cause.length > 0,
     fix: fix.length > 0,
@@ -175,10 +213,17 @@ async function main(): Promise<void> {
   const model = arg('model');
   const tag = arg('tag');
   // baseline: A-35 수정 전 동작 (이전 시스템 프롬프트, 최종 답 병합 없음, 없는 함수에 0 지표)
+  // shipped: v1.9.1 (설정·권한 도구와 한도 런북 이전). tools-only: v1.9.1 프롬프트 + 설정·권한 도구 (탐색용, A-38)
   const variant = arg('variant') ?? 'current';
+  const LEGACY_TOOLS = ['analyze_error', 'get_logs', 'get_function_status', 'get_error_summary', 'recall_memory', 'save_memory'];
+  const shippedPrompt = () => readFileSync('eval/agent/shipped-v1.9.1-system-prompt.txt', 'utf-8');
   const baselineDeps = variant === 'baseline'
-    ? { systemPrompt: readFileSync('eval/agent/baseline-system-prompt.txt', 'utf-8'), mergeAnalysis: false }
-    : {};
+    ? { systemPrompt: readFileSync('eval/agent/baseline-system-prompt.txt', 'utf-8'), mergeAnalysis: false, toolNames: LEGACY_TOOLS }
+    : variant === 'shipped'
+      ? { systemPrompt: shippedPrompt(), toolNames: LEGACY_TOOLS }
+      : variant === 'tools-only'
+        ? { systemPrompt: shippedPrompt() }
+        : {};
   const { runReActAgent } = await import('../../backend/src/functions/slack-agent/orchestrator.js');
   const { analyzeError } = await import('../../backend/src/functions/slack-agent/tools/analyze-error.js');
   const scenarioFile = arg('scenarios') ?? 'eval/agent/scenarios.json';
@@ -191,7 +236,7 @@ async function main(): Promise<void> {
     const byId = new Map(scenarios.map(s => [s.id, s]));
     const regraded = saved.results.map((r: any) => ({ ...r, ...grade(byId.get(r.id)!, r.response, r.calls) }));
     writeReport(scenarios, regraded, saved.meta.runs, saved.meta.model === 'routing(default)' ? undefined : saved.meta.model,
-      `${saved.meta.tag ?? (regrade.match(/agent-eval-([a-z0-9-]+).json$/)?.[1] ?? 'run')}-regraded`, scenarioFile);
+      arg('tag') ?? `${saved.meta.tag ?? (regrade.match(/agent-eval-([a-z0-9-]+).json$/)?.[1] ?? 'run')}-regraded`, scenarioFile, saved.meta.variant);
     return;
   }
 
@@ -219,17 +264,17 @@ async function main(): Promise<void> {
     }
   }
 
-  writeReport(scenarios, results, runs, model, tag, scenarioFile);
+  writeReport(scenarios, results, runs, model, tag, scenarioFile, variant);
 }
 
-function writeReport(scenarios: Scenario[], results: any[], runs: number, model: string | undefined, tag: string | undefined, scenarioFile: string): void {
-  const byScenario = scenarios.map(s => {
+function writeReport(scenarios: Scenario[], results: any[], runs: number, model: string | undefined, tag: string | undefined, scenarioFile: string, variant?: string): void {
+  const byScenario = scenarios.filter(s => results.some(r => r.id === s.id)).map(s => {
     const rs = results.filter(r => r.id === s.id);
-    return { id: s.id, title: s.title, source: s.source, passRate: rs.filter(r => r.pass).length / rs.length, passAll: rs.every(r => r.pass), runs: rs.length };
+    return { id: s.id, title: s.title, source: s.source, ...(s.category ? { category: s.category } : {}), passRate: rs.filter(r => r.pass).length / rs.length, passAll: rs.every(r => r.pass), runs: rs.length };
   });
   const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / Math.max(xs.length, 1);
   const summary = {
-    scenarios: scenarios.length,
+    scenarios: byScenario.length,
     runsPerScenario: runs,
     passAt1: mean(results.map(r => (r.pass ? 1 : 0))),
     passHatK: mean(byScenario.map(s => (s.passAll ? 1 : 0))),
@@ -252,12 +297,12 @@ function writeReport(scenarios: Scenario[], results: any[], runs: number, model:
   const date = new Date().toISOString().slice(0, 10);
   const stem = join('eval/reports', `${date}-agent-eval${tag ? `-${tag}` : ''}`);
   mkdirSync('eval/reports', { recursive: true });
-  writeFileSync(`${stem}.json`, JSON.stringify({ meta: { date, model: model ?? 'routing(default)', runs }, summary, byScenario, results }, null, 2) + '\n', 'utf-8');
+  writeFileSync(`${stem}.json`, JSON.stringify({ meta: { date, model: model ?? 'routing(default)', runs, variant: variant ?? 'current', scenarioFile, tag }, summary, byScenario, results }, null, 2) + '\n', 'utf-8');
   const pct = (x: number) => `${(x * 100).toFixed(0)}%`;
   const md = [
     `# 자동이 진단 평가 (${date}${tag ? `, ${tag}` : ''})`,
     '',
-    `- 시나리오 ${summary.scenarios}개 × ${runs}회, 모델: ${model ?? '기본 라우팅 (복잡한 질문 첫 턴만 Sonnet)'}`,
+    `- 시나리오 ${summary.scenarios}개 × ${runs}회 (${scenarioFile}, 구성 ${variant ?? 'current'}), 모델: ${model ?? '기본 라우팅 (복잡한 질문 첫 턴만 Sonnet)'}`,
     `- 통과(원인·조치·오진 없음·필요 도구 모두): pass@1 ${pct(summary.passAt1)}, pass^${runs} ${pct(summary.passHatK)}`,
     `- 항목별: 원인 ${pct(summary.cause)}, 조치 ${pct(summary.fix)}, 오진 없음 ${pct(summary.noWrongClaim)}, 도구 ${pct(summary.tools)}, 증거(대상 함수 조회) ${pct(summary.evidence)}`,
     `- 실행당 평균: 턴 ${summary.avgTurns.toFixed(1)}, 도구 호출 ${summary.avgToolCalls.toFixed(1)}, 입력 토큰 ${summary.avgInputTokens.toFixed(0)}, 출력 토큰 ${summary.avgOutputTokens.toFixed(0)}, 비용 $${summary.avgCostUsd.toFixed(4)}, 지연 ${(summary.avgLatencyMs / 1000).toFixed(1)}s`,
