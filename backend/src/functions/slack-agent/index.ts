@@ -146,22 +146,36 @@ export const handler = async (
 
 /**
  * 비동기 작업 실행 (같은 함수의 Event 호출로 들어온다)
+ *
+ * 예외를 밖으로 던지지 않는다. 던지면 Lambda가 비동기 호출을 두 번 더 재시도해 Slack에 답이 여러 번 갈 수 있다.
+ * 재시도 횟수 설정(EventInvokeConfig)은 배포 역할 권한이 없어 쓰지 않았다 (A-36). 대신 실패는 지표로 남긴다.
  */
-async function runJob(job: JadongJob): Promise<void> {
-  if (job.type === 'app_mention') {
-    await handleAppMention(job.event);
-    return;
-  }
-  const responseUrl = job.event.response_url;
+export async function runJob(job: JadongJob): Promise<void> {
   try {
-    const result = await handleSlashCommand(job.event);
-    if (responseUrl && result) await postToResponseUrl(responseUrl, result);
-  } catch (error) {
-    console.error('Error handling slash command job:', error);
-    if (responseUrl) {
-      await postToResponseUrl(responseUrl, { response_type: 'ephemeral', text: '처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.' });
+    if (job.type === 'app_mention') {
+      await handleAppMention(job.event);
+      return;
     }
+    const responseUrl = job.event.response_url;
+    try {
+      const result = await handleSlashCommand(job.event);
+      if (responseUrl && result) await postToResponseUrl(responseUrl, result);
+    } catch (error) {
+      console.error('Error handling slash command job:', error);
+      recordJobError(job.type);
+      if (responseUrl) {
+        await postToResponseUrl(responseUrl, { response_type: 'ephemeral', text: '처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.' });
+      }
+    }
+  } catch (error) {
+    console.error('Jadong job failed:', error);
+    recordJobError(job.type);
   }
+}
+
+/** 작업 경로는 예외를 삼키므로 Lambda Errors 지표에 잡히지 않는다. 대신 이 지표로 본다 */
+function recordJobError(jobType: string): void {
+  emitMetrics('EECAR/Agent', { JobType: jobType }, { JobErrors: { value: 1, unit: 'Count' } }, [['JobType'], []]);
 }
 
 /**
