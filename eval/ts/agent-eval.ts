@@ -58,7 +58,76 @@ interface Scenario {
   message: string;
   functions: Record<string, Fixture>;
   category?: string;
-  label: { cause: string[]; fix: string[]; mustNot: string[]; tools: string[] };
+  /** 표현 목록 채점용 (v1·v2 시나리오). v3부터는 truth + 판정 모델로 채점한다 (E-33) */
+  label?: { cause: string[]; fix: string[]; mustNot: string[]; tools: string[] };
+  /** v3 시나리오: 실제 장애 분포를 따른 분류 코드(A1~F4)와 세계 상태 */
+  code?: string;
+  world?: {
+    functions?: Record<string, Fixture>;
+    changes?: Array<{ time: string; type: string; target: string; actor?: string; summary?: string; details?: unknown }>;
+    metrics?: { bedrock?: Record<string, Record<string, number>>; dynamodb?: Record<string, number>; apiGateway?: Record<string, number>; canary?: Record<string, unknown> };
+    externalStatus?: Array<{ provider: string; time?: string; severity?: string; title?: string; body?: string }>;
+  };
+  truth?: { verdict: string; component?: string; faultType?: string; cause: string; fix: string; acceptableFixes?: string[]; forbiddenFixes?: string[]; contributing?: string[] };
+}
+
+/** v3 세계 상태의 함수 고정 데이터를 v1·v2와 같은 자리로 옮긴다 */
+export function normalizeScenario<T extends { functions?: Record<string, Fixture>; world?: Scenario['world']; category?: string; code?: string }>(s: T): T {
+  s.functions = s.functions ?? s.world?.functions ?? {};
+  s.category = s.category ?? s.code;
+  return s;
+}
+
+const HEALTHY_BEDROCK = [
+  { modelId: 'global.anthropic.claude-haiku-4-5-20251001-v1:0', invocations: 200, throttles: 0, serverErrors: 0, clientErrors: 0 },
+  { modelId: 'amazon.titan-embed-text-v2:0', invocations: 400, throttles: 0, serverErrors: 0, clientErrors: 0 },
+];
+
+/** 운영 도구(get_service_metrics)와 같은 형태로 세계 상태의 지표를 돌려준다. 시나리오에 없으면 정상값이다 */
+function worldServiceMetrics(scenario: Scenario, service: string, fn: string): Record<string, unknown> {
+  const m = scenario.world?.metrics ?? {};
+  const windowHours = 24;
+  if (service === 'lambda') {
+    const known = isKnown(fn);
+    if (!known) return { service, functionName: fn, found: false, note: `'${fn}' 함수를 스택에서 찾지 못했습니다.` };
+    const s = findFixture(scenario, fn)?.fixture.status as Record<string, number> | undefined;
+    return { service, functionName: fn, windowHours, throttles: s?.throttles ?? 0, durationP99: s?.durationP99 ?? Math.round((s?.avgDuration ?? 250) * 2), maxConcurrency: s?.maxConcurrency ?? 3 };
+  }
+  if (service === 'bedrock') {
+    const models = m.bedrock ? Object.entries(m.bedrock).map(([modelId, v]) => ({ modelId, clientErrors: 0, ...v })) : HEALTHY_BEDROCK;
+    return { service, windowHours, models };
+  }
+  if (service === 'dynamodb') return { service, windowHours, throttledRequests: 0, consumedRCU: 3000, consumedWCU: 2000, systemErrors: 0, ...(m.dynamodb ?? {}) };
+  if (service === 'apigateway') return { service, windowHours, count: 500, '5xx': 0, '4xx': 3, ...(m.apiGateway ?? {}) };
+  if (service === 'canary') return { service, windowHours, runs: 24, minVectorCandidates: 100, ...(m.canary ?? {}) };
+  return { service, error: `지원하지 않는 서비스입니다: ${service}` };
+}
+
+/** 운영 도구(get_provider_status)와 같은 형태. 세계 상태에 공지가 없으면 모두 정상이다 */
+function worldProviderStatus(scenario: Scenario): Record<string, unknown> {
+  const items = scenario.world?.externalStatus ?? [];
+  const of = (p: string) => items.filter(i => i.provider.toLowerCase() === p);
+  const aws = of('aws');
+  const anthropic = of('anthropic');
+  const slack = of('slack');
+  return {
+    aws: { region: 'ap-northeast-2', notices: aws.map(n => ({ title: n.title, published: n.time, description: n.body, severity: n.severity })) },
+    anthropic: anthropic.length
+      ? { indicator: anthropic[0].severity ?? 'minor', description: anthropic[0].title, incidents: anthropic.map(n => ({ name: n.title, status: n.severity, startedAt: n.time, body: n.body })) }
+      : { indicator: 'none', description: 'All Systems Operational', incidents: [] },
+    slack: slack.length
+      ? { status: 'active', incidents: slack.map(n => ({ title: n.title, status: n.severity, startedAt: n.time, body: n.body })) }
+      : { status: 'ok', incidents: [] },
+  };
+}
+
+/** 운영 도구(get_recent_changes)와 같은 형태. 함수를 지정하면 그 함수와 스택 전체 변경만 돌려준다 */
+function worldChanges(scenario: Scenario, fn: string): Record<string, unknown> {
+  const n = fn ? norm(fn) : '';
+  const changes = (scenario.world?.changes ?? [])
+    .filter(c => !n || ['stack_update', 'layer_publish', 'ssm_param'].includes(c.type) || norm(c.target).includes(n))
+    .sort((a, b) => b.time.localeCompare(a.time));
+  return { windowHours: 168, changes };
 }
 
 // 시나리오에 없는 함수는 정상 상태로 응답한다 (get_function_status "all" 대비)
@@ -113,7 +182,11 @@ function healthy(name: string) {
 
 interface Call { name: string; functionName?: string }
 
+/** 운영 get_function_status가 돌려주는 필드만. 스로틀·p99·동시 실행은 get_service_metrics로 본다 */
+const baseStatus = (s: { invocations: number; errors: number; avgDuration: number }) => ({ invocations: s.invocations, errors: s.errors, avgDuration: s.avgDuration });
+
 export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, legacyTools = false) {
+  normalizeScenario(scenario);
   return async (name: string, input: Record<string, unknown>) => {
     calls.push({ name, ...(input.functionName ? { functionName: String(input.functionName) } : {}) });
     const fn = String(input.functionName ?? '');
@@ -133,7 +206,7 @@ export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, 
             success: true,
             data: KNOWN_FUNCTIONS.map(n => {
               const f = findFixture(scenario, n)?.fixture;
-              return f?.status ? { functionName: n, ...f.status, errorRate: f.status.invocations ? (f.status.errors / f.status.invocations) * 100 : 0 } : healthy(n);
+              return f?.status ? { functionName: n, ...baseStatus(f.status), errorRate: f.status.invocations ? (f.status.errors / f.status.invocations) * 100 : 0 } : healthy(n);
             }),
           };
         }
@@ -150,7 +223,7 @@ export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, 
           return {
             success: true,
             data: {
-              functionName: fn, ...s, errorRate: s.invocations ? (s.errors / s.invocations) * 100 : 0,
+              functionName: fn, ...baseStatus(s), errorRate: s.invocations ? (s.errors / s.invocations) * 100 : 0,
               ...(s.errors > 0 && lastErrorLine ? { lastError: { message: lastErrorLine, timestamp: new Date().toISOString() } } : {}),
             },
           };
@@ -163,6 +236,12 @@ export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, 
           invocations: 0, errors: 0, errorRate: 0, avgDuration: 0,
         } };
       }
+      case 'get_recent_changes':
+        return { success: true, data: worldChanges(scenario, fn) };
+      case 'get_service_metrics':
+        return { success: true, data: worldServiceMetrics(scenario, String(input.service ?? ''), fn) };
+      case 'get_provider_status':
+        return { success: true, data: worldProviderStatus(scenario) };
       case 'get_function_config':
       case 'get_function_permissions': {
         const known = isKnown(fn);
@@ -192,6 +271,10 @@ export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, 
 }
 
 function grade(scenario: Scenario, response: string, calls: Call[]) {
+  // v3 시나리오는 표현 목록이 없다. 판정 모델로 따로 채점한다 (eval/ts/agent-judge.ts)
+  if (!scenario.label) {
+    return { cause: false, fix: false, noWrongClaim: true, tools: true, evidence: true, pass: false, graded: false, matched: { cause: [], fix: [], wrong: [] } };
+  }
   const text = response.toLowerCase();
   const has = (phrases: string[]) => phrases.filter(p => text.includes(p.toLowerCase()));
   const cause = has(scenario.label.cause);
@@ -239,12 +322,14 @@ async function main(): Promise<void> {
         ? { systemPrompt: promptFile('eval/agent/config-runbook-system-prompt.txt'), toolNames: CONFIG_TOOLS }
         : variant === 'tools-only'
           ? { systemPrompt: shippedPrompt(), toolNames: CONFIG_TOOLS }
-          : {};
+          : variant === 'candidate'
+            ? { systemPrompt: promptFile(arg('prompt') ?? 'eval/agent/candidate-system-prompt.txt'), toolNames: [...CONFIG_TOOLS, 'get_recent_changes', 'get_service_metrics', 'get_provider_status', 'submit_diagnosis'] }
+            : {};
   const { runReActAgent } = await import('../../backend/src/functions/slack-agent/orchestrator.js');
   const { analyzeError } = await import('../../backend/src/functions/slack-agent/tools/analyze-error.js');
   const scenarioFile = arg('scenarios') ?? 'eval/agent/scenarios.json';
   const spec = JSON.parse(readFileSync(scenarioFile, 'utf-8')) as { scenarios: Scenario[] };
-  const scenarios = spec.scenarios.filter(s => !only || only.includes(s.id));
+  const scenarios = spec.scenarios.filter(s => !only || only.includes(s.id)).map(s => normalizeScenario(s));
 
   const regrade = arg('regrade');
   if (regrade) {
@@ -275,7 +360,7 @@ async function main(): Promise<void> {
         console.error = originalError;
       }
       const g = grade(scenario, outcome.response, calls);
-      results.push({ id: scenario.id, run: r, source: scenario.source, title: scenario.title, ...g, calls, response: outcome.response, metrics: outcome.metrics, steps: outcome.steps });
+      results.push({ id: scenario.id, run: r, source: scenario.source ?? 'v3', code: scenario.code, title: scenario.title, ...g, calls, response: outcome.response, ...(outcome.diagnosis ? { diagnosis: outcome.diagnosis } : {}), metrics: outcome.metrics, steps: outcome.steps });
       originalLog(`${g.pass ? 'pass' : 'FAIL'} ${scenario.id}#${r} cause=${g.cause} fix=${g.fix} noWrong=${g.noWrongClaim} tools=${g.tools} evidence=${g.evidence} turns=${outcome.metrics.turns} $${outcome.metrics.estimatedCostUsd.toFixed(4)}`);
     }
   }

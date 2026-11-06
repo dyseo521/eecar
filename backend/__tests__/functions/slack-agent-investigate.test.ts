@@ -13,6 +13,7 @@ import {
   getProviderStatus,
   getRecentChanges,
   getServiceMetrics,
+  parseAwsFeed,
   type ChangeEvent,
 } from '../../src/functions/slack-agent/tools/investigate.js';
 import { renderDiagnosis } from '../../src/functions/slack-agent/tools/diagnosis.js';
@@ -134,6 +135,22 @@ describe('getProviderStatus', () => {
     } finally {
       global.fetch = original;
     }
+  });
+});
+
+describe('parseAwsFeed', () => {
+  const now = Date.parse('2026-11-06T12:00:00Z');
+  const item = (title: string, date: string) => `<item><title><![CDATA[${title}]]></title><pubDate>${date}</pubDate><description><![CDATA[<p>details</p>]]></description></item>`;
+
+  it('keeps recent notices and strips markup', () => {
+    const xml = `<rss><channel><title>feed</title>${item('Increased error rates', 'Thu, 05 Nov 2026 10:00:00 GMT')}${item('Old event', 'Thu, 01 Oct 2026 10:00:00 GMT')}</channel></rss>`;
+    expect(parseAwsFeed('lambda', xml, now)).toEqual([
+      { service: 'lambda', title: 'Increased error rates', published: 'Thu, 05 Nov 2026 10:00:00 GMT', description: 'details' },
+    ]);
+  });
+
+  it('returns nothing for an empty feed', () => {
+    expect(parseAwsFeed('lambda', '<rss><channel><title>feed</title></channel></rss>', now)).toEqual([]);
   });
 });
 
