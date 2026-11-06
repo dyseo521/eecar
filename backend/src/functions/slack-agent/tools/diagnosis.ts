@@ -47,7 +47,7 @@ export const SUBMIT_DIAGNOSIS_TOOL: Tool = {
   input_schema: {
     type: 'object',
     properties: {
-      verdict: { type: 'string', description: 'root_cause: 근거로 확인한 원인 / hypothesis: 가능성이 높지만 확인하지 못함 / insufficient_evidence: 판단할 근거 부족 / no_fault: 장애가 아님 (정상, 의도된 동작, 일시적으로 회복됨)', enum: [...VERDICTS] },
+      verdict: { type: 'string', description: 'root_cause: 근거로 확인한 원인 / hypothesis: 가능성이 높지만 확인하지 못함 / insufficient_evidence: 유력한 설명조차 없음 / no_fault: 장애가 아님 (정상, 의도된 동작, 배포 직후의 짧은 과도 현상)', enum: [...VERDICTS] },
       summary: { type: 'string', description: '결론 한두 문장 (사용자가 가장 먼저 읽는 문장)' },
       cause: { type: 'string', description: '원인 설명. no_fault면 왜 문제가 아닌지' },
       component: { type: 'string', description: '원인이 있는 구성요소', enum: [...COMPONENTS] },
@@ -75,11 +75,15 @@ export const SUBMIT_DIAGNOSIS_TOOL: Tool = {
  * dev에서 근거 부족 사례의 대부분을 root_cause로 단정했다. 결론을 쓰는 시점에 판정 기준을 다시 확인하게 한다.
  */
 export const DIAGNOSIS_FINALIZE_PROMPT = `조사 결과를 submit_diagnosis로 제출하세요. 제출 전에 확인하세요.
-- root_cause는 증상을 직접 설명하는 도구 결과를 evidence에 옮길 수 있을 때만 씁니다. 시각이 비슷한 변경이 있다는 것만으로는 hypothesis입니다.
-- 호출 주체나 요청 내용처럼 원인을 가르는 신호를 볼 수 없으면 insufficient_evidence입니다.
-- 오류가 이미 멈췄고 지금 정상이면 no_fault입니다. 마지막 오류 시각과 현재 시각을 비교하세요.
+- root_cause: 변경 내용, 로그, 설정, 지표가 증상을 함께 설명하면 코드를 직접 보지 못했어도 root_cause입니다. 시각이 비슷한 변경이 있다는 것만으로는 원인이 아닙니다.
+- hypothesis: 유력한 설명이 있지만 확인하지 못했을 때 씁니다. 무엇을 보면 확인되는지 적습니다.
+- insufficient_evidence: 유력한 설명조차 없을 때만 씁니다. 코드를 볼 수 없다는 이유만으로 고르지 않습니다.
+- no_fault: 장애가 아닐 때만 씁니다(정상, 의도된 동작, 배포 직후의 짧은 과도 현상). 사용자에게 영향이 있었던 장애는 복구됐어도 root_cause로 쓰고 복구됐다고 적습니다. 반복되는 오류는 몇 분 조용해도 회복이 아닙니다.
 - 원인을 확인하지 못했으면 fix.action에는 코드·설정 변경이 아니라 다음에 확인할 것을 씁니다.
 - evidence와 cause에는 도구 결과에 있는 값만 씁니다.`;
+
+/** 도구를 한 번도 부르지 않고 끝내려 할 때의 지시. 조사 없이 "근거 부족"으로 끝낸 사례가 있었다 */
+export const DIAGNOSIS_INVESTIGATE_PROMPT = '결론을 내기 전에 도구로 먼저 조사하세요. 함수를 특정할 수 없으면 전체 상태와 최근 변경부터 봅니다.';
 
 /** 시스템 프롬프트에 붙이는 현재 시각. 없으면 모델은 "최근"이나 "이미 회복됨"을 판단할 기준이 없다 (A-40) */
 export const currentTimeSection = (iso: string): string =>
