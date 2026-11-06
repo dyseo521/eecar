@@ -1,0 +1,13 @@
+{
+  "description": "운영 검색 합성 검사(canary). 오류 없이 품질이 떨어지는 장애(C-06 결과 0건, C-09 LLM 폴백, C-26 벡터 누락)를 잡는다. 기대 조건은 운영 회귀 검사(regression.json) 중 운영 데이터가 바뀌어도 성립할 것만 골랐다 (DECISION_LOG A-39)",
+  "diagnostics": { "minVectorCandidates": 50, "minBm25Candidates": 1, "minIndexSize": 100 },
+  "maxLatencyMs": 10000,
+  "checks": [
+    { "id": "c1", "query": "아이오닉5 배터리 팩", "top": 3, "category": "battery", "noMismatch": ["차종"] },
+    { "id": "c2", "query": "테슬라 모델3 모터", "top": 5, "category": "motor" },
+    { "id": "c3", "query": "ESS용 60kWh 이상 배터리", "top": 5, "category": "battery", "noMismatch": ["용량"] },
+    { "id": "c4", "query": "500만원 이하 배터리", "top": 5, "category": "battery", "noMismatch": ["가격"] },
+    { "id": "c5", "query": "코나 인버터", "top": 1, "category": "inverter", "noMismatch": ["차종"] }
+  ],
+  "explain": { "query": "아이오닉5 배터리 팩", "parts": 2 }
+}

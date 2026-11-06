@@ -818,6 +818,26 @@ Resources:
       ComparisonOperator: GreaterThanOrEqualToThreshold
       TreatMissingData: notBreaching
 
+  # 합성 검사(canary)의 벡터 후보가 0이거나 검사가 멈추면 경보 (DECISION_LOG A-39)
+  # 검사는 GitHub Actions가 매시 실행한다. 일정 실행은 몇십 분 늦어질 수 있어 3시간 연속일 때만 경보한다
+  SearchCanaryVectorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${AWS::StackName}-search-canary-vector'
+      AlarmDescription: Search canary saw no vector candidates (vector search silently off or index empty), or the canary stopped running.
+      Namespace: EECAR/Search
+      MetricName: VectorCandidates
+      Dimensions:
+        - Name: Operation
+          Value: Canary
+      Statistic: Minimum
+      Period: 3600
+      EvaluationPeriods: 3
+      DatapointsToAlarm: 3
+      Threshold: 1
+      ComparisonOperator: LessThanThreshold
+      TreatMissingData: breaching
+
   EECARDashboard:
     Type: AWS::CloudWatch::Dashboard
     Properties:
