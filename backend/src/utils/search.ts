@@ -54,7 +54,10 @@ export function joinedBigramTokenize(text: string): string[] {
   return out;
 }
 
-/** 검색 BM25 색인과 질의에 쓰는 토크나이저 */
+/**
+ * 검색 BM25 색인과 질의에 쓰는 토크나이저 (E-25, E-26).
+ * joinedBigramTokenize는 dev·v4에서 해가 없었지만, 고치는 운영 실패가 확인되지 않아 채택하지 않았다 (A-33)
+ */
 export const SEARCH_TOKENIZER = bigramTokenize;
 
 /**

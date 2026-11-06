@@ -68,7 +68,9 @@ export function extractSearchAttributes(part: any): SearchAttributes {
     quantity: num(part.quantity),
     condition: part.condition || undefined,
     vehicles: (() => {
-      const groups = findAliasGroups(label, VEHICLE_ALIASES).map(group => group[0]);
+      // 브랜드가 vehicleBrand에만 있는 경우("XPeng" + "G6")도 잡도록 함께 본다
+      const brandModel = part.vehicleBrand && part.model ? `${part.vehicleBrand} ${part.model}` : '';
+      const groups = findAliasGroups([brandModel, label].filter(Boolean).join(' / '), VEHICLE_ALIASES).map(group => group[0]);
       return groups.length ? groups : undefined;
     })(),
   };

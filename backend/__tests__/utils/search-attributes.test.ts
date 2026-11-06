@@ -79,3 +79,10 @@ describe('rankCandidates', () => {
     expect(ranked.find(h => h.id === 'small')?.constraints.mismatched).toEqual(['용량 17.6kWh']);
   });
 });
+
+describe('vehicle detection with vehicleBrand', () => {
+  it('joins the brand and model when the brand is only in vehicleBrand', () => {
+    expect(extractSearchAttributes({ name: '배터리 팩 - CATL', vehicleBrand: 'XPeng', model: 'G6' }).vehicles).toEqual(['XPeng G6']);
+    expect(extractSearchAttributes({ name: '범용 충전 케이블', model: 'EV Universal' }).vehicles).toBeUndefined();
+  });
+});
