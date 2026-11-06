@@ -394,9 +394,6 @@ Resources:
       Description: 자동이 2.0 - AI DevOps 어시스턴트 (Slash Commands, @멘션, 에러 분석)
       MemorySize: 1024  # AI 처리용 증설
       Timeout: 60  # ReAct 루프용 (Slack은 3초 내 응답 필요, 비동기 처리)
-      # 비동기 작업이 실패해도 자동 재시도하지 않는다 (재시도하면 Slack에 답이 두 번 갈 수 있다, A-36)
-      EventInvokeConfig:
-        MaximumRetryAttempts: 0
       Layers:
         - !Ref EECARUtilsLayer
       Environment:

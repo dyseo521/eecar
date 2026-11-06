@@ -107,6 +107,19 @@ describe('async job', () => {
     }
     expect(fetchMock).toHaveBeenCalledWith('https://hooks.slack.com/x', expect.objectContaining({ method: 'POST' }));
   });
+
+  it('never throws, so Lambda does not retry the job and answer twice', async () => {
+    const original = global.fetch;
+    global.fetch = (async () => { throw new Error('network down'); }) as unknown as typeof fetch;
+    const writes: string[] = [];
+    (process.stdout.write as unknown as jest.Mock).mockImplementation(((chunk: string) => { writes.push(String(chunk)); return true; }) as any);
+    try {
+      await expect(handler({ jadongJob: { type: 'slash_command', event: { type: 'slash_command', text: 'help', response_url: 'https://hooks.slack.com/x' } } })).resolves.toBeUndefined();
+    } finally {
+      global.fetch = original;
+    }
+    expect(writes.join('')).toContain('JobErrors');
+  });
 });
 
 describe('claimSlackEvent', () => {
