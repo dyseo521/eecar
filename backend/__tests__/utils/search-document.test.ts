@@ -167,3 +167,19 @@ describe('findAliasGroups', () => {
     expect(makers).toEqual(['현대모비스']);
   });
 });
+
+describe('vehicle vocabulary from production data (A-32)', () => {
+  const groupOf = (text: string) => findAliasGroups(text, VEHICLE_ALIASES).map(g => g[0]);
+
+  it('recognizes vehicles added from the production catalog', () => {
+    expect(groupOf('Sila 배터리 모듈 (Genesis GV60 호환)')).toEqual(['GV60']);
+    expect(groupOf('Ford E-Transit Custom')).toEqual(['E-트랜짓']);
+    expect(groupOf('BMW iX3 리튬이온 배터리')).toContain('iX3');
+  });
+
+  it('does not treat short words with other meanings as vehicles', () => {
+    expect(groupOf('한 번 사용한 배터리')).toEqual([]);
+    expect(groupOf('BYD Han 배터리')).toEqual(['BYD Han']);
+    expect(groupOf('R3 볼트 세트')).toEqual([]);
+  });
+});
