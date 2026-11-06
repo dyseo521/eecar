@@ -253,6 +253,16 @@ npx tsx eval/ts/export-gate-embeddings.ts --dataset eval/datasets/v3            
 - **결과**: v4 0.878 → 0.884 (+0.006 [+0.001, +0.012])로 채택했습니다(E-27, E-28).
 - **CI 게이트**: v2·v3·v4 운영 순위를 검사합니다.
 
+## 운영 데이터 회귀 검사 (2026-11-06)
+
+- 합성 코퍼스에 잘 나타나지 않는 운영의 실패를 막는 검사입니다. 운영 부품 186개 스냅숏(`datasets/prod-snapshot`)과 검사 16개(`prod/regression.json`)로 구성합니다.
+- 프로덕션 순위 함수로 실행하고, CI에서 돌립니다. 조건 재정렬을 끄면 8/16만 통과하므로, 회귀를 잡는 검사입니다(A-33).
+
+```bash
+npx tsx eval/ts/prod-regression.ts                                                       # AWS 불필요
+PARTS_TABLE_NAME=eecar-parts-table npx tsx eval/ts/export-prod-snapshot.ts             # 스냅숏 갱신 (AWS 필요)
+```
+
 ## 한계 (해석할 때 주의)
 
 - **코퍼스와 라벨이 합성 데이터다.**
