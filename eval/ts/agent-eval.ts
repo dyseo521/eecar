@@ -216,9 +216,11 @@ async function main(): Promise<void> {
   // shipped: v1.9.1 (설정·권한 도구와 한도 런북 이전). tools-only: v1.9.1 프롬프트 + 설정·권한 도구 (탐색용, A-38)
   const variant = arg('variant') ?? 'current';
   const LEGACY_TOOLS = ['analyze_error', 'get_logs', 'get_function_status', 'get_error_summary', 'recall_memory', 'save_memory'];
-  const shippedPrompt = () => readFileSync('eval/agent/shipped-v1.9.1-system-prompt.txt', 'utf-8');
+  // 체크아웃 환경에 따라 CRLF가 될 수 있어 운영과 같은 LF로 맞춘다
+  const promptFile = (f: string) => readFileSync(f, 'utf-8').split('\r\n').join('\n');
+  const shippedPrompt = () => promptFile('eval/agent/shipped-v1.9.1-system-prompt.txt');
   const baselineDeps = variant === 'baseline'
-    ? { systemPrompt: readFileSync('eval/agent/baseline-system-prompt.txt', 'utf-8'), mergeAnalysis: false, toolNames: LEGACY_TOOLS }
+    ? { systemPrompt: promptFile('eval/agent/baseline-system-prompt.txt'), mergeAnalysis: false, toolNames: LEGACY_TOOLS }
     : variant === 'shipped'
       ? { systemPrompt: shippedPrompt(), toolNames: LEGACY_TOOLS }
       : variant === 'tools-only'
