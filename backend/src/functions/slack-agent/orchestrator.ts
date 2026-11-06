@@ -48,6 +48,8 @@ export interface AgentRunMetrics {
   estimatedCostUsd: number;
   toolCalls: number;
   toolErrors: number;
+  /** 복잡한 질문용 모델이 스로틀되어 기본 모델로 답한 횟수 (A-42) */
+  modelFallbacks: number;
   tools: Array<{ name: string; ok: boolean; latencyMs: number; resultChars: number }>;
   latencyMs: number;
 }
@@ -110,7 +112,7 @@ export async function runReActAgent(
   context: AgentContext,
   deps: AgentDeps = {}
 ): Promise<AgentResult> {
-  const converse = deps.converse ?? (input => bedrockClient.send(new ConverseCommand(input)));
+  const converseOnce = deps.converse ?? (input => bedrockClient.send(new ConverseCommand(input)));
   const runTool = deps.executeTool ?? executeTool;
   const started = Date.now();
   const metrics: AgentRunMetrics = {
@@ -123,10 +125,26 @@ export async function runReActAgent(
     estimatedCostUsd: 0,
     toolCalls: 0,
     toolErrors: 0,
+    modelFallbacks: 0,
     tools: [],
     latencyMs: 0,
   };
   console.log('Starting ReAct agent:', { runId: metrics.runId, userMessage, context });
+
+  // 복잡한 질문용 모델이 스로틀되면 기본 모델로 답한다. 일일 토큰 한도에 닿으면 그날 복잡한 질문이 모두 실패했다 (A-42)
+  let usedModel = '';
+  const converse = async (input: ConverseCommandInput): Promise<ConverseCommandOutput> => {
+    usedModel = input.modelId!;
+    try {
+      return await converseOnce(input);
+    } catch (error) {
+      if ((error as Error)?.name !== 'ThrottlingException' || deps.modelOverride || usedModel === HAIKU_MODEL_ID) throw error;
+      console.warn('Complex model throttled, using default model:', (error as Error).message);
+      metrics.modelFallbacks++;
+      usedModel = HAIKU_MODEL_ID;
+      return converseOnce({ ...input, modelId: usedModel });
+    }
+  };
 
   const steps: AgentStep[] = [];
   const messages: Message[] = [];
@@ -174,12 +192,12 @@ export async function runReActAgent(
         },
       });
       metrics.turns = turnCount;
-      metrics.modelCalls[modelId] = (metrics.modelCalls[modelId] ?? 0) + 1;
+      metrics.modelCalls[usedModel] = (metrics.modelCalls[usedModel] ?? 0) + 1;
       const inputTokens = response.usage?.inputTokens ?? 0;
       const outputTokens = response.usage?.outputTokens ?? 0;
       metrics.inputTokens += inputTokens;
       metrics.outputTokens += outputTokens;
-      metrics.estimatedCostUsd += estimateCostUsd(modelId, inputTokens, outputTokens);
+      metrics.estimatedCostUsd += estimateCostUsd(usedModel, inputTokens, outputTokens);
 
       const assistantMessage = response.output?.message;
       if (!assistantMessage?.content) {
@@ -301,6 +319,7 @@ export async function runReActAgent(
     'eecar.agent.models': metrics.modelCalls,
     'eecar.agent.tool_calls': metrics.toolCalls,
     'eecar.agent.tool_errors': metrics.toolErrors,
+    'eecar.agent.model_fallbacks': metrics.modelFallbacks,
     'eecar.agent.cost_usd': Number(metrics.estimatedCostUsd.toFixed(6)),
     'eecar.agent.latency_ms': metrics.latencyMs,
   }));
@@ -323,6 +342,7 @@ export function emitAgentMetrics(metrics: AgentRunMetrics): void {
     AgentTurns: { value: metrics.turns, unit: 'Count' },
     AgentToolCalls: { value: metrics.toolCalls, unit: 'Count' },
     AgentToolErrors: { value: metrics.toolErrors, unit: 'Count' },
+    AgentModelFallbacks: { value: metrics.modelFallbacks, unit: 'Count' },
     AgentInputTokens: { value: metrics.inputTokens, unit: 'Count' },
     AgentOutputTokens: { value: metrics.outputTokens, unit: 'Count' },
     // EMF 단위에 통화가 없어 마이크로달러(1e-6 USD) 정수로 남긴다

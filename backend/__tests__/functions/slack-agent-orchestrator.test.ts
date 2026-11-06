@@ -29,6 +29,50 @@ describe('runReActAgent', () => {
   });
   afterEach(() => jest.restoreAllMocks());
 
+  describe('when the complex model is throttled', () => {
+    const throttled = () => Object.assign(new Error('Too many tokens per day, please wait before trying again.'), { name: 'ThrottlingException' });
+
+    it('answers with the default model and counts the fallback', async () => {
+      const models: string[] = [];
+      const converse = jest.fn(async (input: ConverseCommandInput) => {
+        models.push(input.modelId!);
+        if (input.modelId !== HAIKU) throw throttled();
+        return finalTurn('기본 모델의 답입니다.');
+      });
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const result = await runReActAgent('이 에러 분석해줘', context, { converse, emit: false });
+
+      expect(models[0]).not.toBe(HAIKU);
+      expect(models[1]).toBe(HAIKU);
+      expect(result.response).toBe('기본 모델의 답입니다.');
+      expect(result.metrics).toMatchObject({ stopReason: 'final', modelFallbacks: 1, modelCalls: { [HAIKU]: 1 } });
+      expect(warn).toHaveBeenCalled();
+    });
+
+    it('does not retry other errors on the default model', async () => {
+      const converse = jest.fn(async (_: ConverseCommandInput) => { throw Object.assign(new Error('denied'), { name: 'AccessDeniedException' }); });
+      const result = await runReActAgent('이 에러 분석해줘', context, { converse, emit: false });
+      expect(converse).toHaveBeenCalledTimes(1);
+      expect(result.metrics).toMatchObject({ stopReason: 'error', modelFallbacks: 0 });
+    });
+
+    it('reports an error when the default model is throttled too', async () => {
+      const converse = jest.fn(async (_: ConverseCommandInput) => { throw throttled(); });
+      jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const result = await runReActAgent('이 에러 분석해줘', context, { converse, emit: false });
+      expect(converse).toHaveBeenCalledTimes(2);
+      expect(result.metrics.stopReason).toBe('error');
+    });
+
+    it('keeps a pinned model so evaluations measure the model they asked for', async () => {
+      const converse = jest.fn(async (_: ConverseCommandInput) => { throw throttled(); });
+      const result = await runReActAgent('이 에러 분석해줘', context, { converse, emit: false, modelOverride: 'global.anthropic.claude-sonnet-4-6' });
+      expect(converse).toHaveBeenCalledTimes(1);
+      expect(result.metrics).toMatchObject({ stopReason: 'error', modelFallbacks: 0 });
+    });
+  });
+
   it('records turns, tokens, cost and tool results for a tool-using run', async () => {
     const replies = [toolTurn('get_logs', { functionName: 'VectorSearch' }), finalTurn('원인은 Bedrock 스로틀링입니다.')];
     const converse = jest.fn(async (_: ConverseCommandInput) => replies.shift()!);
@@ -119,7 +163,7 @@ describe('agent metrics', () => {
     jest.spyOn(process.stdout, 'write').mockImplementation(chunk => { lines.push(String(chunk)); return true; });
     emitAgentMetrics({
       runId: 'r', turns: 2, stopReason: 'final', modelCalls: {}, inputTokens: 10, outputTokens: 2,
-      estimatedCostUsd: 0.000123, toolCalls: 1, toolErrors: 0, latencyMs: 50,
+      estimatedCostUsd: 0.000123, toolCalls: 1, toolErrors: 0, modelFallbacks: 1, latencyMs: 50,
       tools: [{ name: 'get_logs', ok: true, latencyMs: 20, resultChars: 100 }],
     });
     jest.restoreAllMocks();
@@ -127,6 +171,7 @@ describe('agent metrics', () => {
     const run = JSON.parse(lines[0]);
     expect(run._aws.CloudWatchMetrics[0].Namespace).toBe('EECAR/Agent');
     expect(run.AgentCostMicroUsd).toBe(123);
+    expect(run.AgentModelFallbacks).toBe(1);
     expect(JSON.parse(lines[1]).Tool).toBe('get_logs');
   });
 });
