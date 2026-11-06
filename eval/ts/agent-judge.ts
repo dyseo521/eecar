@@ -65,7 +65,7 @@ q_correct_elsewhere: 핵심 조치가 아니더라도 답변 어딘가에 이 �
  * 판정 모델이 프롬프트의 함수 목록을 말한 답을 "지어냈다"고 봤다 (v2.2)
  */
 function promptFor(variant: string): string {
-  const file = one('agent-prompt') ?? (variant === 'config' ? 'eval/agent/config-runbook-system-prompt.txt' : 'eval/agent/shipped-v1.9.1-system-prompt.txt');
+  const file = one('agent-prompt') ?? (variant === 'config' ? 'eval/agent/config-runbook-system-prompt.txt' : variant === 'candidate' ? 'eval/agent/candidate-system-prompt.txt' : 'eval/agent/shipped-v1.9.1-system-prompt.txt');
   return readFileSync(file, 'utf-8').split('\r\n').join('\n');
 }
 
@@ -160,15 +160,18 @@ async function main(): Promise<void> {
   let inTok = 0, outTok = 0;
   for (const file of REPORTS) {
     const report = JSON.parse(readFileSync(file, 'utf-8'));
-    const variant = (file.match(/holdout2-([a-z]+)\.json$/)?.[1]) ?? report.meta?.tag ?? report.meta?.variant ?? 'unknown';
+    const variant = (file.match(/holdout2-([a-z]+)\.json$/)?.[1]) ?? report.meta?.variant ?? report.meta?.tag ?? 'unknown';
     const scenarioFile = report.meta?.scenarioFile ?? 'eval/agent/holdout_v2_scenarios.json';
     const scenarios = new Map((JSON.parse(readFileSync(scenarioFile, 'utf-8')).scenarios as any[]).map(s => [s.id, s]));
     for (const r of report.results) {
       const item = ITEMS?.find(i => i.variant === variant && i.scenario === r.id && i.run === r.run);
       if (ITEMS && !item) continue;
-      const truth = TRUTH[r.id];
-      if (!truth) continue;
       const scenario = scenarios.get(r.id);
+      // v3 시나리오는 정답을 시나리오에 함께 둔다. 유효한 다른 조치와 금지 조치도 정답 요지에 넣는다
+      const truth = scenario?.truth
+        ? { cause: scenario.truth.cause, fix: [scenario.truth.fix, ...(scenario.truth.acceptableFixes ?? []).map((f: string) => `또는 ${f}`), ...(scenario.truth.forbiddenFixes?.length ? [`(하면 안 되는 조치: ${scenario.truth.forbiddenFixes.join(', ')})`] : [])].join(' ') }
+        : TRUTH[r.id];
+      if (!truth) continue;
       const evidence = await fullEvidence(scenario, r.steps);
       const head = `## 사용자 질문\n${scenario.message}\n\n## 정답 요지\n- 원인: ${truth.cause}\n- 올바른 조치(한 가지 예): ${truth.fix}\n\n`;
       const c = await callTool(CAUSE_RUBRIC, `${head}## 도우미가 원래 아는 정보 (시스템 프롬프트)\n${promptFor(variant)}\n\n## 도우미가 조회한 자료\n${evidence}\n\n## 진단 도우미의 답변\n${r.response}`, CAUSE_TOOL);

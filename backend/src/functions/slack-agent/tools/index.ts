@@ -128,11 +128,12 @@ export const TOOLS: Tool[] = [
   {
     name: 'get_service_metrics',
     description:
-      '의존 서비스 지표를 조회합니다: bedrock(모델별 호출·스로틀·서버 오류), dynamodb(스로틀·소비 용량), apigateway(요청·5XX·4XX).',
+      '의존 서비스와 함수 한도 지표를 조회합니다: lambda(함수의 스로틀·지연 p99·최대 동시 실행, functionName 필요), bedrock(모델별 호출·스로틀·서버 오류), dynamodb(스로틀·소비 용량), apigateway(요청·5XX·4XX), canary(검색 합성 검사 실행 수와 벡터 후보 최솟값).',
     input_schema: {
       type: 'object',
       properties: {
-        service: { type: 'string', description: '서비스', enum: ['bedrock', 'dynamodb', 'apigateway'] },
+        service: { type: 'string', description: '서비스', enum: ['lambda', 'bedrock', 'dynamodb', 'apigateway', 'canary'] },
+        functionName: { type: 'string', description: 'service가 lambda일 때 함수명' },
         hours: { type: 'number', description: '조회 기간 (시간, 기본 24시간)' },
       },
       required: ['service'],
@@ -141,7 +142,7 @@ export const TOOLS: Tool[] = [
   {
     name: 'get_provider_status',
     description:
-      '외부 공급자(Anthropic, Slack)의 공개 상태와 진행 중인 장애를 조회합니다. 원인이 우리 쪽인지 공급자 쪽인지 가릴 때 사용합니다.',
+      '외부 공급자(AWS 서울 리전, Anthropic, Slack)의 공개 상태와 진행 중인 장애를 조회합니다. 원인이 우리 쪽인지 공급자 쪽인지 가릴 때 사용합니다.',
     input_schema: { type: 'object', properties: {}, required: [] },
   },
   SUBMIT_DIAGNOSIS_TOOL,
@@ -264,7 +265,7 @@ export async function executeTool(
         return { success: true, data: await getRecentChanges(input.functionName ? String(input.functionName) : undefined, Number(input.hours) || 168) };
 
       case 'get_service_metrics':
-        return { success: true, data: await getServiceMetrics(String(input.service), Number(input.hours) || 24) };
+        return { success: true, data: await getServiceMetrics(String(input.service), Number(input.hours) || 24, input.functionName ? String(input.functionName) : undefined) };
 
       case 'get_provider_status':
         return { success: true, data: await getProviderStatus() };

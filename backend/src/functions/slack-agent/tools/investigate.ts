@@ -8,6 +8,7 @@
 import { CloudTrailClient, LookupEventsCommand } from '@aws-sdk/client-cloudtrail';
 import { CloudFormationClient, DescribeStackEventsCommand } from '@aws-sdk/client-cloudformation';
 import { CloudWatchClient, GetMetricStatisticsCommand, type Datapoint } from '@aws-sdk/client-cloudwatch';
+import { resolveFunction } from './cloudwatch.js';
 
 const REGION = 'ap-northeast-2';
 const STACK = process.env.STACK_NAME || 'eecar-stack';
@@ -177,11 +178,38 @@ async function metricSum(namespace: string, metric: string, dimensions: Array<{ 
   return sum(r.Datapoints);
 }
 
-/** 의존 서비스 지표: Bedrock 모델별 호출·스로틀·서버 오류, DynamoDB 스로틀·소비 용량, API Gateway 5XX·4XX */
-export async function getServiceMetrics(service: string, hours = 24): Promise<Record<string, unknown>> {
+/** 의존 서비스 지표: Bedrock 모델별 호출·스로틀·서버 오류, DynamoDB 스로틀·소비 용량, API Gateway 5XX·4XX, 합성 검사 */
+export async function getServiceMetrics(service: string, hours = 24, functionName?: string): Promise<Record<string, unknown>> {
   const end = new Date();
   const since = new Date(end.getTime() - hours * 3_600_000);
   const period = Math.max(3600, hours * 60);
+  if (service === 'lambda') {
+    // 함수 한도 신호: 스로틀, 지연 p99, 최대 동시 실행 (get_function_status에는 평균 지연만 있다)
+    if (!functionName) return { service, error: 'functionName이 필요합니다' };
+    const { fullName, found } = await resolveFunction(functionName);
+    if (!found) return { service, functionName, found: false, note: `'${functionName}' 함수를 스택에서 찾지 못했습니다.` };
+    const d = [{ Name: 'FunctionName', Value: fullName }];
+    const stat = (metric: string, opts: { Statistics?: Array<'Maximum' | 'Sum'>; ExtendedStatistics?: string[] }) =>
+      cloudWatch.send(new GetMetricStatisticsCommand({ Namespace: 'AWS/Lambda', MetricName: metric, Dimensions: d, StartTime: since, EndTime: end, Period: period, ...opts }));
+    const [throttles, duration, concurrency] = await Promise.all([
+      stat('Throttles', { Statistics: ['Sum'] }),
+      stat('Duration', { ExtendedStatistics: ['p99'] }),
+      stat('ConcurrentExecutions', { Statistics: ['Maximum'] }),
+    ]);
+    const maxOf = (values: number[]) => (values.length ? Math.max(...values) : 0);
+    return {
+      service, functionName, windowHours: hours,
+      throttles: sum(throttles.Datapoints),
+      durationP99: Math.round(maxOf((duration.Datapoints ?? []).map(p => p.ExtendedStatistics?.p99 ?? 0))),
+      maxConcurrency: maxOf((concurrency.Datapoints ?? []).map(p => p.Maximum ?? 0)),
+    };
+  }
+  if (service === 'canary') {
+    // 검색 합성 검사(A-39): 벡터 후보가 0이면 오류 없이 벡터 검색이 꺼진 것이다
+    const r = await cloudWatch.send(new GetMetricStatisticsCommand({ Namespace: 'EECAR/Search', MetricName: 'VectorCandidates', Dimensions: [{ Name: 'Operation', Value: 'Canary' }], StartTime: since, EndTime: end, Period: period, Statistics: ['Minimum', 'SampleCount'] }));
+    const points = r.Datapoints ?? [];
+    return { service, windowHours: hours, runs: points.reduce((a, d) => a + (d.SampleCount ?? 0), 0), minVectorCandidates: points.length ? Math.min(...points.map(d => d.Minimum ?? 0)) : null };
+  }
   if (service === 'bedrock') {
     const models = [...new Set([process.env.BEDROCK_MODEL_ID, process.env.AGENT_MODEL_ID, process.env.AGENT_COMPLEX_MODEL_ID, 'amazon.titan-embed-text-v2:0'].filter(Boolean) as string[])];
     const rows = await Promise.all(models.map(async modelId => {
@@ -212,16 +240,50 @@ async function fetchJson(url: string): Promise<any> {
   return res.json();
 }
 
+const AWS_FEEDS = ['lambda', 'bedrock', 'dynamodb', 'apigateway', 's3', 'sns'];
+const AWS_NOTICE_WINDOW_DAYS = 7;
+
+/** AWS 공개 상태 RSS의 항목을 읽는다 (최근 7일) */
+export function parseAwsFeed(service: string, xml: string, now = Date.now()): Array<{ service: string; title: string; published: string; description: string }> {
+  const clean = (s: string | undefined) => (s ?? '').replace(/<!\[CDATA\[|\]\]>/g, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const items = xml.match(/<item>[\s\S]*?<\/item>/g) ?? [];
+  return items.map(item => ({
+    service,
+    title: clean(item.match(/<title>([\s\S]*?)<\/title>/)?.[1]),
+    published: clean(item.match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1]),
+    description: clean(item.match(/<description>([\s\S]*?)<\/description>/)?.[1]).slice(0, 300),
+  })).filter(i => {
+    const t = Date.parse(i.published);
+    return Number.isNaN(t) || now - t <= AWS_NOTICE_WINDOW_DAYS * 86_400_000;
+  });
+}
+
+async function awsNotices(): Promise<Record<string, unknown>> {
+  const results = await Promise.allSettled(AWS_FEEDS.map(async service => {
+    const res = await fetch(`https://status.aws.amazon.com/rss/${service}-ap-northeast-2.rss`, { signal: AbortSignal.timeout(STATUS_TIMEOUT_MS) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return parseAwsFeed(service, await res.text());
+  }));
+  const failed = AWS_FEEDS.filter((_, i) => results[i].status === 'rejected');
+  return {
+    region: 'ap-northeast-2',
+    notices: results.flatMap(r => (r.status === 'fulfilled' ? r.value : [])),
+    ...(failed.length ? { unavailable: failed } : {}),
+  };
+}
+
 /**
  * 공급자 공개 상태 페이지. 조회 실패는 "장애 없음"이 아니라 "확인 못 함"으로 돌려준다.
- * AWS Health API는 Business 이상 지원 플랜이 필요해 쓰지 않는다. AWS 쪽은 서비스 지표로 판단한다.
+ * AWS Health API는 Business 이상 지원 플랜이 필요해, AWS는 공개 상태 RSS(서울 리전)를 읽는다.
  */
 export async function getProviderStatus(): Promise<Record<string, unknown>> {
-  const [anthropic, slack] = await Promise.allSettled([
+  const [anthropic, slack, aws] = await Promise.allSettled([
     fetchJson('https://status.claude.com/api/v2/summary.json'),
     fetchJson('https://slack-status.com/api/v2.0.0/current'),
+    awsNotices(),
   ]);
   return {
+    aws: aws.status === 'fulfilled' ? aws.value : { unavailable: String((aws.reason as Error)?.message ?? aws.reason) },
     anthropic: anthropic.status === 'fulfilled'
       ? {
           indicator: anthropic.value?.status?.indicator,
@@ -232,6 +294,5 @@ export async function getProviderStatus(): Promise<Record<string, unknown>> {
     slack: slack.status === 'fulfilled'
       ? { status: slack.value?.status, incidents: (slack.value?.active_incidents ?? []).slice(0, 5).map((i: any) => ({ title: i.title, status: i.status, type: i.type })) }
       : { unavailable: String((slack.reason as Error)?.message ?? slack.reason) },
-    note: 'AWS 상태는 여기 없다. get_service_metrics와 로그로 판단한다.',
   };
 }
