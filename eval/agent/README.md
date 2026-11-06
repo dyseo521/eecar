@@ -9,6 +9,11 @@
 | `scenarios.json` | dev 시나리오 20개. 2개는 운영 CloudWatch 로그 원문, 18개는 AWS SDK·Lambda 실제 오류 형식의 합성 |
 | `holdout_scenarios.json` | 블라인드 홀드아웃 15개. 프롬프트·오케스트레이터·dev 시나리오를 보지 않은 별도 에이전트가 썼다 |
 | `baseline-system-prompt.txt` | A-35 수정 전 시스템 프롬프트 (`--variant baseline` 재현용) |
+| `holdout_v2_scenarios.json` | 블라인드 홀드아웃 v2 30개 (E-31에서 사전 등록, 한 번 씀). 함수 설정·권한 세계 상태 포함 |
+| `dev_h_scenarios.json` | 홀드아웃 v1을 dev로 돌린 것. 설정이 원인인 h02·h09에 세계 상태 추가 |
+| `world-default.json` | 운영 함수 12개의 설정·권한 스냅숏 (`eval/ts/export-agent-world.ts`, 비밀값 가림). 시나리오는 다른 부분만 덮어쓴다 |
+| `shipped-v1.9.1-system-prompt.txt`, `config-runbook-system-prompt.txt` | 비교용 프롬프트 (v1.9.1, 설정 도구 실험의 런북 포함) |
+| `../ts/agent-compare.ts` | 두 결과를 시나리오 단위로 짝지어 비교 (부트스트랩 구간, 범주별 부분집합) |
 | `../ts/agent-eval.ts` | 실행기. 에이전트(`orchestrator.runReActAgent`)는 운영 코드 그대로, 모델도 실제로 호출한다 |
 | `../reports/*-agent-eval-*.{json,md}` | 실행 결과 |
 
@@ -38,6 +43,8 @@ Bedrock 자격 증명이 필요하다. 시나리오 20개 × 3회에 약 $0.8가
 node --import tsx --import ./eval/ts/opt-alias.mjs eval/ts/agent-eval.ts --runs 3 --tag <이름>
 node --import tsx --import ./eval/ts/opt-alias.mjs eval/ts/agent-eval.ts --scenarios eval/agent/holdout_scenarios.json --tag holdout
 node --import tsx --import ./eval/ts/opt-alias.mjs eval/ts/agent-eval.ts --variant baseline --tag baseline   # 수정 전 동작
+node --import tsx --import ./eval/ts/opt-alias.mjs eval/ts/agent-eval.ts --variant config --tag config        # 설정·권한 도구 + 런북 (A-38 실험)
+npx tsx eval/ts/agent-compare.ts eval/reports/<A>.json eval/reports/<B>.json --exclude config,iam,limit
 node --import tsx --import ./eval/ts/opt-alias.mjs eval/ts/agent-eval.ts --regrade eval/reports/<파일>.json   # 다시 채점 (모델 호출 없음)
 ```
 
@@ -58,9 +65,22 @@ pass@1은 전체 실행 중 통과 비율, pass^3은 3회 모두 통과한 시�
 - 배포 구성의 dev 결과로 나눠 보면, 사실 정정과 응답 조립이 72% → 88%를 만들었다(함수 혼동, 없는 함수, 경고 오판, 잘못된 모델 ID). 지시문이 더하던 9%p는 쿼터 소진(s12)과 의도된 중복 억제(s13) 두 시나리오였다.
 - **홀드아웃 실패의 주원인은 에이전트가 볼 수 없는 정보다.** 에이전트는 로그와 지표만 본다. 함수 설정(환경 변수, 제한 시간, 레이어), 코드, IAM 정책, 플랫폼 한도(API Gateway 29초)를 볼 수 없어 원인을 짐작한다.
 
+### 홀드아웃 v2: 설정·권한 조회 도구 (E-31 사전 등록, E-32)
+
+| 구성 | pass@1 | 실행당 비용 |
+|---|---:|---:|
+| v1.9.1 | 44% | $0.0149 |
+| 설정·권한 도구 + 한도 런북 | 49% | $0.0211 |
+| 도구만 (탐색용) | 48% | $0.0181 |
+
+- 차이 +0.044 [−0.067, +0.156]로 사전 등록 기준(구간 하한 > 0)을 넘지 못해 **채택하지 않았다.** 도구는 평가에서만 켠다(A-38).
+- **채점기 검증**: 원인은 맞고 조치만 실패한 48건을 구성을 가린 채 별도 에이전트가 판정했더니, 25건(52%)은 맞는 조치를 다른 표현으로 썼다. 맞는 답을 통과로 바꿔도 판단은 같았다(+0.078 [−0.044, +0.200]).
+- 다음 개선의 병목은 에이전트가 아니라 채점기다. 사람 판정 표본과의 일치도를 먼저 잰다.
+
 ## 한계
 
 - 시나리오 수가 적다(dev 20, 홀드아웃 15). 시나리오 1개가 pass@1을 2~7%p 움직인다.
 - 원인·조치 표현 목록은 같은 뜻의 다른 표현을 놓칠 수 있다. 채점을 바꿀 때마다 응답을 직접 읽고 대조했다.
 - 홀드아웃 채점의 알려진 결함: h12(전체 상태 점검)는 `get_function_status('all')` 호출을 증거로 인정하지 않는다. 두 구성 모두 같은 영향을 받는다. 결과를 본 뒤에는 고치지 않았다.
-- 홀드아웃은 한 번 썼다. 다음 변경을 확인하려면 새 홀드아웃이 필요하다.
+- **조치 채점이 거칠다.** 자유 서술 답의 조치를 표현 목록으로 채점하면 맞는 답의 약 절반을 놓친다(E-32). 절대값은 낮게 나오고, 구성 간 차이도 잡음에 묻힌다.
+- 홀드아웃 v1·v2는 각각 한 번 썼다. 다음 변경을 확인하려면 새 홀드아웃이 필요하다.

@@ -1,0 +1,290 @@
+[
+ {
+  "id": "J01",
+  "scenario": "v2-18",
+  "variant": "shipped",
+  "run": 1
+ },
+ {
+  "id": "J02",
+  "scenario": "v2-11",
+  "variant": "config",
+  "run": 2
+ },
+ {
+  "id": "J03",
+  "scenario": "v2-11",
+  "variant": "config",
+  "run": 0
+ },
+ {
+  "id": "J04",
+  "scenario": "v2-27",
+  "variant": "shipped",
+  "run": 0
+ },
+ {
+  "id": "J05",
+  "scenario": "v2-18",
+  "variant": "config",
+  "run": 2
+ },
+ {
+  "id": "J06",
+  "scenario": "v2-13",
+  "variant": "config",
+  "run": 2
+ },
+ {
+  "id": "J07",
+  "scenario": "v2-12",
+  "variant": "config",
+  "run": 2
+ },
+ {
+  "id": "J08",
+  "scenario": "v2-17",
+  "variant": "shipped",
+  "run": 1
+ },
+ {
+  "id": "J09",
+  "scenario": "v2-10",
+  "variant": "config",
+  "run": 2
+ },
+ {
+  "id": "J10",
+  "scenario": "v2-12",
+  "variant": "config",
+  "run": 1
+ },
+ {
+  "id": "J11",
+  "scenario": "v2-12",
+  "variant": "shipped",
+  "run": 2
+ },
+ {
+  "id": "J12",
+  "scenario": "v2-27",
+  "variant": "config",
+  "run": 2
+ },
+ {
+  "id": "J13",
+  "scenario": "v2-15",
+  "variant": "config",
+  "run": 0
+ },
+ {
+  "id": "J14",
+  "scenario": "v2-28",
+  "variant": "config",
+  "run": 0
+ },
+ {
+  "id": "J15",
+  "scenario": "v2-17",
+  "variant": "shipped",
+  "run": 0
+ },
+ {
+  "id": "J16",
+  "scenario": "v2-03",
+  "variant": "config",
+  "run": 2
+ },
+ {
+  "id": "J17",
+  "scenario": "v2-20",
+  "variant": "config",
+  "run": 2
+ },
+ {
+  "id": "J18",
+  "scenario": "v2-10",
+  "variant": "config",
+  "run": 0
+ },
+ {
+  "id": "J19",
+  "scenario": "v2-11",
+  "variant": "config",
+  "run": 1
+ },
+ {
+  "id": "J20",
+  "scenario": "v2-06",
+  "variant": "shipped",
+  "run": 2
+ },
+ {
+  "id": "J21",
+  "scenario": "v2-28",
+  "variant": "config",
+  "run": 2
+ },
+ {
+  "id": "J22",
+  "scenario": "v2-20",
+  "variant": "shipped",
+  "run": 0
+ },
+ {
+  "id": "J23",
+  "scenario": "v2-03",
+  "variant": "config",
+  "run": 1
+ },
+ {
+  "id": "J24",
+  "scenario": "v2-02",
+  "variant": "config",
+  "run": 2
+ },
+ {
+  "id": "J25",
+  "scenario": "v2-14",
+  "variant": "config",
+  "run": 1
+ },
+ {
+  "id": "J26",
+  "scenario": "v2-15",
+  "variant": "config",
+  "run": 2
+ },
+ {
+  "id": "J27",
+  "scenario": "v2-30",
+  "variant": "shipped",
+  "run": 2
+ },
+ {
+  "id": "J28",
+  "scenario": "v2-12",
+  "variant": "config",
+  "run": 0
+ },
+ {
+  "id": "J29",
+  "scenario": "v2-11",
+  "variant": "shipped",
+  "run": 0
+ },
+ {
+  "id": "J30",
+  "scenario": "v2-20",
+  "variant": "shipped",
+  "run": 2
+ },
+ {
+  "id": "J31",
+  "scenario": "v2-14",
+  "variant": "shipped",
+  "run": 0
+ },
+ {
+  "id": "J32",
+  "scenario": "v2-14",
+  "variant": "shipped",
+  "run": 1
+ },
+ {
+  "id": "J33",
+  "scenario": "v2-24",
+  "variant": "config",
+  "run": 1
+ },
+ {
+  "id": "J34",
+  "scenario": "v2-18",
+  "variant": "config",
+  "run": 0
+ },
+ {
+  "id": "J35",
+  "scenario": "v2-18",
+  "variant": "shipped",
+  "run": 0
+ },
+ {
+  "id": "J36",
+  "scenario": "v2-13",
+  "variant": "shipped",
+  "run": 0
+ },
+ {
+  "id": "J37",
+  "scenario": "v2-03",
+  "variant": "shipped",
+  "run": 1
+ },
+ {
+  "id": "J38",
+  "scenario": "v2-20",
+  "variant": "config",
+  "run": 1
+ },
+ {
+  "id": "J39",
+  "scenario": "v2-20",
+  "variant": "shipped",
+  "run": 1
+ },
+ {
+  "id": "J40",
+  "scenario": "v2-07",
+  "variant": "config",
+  "run": 2
+ },
+ {
+  "id": "J41",
+  "scenario": "v2-27",
+  "variant": "shipped",
+  "run": 2
+ },
+ {
+  "id": "J42",
+  "scenario": "v2-18",
+  "variant": "config",
+  "run": 1
+ },
+ {
+  "id": "J43",
+  "scenario": "v2-02",
+  "variant": "shipped",
+  "run": 2
+ },
+ {
+  "id": "J44",
+  "scenario": "v2-18",
+  "variant": "shipped",
+  "run": 2
+ },
+ {
+  "id": "J45",
+  "scenario": "v2-13",
+  "variant": "shipped",
+  "run": 1
+ },
+ {
+  "id": "J46",
+  "scenario": "v2-11",
+  "variant": "shipped",
+  "run": 1
+ },
+ {
+  "id": "J47",
+  "scenario": "v2-10",
+  "variant": "shipped",
+  "run": 2
+ },
+ {
+  "id": "J48",
+  "scenario": "v2-20",
+  "variant": "config",
+  "run": 0
+ }
+]
