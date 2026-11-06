@@ -219,10 +219,14 @@ async function main(): Promise<void> {
   const only = arg('only')?.split(',');
   const model = arg('model');
   const tag = arg('tag');
+  // current: 운영 코드 그대로 (v1.9.1 이후 운영 = shipped와 같음)
   // baseline: A-35 수정 전 동작 (이전 시스템 프롬프트, 최종 답 병합 없음, 없는 함수에 0 지표)
-  // shipped: v1.9.1 (설정·권한 도구와 한도 런북 이전). tools-only: v1.9.1 프롬프트 + 설정·권한 도구 (탐색용, A-38)
+  // shipped: v1.9.1 프롬프트 + 운영 도구
+  // config: 설정·권한 도구 + 한도 런북 프롬프트 (A-38 실험, 홀드아웃 v2 미채택 E-32. 커밋 1cdebd3의 current와 같음)
+  // tools-only: v1.9.1 프롬프트 + 설정·권한 도구 (탐색용)
   const variant = arg('variant') ?? 'current';
   const LEGACY_TOOLS = ['analyze_error', 'get_logs', 'get_function_status', 'get_error_summary', 'recall_memory', 'save_memory'];
+  const CONFIG_TOOLS = [...LEGACY_TOOLS, 'get_function_config', 'get_function_permissions'];
   // 체크아웃 환경에 따라 CRLF가 될 수 있어 운영과 같은 LF로 맞춘다
   const promptFile = (f: string) => readFileSync(f, 'utf-8').split('\r\n').join('\n');
   const shippedPrompt = () => promptFile('eval/agent/shipped-v1.9.1-system-prompt.txt');
@@ -230,9 +234,11 @@ async function main(): Promise<void> {
     ? { systemPrompt: promptFile('eval/agent/baseline-system-prompt.txt'), mergeAnalysis: false, toolNames: LEGACY_TOOLS }
     : variant === 'shipped'
       ? { systemPrompt: shippedPrompt(), toolNames: LEGACY_TOOLS }
-      : variant === 'tools-only'
-        ? { systemPrompt: shippedPrompt() }
-        : {};
+      : variant === 'config'
+        ? { systemPrompt: promptFile('eval/agent/config-runbook-system-prompt.txt'), toolNames: CONFIG_TOOLS }
+        : variant === 'tools-only'
+          ? { systemPrompt: shippedPrompt(), toolNames: CONFIG_TOOLS }
+          : {};
   const { runReActAgent } = await import('../../backend/src/functions/slack-agent/orchestrator.js');
   const { analyzeError } = await import('../../backend/src/functions/slack-agent/tools/analyze-error.js');
   const scenarioFile = arg('scenarios') ?? 'eval/agent/scenarios.json';
