@@ -40,6 +40,14 @@ describe('classifySeverity', () => {
 });
 
 describe('parseLogEvent', () => {
+  it('does not read the service from file paths in the stack trace', () => {
+    const stack = '\n    at send (/opt/nodejs/utils/dynamodb.js:1:1)\n    at handler (/var/task/index.js:2:2)';
+    const type = (message: string) => parseLogEvent({ timestamp: 1, message }, VECTOR_SEARCH_LOG_GROUP).errorType;
+    expect(type(`ThrottlingException: Too many tokens per day${stack}`)).toBe('BedrockThrottling');
+    expect(type(`ThrottlingException: Rate exceeded${stack}`)).toBe('Throttling');
+    expect(type(`ValidationException: Invalid parameter: Subject${stack}`)).toBe('ValidationError');
+  });
+
   it('extracts request id, error type and message from a Node.js runtime ERROR line', () => {
     const parsed = parseLogEvent(
       {
@@ -59,9 +67,20 @@ describe('parseLogEvent', () => {
   });
 
   it.each([
-    ['ThrottlingException: Rate exceeded', 'BedrockThrottling'],
+    ['ThrottlingException: Too many requests, please wait before trying again.', 'BedrockThrottling'],
+    ['ThrottlingException: Too many tokens per day', 'BedrockThrottling'],
+    ['ThrottlingException: Throughput exceeds the current capacity of your table or index', 'DynamoDBThrottling'],
+    ['ThrottlingException: Rate exceeded', 'Throttling'],
     ['ModelNotFoundException: no such model', 'BedrockModelNotFound'],
-    ['AccessDeniedException: not authorized', 'BedrockAccessDenied'],
+    ['AccessDeniedException: User is not authorized to perform: bedrock:InvokeModel on resource', 'BedrockAccessDenied'],
+    ['AccessDeniedException: anthropic.claude-haiku-5-5 is not available for this account', 'BedrockAccessDenied'],
+    ['AccessDeniedException: User is not authorized to perform: dynamodb:PutItem on resource', 'DynamoDBAccessDenied'],
+    ['AccessDeniedException: User is not authorized to perform: s3vectors:QueryVectors', 'S3VectorsAccessDenied'],
+    ['AccessDeniedException: The ciphertext refers to a customer master key that does not exist', 'KMSAccessDenied'],
+    ['AccessDeniedException: not authorized', 'AccessDenied'],
+    ['ValidationException: Invalid vector dimension', 'S3VectorsValidation'],
+    ['ValidationException: Item size has exceeded the maximum allowed size', 'DynamoDBValidation'],
+    ['ValidationException: Invalid parameter: Subject', 'ValidationError'],
     ['ModelTimeoutException: took too long', 'BedrockTimeout'],
     ['ProvisionedThroughputExceededException: slow down', 'DynamoDBThrottling'],
     ['ResourceNotFoundException: table missing', 'DynamoDBResourceNotFound'],

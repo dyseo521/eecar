@@ -138,7 +138,7 @@ Attributes:
   - TTL: number (7일 후 자동 삭제)
 
 GSI1PK: CACHE
-GSI1SK: HIT_COUNT#{hitCount}
+GSI1SK: HIT_COUNT#1 (생성 시 고정. 적중 수는 hitCount를 원자적으로 올린다, A-41)
 ```
 
 ---
@@ -241,10 +241,10 @@ GSI1SK: SENT#{timestamp}
    GSI1: GSI1PK = "COMPANY#{buyerId}", GSI1SK begins_with "STATUS#pending#"
    ```
 
-4. **Find cached similar queries (most frequently hit)**
+4. **Find cached queries (most frequently hit)**
    ```
    GSI1: GSI1PK = "CACHE", GSI1SK begins_with "HIT_COUNT#"
-   (descending sort)
+   (정렬 키는 고정값이므로 적중 수 순서는 hitCount로 애플리케이션에서 정렬한다)
    ```
 
 5. **Get buyer's active watches**

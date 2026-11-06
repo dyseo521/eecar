@@ -77,20 +77,54 @@ function extractRequestId(message: string): string {
   return 'unknown';
 }
 
+/** 스택 경로(/var/runtime/index.js, /opt/nodejs/utils/dynamodb.js)가 서비스 판별에 걸리지 않게 뺀다 */
+function withoutStack(message: string): string {
+  return message.split('\n').filter(line => !/^\s*at\s/.test(line)).join('\n');
+}
+
+function throttlingType(fullMessage: string): string {
+  const message = withoutStack(fullMessage);
+  if (/dynamodb|\btable\b|\bindex\b|throughput exceeds/i.test(message)) return 'DynamoDBThrottling';
+  if (/too many (requests|tokens)|bedrock|anthropic|titan|\bmodel\b/i.test(message)) return 'BedrockThrottling';
+  return 'Throttling';
+}
+
+/** "not authorized to perform: dynamodb:PutItem" 같은 문구의 액션 접두사로 서비스를 정한다 */
+function accessDeniedType(fullMessage: string): string {
+  const message = withoutStack(fullMessage);
+  const action = /perform:?\s+(\w+):/i.exec(message)?.[1]?.toLowerCase();
+  const byAction: Record<string, string> = {
+    bedrock: 'BedrockAccessDenied', dynamodb: 'DynamoDBAccessDenied', s3vectors: 'S3VectorsAccessDenied', s3: 'S3AccessDenied',
+    kms: 'KMSAccessDenied', sns: 'SNSAccessDenied', ssm: 'SSMAccessDenied', lambda: 'LambdaAccessDenied',
+  };
+  if (action && byAction[action]) return byAction[action];
+  if (/ciphertext|customer master key|kms/i.test(message)) return 'KMSAccessDenied';
+  if (/\bmodel\b|bedrock|not available for this account/i.test(message)) return 'BedrockAccessDenied';
+  return 'AccessDenied';
+}
+
+function validationType(fullMessage: string): string {
+  const message = withoutStack(fullMessage);
+  if (/vector|dimension/i.test(message)) return 'S3VectorsValidation';
+  if (/item size|\bkey\b|expression|\btable\b|attribute|parameter values|exclusivestartkey|dynamodb/i.test(message)) return 'DynamoDBValidation';
+  return 'ValidationError';
+}
+
 function extractErrorType(message: string): string {
   // Bedrock 모델 수명 주기·입력 에러. 예외 이름이 DynamoDB와 같으므로 'model' 문맥으로 먼저 구분한다.
   // (2026-11-04 퇴역 모델 장애가 DynamoDBResourceNotFound로 잘못 분류됐었다)
   if (message.includes('ResourceNotFoundException') && /\bmodel\b/i.test(message)) return 'BedrockModelUnavailable';
   if (message.includes('ValidationException') && /\bmodel\b/i.test(message)) return 'BedrockValidation';
 
-  // Bedrock 에러
-  if (message.includes('ThrottlingException')) return 'BedrockThrottling';
+  // 같은 예외 이름을 여러 서비스가 쓴다. 메시지 내용으로 서비스를 가린다 (A-41).
+  // 이전에는 모든 스로틀·권한 오류를 Bedrock으로 표시해 DynamoDB 권한 오류도 BedrockAccessDenied로 나갔다
+  if (message.includes('ThrottlingException')) return throttlingType(message);
   if (message.includes('ModelNotFoundException')) return 'BedrockModelNotFound';
-  if (message.includes('AccessDeniedException')) return 'BedrockAccessDenied';
+  if (message.includes('AccessDeniedException')) return accessDeniedType(message);
   if (message.includes('ModelTimeoutException')) return 'BedrockTimeout';
 
   // DynamoDB 에러
-  if (message.includes('ValidationException')) return 'DynamoDBValidation';
+  if (message.includes('ValidationException')) return validationType(message);
   if (message.includes('ProvisionedThroughputExceededException')) return 'DynamoDBThrottling';
   if (message.includes('ResourceNotFoundException')) return 'DynamoDBResourceNotFound';
 

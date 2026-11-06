@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import crypto from 'crypto';
 import { generateEmbedding, findTopKSimilar, callClaude } from '/opt/nodejs/utils/bedrock.js';
 import { getVector, listVectorKeys } from '/opt/nodejs/utils/s3.js';
-import { getItem, putItem, batchGetItems, DynamoDBItem } from '/opt/nodejs/utils/dynamodb.js';
+import { getItem, putItem, batchGetItems, DynamoDBItem, incrementAttribute } from '/opt/nodejs/utils/dynamodb.js';
 import { successResponse, errorResponse, parseJsonBody } from '/opt/nodejs/utils/response.js';
 import { CANDIDATES_PER_RETRIEVER } from '/opt/nodejs/utils/search.js';
 import { getSearchIndex, partIdOf } from '/opt/nodejs/utils/search-index.js';
@@ -291,15 +291,16 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return errorResponse('Query is required', undefined, 400, event);
     }
 
-    console.log('Processing search query:', query);
-
     // Step 1: Check cache
     const queryHash = searchCacheKey(query, filters, topK, explain);
+    // 검색어 원문을 로그에 남기지 않는다. 알림 구독 필터(?ERROR ?Exception)에 걸려 누구나 CRITICAL 알림을 만들 수 있었고,
+    // 그 문자열이 자동이의 로그 입력으로도 들어갔다 (DECISION_LOG A-41)
+    console.log('Processing search:', { queryLength: String(query).length, queryHash });
     const cachedResult = canary ? undefined : await getItem(`MATCH#${queryHash}`, 'RESULT');
 
     if (cachedResult && cachedResult.TTL && Date.now() < cachedResult.TTL * 1000) {
       console.log('Cache hit!');
-      await incrementCacheHit(queryHash);
+      await recordCacheHit(queryHash);
       recordSearch(true, (cachedResult.matchedParts || []).length, { TotalMs: Date.now() - started });
       return successResponse({
         results: cachedResult.matchedParts,
@@ -698,14 +699,15 @@ export function matchesFilters(part: any, filters: any): boolean {
 /**
  * Increment cache hit counter
  */
-async function incrementCacheHit(queryHash: string): Promise<void> {
-  const item = await getItem(`MATCH#${queryHash}`, 'RESULT');
-  if (item) {
-    const newHitCount = (item.hitCount || 1) + 1;
-    await putItem({
-      ...item,
-      hitCount: newHitCount,
-      GSI1SK: `HIT_COUNT#${newHitCount}`,
-    });
+/**
+ * 캐시 적중 수를 올린다. 통계일 뿐이므로 실패해도 응답을 깨지 않는다 (A-41).
+ * 이전에는 항목 전체를 다시 읽어 덮어써서 동시 요청이 수를 잃었고, 쓰기 스로틀이 나면 캐시 적중이 500이 됐다 (C-04 잔여).
+ */
+async function recordCacheHit(queryHash: string): Promise<void> {
+  try {
+    await incrementAttribute(`MATCH#${queryHash}`, 'RESULT', 'hitCount');
+  } catch (error) {
+    // console.error는 알림 필터에 걸린다. 사용자 영향이 없는 통계 실패로 알림을 만들지 않는다
+    console.warn('Failed to record cache hit:', (error as Error)?.name);
   }
 }
