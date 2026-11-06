@@ -17,7 +17,8 @@
  * 세계 상태: 함수 설정·권한의 기본값은 운영 스냅숏(eval/agent/world-default.json)이고, 시나리오는 다른 부분만 덮어쓴다.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { join, resolve } from 'path';
+import { fileURLToPath } from 'url';
 
 interface Fixture {
   status?: { invocations: number; errors: number; avgDuration: number };
@@ -112,7 +113,7 @@ function healthy(name: string) {
 
 interface Call { name: string; functionName?: string }
 
-function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, legacyTools = false) {
+export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, legacyTools = false) {
   return async (name: string, input: Record<string, unknown>) => {
     calls.push({ name, ...(input.functionName ? { functionName: String(input.functionName) } : {}) });
     const fn = String(input.functionName ?? '');
@@ -333,7 +334,10 @@ function writeReport(scenarios: Scenario[], results: any[], runs: number, model:
 }
 
 
-main().catch(error => {
-  console.error(error);
-  process.exit(1);
-});
+// 직접 실행할 때만 평가를 돌린다 (다른 스크립트가 makeTools를 가져다 쓸 수 있게)
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch(error => {
+    console.error(error);
+    process.exit(1);
+  });
+}
