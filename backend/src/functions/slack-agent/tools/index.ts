@@ -7,6 +7,8 @@ import { analyzeError } from './analyze-error.js';
 import { getLambdaStatus, getRecentLogs, getErrorSummary, getAllLambdaStatuses } from './cloudwatch.js';
 import { recallMemory, saveMemory } from './memory.js';
 import { getFunctionConfig, getFunctionPermissions } from './config.js';
+import { getProviderStatus, getRecentChanges, getServiceMetrics } from './investigate.js';
+import { SUBMIT_DIAGNOSIS_TOOL } from './diagnosis.js';
 
 /**
  * 운영에서 모델에 보여주는 도구. 설정·권한 조회 도구(get_function_config, get_function_permissions)는
@@ -110,6 +112,39 @@ export const TOOLS: Tool[] = [
       required: ['functionName'],
     },
   },
+  {
+    name: 'get_recent_changes',
+    description:
+      '최근 변경 이력을 조회합니다: 스택 배포, 콘솔·스크립트의 함수 설정·코드·IAM·SSM 변경. 장애 대부분은 변경에서 시작하므로 장애 조사에서 먼저 확인합니다.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        functionName: { type: 'string', description: '특정 함수로 좁힐 때 (선택)' },
+        hours: { type: 'number', description: '조회 기간 (시간, 기본 168시간)' },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'get_service_metrics',
+    description:
+      '의존 서비스 지표를 조회합니다: bedrock(모델별 호출·스로틀·서버 오류), dynamodb(스로틀·소비 용량), apigateway(요청·5XX·4XX).',
+    input_schema: {
+      type: 'object',
+      properties: {
+        service: { type: 'string', description: '서비스', enum: ['bedrock', 'dynamodb', 'apigateway'] },
+        hours: { type: 'number', description: '조회 기간 (시간, 기본 24시간)' },
+      },
+      required: ['service'],
+    },
+  },
+  {
+    name: 'get_provider_status',
+    description:
+      '외부 공급자(Anthropic, Slack)의 공개 상태와 진행 중인 장애를 조회합니다. 원인이 우리 쪽인지 공급자 쪽인지 가릴 때 사용합니다.',
+    input_schema: { type: 'object', properties: {}, required: [] },
+  },
+  SUBMIT_DIAGNOSIS_TOOL,
   {
     name: 'get_error_summary',
     description:
@@ -224,6 +259,15 @@ export async function executeTool(
           return { success: true, data: status };
         }
       }
+
+      case 'get_recent_changes':
+        return { success: true, data: await getRecentChanges(input.functionName ? String(input.functionName) : undefined, Number(input.hours) || 168) };
+
+      case 'get_service_metrics':
+        return { success: true, data: await getServiceMetrics(String(input.service), Number(input.hours) || 24) };
+
+      case 'get_provider_status':
+        return { success: true, data: await getProviderStatus() };
 
       case 'get_function_config':
         return { success: true, data: await getFunctionConfig(String(input.functionName)) };

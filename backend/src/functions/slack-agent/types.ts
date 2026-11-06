@@ -50,6 +50,8 @@ export interface ToolProperty {
   type: string;
   description: string;
   enum?: string[];
+  items?: { type: string };
+  properties?: Record<string, ToolProperty>;
 }
 
 // ReAct 스텝
