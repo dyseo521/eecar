@@ -152,7 +152,7 @@ async function fullEvidence(scenario: any, steps: any[] | undefined): Promise<st
   const tools = makeTools(scenario, [], null, false);
   const rows: string[] = [];
   for (const st of steps ?? []) {
-    if (!st.action) continue;
+    if (!st.action || st.action === 'submit_diagnosis') continue;
     const target = String(st.actionInput?.functionName ?? st.actionInput?.query ?? '');
     let result: string;
     if (st.action === 'analyze_error') result = String(st.observation ?? '');
@@ -166,8 +166,13 @@ async function fullEvidence(scenario: any, steps: any[] | undefined): Promise<st
 }
 
 async function main(): Promise<void> {
-  const out: any[] = [];
+  // 한 건마다 저장한다. 일일 토큰 한도로 멈추면 전부 잃었다 (2026-11-06). --resume으로 이어서 실행한다
+  const date = new Date().toISOString().slice(0, 10);
+  const outFile = one('resume') ?? `eval/reports/${date}-agent-judge-${TAG}.json`;
+  const out: any[] = one('resume') ? JSON.parse(readFileSync(outFile, 'utf-8')).judgments : [];
+  const done = new Set(out.map(j => `${j.variant}/${j.scenario}/${j.run}`));
   let inTok = 0, outTok = 0;
+  const save = () => writeFileSync(outFile, JSON.stringify({ meta: { date, judgeVersion: JUDGE_VERSION, model: MODEL, reports: REPORTS, items: one('items') ?? null, inputTokens: inTok, outputTokens: outTok }, judgments: out }, null, 1));
   for (const file of REPORTS) {
     const report = JSON.parse(readFileSync(file, 'utf-8'));
     const variant = (file.match(/holdout2-([a-z]+)\.json$/)?.[1]) ?? report.meta?.variant ?? report.meta?.tag ?? 'unknown';
@@ -176,6 +181,7 @@ async function main(): Promise<void> {
     for (const r of report.results) {
       const item = ITEMS?.find(i => i.variant === variant && i.scenario === r.id && i.run === r.run);
       if (ITEMS && !item) continue;
+      if (done.has(`${variant}/${r.id}/${r.run}`)) continue;
       const scenario = scenarios.get(r.id);
       // v3 시나리오는 정답을 시나리오에 함께 둔다. 유효한 다른 조치와 금지 조치도 정답 요지에 넣는다
       const truth = scenario?.truth
@@ -192,13 +198,12 @@ async function main(): Promise<void> {
       const j = { cause: c.input.cause, wrong: c.input.wrong, fix, checklist, reason: c.input.reason, fixReason: f.input.reason };
       const pass = j.cause === 'yes' && j.fix === 'yes' && j.wrong === 'none';
       out.push({ item: item?.id, variant, scenario: r.id, run: r.run, ...j, pass, phrasePass: r.pass });
+      save();
       console.log(`${item?.id ?? ''} ${variant} ${r.id}#${r.run} cause=${j.cause} fix=${j.fix} wrong=${j.wrong} pass=${pass} (phrase ${r.pass})`);
     }
   }
-  const date = new Date().toISOString().slice(0, 10);
-  const file = `eval/reports/${date}-agent-judge-${TAG}.json`;
-  writeFileSync(file, JSON.stringify({ meta: { date, judgeVersion: JUDGE_VERSION, model: MODEL, reports: REPORTS, items: one('items') ?? null, inputTokens: inTok, outputTokens: outTok }, judgments: out }, null, 2) + '\n', 'utf-8');
-  console.log(`\n${out.length}건 → ${file} (입력 ${inTok}, 출력 ${outTok} 토큰)`);
+  save();
+  console.log(`\n${out.length}건 → ${outFile} (입력 ${inTok}, 출력 ${outTok} 토큰)`);
 }
 
 main().catch(error => {

@@ -18,7 +18,7 @@ import {
 import { AgentStep, ToolResult } from './types.js';
 import { JADONG_SYSTEM_PROMPT } from './prompts/system.js';
 import { PRODUCTION_TOOL_NAMES, TOOLS, executeTool } from './tools/index.js';
-import { Diagnosis, renderDiagnosis, DIAGNOSIS_FINALIZE_PROMPT, currentTimeSection } from './tools/diagnosis.js';
+import { Diagnosis, renderDiagnosis, DIAGNOSIS_FINALIZE_PROMPT, DIAGNOSIS_INVESTIGATE_PROMPT, currentTimeSection } from './tools/diagnosis.js';
 import { emitMetrics } from '/opt/nodejs/utils/emf.js';
 
 const bedrockClient = new BedrockRuntimeClient({ region: 'ap-northeast-2' });
@@ -172,6 +172,7 @@ export async function runReActAgent(
   let lastAnalysis = '';
   let diagnosis: Diagnosis | undefined;
   let finalizing = false;
+  let investigating = false;
 
   // Bedrock Converse API용 도구 정의
   const offered = deps.toolNames ?? PRODUCTION_TOOL_NAMES;
@@ -200,7 +201,7 @@ export async function runReActAgent(
           tools,
           ...(deps.requireDiagnosis && (finalizing || turnCount === MAX_TURNS)
             ? { toolChoice: { tool: { name: 'submit_diagnosis' } } }
-            : {}),
+            : investigating ? { toolChoice: { any: {} } } : {}),
         },
         inferenceConfig: {
           maxTokens: 2048,
@@ -307,6 +308,11 @@ export async function runReActAgent(
 
       // 구조화 진단이 필요하면 텍스트로 끝내지 않고 제출을 받는다 (앞의 분석은 대화에 남아 있다)
       if (textResponse && deps.requireDiagnosis && !finalizing) {
+        if (metrics.toolCalls === 0 && !investigating) {
+          investigating = true;
+          messages.push({ role: 'user', content: [{ text: DIAGNOSIS_INVESTIGATE_PROMPT }] });
+          continue;
+        }
         finalizing = true;
         messages.push({ role: 'user', content: [{ text: DIAGNOSIS_FINALIZE_PROMPT }] });
         continue;

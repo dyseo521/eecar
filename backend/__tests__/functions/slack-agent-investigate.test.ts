@@ -231,6 +231,28 @@ describe('orchestrator with submit_diagnosis', () => {
     expect(result.metrics.stopReason).toBe('final');
   });
 
+  it('makes the model investigate before it can conclude without calling any tool', async () => {
+    const choices: unknown[] = [];
+    const replies = [
+      reply([{ text: '근거가 부족합니다.' }]),
+      reply([{ toolUse: { toolUseId: 't1', name: 'get_recent_changes', input: {} } }]),
+      reply([{ text: '변경이 없습니다.' }]),
+      reply([submit('insufficient_evidence')]),
+    ];
+    const converse = jest.fn(async (input: ConverseCommandInput) => {
+      choices.push(input.toolConfig?.toolChoice);
+      return replies.shift()!;
+    });
+    const executeTool = jest.fn(async () => ({ success: true, data: { changes: [] } }));
+    const result = await runReActAgent('이상해요', { userId: 'U', channelId: 'C' }, {
+      converse, executeTool, emit: false, modelOverride: HAIKU, toolNames: ['get_recent_changes', 'submit_diagnosis'], requireDiagnosis: true,
+    });
+    expect(choices[1]).toEqual({ any: {} });
+    expect(choices[3]).toEqual({ tool: { name: 'submit_diagnosis' } });
+    expect(executeTool).toHaveBeenCalledTimes(1);
+    expect(result.diagnosis).toMatchObject({ verdict: 'insufficient_evidence' });
+  });
+
   it('forces the submission on the last turn so a long run still ends with a diagnosis', async () => {
     const choices: unknown[] = [];
     const converse = jest.fn(async (input: ConverseCommandInput) => {
