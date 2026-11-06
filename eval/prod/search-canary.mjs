@@ -1,7 +1,7 @@
 /**
  * 운영 검색 합성 검사 (DECISION_LOG A-39). 의존성 없이 Node 20+에서 실행한다.
  *
- *   node eval/prod/search-canary.mjs [--api https://.../prod]
+ *   node eval/prod/search-canary.mjs [--api https://.../prod] [--spec 다른-검사.json]
  *
  * - 검색: canary=true로 캐시를 거치지 않고 실제 파이프라인을 실행한다. 결과 카테고리·조건 위반과
  *   검색기별 후보 수(벡터·BM25), 색인 크기를 확인한다.
@@ -13,7 +13,9 @@ import { readFileSync, appendFileSync } from 'fs';
 const argApi = process.argv.indexOf('--api');
 const API = (argApi >= 0 ? process.argv[argApi + 1] : process.env.EECAR_API_URL) ||
   'https://6o4futufni.execute-api.ap-northeast-2.amazonaws.com/prod';
-const spec = JSON.parse(readFileSync(new URL('./canary.json', import.meta.url), 'utf-8'));
+const argSpec = process.argv.indexOf('--spec');
+// --spec: 다른 검사 정의로 실행 (일부러 실패하는 검사로 검출을 확인할 때)
+const spec = JSON.parse(readFileSync(argSpec >= 0 ? process.argv[argSpec + 1] : new URL('./canary.json', import.meta.url), 'utf-8'));
 
 async function post(path, payload) {
   const started = performance.now();
