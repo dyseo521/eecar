@@ -18,6 +18,7 @@ import {
 import { AgentStep, ToolResult } from './types.js';
 import { JADONG_SYSTEM_PROMPT } from './prompts/system.js';
 import { PRODUCTION_TOOL_NAMES, TOOLS, executeTool } from './tools/index.js';
+import { Diagnosis, renderDiagnosis } from './tools/diagnosis.js';
 import { emitMetrics } from '/opt/nodejs/utils/emf.js';
 
 const bedrockClient = new BedrockRuntimeClient({ region: 'ap-northeast-2' });
@@ -99,6 +100,8 @@ interface AgentContext {
 }
 
 export interface AgentResult {
+  /** submit_diagnosis로 제출한 구조화 진단 (제출한 경우만) */
+  diagnosis?: Diagnosis;
   response: string;
   steps: AgentStep[];
   metrics: AgentRunMetrics;
@@ -159,6 +162,7 @@ export async function runReActAgent(
   let finalResponse = '';
   // 도구 호출과 함께 쓴 분석 텍스트. 마지막 턴이 짧은 마무리만 쓰면 이것을 앞에 붙인다 (A-35)
   let lastAnalysis = '';
+  let diagnosis: Diagnosis | undefined;
 
   // Bedrock Converse API용 도구 정의
   const offered = deps.toolNames ?? PRODUCTION_TOOL_NAMES;
@@ -215,6 +219,15 @@ export async function runReActAgent(
 
       // Tool 호출이 있으면 실행
       if (hasToolUse && toolUses.length > 0) {
+        // 구조화 진단 제출: 다른 도구 호출과 함께 와도 제출을 최종 답으로 삼고 끝낸다 (A-40)
+        const submitted = toolUses.find(t => t.name === 'submit_diagnosis');
+        if (submitted) {
+          diagnosis = submitted.input as unknown as Diagnosis;
+          finalResponse = renderDiagnosis(diagnosis);
+          metrics.stopReason = 'final';
+          steps.push({ thought: '진단 제출', action: 'submit_diagnosis', actionInput: submitted.input as Record<string, unknown> });
+          break;
+        }
         if (textResponse.length >= ANALYSIS_MIN_CHARS) lastAnalysis = textResponse;
         const toolResults: ToolResultBlock[] = [];
 
@@ -327,6 +340,7 @@ export async function runReActAgent(
 
   return {
     response: finalResponse,
+    ...(diagnosis ? { diagnosis } : {}),
     steps,
     metrics,
   };
