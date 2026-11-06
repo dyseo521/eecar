@@ -1,0 +1,85 @@
+import json, io, random, collections
+
+import sys, argparse
+ROOT = "C:/Users/you1a/orca/eecar/"
+ap = argparse.ArgumentParser()
+ap.add_argument("--name", default="holdout2")  # 출력 이름: <name>-items.json, <name>-key.json
+ap.add_argument("--exclude", default=None)     # 이미 쓴 표본의 key (판정 모델 개발용 표본을 시험용에서 뺀다)
+ap.add_argument("--seed", type=int, default=20261106)
+ARGS = ap.parse_args()
+S = ROOT + "eval/agent/labeling/"
+
+TRUTH = {
+ "v2-01": ("검색 결과 캐시 항목이 DynamoDB 항목 최대 크기(400KB)를 넘는다. API로 올린 부품의 base64 이미지가 결과에 들어 있다.", "이미지처럼 큰 필드를 빼고 캐시에 저장하거나, 너무 크면 캐시 저장을 건너뛴다(검색 자체를 실패시키지 않는다)."),
+ "v2-02": ("WatchPartFunction의 정책이 읽기 전용으로 바뀌어 dynamodb:PutItem이 거부된다.", "쓰기 권한(PutItem, DynamoDBCrudPolicy)을 복구한다."),
+ "v2-03": ("KNOWLEDGE_BASE_ID가 비어 있는 것은 의도된 설정이다. USE_KNOWLEDGE_BASE=false이고 검색은 S3 Vectors를 쓴다.", "값을 채울 필요가 없다."),
+ "v2-04": ("API Gateway 통합 제한 시간 29초 때문에 504가 난다. Lambda는 66초에 끝까지 실행되어 데이터는 생성된다.", "비동기 처리(Event 호출 후 작업 ID 반환)로 바꾸거나 한 번에 만드는 개수를 줄인다."),
+ "v2-05": ("규정 검사 결과 파서가 정확히 '없음'인 줄만 걸러, '위반 사항 없음' 같은 문장도 위반으로 센다.", "모델 출력을 JSON 같은 구조화 형식으로 받거나 파싱 로직을 고친다."),
+ "v2-06": ("문의한 결제 함수(PaymentWebhookFunction)는 스택에 없다.", "정확한 함수 이름이나 알림 원문을 요청한다."),
+ "v2-07": ("콘솔 롤백 뒤 BatteryHealthAssessmentFunction이 레이어 v22에 고정됐다(최신은 27). v22에는 parts.js가 없다.", "레이어를 최신 버전(27)으로 되돌리거나 다시 배포한다."),
+ "v2-08": ("파트너가 limit=0으로 호출해 DynamoDB ValidationException이 나고 500을 돌려준다.", "입력을 검증해 400 Bad Request를 돌려준다."),
+ "v2-09": ("SlackNotificationFunction의 DynamoDB 권한이 빠져 중복 제거가 fail open으로 동작하고, 같은 알림이 반복된다.", "DynamoDB 권한을 복구한다."),
+ "v2-10": ("첫 요청만 느린 것은 콜드 스타트이고, punycode DeprecationWarning은 원인과 무관한 경고다.", "조치가 필요 없다(그대로 둬도 된다)."),
+ "v2-11": ("PartRegistrationFunction 제한 시간이 3초로 줄었다. METADATA를 저장한 뒤 시간이 초과되어, 사용자는 실패를 보지만 부품은 등록된다(재시도하면 중복).", "제한 시간을 원래 값(60초)으로 늘린다."),
+ "v2-12": ("ESM import에서 .js 확장자가 빠졌다. Jest의 moduleNameMapper가 테스트에서 이를 가렸다.", "import 경로에 .js를 붙인다."),
+ "v2-13": ("SNS Subject는 100자 미만이어야 해서, 제목이 긴 문의가 InvalidParameter로 실패한다.", "Subject를 100자 미만으로 자른다."),
+ "v2-14": ("배포 후 모든 함수가 정상이다.", "추가 조치가 필요 없다."),
+ "v2-15": ("ComplianceCheckFunction의 Bedrock 정책이 서울 리전 ARN으로만 좁혀져, global 추론 프로필이 쓰는 다른 리전의 foundation-model ARN이 빠졌다. 그래서 검사가 항상 '위반 없음'이 된다.", "모든 리전의 foundation-model 리소스(arn:aws:bedrock:::foundation-model/* 등)를 다시 추가한다."),
+ "v2-16": ("모델이 따옴표를 이스케이프하지 않은 깨진 JSON을 돌려줘 설명이 기본 문구로 폴백된다. Bedrock 자체는 정상이다.", "구조화된 출력(tool use)을 쓰거나 프롬프트·파싱을 고친다."),
+ "v2-17": ("가끔만 알림이 오는 것은 의도된 5분 중복 제거 창 때문이다. 256MB 메모리는 원인이 아니다.", "조치가 필요 없다(메모리 증설도 필요 없다)."),
+ "v2-18": ("SyntheticDataFunction의 BEDROCK_MODEL_ID가 추론 프로필 없이 Sonnet 4.5 모델 ID로 바뀌어 on-demand 호출이 거부되고, 템플릿 문장으로 폴백된다.", "global./apac. 추론 프로필 ID로 바꾸거나 원래 값(Globals)으로 되돌린다."),
+ "v2-19": ("일괄 적재한 레코드의 suitableApplications가 배열이 아니라 문자열이라 TypeError가 난다.", "데이터를 배열로 고치거나 코드가 문자열도 처리하게 한다."),
+ "v2-20": ("GetPartsFunction 정책에 테이블 ARN만 있고 인덱스 ARN(index/*)이 없어 목록 조회(GSI Query)가 실패한다. 프론트엔드는 샘플 데이터로 폴백한다.", "인덱스 ARN 권한을 추가한다."),
+ "v2-21": ("막연한 질문이고, 모든 함수가 정상이다.", "어떤 기능·화면·시각인지 구체적으로 묻는다."),
+ "v2-22": ("붙여 넣은 데이터시트가 Titan 임베딩 입력 한도(8,192토큰)를 넘는다. 실패 전에 저장된 부품이 중복으로 남는다.", "임베딩 입력을 자르거나 요약하고, 길이를 제한한다."),
+ "v2-23": ("에러가 몰릴 때 Slack 웹훅 속도 제한(429)에 걸려 일부 알림이 빠진다.", "Retry-After를 지키는 재시도·백오프를 넣거나 알림을 묶어 보낸다."),
+ "v2-24": ("DynamoDB TTL 삭제는 늦게 일어난다. 코드가 TTL을 직접 비교하므로 문제가 아니다.", "조치가 필요 없다."),
+ "v2-25": ("MaterialPropertySearchFunction 메모리가 128MB로 줄어 전체 카탈로그를 읽을 때 메모리가 부족하다.", "메모리를 원래 값(512MB)으로 늘린다."),
+ "v2-26": ("7일 결과 캐시가 부품 등록 전의 결과를 돌려준다. 띄어쓰기는 원인이 아니다.", "해당 캐시 항목을 지우거나 등록 시 캐시를 무효화한다."),
+ "v2-27": ("문의는 설계상 DB에 저장하지 않고 SNS 이메일로만 보낸다. 고장이 아니다.", "구독된 이메일 수신함을 확인하도록 안내한다."),
+ "v2-28": ("ProposalFunction의 SNS 정책 리소스에 오타(eecar-notification)가 있다.", "리소스를 eecar-notifications(!Ref NotificationTopic)로 고친다."),
+ "v2-29": ("utils를 바꿨지만 레이어를 다시 빌드하지 않아 새 레이어 버전이 없고, 함수가 레이어에 없는 export를 import한다.", "레이어를 다시 빌드해 함께 배포한다(build:all 후 배포)."),
+ "v2-30": ("함수 이름 오타(MaterialSearchFunction)다. 실제 MaterialPropertySearchFunction은 정상이다.", "정확한 함수 이름을 안내하고, 에러가 없다고 답한다."),
+}
+
+sc = {s["id"]: s for s in json.load(io.open(ROOT + "eval/agent/holdout_v2_scenarios.json", encoding="utf-8"))["scenarios"]}
+judged = {(k["variant"], k["scenario"], k["run"]) for k in json.load(io.open(ROOT + "eval/reports/2026-11-06-agent-eval-holdout2-fixjudge-key.json", encoding="utf-8"))}
+
+runs = []
+for t in ("shipped", "config", "toolsonly"):
+    d = json.load(io.open(ROOT + f"eval/reports/2026-11-06-agent-eval-holdout2-{t}.json", encoding="utf-8"))
+    for r in d["results"]:
+        stratum = "pass" if r["pass"] else ("fixonly" if (r["cause"] and not r["fix"] and r["noWrongClaim"] and r["evidence"]) else ("cause" if not r["cause"] else "other"))
+        evidence = [{"tool": st.get("action"), "target": (st.get("actionInput") or {}).get("functionName") or (st.get("actionInput") or {}).get("query") or "", "result": str(st.get("observation", ""))[:1200]} for st in (r.get("steps") or []) if st.get("action")]
+        runs.append({"variant": t, "scenario": r["id"], "run": r["run"], "stratum": stratum, "grader": {k: r[k] for k in ("cause", "fix", "noWrongClaim", "evidence", "pass")}, "response": r["response"], "evidence": evidence})
+
+rng = random.Random(ARGS.seed)
+excluded = set()
+if ARGS.exclude:
+    excluded = {(k["variant"], k["scenario"], k["run"]) for k in json.load(io.open(ARGS.exclude, encoding="utf-8"))}
+runs = [r for r in runs if (r["variant"], r["scenario"], r["run"]) not in excluded]
+rng.shuffle(runs)
+quota = {"pass": 14, "fixonly": 14, "cause": 12}
+per_scenario = collections.Counter()
+picked = []
+for r in runs:
+    st = r["stratum"]
+    if quota.get(st, 0) <= 0 or per_scenario[r["scenario"]] >= 2:
+        continue
+    if st == "fixonly" and not ARGS.exclude and (r["variant"], r["scenario"], r["run"]) not in judged:
+        continue
+    picked.append(r); quota[st] -= 1; per_scenario[r["scenario"]] += 1
+assert all(v == 0 for v in quota.values()), quota
+rng.shuffle(picked)
+
+items, key = [], []
+for i, r in enumerate(picked):
+    s = sc[r["scenario"]]
+    cause, fix = TRUTH[r["scenario"]]
+    iid = f"L{i+1:02d}"
+    items.append({"id": iid, "scenario": r["scenario"], "title": s["title"], "question": s["message"], "truthCause": cause, "truthFix": fix, "answer": r["response"], "evidence": r["evidence"]})
+    key.append({"id": iid, "variant": r["variant"], "scenario": r["scenario"], "run": r["run"], "stratum": r["stratum"], "grader": r["grader"]})
+
+io.open(S + f"{ARGS.name}-items.json", "w", encoding="utf-8").write(json.dumps(items, ensure_ascii=False))
+io.open(S + f"{ARGS.name}-key.json", "w", encoding="utf-8").write(json.dumps(key, ensure_ascii=False, indent=1))
+print(len(items), collections.Counter(k["stratum"] for k in key), collections.Counter(k["variant"] for k in key), len(set(k["scenario"] for k in key)))

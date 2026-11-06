@@ -1,0 +1,772 @@
+{
+  "meta": {
+    "date": "2026-11-06",
+    "judgeVersion": "v2",
+    "model": "apac.amazon.nova-pro-v1:0",
+    "reports": [
+      "eval/reports/2026-11-06-agent-eval-holdout2-shipped.json",
+      "eval/reports/2026-11-06-agent-eval-holdout2-config.json",
+      "eval/reports/2026-11-06-agent-eval-holdout2-toolsonly.json"
+    ],
+    "items": "eval/agent/labeling/holdout2-key.json",
+    "inputTokens": 232441,
+    "outputTokens": 7737
+  },
+  "judgments": [
+    {
+      "item": "L33",
+      "variant": "shipped",
+      "scenario": "v2-02",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미의 답변에서 정확한 원인을 짚었다.",
+      "fixReason": "IAM 역할에 필요한 권한을 추가하면 문제가 해결될 것으로 판단됩니다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "item": "L27",
+      "variant": "shipped",
+      "scenario": "v2-04",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미는 API Gateway의 기본 타임아웃이 29초이기 때문에 504 Gateway Timeout 오류가 발생한다고 정확히 짚었다.",
+      "fixReason": "API Gateway 타임아웃을 60초로 증가하면 문제가 해결될 것으로 예상됩니다.",
+      "pass": true,
+      "phrasePass": true
+    },
+    {
+      "item": "L37",
+      "variant": "shipped",
+      "scenario": "v2-06",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "함수가 스택에 없다는 점을 정확히 짚었다.",
+      "fixReason": "진단 도우미는 정확한 함수 이름이나 알림 원문을 요청하는 것이 올바른 조치다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L06",
+      "variant": "shipped",
+      "scenario": "v2-09",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미는 SlackNotificationFunction의 DynamoDB 권한 문제를 언급하지 않고, 여러 가능성을 제시했다.",
+      "fixReason": "SlackNotificationFunction의 집계/중복 제거 로직에 문제가 있을 가능성을 제시하고 확인 방법을 안내했으나, 구체적인 조치를 제안하지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L12",
+      "variant": "shipped",
+      "scenario": "v2-10",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no"
+      },
+      "reason": "첫 요청의 느린 속도는 콜드 스타트 때문이고, punycode DeprecationWarning은 성능 저하와 직접적인 관련이 없다는 점을 잘 설명했다.",
+      "fixReason": "첫 요청이 느린 원인은 콜드 스타트이고, punycode DeprecationWarning은 원인과 무관한 경고이므로 조치가 필요 없다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L16",
+      "variant": "shipped",
+      "scenario": "v2-11",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미는 Lambda 타임아웃과 임베딩 생성 지연을 원인으로 언급했지만, 실제 원인은 PartRegistrationFunction의 제한 시간 감소 때문이다.",
+      "fixReason": "Lambda 타임아웃 값을 증가하고 메모리 할당을 늘리는 것은 문제를 해결할 수 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L14",
+      "variant": "shipped",
+      "scenario": "v2-11",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미는 PartRegistrationFunction의 타임아웃 문제를 정확히 짚었다.",
+      "fixReason": "Lambda 타임아웃을 10초로 늘리는 것은 원인을 해결하는 방향으로 가는 조치이지만, 원인 요지에서 제안한 60초로 늘리는 것보다는 덜 적절하다. 그러나 일부 문제를 해결할 수 있으므로 q_resolves는 yes로 판정한다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "item": "L32",
+      "variant": "shipped",
+      "scenario": "v2-14",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "모든 함수가 정상 작동하고 있으며, 에러가 없다는 점을 정확히 파악했다.",
+      "fixReason": "모든 함수가 정상 작동하고 있으므로 추가 조치가 필요 없다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L26",
+      "variant": "shipped",
+      "scenario": "v2-15",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "진단 도우미는 IAM 권한 부족을 원인으로 짚었지만, 정답 요지에서는 Bedrock 정책의 리전 ARN 문제를 언급했다. 진단 도우미의 답변은 방향은 맞지만 핵심 원인을 놓쳤다.",
+      "fixReason": "진단 도우미의 답변은 정책 문서에 필요한 리소스를 추가하는 조치를 제공했다. 이는 원인을 해결하는 데 도움이 된다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L17",
+      "variant": "shipped",
+      "scenario": "v2-15",
+      "run": 1,
+      "cause": "no",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "진단 도우미는 IAM 권한 부족을 원인으로 지목했지만, 실제 원인은 ComplianceCheckFunction의 Bedrock 정책이 서울 리전 ARN으로만 좁혀져, global 추론 프로필이 쓰는 다른 리전의 foundation-model ARN이 빠졌기 때문이다.",
+      "fixReason": "진단 도우미의 답변은 정답 요지에 맞는 조치를 제공했다. 모든 리전의 foundation-model 리소스에 대한 권한을 추가하는 것이 문제를 해결할 것이다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L21",
+      "variant": "shipped",
+      "scenario": "v2-29",
+      "run": 0,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미는 utils 파일에 함수가 없다고 단정했지만, 실제 원인은 레이어를 다시 빌드하지 않아 함수가 없는 것이다.",
+      "fixReason": "진단 도우미는 search-document.js 파일에 export 추가를 권했지만, 실제 원인은 레이어 버전이 업데이트되지 않았기 때문입니다. 따라서 제시된 조치는 문제를 해결하지 못합니다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L15",
+      "variant": "shipped",
+      "scenario": "v2-30",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "함수 이름 오타를 정확히 짚었다.",
+      "fixReason": "함수 이름 오타를 지적하고 정확한 함수 이름을 안내했다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "item": "L25",
+      "variant": "config",
+      "scenario": "v2-03",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "yes"
+      },
+      "reason": "진단 도우미는 KNOWLEDGE_BASE_ID가 비어 있는 것이 의도된 설정이라는 정답 요지를 올바르게 파악했다.",
+      "fixReason": "KNOWLEDGE_BASE_ID를 채우라는 권장사항은 현재 상황에서는 필요 없다. 검색 정확도 개선을 위한 다른 조치를 먼저 시도해야 한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L35",
+      "variant": "config",
+      "scenario": "v2-03",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "진단 도우미는 KNOWLEDGE_BASE_ID가 비어 있는 것이 의도된 설정이라고 정확히 설명했다.",
+      "fixReason": "현재 설정에서 KNOWLEDGE_BASE_ID가 비어 있는 것은 의도된 설정이므로 값을 채울 필요가 없다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L34",
+      "variant": "config",
+      "scenario": "v2-10",
+      "run": 0,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미는 punycode DeprecationWarning이 첫 요청의 성능을 직접 저하시킨다고 단정했지만, 이는 정답 요지와 다르다. 정답 요지에 따르면, punycode DeprecationWarning은 첫 요청의 성능 저하와 무관한 경고이다.",
+      "fixReason": "첫 요청의 느린 속도는 콜드 스타트 때문이고, punycode DeprecationWarning은 원인과 무관한 경고이므로 조치가 필요 없다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L39",
+      "variant": "config",
+      "scenario": "v2-12",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "진단 도우미가 ESM import에서.js 확장자가 빠졌다는 정확한 원인을 짚었다.",
+      "fixReason": "진단 도우미는 즉시 롤백을 추천했고, 이는 장애를 해결할 것으로 보인다. 그러나 근본 원인을 파악하고 해결하는 과정도 포함되어 있다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "item": "L07",
+      "variant": "config",
+      "scenario": "v2-12",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "진단 도우미가 정확하게 원인을 짚었다.",
+      "fixReason": "진단 도우미의 답변은 ESM import 경로에 누락된.js 확장자를 추가하는 것을 권장했으며, 이는 문제를 해결할 것으로 보인다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "item": "L02",
+      "variant": "config",
+      "scenario": "v2-13",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "진단 도우미는 문의 내용(Subject)에 특수문자나 줄바꿈이 포함되면 SNS가 거부한다고 언급했지만, 정답 요지는 SNS Subject가 100자 미만이어야 한다는 것을 강조했다. 진단 도우미는 특수문자와 줄바꿈에 대한 제약을 언급했지만, 주요 원인인 100자 제한을 명확하게 언급하지 않았다.",
+      "fixReason": "Subject 정제 함수를 추가하고, 프론트엔드에서 입력값을 검증하는 조치는 SNS Subject 제약을 충족하도록 하므로 문제를 해결할 것으로 예상됩니다.",
+      "pass": false,
+      "phrasePass": true
+    },
+    {
+      "item": "L19",
+      "variant": "config",
+      "scenario": "v2-14",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "모든 함수가 정상 작동 중이므로 문제가 없다고 판단했다.",
+      "fixReason": "모든 함수가 정상 작동 중이므로 추가 조치가 필요 없다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "item": "L28",
+      "variant": "config",
+      "scenario": "v2-18",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미는 정답 요지의 원인을 정확하게 짚었다.",
+      "fixReason": "진단 도우미의 답변은 세 가지 옵션을 제시하고, 그 중 첫 번째 옵션을 권장하고 있다. 이 옵션은 문제를 해결할 수 있다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "item": "L03",
+      "variant": "config",
+      "scenario": "v2-19",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "진단 도우미가 제공한 답변은 정답 요지와 일치하며, 잘못된 단정이 없다.",
+      "fixReason": "진단 도우미의 답변은 문제의 원인을 정확히 짚고, 해결책을 제시했다. 즉시 조치로 데이터 정정을 제안하고, 코드 방어 강화, 데이터 마이그레이션, 검증 추가 등 여러 단계의 조치를 제안했다.",
+      "pass": true,
+      "phrasePass": true
+    },
+    {
+      "item": "L30",
+      "variant": "config",
+      "scenario": "v2-20",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "IAM 정책에서 GSI1, GSI2에 대한 Query 권한이 없다는 점을 정확히 짚었다.",
+      "fixReason": "IAM 정책에 인덱스 ARN을 추가하면 문제가 해결될 것이다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "item": "L23",
+      "variant": "config",
+      "scenario": "v2-21",
+      "run": 0,
+      "cause": "no",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "모든 함수가 정상이므로 문제가 없다고 판단했다.",
+      "fixReason": "막연한 질문에 대해 구체적인 정보를 요청하는 것은 올바른 조치다.",
+      "pass": false,
+      "phrasePass": true
+    },
+    {
+      "item": "L29",
+      "variant": "config",
+      "scenario": "v2-21",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "모든 함수가 정상 작동했으므로 문제가 없다고 판단했다.",
+      "fixReason": "모든 함수가 정상 작동하고 있으며, 막연한 질문에 대해 구체적인 정보를 요청하는 것은 적절한 조치이다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L05",
+      "variant": "config",
+      "scenario": "v2-22",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미는 정답 요지와 일치하는 원인을 제시했다.",
+      "fixReason": "입력값 검증 추가, 중복 항목 정리, 사용자 안내 등 여러 단계의 조치를 제안했으며, 이러한 조치를 통해 문제를 해결할 수 있다.",
+      "pass": true,
+      "phrasePass": true
+    },
+    {
+      "item": "L20",
+      "variant": "config",
+      "scenario": "v2-23",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미는 Slack 웹훅 API의 초당 요청 수 제한으로 인한 429 에러를 정확하게 원인으로 짚었다.",
+      "fixReason": "Retry-After를 지키는 재시도·백오프를 넣거나 알림을 묶어 보내는 조치가 제안되었다.",
+      "pass": true,
+      "phrasePass": true
+    },
+    {
+      "item": "L40",
+      "variant": "config",
+      "scenario": "v2-26",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미는 캐시 히트 문제를 정확히 짚었다.",
+      "fixReason": "캐시 무효화를 통해 올바른 결과를 반환할 수 있다.",
+      "pass": true,
+      "phrasePass": true
+    },
+    {
+      "item": "L18",
+      "variant": "config",
+      "scenario": "v2-28",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "진단 도우미는 ProposalFunction의 SNS 정책 리소스에 오타(eecar-notification)가 있다는 정답 요지의 원인을 정확히 짚었다.",
+      "fixReason": "SNS 정책의 리소스 ARN에 오타가 있어 알림 메일이 발송되지 않는 문제를 해결하기 위해 리소스 ARN을 올바른 값으로 수정하는 것이 필요하다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "item": "L09",
+      "variant": "config",
+      "scenario": "v2-28",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미는 IAM 권한 오류를 정확히 짚었다.",
+      "fixReason": "IAM 역할에 필요한 SNS 권한을 추가하면 문제가 해결될 것으로 판단됩니다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "item": "L10",
+      "variant": "config",
+      "scenario": "v2-29",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {},
+      "reason": "도우미는 정답 요지의 원인을 정확히 파악했다.",
+      "fixReason": "레이어를 다시 빌드하고 함께 배포하면 문제가 해결될 것으로 보이므로 q_resolves=yes, 명령어는 그대로 동작할 것으로 보이므로 q_works_as_written=yes, 명령어 자체는 상황을 악화시키지 않을 것으로 보이므로 q_harmful=no, 올바른 조치를 올바른 순서로 권했으므로 q_wrong_first=no",
+      "pass": false,
+      "phrasePass": true
+    },
+    {
+      "item": "L31",
+      "variant": "toolsonly",
+      "scenario": "v2-02",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미의 답변이 정답 요지와 일치하여 원인을 정확히 짚었다.",
+      "fixReason": "IAM 정책에 쓰기 권한(PutItem)을 추가하면 문제가 해결될 것으로 예상됩니다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "item": "L24",
+      "variant": "toolsonly",
+      "scenario": "v2-04",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "API Gateway의 기본 타임아웃이 29초로, Lambda 실행 시간인 약 66초보다 짧아 504 Gateway Timeout이 발생한다는 점을 정확히 짚었다.",
+      "fixReason": "비동기 처리로 변경하는 것이 가장 적절한 해결책이며, Lambda 실행 시간과 API Gateway 타임아웃 간의 불일치 문제를 해결할 수 있다.",
+      "pass": true,
+      "phrasePass": true
+    },
+    {
+      "item": "L11",
+      "variant": "toolsonly",
+      "scenario": "v2-06",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "함수가 스택에 없다는 점을 정확히 짚었다.",
+      "fixReason": "함수명을 확인하고 정확한 함수명을 요청하는 것은 올바른 접근 방식이다.",
+      "pass": false,
+      "phrasePass": true
+    },
+    {
+      "item": "L08",
+      "variant": "toolsonly",
+      "scenario": "v2-13",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미는 제목의 길이 제한을 언급하면서 다른 가능한 원인도 제시했다.",
+      "fixReason": "진단 도우미의 답변은 제공된 정답 요지에 따라 Subject를 100자 미만으로 자르는 올바른 조치를 제안했다.",
+      "pass": true,
+      "phrasePass": true
+    },
+    {
+      "item": "L22",
+      "variant": "toolsonly",
+      "scenario": "v2-16",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미의 답변이 정답 요지와 일치하며, 잘못된 단정이 없다.",
+      "fixReason": "JSON 파싱 실패 문제를 해결하기 위한 즉각적인 조치를 제안했다.",
+      "pass": true,
+      "phrasePass": true
+    },
+    {
+      "item": "L04",
+      "variant": "toolsonly",
+      "scenario": "v2-19",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미의 답변이 정답 요지와 일치하며, 잘못된 단정이 없다.",
+      "fixReason": "일괄 적재한 레코드의 suitableApplications가 배열이 아니라 문자열이라 TypeError가 난다. 데이터를 배열로 고치거나 코드가 문자열도 처리하게 하면 해결된다.",
+      "pass": true,
+      "phrasePass": true
+    },
+    {
+      "item": "L36",
+      "variant": "toolsonly",
+      "scenario": "v2-23",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no"
+      },
+      "reason": "도우미는 로그에 나타난 429 에러를 바탕으로 Slack API의 레이트 제한이 원인임을 정확히 짚었다.",
+      "fixReason": "Retry-After를 지키는 재시도·백오프를 넣거나 알림을 묶어 보내는 것이 문제를 해결할 수 있다.",
+      "pass": true,
+      "phrasePass": true
+    },
+    {
+      "item": "L13",
+      "variant": "toolsonly",
+      "scenario": "v2-27",
+      "run": 1,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no"
+      },
+      "reason": "문의 기능은 설계상 DB에 저장하지 않고 SNS 이메일로만 보내는 것으로, 고장이 아님에도 다른 원인으로 단정했다.",
+      "fixReason": "문의 기능은 설계상 DynamoDB에 저장하지 않고 SNS 이메일로만 보내는 것으로, 문제가 아닙니다. 따라서 DynamoDB 권한 추가는 필요 없습니다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L01",
+      "variant": "toolsonly",
+      "scenario": "v2-27",
+      "run": 2,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no"
+      },
+      "reason": "문의 기능이 고장난 것이 아니라, 설계상 DB에 저장하지 않고 SNS 이메일로만 보내도록 되어 있다는 점을 놓쳤다.",
+      "fixReason": "문의는 설계상 DB에 저장하지 않고 SNS 이메일로만 보낸다. 고장이 아니다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "item": "L38",
+      "variant": "toolsonly",
+      "scenario": "v2-30",
+      "run": 1,
+      "cause": "no",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no"
+      },
+      "reason": "함수 이름 오타를 언급하지 않고 다른 가능성을 제시했다.",
+      "fixReason": "진단 도우미는 함수 이름 오타를 짚지 못하고 다른 가능성을 제시했다.",
+      "pass": false,
+      "phrasePass": false
+    }
+  ]
+}
