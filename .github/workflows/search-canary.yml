@@ -5,7 +5,7 @@ name: Search Canary
 
 on:
   schedule:
-    - cron: '23 * * * *'  # 매시 23분 (정각 혼잡을 피함)
+    - cron: '17 * * * *'  # 매시 17분 (정각 혼잡을 피함). 23분으로 등록한 일정이 돌지 않아 다시 등록했다 (A-43)
   workflow_dispatch:
 
 permissions:

@@ -817,6 +817,10 @@ Resources:
       Threshold: 1
       ComparisonOperator: GreaterThanOrEqualToThreshold
       TreatMissingData: notBreaching
+      AlarmActions:
+        - !Ref NotificationTopic
+      OKActions:
+        - !Ref NotificationTopic
 
   # 합성 검사(canary)의 벡터 후보가 0이거나 검사가 멈추면 경보 (DECISION_LOG A-39)
   # 검사는 GitHub Actions가 매시 실행한다. 일정 실행은 몇십 분 늦어질 수 있어 3시간 연속일 때만 경보한다
@@ -837,6 +841,11 @@ Resources:
       Threshold: 1
       ComparisonOperator: LessThanThreshold
       TreatMissingData: breaching
+      # 경보가 아무에게도 가지 않으면 검사가 멈춘 것을 알 수 없다 (DECISION_LOG A-43)
+      AlarmActions:
+        - !Ref NotificationTopic
+      OKActions:
+        - !Ref NotificationTopic
 
   EECARDashboard:
     Type: AWS::CloudWatch::Dashboard
