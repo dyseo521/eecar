@@ -1,0 +1,3182 @@
+{
+  "version": "holdout-v2",
+  "author_notes": "블라인드 홀드아웃 v2 (30개). 작성자는 자동이의 프롬프트·도구·오케스트레이터, 기존 시나리오·리포트·결정 기록을 보지 않았고 template.yaml, 다른 Lambda 함수 코드, utils, 프론트엔드, docs만 근거로 썼다. 구성: config/iam/limit 12 (config 4, iam 5, limit 3), code/data 9 (code 5, data 4), healthy/trap/ambiguous 9 (healthy 1, trap 5, ambiguous 3). 규약: (1) status.errors는 실패한 요청 수다. 핸들러가 잡아서 500을 돌려준 경우도 센다(형식 예시와 같은 방식). 에러를 잡고 로그만 남기는 경로(규정 검사, 제안 알림, 합성 데이터 설명, 알림 함수의 중복 제거)는 요청이 성공하므로 errors=0이고 ERROR 로그와 errorSummary에만 나타난다. (2) 시각은 UTC, 메시지 속 시각은 KST다. 기본 세계의 아침 배포(00:52Z)가 함수 설정을 템플릿 값으로 되돌리므로, 콘솔에서 바꿨다는 설정은 lastModified를 그 이후로 뒀다. (3) 물리 함수 이름 접미사는 VectorSearch(yXyHE1D702wX, severity.ts)와 ComplianceCheck(world-default)만 실제 값이고 나머지는 SAM 형식으로 지어낸 값이다. (4) 의도한 가공 이름: PaymentWebhookFunction(없는 함수), MaterialSearchFunction(오타), eecar-notification(토픽 ARN 오타), v2-29의 truncateForEmbedding(시나리오 전제상 개발자가 방금 추가한 export라 저장소에는 없음). 없는 함수 항목에는 config.found=false, permissions.found=false, 지표 0, 로그 없음을 명시했다. (5) mustNot은 부정문에 걸리지 않도록 '~때문입니다', '~하세요'처럼 단정 어미로 끝나게 썼다. 의도적으로 짝을 이룬 시나리오: v2-07/v2-12/v2-29(모듈 로드 실패 3종: 오래된 레이어 고정 / .js 확장자 누락 / 레이어 미빌드), v2-07/v2-19(배터리 검색 실패: 설정 vs 데이터), v2-09/v2-17(알림 중복 제거: 권한으로 고장 vs 의도된 억제), v2-16과 v2-18·v2-15(LLM 폴백: 응답 파싱 vs 모델 ID vs IAM).",
+  "scenarios": [
+    {
+      "id": "v2-01",
+      "source": "format-based",
+      "category": "data",
+      "title": "특정 검색어만 검색 실패",
+      "message": "'니로 배터리'로 검색하면 무조건 '검색에 실패했습니다'가 떠요. '니로 모터'나 '코나 배터리'는 잘 되고요. 어제 한 업체가 자기네 시스템에서 API로 사진까지 붙여서 니로 배터리를 여러 개 올렸다던데, 그거랑 상관있을까요?",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 240,
+            "errors": 19,
+            "avgDuration": 1150
+          },
+          "logs": [
+            "START RequestId: 7f5de021-5224-4e36-8433-10565aa7b66d Version: $LATEST",
+            "2026-11-06T04:10:02.114Z\t7f5de021-5224-4e36-8433-10565aa7b66d\tINFO\tProcessing search query: 니로 모터",
+            "2026-11-06T04:10:02.426Z\t7f5de021-5224-4e36-8433-10565aa7b66d\tINFO\tvector 100, bm25 100 (index 191) -> ranked 138, constraints {\"categories\":[\"motor\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"니로\"]}",
+            "{\"_aws\":{\"Timestamp\":1793938202114,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":138,\"VectorSearchMs\":92,\"IndexLoadMs\":2,\"FusionMs\":9,\"TotalMs\":270}",
+            "END RequestId: 7f5de021-5224-4e36-8433-10565aa7b66d",
+            "REPORT RequestId: 7f5de021-5224-4e36-8433-10565aa7b66d\tDuration: 276.31 ms\tBilled Duration: 277 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB",
+            "START RequestId: 36773517-e430-42c4-b236-20a4b1be5f8a Version: $LATEST",
+            "2026-11-06T04:11:37.502Z\t36773517-e430-42c4-b236-20a4b1be5f8a\tINFO\tProcessing search query: 니로 배터리",
+            "2026-11-06T04:11:37.841Z\t36773517-e430-42c4-b236-20a4b1be5f8a\tINFO\tvector 100, bm25 100 (index 191) -> ranked 151, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"니로\"]}",
+            "2026-11-06T04:11:38.633Z\t36773517-e430-42c4-b236-20a4b1be5f8a\tERROR\tError in vector search: ValidationException: Item size has exceeded the maximum allowed size\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:27:5)\n    at async Runtime.handler (file:///var/task/index.js:251:9) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'B3060F54B4BC0B30F12E',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.validate#ValidationException'\n}",
+            "END RequestId: 36773517-e430-42c4-b236-20a4b1be5f8a",
+            "REPORT RequestId: 36773517-e430-42c4-b236-20a4b1be5f8a\tDuration: 1187.55 ms\tBilled Duration: 1188 ms\tMemory Size: 1024 MB\tMax Memory Used: 268 MB",
+            "START RequestId: 23d6ea69-1f42-4a37-9dc3-676ddac2a07f Version: $LATEST",
+            "2026-11-06T04:12:20.019Z\t23d6ea69-1f42-4a37-9dc3-676ddac2a07f\tINFO\tProcessing search query: 코나 배터리",
+            "2026-11-06T04:12:20.331Z\t23d6ea69-1f42-4a37-9dc3-676ddac2a07f\tINFO\tvector 100, bm25 100 (index 191) -> ranked 147, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"코나\"]}",
+            "{\"_aws\":{\"Timestamp\":1793938340019,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":138,\"VectorSearchMs\":92,\"IndexLoadMs\":2,\"FusionMs\":9,\"TotalMs\":270}",
+            "END RequestId: 23d6ea69-1f42-4a37-9dc3-676ddac2a07f",
+            "REPORT RequestId: 23d6ea69-1f42-4a37-9dc3-676ddac2a07f\tDuration: 276.31 ms\tBilled Duration: 277 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB",
+            "START RequestId: 12063244-6c35-482a-996c-50830ee55882 Version: $LATEST",
+            "2026-11-06T04:14:05.271Z\t12063244-6c35-482a-996c-50830ee55882\tINFO\tProcessing search query: 니로 배터리",
+            "2026-11-06T04:14:05.590Z\t12063244-6c35-482a-996c-50830ee55882\tINFO\tvector 100, bm25 100 (index 191) -> ranked 151, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"니로\"]}",
+            "2026-11-06T04:14:06.402Z\t12063244-6c35-482a-996c-50830ee55882\tERROR\tError in vector search: ValidationException: Item size has exceeded the maximum allowed size\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:27:5)\n    at async Runtime.handler (file:///var/task/index.js:251:9) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'F0083EC0951A6725A32A',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.validate#ValidationException'\n}",
+            "END RequestId: 12063244-6c35-482a-996c-50830ee55882",
+            "REPORT RequestId: 12063244-6c35-482a-996c-50830ee55882\tDuration: 1142.08 ms\tBilled Duration: 1143 ms\tMemory Size: 1024 MB\tMax Memory Used: 271 MB"
+          ],
+          "errorSummary": [
+            [
+              "ValidationException",
+              19
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "400KB",
+          "400 KB",
+          "400kb",
+          "항목 크기",
+          "아이템 크기",
+          "item size",
+          "항목의 최대 크기",
+          "최대 크기를 초과",
+          "크기 제한",
+          "크기 한도",
+          "크기를 초과",
+          "최대 허용 크기"
+        ],
+        "fix": [
+          "캐시에 저장하지",
+          "캐시 저장을 건너",
+          "캐시 저장을 생략",
+          "캐시 저장 실패",
+          "캐시에서 이미지",
+          "캐시 항목에서",
+          "이미지를 빼",
+          "이미지를 제외",
+          "images를 빼",
+          "images 필드",
+          "이미지 필드",
+          "base64",
+          "S3에 저장",
+          "S3에 올리",
+          "S3로 옮",
+          "S3 URL",
+          "이미지 URL",
+          "try/catch",
+          "try-catch",
+          "캐시 항목에",
+          "캐시에 이미지",
+          "이미지 데이터를",
+          "이미지를 저장하지"
+        ],
+        "mustNot": [
+          "스로틀링 때문입니다",
+          "권한이 부족합니다",
+          "AccessDenied 때문입니다",
+          "임베딩 생성에 실패했습니다",
+          "S3 Vectors 인덱스에 없기 때문입니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-02",
+      "source": "format-based",
+      "category": "iam",
+      "title": "관심 부품 알림 등록 실패",
+      "message": "구매자 화면에서 관심 부품 알림 등록하면 계속 실패한대요. 오늘 오전 배포 이후부터인 것 같아요.",
+      "functions": {
+        "WatchPartFunction": {
+          "status": {
+            "invocations": 17,
+            "errors": 17,
+            "avgDuration": 210
+          },
+          "logs": [
+            "START RequestId: 8f03ad02-c6ca-4600-92c0-0a972a9bcce6 Version: $LATEST",
+            "2026-11-06T01:42:10.118Z\t8f03ad02-c6ca-4600-92c0-0a972a9bcce6\tINFO\tCreating watch: edf3636e-9a19-4677-a889-bea2ae58c31b",
+            "2026-11-06T01:42:10.304Z\t8f03ad02-c6ca-4600-92c0-0a972a9bcce6\tERROR\tError in watch-part: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-WatchPartFunctionRole-PaWFHWYXP402/eecar-stack-WatchPartFunction-Lk82JdUe0aQz is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:27:5)\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'F38E1BCAB2B7A9B4EA5F',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.service#AccessDeniedException'\n}",
+            "END RequestId: 8f03ad02-c6ca-4600-92c0-0a972a9bcce6",
+            "REPORT RequestId: 8f03ad02-c6ca-4600-92c0-0a972a9bcce6\tDuration: 201.77 ms\tBilled Duration: 202 ms\tMemory Size: 512 MB\tMax Memory Used: 96 MB",
+            "START RequestId: f803dfeb-3583-4509-9a58-a7478f28bd75 Version: $LATEST",
+            "2026-11-06T02:05:51.630Z\tf803dfeb-3583-4509-9a58-a7478f28bd75\tINFO\tCreating watch: 7e08d74a-65fa-49bd-a8d8-0f50ece49ab0",
+            "2026-11-06T02:05:51.792Z\tf803dfeb-3583-4509-9a58-a7478f28bd75\tERROR\tError in watch-part: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-WatchPartFunctionRole-PaWFHWYXP402/eecar-stack-WatchPartFunction-Lk82JdUe0aQz is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:27:5)\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '27C14D3D220F5752FA49',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.service#AccessDeniedException'\n}",
+            "END RequestId: f803dfeb-3583-4509-9a58-a7478f28bd75",
+            "REPORT RequestId: f803dfeb-3583-4509-9a58-a7478f28bd75\tDuration: 176.40 ms\tBilled Duration: 177 ms\tMemory Size: 512 MB\tMax Memory Used: 96 MB",
+            "START RequestId: 7f5144f9-62ef-4e75-a0f7-661e032166db Version: $LATEST",
+            "2026-11-06T03:18:27.044Z\t7f5144f9-62ef-4e75-a0f7-661e032166db\tINFO\tCreating watch: fd7d757e-13ba-49d7-b797-0e4c66c06d9f",
+            "2026-11-06T03:18:27.219Z\t7f5144f9-62ef-4e75-a0f7-661e032166db\tERROR\tError in watch-part: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-WatchPartFunctionRole-PaWFHWYXP402/eecar-stack-WatchPartFunction-Lk82JdUe0aQz is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:27:5)\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '141D6D6BCE4007BD0E50',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.service#AccessDeniedException'\n}",
+            "END RequestId: 7f5144f9-62ef-4e75-a0f7-661e032166db",
+            "REPORT RequestId: 7f5144f9-62ef-4e75-a0f7-661e032166db\tDuration: 188.12 ms\tBilled Duration: 189 ms\tMemory Size: 512 MB\tMax Memory Used: 96 MB"
+          ],
+          "errorSummary": [
+            [
+              "AccessDeniedException",
+              17
+            ]
+          ],
+          "permissions": {
+            "statements": [
+              {
+                "policy": "WatchPartFunctionRolePolicy0",
+                "effect": "Allow",
+                "actions": [
+                  "dynamodb:GetItem",
+                  "dynamodb:Scan",
+                  "dynamodb:Query",
+                  "dynamodb:BatchGetItem",
+                  "dynamodb:DescribeTable"
+                ],
+                "resources": [
+                  "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table",
+                  "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*"
+                ]
+              },
+              {
+                "policy": "WatchPartFunctionRolePolicy1",
+                "effect": "Allow",
+                "actions": [
+                  "sns:Publish"
+                ],
+                "resources": [
+                  "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications"
+                ]
+              },
+              {
+                "policy": "AWSXrayWriteOnlyAccess",
+                "effect": "Allow",
+                "actions": [
+                  "xray:PutTraceSegments",
+                  "xray:PutTelemetryRecords",
+                  "xray:GetSamplingRules",
+                  "xray:GetSamplingTargets",
+                  "xray:GetSamplingStatisticSummaries"
+                ],
+                "resources": [
+                  "*"
+                ]
+              },
+              {
+                "policy": "AWSLambdaBasicExecutionRole",
+                "effect": "Allow",
+                "actions": [
+                  "logs:CreateLogGroup",
+                  "logs:CreateLogStream",
+                  "logs:PutLogEvents"
+                ],
+                "resources": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "label": {
+        "cause": [
+          "DynamoDBReadPolicy",
+          "ReadPolicy",
+          "읽기 전용",
+          "읽기 권한만",
+          "읽기만 허용",
+          "PutItem 권한이 없",
+          "PutItem 권한이 빠",
+          "PutItem이 빠",
+          "PutItem이 없",
+          "PutItem을 허용하지",
+          "PutItem 허용이 없",
+          "PutItem 권한 누락",
+          "쓰기 권한이 없",
+          "쓰기 권한이 빠",
+          "쓰기 권한 누락"
+        ],
+        "fix": [
+          "DynamoDBCrudPolicy",
+          "CrudPolicy",
+          "Crud 정책",
+          "PutItem 권한을 추가",
+          "PutItem을 추가",
+          "PutItem 추가",
+          "dynamodb:PutItem을",
+          "쓰기 권한을 추가",
+          "쓰기 권한 추가",
+          "쓰기 권한을 다시",
+          "쓰기 권한을 복구"
+        ],
+        "mustNot": [
+          "SNS 권한이 부족합니다",
+          "sns:Publish 권한이 없습니다",
+          "테이블이 존재하지 않습니다",
+          "테이블 이름이 잘못되었습니다",
+          "스로틀링 때문입니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-03",
+      "source": "format-based",
+      "category": "trap",
+      "title": "KNOWLEDGE_BASE_ID 빈 값",
+      "message": "VectorSearchFunction 환경 변수 보다가 KNOWLEDGE_BASE_ID가 빈 문자열로 되어 있는 걸 발견했어요. 누가 실수로 지운 거 아닌가요? 요즘 검색 정확도가 좀 아쉬운데 이거 때문인지... 값 넣어야 하나요?",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 365,
+            "errors": 0,
+            "avgDuration": 590
+          },
+          "logs": [
+            "START RequestId: 4bcfb9e5-2cfc-4eb8-af8a-81e7d73eb3e9 Version: $LATEST",
+            "2026-11-06T03:02:44.310Z\t4bcfb9e5-2cfc-4eb8-af8a-81e7d73eb3e9\tINFO\tProcessing search query: 아이오닉5 배터리 팩",
+            "2026-11-06T03:02:44.622Z\t4bcfb9e5-2cfc-4eb8-af8a-81e7d73eb3e9\tINFO\tvector 100, bm25 100 (index 191) -> ranked 149, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"아이오닉 5\"]}",
+            "{\"_aws\":{\"Timestamp\":1793934164310,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":138,\"VectorSearchMs\":92,\"IndexLoadMs\":2,\"FusionMs\":9,\"TotalMs\":270}",
+            "END RequestId: 4bcfb9e5-2cfc-4eb8-af8a-81e7d73eb3e9",
+            "REPORT RequestId: 4bcfb9e5-2cfc-4eb8-af8a-81e7d73eb3e9\tDuration: 276.31 ms\tBilled Duration: 277 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB",
+            "START RequestId: b96ff872-0857-4e51-929c-f422157895ee Version: $LATEST",
+            "{\"_aws\":{\"Timestamp\":1793934165020,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":2210}",
+            "END RequestId: b96ff872-0857-4e51-929c-f422157895ee",
+            "REPORT RequestId: b96ff872-0857-4e51-929c-f422157895ee\tDuration: 2343.42 ms\tBilled Duration: 2344 ms\tMemory Size: 1024 MB\tMax Memory Used: 221 MB",
+            "START RequestId: c90fe265-1db8-49cf-93b9-e37bc8add720 Version: $LATEST",
+            "2026-11-06T03:04:12.881Z\tc90fe265-1db8-49cf-93b9-e37bc8add720\tINFO\tProcessing search query: 모델3 구동 모터",
+            "2026-11-06T03:04:12.881Z\tc90fe265-1db8-49cf-93b9-e37bc8add720\tINFO\tCache hit!",
+            "{\"_aws\":{\"Timestamp\":1793934252881,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":1,\"ZeroResult\":0,\"TotalMs\":38}",
+            "END RequestId: c90fe265-1db8-49cf-93b9-e37bc8add720",
+            "REPORT RequestId: c90fe265-1db8-49cf-93b9-e37bc8add720\tDuration: 44.18 ms\tBilled Duration: 45 ms\tMemory Size: 1024 MB\tMax Memory Used: 209 MB",
+            "START RequestId: 2a466a98-0753-4c02-ba35-b95d10b51221 Version: $LATEST",
+            "2026-11-06T03:07:59.402Z\t2a466a98-0753-4c02-ba35-b95d10b51221\tINFO\tProcessing search query: SOH 85 이상 LFP 배터리",
+            "2026-11-06T03:07:59.714Z\t2a466a98-0753-4c02-ba35-b95d10b51221\tINFO\tvector 100, bm25 100 (index 191, loaded) -> ranked 152, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[]}",
+            "{\"_aws\":{\"Timestamp\":1793934479402,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":138,\"VectorSearchMs\":92,\"IndexLoadMs\":412,\"FusionMs\":9,\"TotalMs\":590}",
+            "END RequestId: 2a466a98-0753-4c02-ba35-b95d10b51221",
+            "REPORT RequestId: 2a466a98-0753-4c02-ba35-b95d10b51221\tDuration: 596.31 ms\tBilled Duration: 597 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB"
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "USE_KNOWLEDGE_BASE",
+          "Knowledge Base를 사용하지",
+          "Knowledge Base를 쓰지",
+          "Knowledge Base 경로를",
+          "KB를 사용하지",
+          "KB를 쓰지",
+          "KB 경로",
+          "S3 Vectors를 사용",
+          "S3 Vectors를 쓰",
+          "S3 Vectors 경로",
+          "S3 Vectors로 검색",
+          "S3 Vectors 기반",
+          "의도적으로 비워",
+          "의도된 설정",
+          "의도된 값",
+          "기능 플래그",
+          "feature flag"
+        ],
+        "fix": [
+          "채울 필요 없",
+          "채울 필요는 없",
+          "채우지 않아도",
+          "넣을 필요 없",
+          "넣을 필요는 없",
+          "넣지 않아도",
+          "그대로 두",
+          "비워 둬도",
+          "비워 두어도",
+          "비워둬도",
+          "수정할 필요 없",
+          "수정할 필요는 없",
+          "변경할 필요 없",
+          "변경할 필요는 없",
+          "바꿀 필요 없",
+          "바꿀 필요는 없",
+          "조치는 필요 없",
+          "조치가 필요 없",
+          "비어 있어도 문제",
+          "비어 있어도 괜찮",
+          "비어 있어도 됩",
+          "빈 값이어도",
+          "빈 값으로 두",
+          "그대로 유지",
+          "현재 상태 유지",
+          "건드리지 않"
+        ],
+        "mustNot": [
+          "KB ID를 입력하세요",
+          "KNOWLEDGE_BASE_ID를 설정하세요",
+          "KNOWLEDGE_BASE_ID를 채우세요",
+          "KNOWLEDGE_BASE_ID 값을 넣으세요",
+          "비어 있어서 검색 정확도가 떨어집니다",
+          "누락되어 검색 정확도가 떨어집니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-04",
+      "source": "format-based",
+      "category": "limit",
+      "title": "합성 데이터 30개 생성 시 504",
+      "message": "합성 데이터 생성에서 개수를 30개로 주면 프론트에서 504 Gateway Timeout이 떠요. 근데 DynamoDB 보면 30개 다 들어가 있음;; 람다 타임아웃은 120초라 넉넉할 텐데 왜 이런 거죠?",
+      "functions": {
+        "SyntheticDataFunction": {
+          "status": {
+            "invocations": 4,
+            "errors": 0,
+            "avgDuration": 63800
+          },
+          "logs": [
+            "START RequestId: 3692e633-c258-493a-9a98-c641e947569b Version: $LATEST",
+            "2026-11-06T02:40:11.006Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerating 30 synthetic parts for category: battery",
+            "2026-11-06T02:40:13.220Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: e07be607-efa6-4346-91cf-0872d108e7e2",
+            "2026-11-06T02:40:13.220Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 1/30: e07be607-efa6-4346-91cf-0872d108e7e2 (2214ms)",
+            "2026-11-06T02:40:15.396Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: 8099309b-872e-4614-98c4-d10d18e02312",
+            "2026-11-06T02:40:15.396Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 2/30: 8099309b-872e-4614-98c4-d10d18e02312 (4390ms)",
+            "2026-11-06T02:40:17.708Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: ad074d03-96e7-4768-9034-c715d8516e32",
+            "2026-11-06T02:40:17.708Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 3/30: ad074d03-96e7-4768-9034-c715d8516e32 (6702ms)",
+            "2026-11-06T02:40:19.817Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: 1b057e18-d701-473d-869d-a38113f8c8a7",
+            "2026-11-06T02:40:19.817Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 4/30: 1b057e18-d701-473d-869d-a38113f8c8a7 (8811ms)",
+            "2026-11-06T02:40:22.036Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: d606c677-a397-4dbf-ae3d-e926fd3506dd",
+            "2026-11-06T02:40:22.036Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 5/30: d606c677-a397-4dbf-ae3d-e926fd3506dd (11030ms)",
+            "2026-11-06T02:40:24.383Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: 393897f9-66c2-4def-9515-0deb91811589",
+            "2026-11-06T02:40:24.383Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 6/30: 393897f9-66c2-4def-9515-0deb91811589 (13377ms)",
+            "2026-11-06T02:40:26.608Z\t3692e633-c258-493a-9a98-c641e947569b\tWARN\tClaude description generation failed, using fallback: ThrottlingException: Too many tokens, please wait before trying again.\n    at de_ThrottlingExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1146:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 429,\n    requestId: '2F04171210F98AD134E0',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "2026-11-06T02:40:26.608Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: 7fe7185a-5f2f-4a2d-a200-323bead5b0e8",
+            "2026-11-06T02:40:26.608Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 7/30: 7fe7185a-5f2f-4a2d-a200-323bead5b0e8 (15602ms)",
+            "2026-11-06T02:40:28.847Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: 9c91196b-7369-4d32-8520-748279b1167b",
+            "2026-11-06T02:40:28.847Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 8/30: 9c91196b-7369-4d32-8520-748279b1167b (17841ms)",
+            "2026-11-06T02:40:31.025Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: 5810e919-7d17-4f46-a921-f6e1d4f12542",
+            "2026-11-06T02:40:31.025Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 9/30: 5810e919-7d17-4f46-a921-f6e1d4f12542 (20019ms)",
+            "2026-11-06T02:40:33.316Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: aed33657-e3aa-494f-98cb-73f0148cdf18",
+            "2026-11-06T02:40:33.316Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 10/30: aed33657-e3aa-494f-98cb-73f0148cdf18 (22310ms)",
+            "2026-11-06T02:40:35.503Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: 96c0d10f-8ba0-4d13-af4c-7e367b9d9c97",
+            "2026-11-06T02:40:35.503Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 11/30: 96c0d10f-8ba0-4d13-af4c-7e367b9d9c97 (24497ms)",
+            "2026-11-06T02:40:37.694Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: 93827490-f71d-4220-96b0-dfe873b21968",
+            "2026-11-06T02:40:37.694Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 12/30: 93827490-f71d-4220-96b0-dfe873b21968 (26688ms)",
+            "2026-11-06T02:40:39.896Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: 1c538c21-9c06-4673-b599-6b65b51c1d29",
+            "2026-11-06T02:40:39.896Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 13/30: 1c538c21-9c06-4673-b599-6b65b51c1d29 (28890ms)",
+            "2026-11-06T02:40:42.108Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: 5381b3c7-2b04-4a3b-b110-4f686098f8e0",
+            "2026-11-06T02:40:42.108Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 14/30: 5381b3c7-2b04-4a3b-b110-4f686098f8e0 (31102ms)",
+            "2026-11-06T02:41:14.851Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: fe3affb5-f272-4d9a-a46d-40ca3559ac26",
+            "2026-11-06T02:41:14.851Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 29/30: fe3affb5-f272-4d9a-a46d-40ca3559ac26 (63845ms)",
+            "2026-11-06T02:41:16.993Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tSuccessfully uploaded vector to S3 Vectors: dfe9f876-751b-4487-9830-3ab5be8d1b6b",
+            "2026-11-06T02:41:16.993Z\t3692e633-c258-493a-9a98-c641e947569b\tINFO\tGenerated part 30/30: dfe9f876-751b-4487-9830-3ab5be8d1b6b (65987ms)",
+            "END RequestId: 3692e633-c258-493a-9a98-c641e947569b",
+            "REPORT RequestId: 3692e633-c258-493a-9a98-c641e947569b\tDuration: 66140.31 ms\tBilled Duration: 66141 ms\tMemory Size: 1024 MB\tMax Memory Used: 171 MB"
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "29초",
+          "29 초",
+          "29 seconds",
+          "29s",
+          "29,000",
+          "29000ms",
+          "29000 ms",
+          "통합 타임아웃",
+          "통합 제한 시간",
+          "integration timeout",
+          "API Gateway 타임아웃",
+          "API Gateway의 타임아웃",
+          "API Gateway 제한 시간",
+          "API Gateway의 제한 시간",
+          "API Gateway 최대",
+          "API Gateway의 최대",
+          "API Gateway timeout"
+        ],
+        "fix": [
+          "비동기",
+          "async",
+          "InvocationType",
+          "'Event'",
+          "Event 호출",
+          "작업 ID",
+          "jobId",
+          "폴링",
+          "Step Functions",
+          "SQS",
+          "개수를 줄",
+          "개수를 나눠",
+          "나눠서 호출",
+          "나눠서 요청",
+          "여러 번 나눠",
+          "분할",
+          "배치를 줄",
+          "한도 상향",
+          "할당량 상향",
+          "할당량 증가",
+          "quota 증가",
+          "quota 상향",
+          "timeoutInMillis"
+        ],
+        "mustNot": [
+          "Lambda 타임아웃을 늘리세요",
+          "Lambda Timeout을 늘리세요",
+          "타임아웃을 300초",
+          "타임아웃을 900초",
+          "스로틀링 때문입니다",
+          "메모리 부족 때문입니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-05",
+      "source": "format-based",
+      "category": "code",
+      "title": "정상 부품에도 규정 위반 알림",
+      "message": "요즘 부품 등록할 때마다 '[EECAR] 규성 위반 알림' 메일이 와요. 열어 보면 위반 사항 칸에 '1. 검토 결과: 위반 사항 없음' 같은 문장이 들어 있어요. 멀쩡한 부품인데 왜 위반 알림이 나가는 거죠?",
+      "functions": {
+        "ComplianceCheckFunction": {
+          "status": {
+            "invocations": 44,
+            "errors": 0,
+            "avgDuration": 2310
+          },
+          "logs": [
+            "START RequestId: a3458cbb-cc33-4c58-8fd7-847834972ffe Version: $LATEST",
+            "2026-11-06T01:12:40.551Z\ta3458cbb-cc33-4c58-8fd7-847834972ffe\tINFO\tRunning compliance check for part: e88dda6f-75c6-41a7-8a39-395c044c2c2d",
+            "2026-11-06T01:12:42.701Z\ta3458cbb-cc33-4c58-8fd7-847834972ffe\tINFO\tFound 2 compliance violations",
+            "2026-11-06T01:12:42.701Z\ta3458cbb-cc33-4c58-8fd7-847834972ffe\tINFO\tCompliance alert sent",
+            "END RequestId: a3458cbb-cc33-4c58-8fd7-847834972ffe",
+            "REPORT RequestId: a3458cbb-cc33-4c58-8fd7-847834972ffe\tDuration: 2188.40 ms\tBilled Duration: 2189 ms\tMemory Size: 512 MB\tMax Memory Used: 103 MB",
+            "START RequestId: 8c961171-8f04-42ac-8dd0-baf0903d22e5 Version: $LATEST",
+            "2026-11-06T02:33:09.017Z\t8c961171-8f04-42ac-8dd0-baf0903d22e5\tINFO\tRunning compliance check for part: 92b99952-103f-4402-ac99-a7daa6fd5aac",
+            "2026-11-06T02:33:11.167Z\t8c961171-8f04-42ac-8dd0-baf0903d22e5\tINFO\tFound 2 compliance violations",
+            "2026-11-06T02:33:11.167Z\t8c961171-8f04-42ac-8dd0-baf0903d22e5\tINFO\tCompliance alert sent",
+            "END RequestId: 8c961171-8f04-42ac-8dd0-baf0903d22e5",
+            "REPORT RequestId: 8c961171-8f04-42ac-8dd0-baf0903d22e5\tDuration: 2412.73 ms\tBilled Duration: 2413 ms\tMemory Size: 512 MB\tMax Memory Used: 103 MB",
+            "START RequestId: a71d8391-5f88-49e1-9a51-1021db1b3aa0 Version: $LATEST",
+            "2026-11-06T03:51:22.906Z\ta71d8391-5f88-49e1-9a51-1021db1b3aa0\tINFO\tRunning compliance check for part: 8aaa1c09-a872-4a3b-b5c7-c26279cccbdc",
+            "2026-11-06T03:51:25.056Z\ta71d8391-5f88-49e1-9a51-1021db1b3aa0\tINFO\tFound 3 compliance violations",
+            "2026-11-06T03:51:25.056Z\ta71d8391-5f88-49e1-9a51-1021db1b3aa0\tINFO\tCompliance alert sent",
+            "END RequestId: a71d8391-5f88-49e1-9a51-1021db1b3aa0",
+            "REPORT RequestId: a71d8391-5f88-49e1-9a51-1021db1b3aa0\tDuration: 2297.15 ms\tBilled Duration: 2298 ms\tMemory Size: 512 MB\tMax Memory Used: 103 MB"
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "파싱",
+          "parsing",
+          "parse",
+          "'없음'",
+          "\"없음\"",
+          "정확히 일치",
+          "완전히 일치",
+          "그대로 위반으로",
+          "모든 줄을 위반",
+          "각 줄을 위반",
+          "줄마다 위반",
+          "한 줄씩 위반",
+          "줄 단위로",
+          "응답 형식",
+          "출력 형식"
+        ],
+        "fix": [
+          "JSON",
+          "구조화",
+          "structured",
+          "파싱 로직",
+          "파싱을 수정",
+          "파싱 방식",
+          "파서를 수정",
+          "판정 로직",
+          "프롬프트를 수정",
+          "프롬프트 수정",
+          "출력 형식을 고정",
+          "형식을 강제",
+          "tool use",
+          "도구 호출",
+          "위반 여부를 별도"
+        ],
+        "mustNot": [
+          "실제로 규정을 위반했습니다",
+          "규정 위반이 맞습니다",
+          "SNS 권한이 부족합니다",
+          "모델 ID가 잘못되었습니다",
+          "Bedrock 권한이 부족합니다",
+          "권한이 부족합니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-06",
+      "source": "format-based",
+      "category": "ambiguous",
+      "title": "존재하지 않는 결제 함수 문의",
+      "message": "PaymentWebhookFunction에서 에러 알림 왔다고 하던데 원인 좀 봐주세요.",
+      "functions": {
+        "PaymentWebhookFunction": {
+          "status": {
+            "invocations": 0,
+            "errors": 0,
+            "avgDuration": 0
+          },
+          "logs": [],
+          "config": {
+            "found": false
+          },
+          "permissions": {
+            "found": false,
+            "statements": []
+          }
+        }
+      },
+      "label": {
+        "cause": [
+          "존재하지 않",
+          "없는 함수",
+          "찾을 수 없",
+          "스택에 없",
+          "스택에는 없",
+          "해당 함수가 없",
+          "그런 함수는 없",
+          "그런 이름의 함수",
+          "등록되어 있지 않",
+          "배포되어 있지 않",
+          "not found",
+          "목록에 없"
+        ],
+        "fix": [
+          "함수 이름을 다시",
+          "정확한 함수",
+          "함수명을 확인",
+          "함수 이름을 확인",
+          "알림 원문",
+          "알림 메시지를",
+          "알림 내용을",
+          "어떤 알림",
+          "다른 스택",
+          "다른 계정",
+          "다른 리전",
+          "스크린샷",
+          "링크를 공유",
+          "공유해 주시면",
+          "공유해주시면",
+          "알려주시면",
+          "알려 주시면",
+          "어느 채널",
+          "어디서 받",
+          "누가 보낸",
+          "출처",
+          "확인해 주시",
+          "확인 부탁"
+        ],
+        "mustNot": [
+          "PaymentWebhookFunction의 권한이 부족합니다",
+          "PaymentWebhookFunction이 타임아웃되었습니다",
+          "PaymentWebhookFunction에서 타임아웃이 발생했습니다",
+          "웹훅 서명 검증에 실패했습니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-07",
+      "source": "format-based",
+      "category": "config",
+      "title": "배터리 SOH 검색만 실패",
+      "message": "배터리 SOH 검색 탭만 계속 실패해요. AI 검색이랑 부품 목록은 멀쩡하고요. 오늘 오전에 배터리 쪽 함수 문제 있어서 콘솔에서 급하게 이전 버전으로 돌렸다가, 코드만 다시 원래대로 올렸다고 들었어요.",
+      "functions": {
+        "BatteryHealthAssessmentFunction": {
+          "status": {
+            "invocations": 46,
+            "errors": 46,
+            "avgDuration": 260
+          },
+          "logs": [
+            "INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:9c3e7a1f0b2d4e6a8c5b7d9f1e3a5c7b9d1f3e5a7c9b1d3f5e7a9c1b3d5f7e9a",
+            "2026-11-06T03:05:41.508Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\":\"Error\",\"errorMessage\":\"Cannot find module '/opt/nodejs/utils/parts.js' imported from /var/task/index.js\",\"code\":\"ERR_MODULE_NOT_FOUND\",\"url\":\"file:///opt/nodejs/utils/parts.js\",\"stack\":[\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/parts.js' imported from /var/task/index.js\",\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\",\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\",\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\",\"    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)\"]}",
+            "INIT_REPORT Init Duration: 231.42 ms\tPhase: init\tStatus: error\tError Type: Runtime.Unknown",
+            "START RequestId: a7228a7d-885a-4f09-846e-e2a8fb2e3252 Version: $LATEST",
+            "2026-11-06T03:05:42.090Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\":\"Error\",\"errorMessage\":\"Cannot find module '/opt/nodejs/utils/parts.js' imported from /var/task/index.js\",\"code\":\"ERR_MODULE_NOT_FOUND\",\"url\":\"file:///opt/nodejs/utils/parts.js\",\"stack\":[\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/parts.js' imported from /var/task/index.js\",\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\",\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\",\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\",\"    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)\"]}",
+            "INIT_REPORT Init Duration: 226.80 ms\tPhase: invoke\tStatus: error\tError Type: Runtime.Unknown",
+            "END RequestId: a7228a7d-885a-4f09-846e-e2a8fb2e3252",
+            "REPORT RequestId: a7228a7d-885a-4f09-846e-e2a8fb2e3252\tDuration: 248.36 ms\tBilled Duration: 249 ms\tMemory Size: 512 MB\tMax Memory Used: 58 MB\tStatus: error\tError Type: Runtime.Unknown",
+            "START RequestId: a74b59c0-f4fd-4cc6-a7ff-3acb630e455c Version: $LATEST",
+            "2026-11-06T03:21:17.433Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\":\"Error\",\"errorMessage\":\"Cannot find module '/opt/nodejs/utils/parts.js' imported from /var/task/index.js\",\"code\":\"ERR_MODULE_NOT_FOUND\",\"url\":\"file:///opt/nodejs/utils/parts.js\",\"stack\":[\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/parts.js' imported from /var/task/index.js\",\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\",\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\",\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\",\"    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)\"]}",
+            "INIT_REPORT Init Duration: 229.90 ms\tPhase: invoke\tStatus: error\tError Type: Runtime.Unknown",
+            "END RequestId: a74b59c0-f4fd-4cc6-a7ff-3acb630e455c",
+            "REPORT RequestId: a74b59c0-f4fd-4cc6-a7ff-3acb630e455c\tDuration: 250.56 ms\tBilled Duration: 251 ms\tMemory Size: 512 MB\tMax Memory Used: 58 MB\tStatus: error\tError Type: Runtime.Unknown"
+          ],
+          "errorSummary": [
+            [
+              "ERR_MODULE_NOT_FOUND",
+              46
+            ]
+          ],
+          "config": {
+            "lastModified": "2026-11-06T02:31:44.000+0000",
+            "layers": [
+              {
+                "name": "eecar-utils-layer",
+                "version": 22,
+                "createdDate": "2026-10-28T07:15:02.118+0000",
+                "latestVersion": 27,
+                "latestCreatedDate": "2026-11-06T00:52:52.734+0000",
+                "isLatest": false
+              }
+            ]
+          }
+        }
+      },
+      "label": {
+        "cause": [
+          "레이어 버전",
+          "레이어의 버전",
+          "layer version",
+          "버전 22",
+          "v22",
+          "22번",
+          "버전이 22",
+          "22 버전",
+          "구버전 레이어",
+          "이전 레이어",
+          "예전 레이어",
+          "옛 레이어",
+          "레이어가 최신이 아",
+          "최신 레이어가 아",
+          "isLatest",
+          "layer 22",
+          "레이어 22",
+          "레이어가 22",
+          "(22)",
+          "version 22",
+          "layer v22",
+          "isLatest: false",
+          "isLatest=false"
+        ],
+        "fix": [
+          "27로",
+          "27번",
+          "버전 27",
+          "v27",
+          "최신 레이어",
+          "최신 버전의 레이어",
+          "레이어를 최신",
+          "레이어 버전을 최신",
+          "레이어 버전을 올",
+          "sam deploy",
+          "SAM으로 다시 배포",
+          "SAM 재배포",
+          "레이어를 27",
+          "레이어 27",
+          "최신(27"
+        ],
+        "mustNot": [
+          ".js 확장자를 붙이세요",
+          "확장자가 빠져 있습니다",
+          "DynamoDB 권한이 부족합니다",
+          "권한이 부족합니다",
+          "메모리 부족 때문입니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-08",
+      "source": "format-based",
+      "category": "data",
+      "title": "파트너 연동 후 목록 API 에러 급증",
+      "message": "어제부터 GetParts 쪽 에러 알림이 계속 와요. 우리 프론트 목록은 멀쩡하게 잘 뜨는데요. 이번 주에 부품 목록 API를 외부 파트너사에 열어줬는데 그거랑 관련이 있으려나요.",
+      "functions": {
+        "GetPartsFunction": {
+          "status": {
+            "invocations": 860,
+            "errors": 214,
+            "avgDuration": 72
+          },
+          "logs": [
+            "START RequestId: 8968f380-d149-4f37-bde1-e787c798bebb Version: $LATEST",
+            "END RequestId: 8968f380-d149-4f37-bde1-e787c798bebb",
+            "REPORT RequestId: 8968f380-d149-4f37-bde1-e787c798bebb\tDuration: 64.20 ms\tBilled Duration: 65 ms\tMemory Size: 512 MB\tMax Memory Used: 88 MB",
+            "START RequestId: 31b7b723-68bd-43d8-bfca-653ccbae5693 Version: $LATEST",
+            "2026-11-06T02:14:55.310Z\t31b7b723-68bd-43d8-bfca-653ccbae5693\tERROR\tError in get-parts: ValidationException: 1 validation error detected: Value '0' at 'limit' failed to satisfy constraint: Member must have value greater than or equal to 1\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async queryAllMetadataWithPagination (file:///opt/nodejs/utils/dynamodb.js:184:20)\n    at async listParts (file:///var/task/index.js:71:18) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '23A04AC99905C8C7D690',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.validate#ValidationException'\n}",
+            "END RequestId: 31b7b723-68bd-43d8-bfca-653ccbae5693",
+            "REPORT RequestId: 31b7b723-68bd-43d8-bfca-653ccbae5693\tDuration: 41.73 ms\tBilled Duration: 42 ms\tMemory Size: 512 MB\tMax Memory Used: 90 MB",
+            "START RequestId: 13c022b0-b3f1-4166-be83-4e0e155b0651 Version: $LATEST",
+            "2026-11-06T02:14:58.904Z\t13c022b0-b3f1-4166-be83-4e0e155b0651\tERROR\tError in get-parts: ValidationException: 1 validation error detected: Value '0' at 'limit' failed to satisfy constraint: Member must have value greater than or equal to 1\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async queryGSI1WithPagination (file:///opt/nodejs/utils/dynamodb.js:157:20)\n    at async listParts (file:///var/task/index.js:71:18) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '70DDC8348926F940726E',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.validate#ValidationException'\n}",
+            "END RequestId: 13c022b0-b3f1-4166-be83-4e0e155b0651",
+            "REPORT RequestId: 13c022b0-b3f1-4166-be83-4e0e155b0651\tDuration: 42.73 ms\tBilled Duration: 43 ms\tMemory Size: 512 MB\tMax Memory Used: 90 MB",
+            "START RequestId: a14ebe5d-a1db-49f6-ad0c-a1016087c36b Version: $LATEST",
+            "END RequestId: a14ebe5d-a1db-49f6-ad0c-a1016087c36b",
+            "REPORT RequestId: a14ebe5d-a1db-49f6-ad0c-a1016087c36b\tDuration: 71.05 ms\tBilled Duration: 72 ms\tMemory Size: 512 MB\tMax Memory Used: 90 MB",
+            "START RequestId: 06eb133b-bfae-45b6-8abe-123e005a7c95 Version: $LATEST",
+            "2026-11-06T02:15:03.122Z\t06eb133b-bfae-45b6-8abe-123e005a7c95\tERROR\tError in get-parts: ValidationException: 1 validation error detected: Value '0' at 'limit' failed to satisfy constraint: Member must have value greater than or equal to 1\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async queryAllMetadataWithPagination (file:///opt/nodejs/utils/dynamodb.js:184:20)\n    at async listParts (file:///var/task/index.js:71:18) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '5D002552B3C54C9A005D',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.validate#ValidationException'\n}",
+            "END RequestId: 06eb133b-bfae-45b6-8abe-123e005a7c95",
+            "REPORT RequestId: 06eb133b-bfae-45b6-8abe-123e005a7c95\tDuration: 43.73 ms\tBilled Duration: 44 ms\tMemory Size: 512 MB\tMax Memory Used: 90 MB"
+          ],
+          "errorSummary": [
+            [
+              "ValidationException",
+              214
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "limit=0",
+          "limit 0",
+          "limit이 0",
+          "limit 값이 0",
+          "limit값이 0",
+          "Limit이 0",
+          "limit을 0",
+          "0을 보내",
+          "0으로 보내",
+          "0으로 호출",
+          "0을 넘기",
+          "limit 파라미터",
+          "limit 값 검증",
+          "limit 검증",
+          "입력 검증이 없",
+          "검증 없이 그대로",
+          "검증하지 않",
+          "limit 값",
+          "limit 쿼리",
+          "Value '0'",
+          "'limit'"
+        ],
+        "fix": [
+          "400 Bad Request",
+          "400으로",
+          "400을 반환",
+          "400 응답",
+          "400 에러",
+          "입력 검증",
+          "값 검증",
+          "파라미터 검증",
+          "limit 검증",
+          "clamp",
+          "최솟값",
+          "최소값",
+          "1 이상",
+          "1~100",
+          "1에서 100",
+          "범위를 제한",
+          "범위 검사",
+          "파트너사에 안내",
+          "파트너사에 알려",
+          "파트너에게 안내",
+          "파트너에게 알려"
+        ],
+        "mustNot": [
+          "스로틀링 때문입니다",
+          "권한이 부족합니다",
+          "인덱스 권한이 없습니다",
+          "AccessDenied 때문입니다",
+          "테이블 용량이 부족합니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-09",
+      "source": "format-based",
+      "category": "iam",
+      "title": "같은 에러 알림이 계속 쌓임",
+      "message": "#eecar-alerts에 똑같은 VectorSearch 에러 알림이 1분에도 몇 개씩 계속 쌓여요. 예전엔 같은 에러면 한 번 오고 다음 알림에 'N회 더 발생'이 붙어서 왔던 것 같은데... 알림 함수 쪽 뭐 바뀌었나요?",
+      "functions": {
+        "SlackNotificationFunction": {
+          "status": {
+            "invocations": 96,
+            "errors": 0,
+            "avgDuration": 430
+          },
+          "logs": [
+            "START RequestId: 56d9ba4e-c637-46b4-8278-c3a7837db9e9 Version: $LATEST",
+            "2026-11-06T04:20:03.118Z\t56d9ba4e-c637-46b4-8278-c3a7837db9e9\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX",
+            "2026-11-06T04:20:03.118Z\t56d9ba4e-c637-46b4-8278-c3a7837db9e9\tINFO\tFound 1 error events",
+            "2026-11-06T04:20:03.201Z\t56d9ba4e-c637-46b4-8278-c3a7837db9e9\tERROR\tFailed to acquire alert slot: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-SlackNotificationFunctionRole-8P4lsCMRjFFO/eecar-stack-SlackNotificationFunction-Wq3e5R7t9Y1u is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async acquireAlertSlot (file:///var/task/deduplicator.js:23:26) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '61836BE70A218223EF79',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.service#AccessDeniedException'\n}",
+            "2026-11-06T04:20:03.498Z\t56d9ba4e-c637-46b4-8278-c3a7837db9e9\tINFO\tSent CRITICAL alert for eecar-stack-VectorSearchFunction-yXyHE1D702wX: GenericError",
+            "2026-11-06T04:20:03.499Z\t56d9ba4e-c637-46b4-8278-c3a7837db9e9\tINFO\tSuccessfully sent 1/1 notifications to Slack",
+            "END RequestId: 56d9ba4e-c637-46b4-8278-c3a7837db9e9",
+            "REPORT RequestId: 56d9ba4e-c637-46b4-8278-c3a7837db9e9\tDuration: 412.66 ms\tBilled Duration: 413 ms\tMemory Size: 256 MB\tMax Memory Used: 89 MB",
+            "START RequestId: d2716515-bd05-4827-89a3-1002d4bbc958 Version: $LATEST",
+            "2026-11-06T04:20:41.502Z\td2716515-bd05-4827-89a3-1002d4bbc958\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX",
+            "2026-11-06T04:20:41.502Z\td2716515-bd05-4827-89a3-1002d4bbc958\tINFO\tFound 1 error events",
+            "2026-11-06T04:20:41.585Z\td2716515-bd05-4827-89a3-1002d4bbc958\tERROR\tFailed to acquire alert slot: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-SlackNotificationFunctionRole-8P4lsCMRjFFO/eecar-stack-SlackNotificationFunction-Wq3e5R7t9Y1u is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async acquireAlertSlot (file:///var/task/deduplicator.js:23:26) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'E92368397622742AF4BF',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.service#AccessDeniedException'\n}",
+            "2026-11-06T04:20:41.882Z\td2716515-bd05-4827-89a3-1002d4bbc958\tINFO\tSent CRITICAL alert for eecar-stack-VectorSearchFunction-yXyHE1D702wX: GenericError",
+            "2026-11-06T04:20:41.883Z\td2716515-bd05-4827-89a3-1002d4bbc958\tINFO\tSuccessfully sent 1/1 notifications to Slack",
+            "END RequestId: d2716515-bd05-4827-89a3-1002d4bbc958",
+            "REPORT RequestId: d2716515-bd05-4827-89a3-1002d4bbc958\tDuration: 419.66 ms\tBilled Duration: 420 ms\tMemory Size: 256 MB\tMax Memory Used: 89 MB",
+            "START RequestId: e64770ac-6bac-4562-ab4f-59b6a03e2ff8 Version: $LATEST",
+            "2026-11-06T04:21:19.877Z\te64770ac-6bac-4562-ab4f-59b6a03e2ff8\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX",
+            "2026-11-06T04:21:19.877Z\te64770ac-6bac-4562-ab4f-59b6a03e2ff8\tINFO\tFound 1 error events",
+            "2026-11-06T04:21:19.960Z\te64770ac-6bac-4562-ab4f-59b6a03e2ff8\tERROR\tFailed to acquire alert slot: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-SlackNotificationFunctionRole-8P4lsCMRjFFO/eecar-stack-SlackNotificationFunction-Wq3e5R7t9Y1u is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async acquireAlertSlot (file:///var/task/deduplicator.js:23:26) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'C5823B522FDD324E3EC3',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.service#AccessDeniedException'\n}",
+            "2026-11-06T04:21:20.257Z\te64770ac-6bac-4562-ab4f-59b6a03e2ff8\tINFO\tSent CRITICAL alert for eecar-stack-VectorSearchFunction-yXyHE1D702wX: GenericError",
+            "2026-11-06T04:21:20.258Z\te64770ac-6bac-4562-ab4f-59b6a03e2ff8\tINFO\tSuccessfully sent 1/1 notifications to Slack",
+            "END RequestId: e64770ac-6bac-4562-ab4f-59b6a03e2ff8",
+            "REPORT RequestId: e64770ac-6bac-4562-ab4f-59b6a03e2ff8\tDuration: 426.66 ms\tBilled Duration: 427 ms\tMemory Size: 256 MB\tMax Memory Used: 89 MB"
+          ],
+          "errorSummary": [
+            [
+              "AccessDeniedException",
+              96
+            ]
+          ],
+          "permissions": {
+            "statements": [
+              {
+                "policy": "SlackNotificationFunctionRolePolicy0",
+                "effect": "Allow",
+                "actions": [
+                  "ssm:GetParameter"
+                ],
+                "resources": [
+                  "arn:aws:ssm:ap-northeast-2:425454508084:parameter/eecar/slack/webhook-url"
+                ]
+              },
+              {
+                "policy": "SlackNotificationFunctionRolePolicy1",
+                "effect": "Allow",
+                "actions": [
+                  "logs:CreateLogGroup",
+                  "logs:CreateLogStream",
+                  "logs:PutLogEvents"
+                ],
+                "resources": [
+                  "*"
+                ]
+              },
+              {
+                "policy": "AWSXrayWriteOnlyAccess",
+                "effect": "Allow",
+                "actions": [
+                  "xray:PutTraceSegments",
+                  "xray:PutTelemetryRecords",
+                  "xray:GetSamplingRules",
+                  "xray:GetSamplingTargets",
+                  "xray:GetSamplingStatisticSummaries"
+                ],
+                "resources": [
+                  "*"
+                ]
+              },
+              {
+                "policy": "AWSLambdaBasicExecutionRole",
+                "effect": "Allow",
+                "actions": [
+                  "logs:CreateLogGroup",
+                  "logs:CreateLogStream",
+                  "logs:PutLogEvents"
+                ],
+                "resources": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        },
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 410,
+            "errors": 0,
+            "avgDuration": 1300
+          },
+          "logs": [
+            "START RequestId: 6311aca2-2c1a-4f79-af64-75e52ace4bdc Version: $LATEST",
+            "2026-11-06T04:20:01.640Z\t6311aca2-2c1a-4f79-af64-75e52ace4bdc\tERROR\tBatch explanation generation failed: SyntaxError: Expected ',' or ']' after array element in JSON at position 38 (line 1 column 39)\n    at JSON.parse (<anonymous>)\n    at parseExplanations (file:///opt/nodejs/utils/search-llm.js:118:31)\n    at generateExplanations (file:///opt/nodejs/utils/search-llm.js:136:16)\n    at async explainHandler (file:///var/task/index.js:449:41)",
+            "2026-11-06T04:20:01.640Z\t6311aca2-2c1a-4f79-af64-75e52ace4bdc\tERROR\tRaw response: [\"용량 64kWh로 조건 일치\",\"전압 800V로 조건 일치\",\"\"아이오닉5\" 표기 있음, 연식 조건 확인 필요\",\"SOH 91%로 조건 일치\"]",
+            "{\"_aws\":{\"Timestamp\":1793938801640,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":1,\"LLMLatency\":1984}",
+            "END RequestId: 6311aca2-2c1a-4f79-af64-75e52ace4bdc",
+            "REPORT RequestId: 6311aca2-2c1a-4f79-af64-75e52ace4bdc\tDuration: 2101.37 ms\tBilled Duration: 2102 ms\tMemory Size: 1024 MB\tMax Memory Used: 233 MB",
+            "START RequestId: 90baadc1-e37c-4d64-9f3f-1f7d6dee9c2b Version: $LATEST",
+            "2026-11-06T04:20:40.017Z\t90baadc1-e37c-4d64-9f3f-1f7d6dee9c2b\tERROR\tBatch explanation generation failed: SyntaxError: Expected ',' or ']' after array element in JSON at position 38 (line 1 column 39)\n    at JSON.parse (<anonymous>)\n    at parseExplanations (file:///opt/nodejs/utils/search-llm.js:118:31)\n    at generateExplanations (file:///opt/nodejs/utils/search-llm.js:136:16)\n    at async explainHandler (file:///var/task/index.js:449:41)",
+            "2026-11-06T04:20:40.017Z\t90baadc1-e37c-4d64-9f3f-1f7d6dee9c2b\tERROR\tRaw response: [\"용량 64kWh로 조건 일치\",\"전압 800V로 조건 일치\",\"\"아이오닉5\" 표기 있음, 연식 조건 확인 필요\",\"SOH 91%로 조건 일치\"]",
+            "{\"_aws\":{\"Timestamp\":1793938840017,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":1,\"LLMLatency\":1984}",
+            "END RequestId: 90baadc1-e37c-4d64-9f3f-1f7d6dee9c2b",
+            "REPORT RequestId: 90baadc1-e37c-4d64-9f3f-1f7d6dee9c2b\tDuration: 2101.37 ms\tBilled Duration: 2102 ms\tMemory Size: 1024 MB\tMax Memory Used: 233 MB",
+            "START RequestId: aab71649-033d-475a-9f4a-8f0fa7013064 Version: $LATEST",
+            "2026-11-06T04:21:18.390Z\taab71649-033d-475a-9f4a-8f0fa7013064\tERROR\tBatch explanation generation failed: SyntaxError: Expected ',' or ']' after array element in JSON at position 38 (line 1 column 39)\n    at JSON.parse (<anonymous>)\n    at parseExplanations (file:///opt/nodejs/utils/search-llm.js:118:31)\n    at generateExplanations (file:///opt/nodejs/utils/search-llm.js:136:16)\n    at async explainHandler (file:///var/task/index.js:449:41)",
+            "2026-11-06T04:21:18.390Z\taab71649-033d-475a-9f4a-8f0fa7013064\tERROR\tRaw response: [\"용량 64kWh로 조건 일치\",\"전압 800V로 조건 일치\",\"\"아이오닉5\" 표기 있음, 연식 조건 확인 필요\",\"SOH 91%로 조건 일치\"]",
+            "{\"_aws\":{\"Timestamp\":1793938878390,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":1,\"LLMLatency\":1984}",
+            "END RequestId: aab71649-033d-475a-9f4a-8f0fa7013064",
+            "REPORT RequestId: aab71649-033d-475a-9f4a-8f0fa7013064\tDuration: 2101.37 ms\tBilled Duration: 2102 ms\tMemory Size: 1024 MB\tMax Memory Used: 233 MB"
+          ],
+          "errorSummary": [
+            [
+              "SyntaxError",
+              93
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "DynamoDB 권한",
+          "DynamoDB 쓰기 권한",
+          "DynamoDB 접근 권한",
+          "dynamodb:PutItem 권한",
+          "PutItem 권한",
+          "DynamoDBCrudPolicy",
+          "테이블 권한",
+          "fail open",
+          "fail-open",
+          "페일 오픈",
+          "acquireAlertSlot",
+          "알림 슬롯",
+          "중복 제거 기록",
+          "중복 제거용 항목",
+          "중복 판정에 실패",
+          "중복 제거가 실패",
+          "중복 제거에 실패",
+          "중복 확인에 실패"
+        ],
+        "fix": [
+          "DynamoDBCrudPolicy",
+          "Crud 정책",
+          "DynamoDB 권한을 다시",
+          "DynamoDB 권한을 복구",
+          "DynamoDB 권한 복구",
+          "DynamoDB 권한을 추가",
+          "DynamoDB 권한 추가",
+          "PutItem 권한을 추가",
+          "PutItem 권한 추가",
+          "dynamodb:PutItem",
+          "UpdateItem",
+          "DynamoDB 쓰기 권한을"
+        ],
+        "mustNot": [
+          "Slack rate limit 때문입니다",
+          "레이트 리밋 때문입니다",
+          "웹훅 URL이 잘못되었습니다",
+          "메모리 부족 때문입니다",
+          "타임아웃 때문입니다",
+          "SSM 권한이 부족합니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-10",
+      "source": "format-based",
+      "category": "trap",
+      "title": "알림 등록 첫 요청만 느림 + 경고 로그",
+      "message": "관심 부품 알림 등록이 아침 첫 요청만 2~3초 걸리고 그다음부터는 금방 돼요. 로그 보니까 punycode 어쩌고 하는 DeprecationWarning이 찍혀 있던데, 이거 고치면 빨라지나요?",
+      "functions": {
+        "WatchPartFunction": {
+          "status": {
+            "invocations": 14,
+            "errors": 0,
+            "avgDuration": 410
+          },
+          "logs": [
+            "INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:9c3e7a1f0b2d4e6a8c5b7d9f1e3a5c7b9d1f3e5a7c9b1d3f5e7a9c1b3d5f7e9a",
+            "(node:2) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)",
+            "START RequestId: 71149d8d-7300-49ca-ae3b-0ad93b6b93ae Version: $LATEST",
+            "2026-11-06T00:12:31.880Z\t71149d8d-7300-49ca-ae3b-0ad93b6b93ae\tINFO\tCreating watch: d6b39cf9-2df1-4dc6-b700-e15538516101",
+            "END RequestId: 71149d8d-7300-49ca-ae3b-0ad93b6b93ae",
+            "REPORT RequestId: 71149d8d-7300-49ca-ae3b-0ad93b6b93ae\tDuration: 1312.55 ms\tBilled Duration: 2417 ms\tMemory Size: 512 MB\tMax Memory Used: 101 MB\tInit Duration: 1104.32 ms",
+            "START RequestId: dc73f88b-3f5a-4b42-bdbb-655dfc25917d Version: $LATEST",
+            "2026-11-06T00:14:02.441Z\tdc73f88b-3f5a-4b42-bdbb-655dfc25917d\tINFO\tCreating watch: a49d7de0-4057-4e79-870b-06898e6a4110",
+            "END RequestId: dc73f88b-3f5a-4b42-bdbb-655dfc25917d",
+            "REPORT RequestId: dc73f88b-3f5a-4b42-bdbb-655dfc25917d\tDuration: 46.20 ms\tBilled Duration: 47 ms\tMemory Size: 512 MB\tMax Memory Used: 103 MB",
+            "START RequestId: bba3f466-0046-4341-9791-112b0a9e3344 Version: $LATEST",
+            "2026-11-06T00:31:47.019Z\tbba3f466-0046-4341-9791-112b0a9e3344\tINFO\tCreating watch: a47af993-6332-4c2b-936d-c9761b3eb443",
+            "END RequestId: bba3f466-0046-4341-9791-112b0a9e3344",
+            "REPORT RequestId: bba3f466-0046-4341-9791-112b0a9e3344\tDuration: 39.88 ms\tBilled Duration: 40 ms\tMemory Size: 512 MB\tMax Memory Used: 103 MB"
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "콜드 스타트",
+          "콜드스타트",
+          "cold start",
+          "Init Duration",
+          "INIT 단계",
+          "초기화 시간",
+          "초기화 단계",
+          "실행 환경을 새로",
+          "실행 환경이 새로",
+          "SDK 초기화"
+        ],
+        "fix": [
+          "조치는 필요 없",
+          "조치가 필요 없",
+          "조치할 필요 없",
+          "그대로 두",
+          "무시해도",
+          "Provisioned Concurrency",
+          "프로비저닝된 동시성",
+          "프로비저닝 동시성",
+          "웜업",
+          "warm-up",
+          "워밍업",
+          "예열"
+        ],
+        "mustNot": [
+          "DeprecationWarning 때문입니다",
+          "DeprecationWarning이 원인입니다",
+          "punycode 때문입니다",
+          "경고 때문입니다",
+          "경고가 원인입니다",
+          "메모리 부족 때문입니다",
+          "스로틀링 때문입니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-11",
+      "source": "format-based",
+      "category": "config",
+      "title": "부품 등록 실패 메시지인데 목록엔 등록됨",
+      "message": "판매자분들이 부품 등록하면 '부품 등록에 실패했습니다'가 뜬대요. 근데 목록 보면 그 부품이 올라가 있고, 몇 분은 다시 눌러서 같은 부품이 두세 개씩 생겼어요. 오늘 점심 전후부터 그런 것 같아요.",
+      "functions": {
+        "PartRegistrationFunction": {
+          "status": {
+            "invocations": 38,
+            "errors": 14,
+            "avgDuration": 2710
+          },
+          "logs": [
+            "INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:9c3e7a1f0b2d4e6a8c5b7d9f1e3a5c7b9d1f3e5a7c9b1d3f5e7a9c1b3d5f7e9a",
+            "START RequestId: 1c222c91-81f2-4fcc-88ca-42e869cf88c8 Version: $LATEST",
+            "2026-11-06T02:31:15.944Z\t1c222c91-81f2-4fcc-88ca-42e869cf88c8\tINFO\tRegistering new part: 30bf5fff-0312-48c5-944e-ac0fba730941",
+            "2026-11-06T02:31:16.212Z\t1c222c91-81f2-4fcc-88ca-42e869cf88c8\tINFO\tPart metadata stored",
+            "2026-11-06T02:31:16.281Z\t1c222c91-81f2-4fcc-88ca-42e869cf88c8\tINFO\tPart specifications stored",
+            "2026-11-06T02:31:16.497Z\t1c222c91-81f2-4fcc-88ca-42e869cf88c8\tINFO\tStored 3 use cases",
+            "2026-11-06T02:31:16.498Z\t1c222c91-81f2-4fcc-88ca-42e869cf88c8\tINFO\tGenerating embedding...",
+            "2026-11-06T02:31:18.945Z 1c222c91-81f2-4fcc-88ca-42e869cf88c8 Task timed out after 3.00 seconds",
+            "END RequestId: 1c222c91-81f2-4fcc-88ca-42e869cf88c8",
+            "REPORT RequestId: 1c222c91-81f2-4fcc-88ca-42e869cf88c8\tDuration: 3000.00 ms\tBilled Duration: 3612 ms\tMemory Size: 1024 MB\tMax Memory Used: 142 MB\tInit Duration: 611.27 ms\tStatus: timeout",
+            "START RequestId: faecbd2d-ae42-4cfd-be4b-4e5a9ecfdc84 Version: $LATEST",
+            "2026-11-06T02:33:02.107Z\tfaecbd2d-ae42-4cfd-be4b-4e5a9ecfdc84\tINFO\tRegistering new part: 4f4b816c-0f9b-472f-bfd7-7bb421212867",
+            "2026-11-06T02:33:02.168Z\tfaecbd2d-ae42-4cfd-be4b-4e5a9ecfdc84\tINFO\tPart metadata stored",
+            "2026-11-06T02:33:02.229Z\tfaecbd2d-ae42-4cfd-be4b-4e5a9ecfdc84\tINFO\tPart specifications stored",
+            "2026-11-06T02:33:02.230Z\tfaecbd2d-ae42-4cfd-be4b-4e5a9ecfdc84\tINFO\tGenerating embedding...",
+            "2026-11-06T02:33:03.402Z\tfaecbd2d-ae42-4cfd-be4b-4e5a9ecfdc84\tINFO\tVector uploaded to S3 (JSON)",
+            "2026-11-06T02:33:04.155Z\tfaecbd2d-ae42-4cfd-be4b-4e5a9ecfdc84\tINFO\tVector uploaded to S3 Vectors: 4f4b816c-0f9b-472f-bfd7-7bb421212867",
+            "2026-11-06T02:33:04.219Z\tfaecbd2d-ae42-4cfd-be4b-4e5a9ecfdc84\tINFO\tInvoking compliance check...",
+            "2026-11-06T02:33:04.590Z\tfaecbd2d-ae42-4cfd-be4b-4e5a9ecfdc84\tINFO\tCompliance check invoked",
+            "END RequestId: faecbd2d-ae42-4cfd-be4b-4e5a9ecfdc84",
+            "REPORT RequestId: faecbd2d-ae42-4cfd-be4b-4e5a9ecfdc84\tDuration: 2486.12 ms\tBilled Duration: 2487 ms\tMemory Size: 1024 MB\tMax Memory Used: 151 MB",
+            "INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:9c3e7a1f0b2d4e6a8c5b7d9f1e3a5c7b9d1f3e5a7c9b1d3f5e7a9c1b3d5f7e9a",
+            "START RequestId: bfcacdfd-ea54-47b0-bd6b-9c9f108118a6 Version: $LATEST",
+            "2026-11-06T03:12:44.020Z\tbfcacdfd-ea54-47b0-bd6b-9c9f108118a6\tINFO\tRegistering new part: 593eec80-d71d-4db3-82f4-6727ea9d8e8b",
+            "2026-11-06T03:12:44.301Z\tbfcacdfd-ea54-47b0-bd6b-9c9f108118a6\tINFO\tPart metadata stored",
+            "2026-11-06T03:12:44.302Z\tbfcacdfd-ea54-47b0-bd6b-9c9f108118a6\tINFO\tGenerating embedding...",
+            "2026-11-06T03:12:45.611Z\tbfcacdfd-ea54-47b0-bd6b-9c9f108118a6\tINFO\tVector uploaded to S3 (JSON)",
+            "2026-11-06T03:12:46.998Z bfcacdfd-ea54-47b0-bd6b-9c9f108118a6 Task timed out after 3.00 seconds",
+            "END RequestId: bfcacdfd-ea54-47b0-bd6b-9c9f108118a6",
+            "REPORT RequestId: bfcacdfd-ea54-47b0-bd6b-9c9f108118a6\tDuration: 3000.00 ms\tBilled Duration: 3599 ms\tMemory Size: 1024 MB\tMax Memory Used: 139 MB\tInit Duration: 598.40 ms\tStatus: timeout"
+          ],
+          "errorSummary": [
+            [
+              "Task timed out",
+              14
+            ]
+          ],
+          "config": {
+            "timeoutSec": 3,
+            "lastModified": "2026-11-06T02:18:40.000+0000"
+          }
+        }
+      },
+      "label": {
+        "cause": [
+          "3초",
+          "3 초",
+          "3 seconds",
+          "3.00 seconds",
+          "3.00초",
+          "타임아웃이 3",
+          "timeout이 3",
+          "Timeout이 3",
+          "Timeout: 3",
+          "timeoutSec: 3",
+          "기본값 3",
+          "제한 시간이 3",
+          "타임아웃 설정이 3",
+          "제한 시간이 너무 짧",
+          "타임아웃이 너무 짧",
+          "Timeout이 너무 짧"
+        ],
+        "fix": [
+          "60초",
+          "60 초",
+          "Timeout: 60",
+          "timeout을 60",
+          "타임아웃을 60",
+          "타임아웃을 늘",
+          "timeout을 늘",
+          "Timeout을 늘",
+          "제한 시간을 늘",
+          "타임아웃 값을 늘",
+          "원래 값(60",
+          "템플릿 값으로"
+        ],
+        "mustNot": [
+          "Bedrock 스로틀링 때문입니다",
+          "ThrottlingException 때문입니다",
+          "DynamoDB 스로틀링 때문입니다",
+          "메모리 부족 때문입니다",
+          "권한이 부족합니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-12",
+      "source": "format-based",
+      "category": "code",
+      "title": "리팩터링 배포 후 제안 API 전체 실패",
+      "message": "오늘 오후 배포 이후로 계약 제안 보내기랑 받은 제안 목록이 둘 다 안 돼요. 공통 유틸 import 정리하는 리팩터링 PR이었고 jest 테스트는 전부 통과했어요.",
+      "functions": {
+        "ProposalFunction": {
+          "status": {
+            "invocations": 22,
+            "errors": 22,
+            "avgDuration": 205
+          },
+          "logs": [
+            "INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:9c3e7a1f0b2d4e6a8c5b7d9f1e3a5c7b9d1f3e5a7c9b1d3f5e7a9c1b3d5f7e9a",
+            "2026-11-06T05:51:02.330Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\":\"Error\",\"errorMessage\":\"Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\nDid you mean to import \\\"/opt/nodejs/utils/dynamodb.js\\\"?\",\"code\":\"ERR_MODULE_NOT_FOUND\",\"url\":\"file:///opt/nodejs/utils/dynamodb\",\"stack\":[\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\",\"Did you mean to import \\\"/opt/nodejs/utils/dynamodb.js\\\"?\",\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\",\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\",\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\"]}",
+            "INIT_REPORT Init Duration: 198.67 ms\tPhase: init\tStatus: error\tError Type: Runtime.Unknown",
+            "START RequestId: da4fb5c6-e93e-44d3-9f85-27599fa62642 Version: $LATEST",
+            "2026-11-06T05:51:02.871Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\":\"Error\",\"errorMessage\":\"Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\nDid you mean to import \\\"/opt/nodejs/utils/dynamodb.js\\\"?\",\"code\":\"ERR_MODULE_NOT_FOUND\",\"url\":\"file:///opt/nodejs/utils/dynamodb\",\"stack\":[\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\",\"Did you mean to import \\\"/opt/nodejs/utils/dynamodb.js\\\"?\",\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\",\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\",\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\"]}",
+            "INIT_REPORT Init Duration: 201.13 ms\tPhase: invoke\tStatus: error\tError Type: Runtime.Unknown",
+            "END RequestId: da4fb5c6-e93e-44d3-9f85-27599fa62642",
+            "REPORT RequestId: da4fb5c6-e93e-44d3-9f85-27599fa62642\tDuration: 214.50 ms\tBilled Duration: 215 ms\tMemory Size: 512 MB\tMax Memory Used: 57 MB\tStatus: error\tError Type: Runtime.Unknown",
+            "START RequestId: 4c56ff4c-e4aa-4957-baa5-dff913df997a Version: $LATEST",
+            "2026-11-06T06:02:39.115Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\":\"Error\",\"errorMessage\":\"Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\nDid you mean to import \\\"/opt/nodejs/utils/dynamodb.js\\\"?\",\"code\":\"ERR_MODULE_NOT_FOUND\",\"url\":\"file:///opt/nodejs/utils/dynamodb\",\"stack\":[\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\",\"Did you mean to import \\\"/opt/nodejs/utils/dynamodb.js\\\"?\",\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\",\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\",\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\"]}",
+            "INIT_REPORT Init Duration: 205.53 ms\tPhase: invoke\tStatus: error\tError Type: Runtime.Unknown",
+            "END RequestId: 4c56ff4c-e4aa-4957-baa5-dff913df997a",
+            "REPORT RequestId: 4c56ff4c-e4aa-4957-baa5-dff913df997a\tDuration: 217.80 ms\tBilled Duration: 218 ms\tMemory Size: 512 MB\tMax Memory Used: 57 MB\tStatus: error\tError Type: Runtime.Unknown"
+          ],
+          "errorSummary": [
+            [
+              "ERR_MODULE_NOT_FOUND",
+              22
+            ]
+          ],
+          "config": {
+            "lastModified": "2026-11-06T05:48:10.000+0000"
+          }
+        }
+      },
+      "label": {
+        "cause": [
+          ".js 확장자",
+          "확장자가 빠",
+          "확장자 누락",
+          "확장자를 빠뜨",
+          "확장자 없이",
+          ".js가 빠",
+          ".js 없이",
+          ".js를 빠뜨",
+          "extension",
+          "'/opt/nodejs/utils/dynamodb'",
+          "utils/dynamodb'",
+          "`/opt/nodejs/utils/dynamodb`"
+        ],
+        "fix": [
+          ".js를 붙",
+          ".js 확장자를 붙",
+          ".js 확장자를 추가",
+          ".js를 추가",
+          "확장자를 붙",
+          "확장자를 추가",
+          "dynamodb.js로",
+          "dynamodb.js'로",
+          "import 경로를 수정",
+          "import 경로 수정",
+          "import 경로를 고치"
+        ],
+        "mustNot": [
+          "레이어 버전이 오래되었습니다",
+          "레이어를 최신 버전으로 바꾸세요",
+          "레이어 버전을 올리세요",
+          "권한이 부족합니다",
+          "SNS 권한이 부족합니다",
+          "메모리 부족 때문입니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-13",
+      "source": "format-based",
+      "category": "limit",
+      "title": "일부 고객 문의만 접수 실패",
+      "message": "문의하기가 어떤 고객은 잘 되고 어떤 고객은 '문의 접수 실패'가 떠요. 같은 브라우저에서 해 봐도 되는 건 되고 안 되는 건 계속 안 되고요. 오늘만 4건 놓친 것 같아요.",
+      "functions": {
+        "ContactInquiryFunction": {
+          "status": {
+            "invocations": 23,
+            "errors": 4,
+            "avgDuration": 175
+          },
+          "logs": [
+            "START RequestId: a1d6b81e-36f8-48d6-9fb6-57d79d2693c4 Version: $LATEST",
+            "2026-11-06T01:03:17.450Z\ta1d6b81e-36f8-48d6-9fb6-57d79d2693c4\tINFO\tProcessing contact inquiry from: buyer.kim@example.com",
+            "2026-11-06T01:03:17.612Z\ta1d6b81e-36f8-48d6-9fb6-57d79d2693c4\tINFO\tContact inquiry notification sent successfully",
+            "END RequestId: a1d6b81e-36f8-48d6-9fb6-57d79d2693c4",
+            "REPORT RequestId: a1d6b81e-36f8-48d6-9fb6-57d79d2693c4\tDuration: 171.84 ms\tBilled Duration: 172 ms\tMemory Size: 512 MB\tMax Memory Used: 92 MB",
+            "START RequestId: c5803c20-6fa6-4c01-9590-a92e009e1e3e Version: $LATEST",
+            "2026-11-06T02:26:40.118Z\tc5803c20-6fa6-4c01-9590-a92e009e1e3e\tINFO\tProcessing contact inquiry from: purchasing@example.co.kr",
+            "2026-11-06T02:26:40.281Z\tc5803c20-6fa6-4c01-9590-a92e009e1e3e\tERROR\tFailed to send contact inquiry notification: InvalidParameterException: Invalid parameter: Subject\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\n    at async sendContactNotification (file:///var/task/index.js:63:5)\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '71EB43BA81E5398F165A',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  Type: 'Sender',\n  Code: 'InvalidParameter'\n}",
+            "2026-11-06T02:26:40.282Z\tc5803c20-6fa6-4c01-9590-a92e009e1e3e\tERROR\tError in contact-inquiry: InvalidParameterException: Invalid parameter: Subject\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\n    at async sendContactNotification (file:///var/task/index.js:63:5)\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '71EB43BA81E5398F165A',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  Type: 'Sender',\n  Code: 'InvalidParameter'\n}",
+            "END RequestId: c5803c20-6fa6-4c01-9590-a92e009e1e3e",
+            "REPORT RequestId: c5803c20-6fa6-4c01-9590-a92e009e1e3e\tDuration: 168.02 ms\tBilled Duration: 169 ms\tMemory Size: 512 MB\tMax Memory Used: 93 MB",
+            "START RequestId: a4498744-0c0b-4efd-bd27-0eb6e4afe279 Version: $LATEST",
+            "2026-11-06T03:10:52.004Z\ta4498744-0c0b-4efd-bd27-0eb6e4afe279\tINFO\tProcessing contact inquiry from: lee.parts@example.org",
+            "2026-11-06T03:10:52.151Z\ta4498744-0c0b-4efd-bd27-0eb6e4afe279\tINFO\tContact inquiry notification sent successfully",
+            "END RequestId: a4498744-0c0b-4efd-bd27-0eb6e4afe279",
+            "REPORT RequestId: a4498744-0c0b-4efd-bd27-0eb6e4afe279\tDuration: 158.37 ms\tBilled Duration: 159 ms\tMemory Size: 512 MB\tMax Memory Used: 93 MB",
+            "START RequestId: b017172d-5ba9-4996-b77b-c83ff1573963 Version: $LATEST",
+            "2026-11-06T04:47:05.903Z\tb017172d-5ba9-4996-b77b-c83ff1573963\tINFO\tProcessing contact inquiry from: ess.team@example.net",
+            "2026-11-06T04:47:06.066Z\tb017172d-5ba9-4996-b77b-c83ff1573963\tERROR\tFailed to send contact inquiry notification: InvalidParameterException: Invalid parameter: Subject\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\n    at async sendContactNotification (file:///var/task/index.js:63:5)\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '4039777851E9301410AA',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  Type: 'Sender',\n  Code: 'InvalidParameter'\n}",
+            "2026-11-06T04:47:06.067Z\tb017172d-5ba9-4996-b77b-c83ff1573963\tERROR\tError in contact-inquiry: InvalidParameterException: Invalid parameter: Subject\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\n    at async sendContactNotification (file:///var/task/index.js:63:5)\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '4039777851E9301410AA',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  Type: 'Sender',\n  Code: 'InvalidParameter'\n}",
+            "END RequestId: b017172d-5ba9-4996-b77b-c83ff1573963",
+            "REPORT RequestId: b017172d-5ba9-4996-b77b-c83ff1573963\tDuration: 169.02 ms\tBilled Duration: 170 ms\tMemory Size: 512 MB\tMax Memory Used: 93 MB"
+          ],
+          "errorSummary": [
+            [
+              "InvalidParameterException",
+              4
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "100자",
+          "100 자",
+          "100글자",
+          "100 글자",
+          "100 characters",
+          "100자 미만",
+          "100자 이상",
+          "100자를 넘",
+          "제목 길이",
+          "Subject 길이",
+          "제목이 너무 길",
+          "Subject가 너무 길",
+          "제목이 길",
+          "길이 제한",
+          "줄바꿈",
+          "개행",
+          "제어 문자"
+        ],
+        "fix": [
+          "잘라",
+          "자르",
+          "truncate",
+          "100자 이내",
+          "100자 미만으로",
+          "길이를 제한",
+          "길이 검증",
+          "제목 검증",
+          "Subject 검증",
+          "고정 제목",
+          "고정된 제목",
+          "제목은 고정",
+          "본문으로 옮",
+          "본문에 넣",
+          "줄바꿈을 제거",
+          "개행을 제거",
+          "제어 문자를 제거"
+        ],
+        "mustNot": [
+          "SNS 권한이 부족합니다",
+          "이메일 형식이 잘못되었습니다",
+          "이메일 형식 오류입니다",
+          "스로틀링 때문입니다",
+          "SNS 토픽이 삭제되었습니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-14",
+      "source": "format-based",
+      "category": "healthy",
+      "title": "배포 직후 전체 상태 점검",
+      "message": "방금 v1.9.2 태그 푸시해서 백엔드 배포 끝났어요. 에러 나는 함수 있는지 한번 훑어봐 주세요.",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 182,
+            "errors": 0,
+            "avgDuration": 710
+          },
+          "logs": [
+            "START RequestId: 56c968ba-4135-4710-9d0a-b942f3363a9e Version: $LATEST",
+            "2026-11-06T06:24:10.512Z\t56c968ba-4135-4710-9d0a-b942f3363a9e\tINFO\tProcessing search query: 중고 테슬라 모델 Y 모터",
+            "2026-11-06T06:24:10.824Z\t56c968ba-4135-4710-9d0a-b942f3363a9e\tINFO\tvector 100, bm25 100 (index 191, loaded) -> ranked 140, constraints {\"categories\":[\"motor\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"모델 Y\"]}",
+            "{\"_aws\":{\"Timestamp\":1793946250512,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":138,\"VectorSearchMs\":92,\"IndexLoadMs\":412,\"FusionMs\":9,\"TotalMs\":590}",
+            "END RequestId: 56c968ba-4135-4710-9d0a-b942f3363a9e",
+            "REPORT RequestId: 56c968ba-4135-4710-9d0a-b942f3363a9e\tDuration: 596.31 ms\tBilled Duration: 597 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB",
+            "START RequestId: b3fbb9b4-7283-40ca-b5c0-a1b25a161a30 Version: $LATEST",
+            "{\"_aws\":{\"Timestamp\":1793946251130,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":1876}",
+            "END RequestId: b3fbb9b4-7283-40ca-b5c0-a1b25a161a30",
+            "REPORT RequestId: b3fbb9b4-7283-40ca-b5c0-a1b25a161a30\tDuration: 2009.42 ms\tBilled Duration: 2010 ms\tMemory Size: 1024 MB\tMax Memory Used: 221 MB",
+            "START RequestId: 4d0c5af7-10fb-44ba-9877-183bf7e05b15 Version: $LATEST",
+            "2026-11-06T06:27:03.018Z\t4d0c5af7-10fb-44ba-9877-183bf7e05b15\tINFO\tProcessing search query: 배터리 팩",
+            "2026-11-06T06:27:03.018Z\t4d0c5af7-10fb-44ba-9877-183bf7e05b15\tINFO\tCache hit!",
+            "{\"_aws\":{\"Timestamp\":1793946423018,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":1,\"ZeroResult\":0,\"TotalMs\":38}",
+            "END RequestId: 4d0c5af7-10fb-44ba-9877-183bf7e05b15",
+            "REPORT RequestId: 4d0c5af7-10fb-44ba-9877-183bf7e05b15\tDuration: 44.18 ms\tBilled Duration: 45 ms\tMemory Size: 1024 MB\tMax Memory Used: 209 MB"
+          ],
+          "config": {
+            "lastModified": "2026-11-06T06:20:14.000+0000"
+          }
+        },
+        "PartRegistrationFunction": {
+          "status": {
+            "invocations": 9,
+            "errors": 0,
+            "avgDuration": 1650
+          },
+          "config": {
+            "lastModified": "2026-11-06T06:20:17.000+0000"
+          },
+          "logs": [
+            "START RequestId: 9f090cd0-e488-4a06-ad9f-fff7de48b604 Version: $LATEST",
+            "2026-11-06T06:31:40.007Z\t9f090cd0-e488-4a06-ad9f-fff7de48b604\tINFO\tRegistering new part: 337a9ad9-0730-42c1-82a2-6b0b369f9a03",
+            "2026-11-06T06:31:40.071Z\t9f090cd0-e488-4a06-ad9f-fff7de48b604\tINFO\tPart metadata stored",
+            "2026-11-06T06:31:40.072Z\t9f090cd0-e488-4a06-ad9f-fff7de48b604\tINFO\tGenerating embedding...",
+            "2026-11-06T06:31:40.390Z\t9f090cd0-e488-4a06-ad9f-fff7de48b604\tINFO\tVector uploaded to S3 (JSON)",
+            "2026-11-06T06:31:40.702Z\t9f090cd0-e488-4a06-ad9f-fff7de48b604\tINFO\tVector uploaded to S3 Vectors: 337a9ad9-0730-42c1-82a2-6b0b369f9a03",
+            "2026-11-06T06:31:40.703Z\t9f090cd0-e488-4a06-ad9f-fff7de48b604\tINFO\tInvoking compliance check...",
+            "2026-11-06T06:31:40.811Z\t9f090cd0-e488-4a06-ad9f-fff7de48b604\tINFO\tCompliance check invoked",
+            "END RequestId: 9f090cd0-e488-4a06-ad9f-fff7de48b604",
+            "REPORT RequestId: 9f090cd0-e488-4a06-ad9f-fff7de48b604\tDuration: 1611.20 ms\tBilled Duration: 2314 ms\tMemory Size: 1024 MB\tMax Memory Used: 148 MB\tInit Duration: 702.55 ms"
+          ]
+        },
+        "GetPartsFunction": {
+          "status": {
+            "invocations": 240,
+            "errors": 0,
+            "avgDuration": 85
+          },
+          "config": {
+            "lastModified": "2026-11-06T06:20:19.000+0000"
+          },
+          "logs": [
+            "START RequestId: 97914425-2f0f-4236-9e5c-0f265e71b53c Version: $LATEST",
+            "END RequestId: 97914425-2f0f-4236-9e5c-0f265e71b53c",
+            "REPORT RequestId: 97914425-2f0f-4236-9e5c-0f265e71b53c\tDuration: 92.40 ms\tBilled Duration: 93 ms\tMemory Size: 512 MB\tMax Memory Used: 87 MB",
+            "START RequestId: a59bbf6c-022a-4ce0-8f92-6a672b813de7 Version: $LATEST",
+            "END RequestId: a59bbf6c-022a-4ce0-8f92-6a672b813de7",
+            "REPORT RequestId: a59bbf6c-022a-4ce0-8f92-6a672b813de7\tDuration: 61.17 ms\tBilled Duration: 62 ms\tMemory Size: 512 MB\tMax Memory Used: 88 MB"
+          ]
+        },
+        "SlackAgentFunction": {
+          "status": {
+            "invocations": 6,
+            "errors": 0,
+            "avgDuration": 2100
+          },
+          "config": {
+            "lastModified": "2026-11-06T06:20:21.000+0000"
+          }
+        }
+      },
+      "label": {
+        "cause": [
+          "에러가 없",
+          "에러는 없",
+          "에러 없이",
+          "오류가 없",
+          "오류는 없",
+          "오류 없이",
+          "이상 없",
+          "이상이 없",
+          "이상은 없",
+          "문제가 없",
+          "문제는 없",
+          "문제 없",
+          "모두 정상",
+          "전부 정상",
+          "모든 함수가 정상",
+          "정상입니다",
+          "정상 동작",
+          "정상적으로 동작",
+          "0건"
+        ],
+        "fix": [
+          "조치는 필요 없",
+          "조치가 필요 없",
+          "조치할 필요 없",
+          "특별한 조치",
+          "추가 조치는 필요 없",
+          "추가 조치가 필요 없",
+          "계속 모니터링",
+          "지켜보",
+          "모니터링하",
+          "모니터링을 계속",
+          "롤백할 필요",
+          "롤백은 필요 없",
+          "별도 조치",
+          "특별히 조치할"
+        ],
+        "mustNot": [
+          "권한이 부족합니다",
+          "타임아웃이 발생하고 있습니다",
+          "스로틀링이 발생하고 있습니다",
+          "롤백하세요",
+          "롤백을 권장합니다",
+          "장애가 발생했습니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-15",
+      "source": "format-based",
+      "category": "iam",
+      "title": "규정 위반 알림이 한 건도 없음",
+      "message": "지난주 보안 점검 작업 들어간 뒤로 규정 위반 알림 메일이 한 번도 안 왔어요. 그 전엔 일주일에 몇 건은 왔거든요. 진짜 위반 부품이 없는 건지 뭔가 고장 난 건지 모르겠어요.",
+      "functions": {
+        "ComplianceCheckFunction": {
+          "status": {
+            "invocations": 41,
+            "errors": 0,
+            "avgDuration": 640
+          },
+          "logs": [
+            "START RequestId: 7ef605fc-8dba-4425-9696-5fbd4c8fbe1f Version: $LATEST",
+            "2026-11-06T01:12:40.551Z\t7ef605fc-8dba-4425-9696-5fbd4c8fbe1f\tINFO\tRunning compliance check for part: fd47e9b2-d31b-464f-a883-2936db3180b2",
+            "2026-11-06T01:12:41.006Z\t7ef605fc-8dba-4425-9696-5fbd4c8fbe1f\tERROR\tFailed to check compliance with AI: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ComplianceCheckFunctionRole-xbXyccpNGbWj/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0 because no identity-based policy allows the bedrock:InvokeModel action\n    at de_AccessDeniedExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1062:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22)\n    at async callClaude (file:///opt/nodejs/utils/bedrock.js:50:17) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 403,\n    requestId: '13682AC418603AA09663',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "2026-11-06T01:12:41.007Z\t7ef605fc-8dba-4425-9696-5fbd4c8fbe1f\tINFO\tNo compliance violations found",
+            "END RequestId: 7ef605fc-8dba-4425-9696-5fbd4c8fbe1f",
+            "REPORT RequestId: 7ef605fc-8dba-4425-9696-5fbd4c8fbe1f\tDuration: 612.33 ms\tBilled Duration: 613 ms\tMemory Size: 512 MB\tMax Memory Used: 97 MB",
+            "START RequestId: a8f15eda-80c5-4adb-8e71-943adc8015cf Version: $LATEST",
+            "2026-11-06T02:33:09.017Z\ta8f15eda-80c5-4adb-8e71-943adc8015cf\tINFO\tRunning compliance check for part: babd0fe2-f0c5-4250-8e36-7a1e61f1717f",
+            "2026-11-06T02:33:09.472Z\ta8f15eda-80c5-4adb-8e71-943adc8015cf\tERROR\tFailed to check compliance with AI: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ComplianceCheckFunctionRole-xbXyccpNGbWj/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0 because no identity-based policy allows the bedrock:InvokeModel action\n    at de_AccessDeniedExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1062:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22)\n    at async callClaude (file:///opt/nodejs/utils/bedrock.js:50:17) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 403,\n    requestId: 'B16A457A3302D7C1F456',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "2026-11-06T02:33:09.473Z\ta8f15eda-80c5-4adb-8e71-943adc8015cf\tINFO\tNo compliance violations found",
+            "END RequestId: a8f15eda-80c5-4adb-8e71-943adc8015cf",
+            "REPORT RequestId: a8f15eda-80c5-4adb-8e71-943adc8015cf\tDuration: 655.90 ms\tBilled Duration: 656 ms\tMemory Size: 512 MB\tMax Memory Used: 97 MB",
+            "START RequestId: 37a749d8-08e4-4495-a8da-1e5352d03cae Version: $LATEST",
+            "2026-11-06T03:51:22.906Z\t37a749d8-08e4-4495-a8da-1e5352d03cae\tINFO\tRunning compliance check for part: 44d5c657-88ac-4d13-9e32-351289a61ab3",
+            "2026-11-06T03:51:23.361Z\t37a749d8-08e4-4495-a8da-1e5352d03cae\tERROR\tFailed to check compliance with AI: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ComplianceCheckFunctionRole-xbXyccpNGbWj/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0 because no identity-based policy allows the bedrock:InvokeModel action\n    at de_AccessDeniedExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1062:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22)\n    at async callClaude (file:///opt/nodejs/utils/bedrock.js:50:17) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 403,\n    requestId: 'AC2646028F5B8B9BBF7A',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "2026-11-06T03:51:23.362Z\t37a749d8-08e4-4495-a8da-1e5352d03cae\tINFO\tNo compliance violations found",
+            "END RequestId: 37a749d8-08e4-4495-a8da-1e5352d03cae",
+            "REPORT RequestId: 37a749d8-08e4-4495-a8da-1e5352d03cae\tDuration: 631.48 ms\tBilled Duration: 632 ms\tMemory Size: 512 MB\tMax Memory Used: 97 MB"
+          ],
+          "errorSummary": [
+            [
+              "AccessDeniedException",
+              41
+            ]
+          ],
+          "permissions": {
+            "statements": [
+              {
+                "policy": "ComplianceCheckFunctionRolePolicy0",
+                "effect": "Allow",
+                "actions": [
+                  "s3:GetObject",
+                  "s3:ListBucket",
+                  "s3:GetBucketLocation",
+                  "s3:GetObjectVersion",
+                  "s3:GetLifecycleConfiguration"
+                ],
+                "resources": [
+                  "arn:aws:s3:::eecar-documents-425454508084",
+                  "arn:aws:s3:::eecar-documents-425454508084/*"
+                ]
+              },
+              {
+                "policy": "ComplianceCheckFunctionRolePolicy1",
+                "effect": "Allow",
+                "actions": [
+                  "sns:Publish"
+                ],
+                "resources": [
+                  "arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications"
+                ]
+              },
+              {
+                "policy": "ComplianceCheckFunctionRolePolicy2",
+                "effect": "Allow",
+                "actions": [
+                  "bedrock:InvokeModel",
+                  "bedrock:InvokeModelWithResponseStream"
+                ],
+                "resources": [
+                  "arn:aws:bedrock:ap-northeast-2:425454508084:inference-profile/*",
+                  "arn:aws:bedrock:ap-northeast-2::foundation-model/*"
+                ]
+              },
+              {
+                "policy": "AWSXrayWriteOnlyAccess",
+                "effect": "Allow",
+                "actions": [
+                  "xray:PutTraceSegments",
+                  "xray:PutTelemetryRecords",
+                  "xray:GetSamplingRules",
+                  "xray:GetSamplingTargets",
+                  "xray:GetSamplingStatisticSummaries"
+                ],
+                "resources": [
+                  "*"
+                ]
+              },
+              {
+                "policy": "AWSLambdaBasicExecutionRole",
+                "effect": "Allow",
+                "actions": [
+                  "logs:CreateLogGroup",
+                  "logs:CreateLogStream",
+                  "logs:PutLogEvents"
+                ],
+                "resources": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "label": {
+        "cause": [
+          "arn:aws:bedrock:::foundation-model",
+          "global inference profile",
+          "글로벌 추론 프로필",
+          "global 추론 프로필",
+          "global 프로필",
+          "글로벌 프로필",
+          "다른 리전",
+          "교차 리전",
+          "cross-region",
+          "크로스 리전",
+          "리전이 없는 foundation-model",
+          "리전 없는 foundation-model",
+          "foundation-model ARN",
+          "ap-northeast-2로만",
+          "서울 리전으로만",
+          "서울 리전만",
+          "ap-northeast-2만"
+        ],
+        "fix": [
+          "arn:aws:bedrock:::foundation-model/*",
+          "arn:aws:bedrock:*::foundation-model/*",
+          "foundation-model/*를 추가",
+          "foundation-model/* 추가",
+          "foundation-model 리소스를 추가",
+          "리소스를 다시 추가",
+          "원래 정책으로",
+          "이전 정책으로",
+          "모든 리전의 foundation-model",
+          "global 모델 ARN",
+          "글로벌 모델 ARN"
+        ],
+        "mustNot": [
+          "sns:Publish 권한이 없습니다",
+          "SNS 권한이 부족합니다",
+          "모델이 퇴역했습니다",
+          "스로틀링 때문입니다",
+          "위반 부품이 없기 때문입니다",
+          "정상적으로 위반이 없습니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-16",
+      "source": "format-based",
+      "category": "code",
+      "title": "AI 설명이 가끔 전부 기본 문구",
+      "message": "검색 결과 밑에 나오는 AI 설명이 어떤 검색에서는 전부 '유사도 기반 매칭'으로만 나와요. 오늘 search-llm-fallback 알람도 몇 번 울렸고요. Bedrock이 불안정한 건가요?",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 410,
+            "errors": 0,
+            "avgDuration": 1900
+          },
+          "logs": [
+            "START RequestId: b73ce398-c39f-406a-b761-d2277d853a92 Version: $LATEST",
+            "2026-11-06T02:02:15.330Z\tb73ce398-c39f-406a-b761-d2277d853a92\tERROR\tBatch explanation generation failed: SyntaxError: Expected ',' or ']' after array element in JSON at position 32 (line 1 column 33)\n    at JSON.parse (<anonymous>)\n    at parseExplanations (file:///opt/nodejs/utils/search-llm.js:118:31)\n    at generateExplanations (file:///opt/nodejs/utils/search-llm.js:136:16)\n    at async explainHandler (file:///var/task/index.js:449:41)",
+            "2026-11-06T02:02:15.330Z\tb73ce398-c39f-406a-b761-d2277d853a92\tERROR\tRaw response: [\"용량 64kWh로 조건 일치\",\"EV6 표기만 있어 \"차종\" 조건 확인 필요\",\"전압 800V로 조건 일치\",\"SOH 91%로 조건 일치\",\"제조사 정보 일치, 용량 조건 확인 필요\",\"니로 EV 호환 표기 있음\",\"용량 17.6kWh로 조건 미달\"]",
+            "{\"_aws\":{\"Timestamp\":1793930535330,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":1,\"LLMLatency\":2140}",
+            "END RequestId: b73ce398-c39f-406a-b761-d2277d853a92",
+            "REPORT RequestId: b73ce398-c39f-406a-b761-d2277d853a92\tDuration: 2281.27 ms\tBilled Duration: 2282 ms\tMemory Size: 1024 MB\tMax Memory Used: 226 MB",
+            "START RequestId: 5ca79b66-0fbc-4947-8b73-990080af2082 Version: $LATEST",
+            "2026-11-06T02:05:47.950Z\t5ca79b66-0fbc-4947-8b73-990080af2082\tINFO\tProcessing search query: EV6 배터리 77kWh",
+            "2026-11-06T02:05:48.262Z\t5ca79b66-0fbc-4947-8b73-990080af2082\tINFO\tvector 100, bm25 100 (index 191) -> ranked 150, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"EV6\"]}",
+            "{\"_aws\":{\"Timestamp\":1793930747950,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":138,\"VectorSearchMs\":92,\"IndexLoadMs\":2,\"FusionMs\":9,\"TotalMs\":270}",
+            "END RequestId: 5ca79b66-0fbc-4947-8b73-990080af2082",
+            "REPORT RequestId: 5ca79b66-0fbc-4947-8b73-990080af2082\tDuration: 276.31 ms\tBilled Duration: 277 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB",
+            "START RequestId: bd4c9ab7-30f5-4132-86b9-99ec0d90d1fb Version: $LATEST",
+            "{\"_aws\":{\"Timestamp\":1793930748771,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":1902}",
+            "END RequestId: bd4c9ab7-30f5-4132-86b9-99ec0d90d1fb",
+            "REPORT RequestId: bd4c9ab7-30f5-4132-86b9-99ec0d90d1fb\tDuration: 2043.27 ms\tBilled Duration: 2044 ms\tMemory Size: 1024 MB\tMax Memory Used: 226 MB",
+            "START RequestId: 82aa4b0a-f34c-4313-a562-076992e50aa3 Version: $LATEST",
+            "2026-11-06T03:44:01.208Z\t82aa4b0a-f34c-4313-a562-076992e50aa3\tERROR\tBatch explanation generation failed: SyntaxError: Expected ',' or ']' after array element in JSON at position 32 (line 1 column 33)\n    at JSON.parse (<anonymous>)\n    at parseExplanations (file:///opt/nodejs/utils/search-llm.js:118:31)\n    at generateExplanations (file:///opt/nodejs/utils/search-llm.js:136:16)\n    at async explainHandler (file:///var/task/index.js:449:41)",
+            "2026-11-06T03:44:01.208Z\t82aa4b0a-f34c-4313-a562-076992e50aa3\tERROR\tRaw response: [\"용량 64kWh로 조건 일치\",\"EV6 표기만 있어 \"차종\" 조건 확인 필요\",\"전압 800V로 조건 일치\",\"SOH 91%로 조건 일치\",\"제조사 정보 일치, 용량 조건 확인 필요\",\"니로 EV 호환 표기 있음\",\"용량 17.6kWh로 조건 미달\"]",
+            "{\"_aws\":{\"Timestamp\":1793936641208,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":1,\"LLMLatency\":2315}",
+            "END RequestId: 82aa4b0a-f34c-4313-a562-076992e50aa3",
+            "REPORT RequestId: 82aa4b0a-f34c-4313-a562-076992e50aa3\tDuration: 2456.27 ms\tBilled Duration: 2457 ms\tMemory Size: 1024 MB\tMax Memory Used: 226 MB"
+          ],
+          "errorSummary": [
+            [
+              "SyntaxError",
+              14
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "JSON 파싱",
+          "JSON.parse",
+          "JSON 형식",
+          "JSON이 깨",
+          "JSON 배열이 깨",
+          "따옴표",
+          "이스케이프",
+          "escape",
+          "SyntaxError",
+          "파싱 실패",
+          "파싱에 실패",
+          "파싱 오류",
+          "응답 형식이 깨",
+          "형식이 잘못된 JSON",
+          "잘못된 JSON",
+          "invalid JSON"
+        ],
+        "fix": [
+          "프롬프트",
+          "구조화된 출력",
+          "structured output",
+          "tool use",
+          "도구 호출",
+          "JSON 모드",
+          "파싱을 보완",
+          "파싱 로직",
+          "파서를",
+          "재시도",
+          "부분 파싱",
+          "jsonrepair",
+          "이스케이프 처리",
+          "따옴표를 이스케이프",
+          "응답 검증"
+        ],
+        "mustNot": [
+          "스로틀링 때문입니다",
+          "ThrottlingException 때문입니다",
+          "모델 접근 권한이 없습니다",
+          "권한이 부족합니다",
+          "모델이 퇴역했습니다",
+          "Bedrock 장애 때문입니다",
+          "Bedrock이 불안정하기 때문입니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-17",
+      "source": "format-based",
+      "category": "trap",
+      "title": "같은 에러인데 알림은 가끔만 옴",
+      "message": "VectorSearch 쪽에서 같은 에러가 로그엔 엄청 찍히는데 슬랙 알림은 가끔 하나씩만 와요. SlackNotification 함수 메모리가 256MB밖에 안 되던데 처리를 못 따라가서 알림이 빠지는 거 아니에요?",
+      "functions": {
+        "SlackNotificationFunction": {
+          "status": {
+            "invocations": 140,
+            "errors": 0,
+            "avgDuration": 160
+          },
+          "logs": [
+            "START RequestId: 0714c352-af2e-4b1a-a703-a5a7664644c5 Version: $LATEST",
+            "2026-11-06T05:01:12.301Z\t0714c352-af2e-4b1a-a703-a5a7664644c5\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX",
+            "2026-11-06T05:01:12.301Z\t0714c352-af2e-4b1a-a703-a5a7664644c5\tINFO\tFound 1 error events",
+            "2026-11-06T05:01:12.662Z\t0714c352-af2e-4b1a-a703-a5a7664644c5\tINFO\tSent CRITICAL alert for eecar-stack-VectorSearchFunction-yXyHE1D702wX: BedrockThrottling",
+            "2026-11-06T05:01:12.663Z\t0714c352-af2e-4b1a-a703-a5a7664644c5\tINFO\tSuccessfully sent 1/1 notifications to Slack",
+            "END RequestId: 0714c352-af2e-4b1a-a703-a5a7664644c5",
+            "REPORT RequestId: 0714c352-af2e-4b1a-a703-a5a7664644c5\tDuration: 388.12 ms\tBilled Duration: 389 ms\tMemory Size: 256 MB\tMax Memory Used: 91 MB",
+            "START RequestId: 2565d681-a26b-4bed-bd09-8465f6e44cc9 Version: $LATEST",
+            "2026-11-06T05:01:40.118Z\t2565d681-a26b-4bed-bd09-8465f6e44cc9\tINFO\tProcessing 2 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX",
+            "2026-11-06T05:01:40.118Z\t2565d681-a26b-4bed-bd09-8465f6e44cc9\tINFO\tFound 2 error events",
+            "2026-11-06T05:01:40.141Z\t2565d681-a26b-4bed-bd09-8465f6e44cc9\tINFO\tDuplicate error suppressed: 6a1f0c2e9b7d4e3a8c5b1f2d0e9a7c6b",
+            "2026-11-06T05:01:40.163Z\t2565d681-a26b-4bed-bd09-8465f6e44cc9\tINFO\tDuplicate error suppressed: 6a1f0c2e9b7d4e3a8c5b1f2d0e9a7c6b",
+            "2026-11-06T05:01:40.164Z\t2565d681-a26b-4bed-bd09-8465f6e44cc9\tINFO\tSuccessfully sent 0/2 notifications to Slack",
+            "END RequestId: 2565d681-a26b-4bed-bd09-8465f6e44cc9",
+            "REPORT RequestId: 2565d681-a26b-4bed-bd09-8465f6e44cc9\tDuration: 48.55 ms\tBilled Duration: 49 ms\tMemory Size: 256 MB\tMax Memory Used: 92 MB",
+            "START RequestId: 9610873a-42bf-45da-b841-b71eb8ad11a5 Version: $LATEST",
+            "2026-11-06T05:02:33.950Z\t9610873a-42bf-45da-b841-b71eb8ad11a5\tINFO\tProcessing 2 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX",
+            "2026-11-06T05:02:33.950Z\t9610873a-42bf-45da-b841-b71eb8ad11a5\tINFO\tFound 2 error events",
+            "2026-11-06T05:02:33.973Z\t9610873a-42bf-45da-b841-b71eb8ad11a5\tINFO\tDuplicate error suppressed: 6a1f0c2e9b7d4e3a8c5b1f2d0e9a7c6b",
+            "2026-11-06T05:02:33.995Z\t9610873a-42bf-45da-b841-b71eb8ad11a5\tINFO\tDuplicate error suppressed: 6a1f0c2e9b7d4e3a8c5b1f2d0e9a7c6b",
+            "2026-11-06T05:02:33.996Z\t9610873a-42bf-45da-b841-b71eb8ad11a5\tINFO\tSuccessfully sent 0/2 notifications to Slack",
+            "END RequestId: 9610873a-42bf-45da-b841-b71eb8ad11a5",
+            "REPORT RequestId: 9610873a-42bf-45da-b841-b71eb8ad11a5\tDuration: 49.55 ms\tBilled Duration: 50 ms\tMemory Size: 256 MB\tMax Memory Used: 92 MB",
+            "START RequestId: 55a0b9d7-086f-42c5-b25b-1e9b9c163ee0 Version: $LATEST",
+            "2026-11-06T05:04:05.417Z\t55a0b9d7-086f-42c5-b25b-1e9b9c163ee0\tINFO\tProcessing 2 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX",
+            "2026-11-06T05:04:05.417Z\t55a0b9d7-086f-42c5-b25b-1e9b9c163ee0\tINFO\tFound 2 error events",
+            "2026-11-06T05:04:05.440Z\t55a0b9d7-086f-42c5-b25b-1e9b9c163ee0\tINFO\tDuplicate error suppressed: 6a1f0c2e9b7d4e3a8c5b1f2d0e9a7c6b",
+            "2026-11-06T05:04:05.462Z\t55a0b9d7-086f-42c5-b25b-1e9b9c163ee0\tINFO\tDuplicate error suppressed: 6a1f0c2e9b7d4e3a8c5b1f2d0e9a7c6b",
+            "2026-11-06T05:04:05.463Z\t55a0b9d7-086f-42c5-b25b-1e9b9c163ee0\tINFO\tSuccessfully sent 0/2 notifications to Slack",
+            "END RequestId: 55a0b9d7-086f-42c5-b25b-1e9b9c163ee0",
+            "REPORT RequestId: 55a0b9d7-086f-42c5-b25b-1e9b9c163ee0\tDuration: 50.55 ms\tBilled Duration: 51 ms\tMemory Size: 256 MB\tMax Memory Used: 92 MB",
+            "START RequestId: cd2cbd0a-7d28-468a-8fa6-8c32fcd6bcd6 Version: $LATEST",
+            "2026-11-06T05:06:20.775Z\tcd2cbd0a-7d28-468a-8fa6-8c32fcd6bcd6\tINFO\tProcessing 1 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX",
+            "2026-11-06T05:06:20.775Z\tcd2cbd0a-7d28-468a-8fa6-8c32fcd6bcd6\tINFO\tFound 1 error events",
+            "2026-11-06T05:06:21.102Z\tcd2cbd0a-7d28-468a-8fa6-8c32fcd6bcd6\tINFO\tSent CRITICAL alert for eecar-stack-VectorSearchFunction-yXyHE1D702wX: BedrockThrottling",
+            "2026-11-06T05:06:21.103Z\tcd2cbd0a-7d28-468a-8fa6-8c32fcd6bcd6\tINFO\tSuccessfully sent 1/1 notifications to Slack",
+            "END RequestId: cd2cbd0a-7d28-468a-8fa6-8c32fcd6bcd6",
+            "REPORT RequestId: cd2cbd0a-7d28-468a-8fa6-8c32fcd6bcd6\tDuration: 341.90 ms\tBilled Duration: 342 ms\tMemory Size: 256 MB\tMax Memory Used: 92 MB"
+          ]
+        },
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 395,
+            "errors": 0,
+            "avgDuration": 1250
+          },
+          "logs": [
+            "START RequestId: b1ffda02-f3fe-44cf-81c8-2767c8d94b29 Version: $LATEST",
+            "2026-11-06T05:01:10.882Z\tb1ffda02-f3fe-44cf-81c8-2767c8d94b29\tERROR\tBatch explanation generation failed: ThrottlingException: Too many tokens, please wait before trying again.\n    at de_ThrottlingExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1146:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 429,\n    requestId: 'B3BBFEF6FAA868F424DF',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "2026-11-06T05:01:10.882Z\tb1ffda02-f3fe-44cf-81c8-2767c8d94b29\tERROR\tRaw response: ",
+            "{\"_aws\":{\"Timestamp\":1793941270882,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":1,\"LLMLatency\":512}",
+            "END RequestId: b1ffda02-f3fe-44cf-81c8-2767c8d94b29",
+            "REPORT RequestId: b1ffda02-f3fe-44cf-81c8-2767c8d94b29\tDuration: 640.18 ms\tBilled Duration: 641 ms\tMemory Size: 1024 MB\tMax Memory Used: 219 MB",
+            "START RequestId: ffa53e8c-e2a8-4147-81a3-6a0429f8a8bd Version: $LATEST",
+            "2026-11-06T05:01:38.640Z\tffa53e8c-e2a8-4147-81a3-6a0429f8a8bd\tERROR\tBatch explanation generation failed: ThrottlingException: Too many tokens, please wait before trying again.\n    at de_ThrottlingExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1146:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 429,\n    requestId: '01DD3F8A2B9BE19FA91A',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "2026-11-06T05:01:38.640Z\tffa53e8c-e2a8-4147-81a3-6a0429f8a8bd\tERROR\tRaw response: ",
+            "{\"_aws\":{\"Timestamp\":1793941298640,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":1,\"LLMLatency\":512}",
+            "END RequestId: ffa53e8c-e2a8-4147-81a3-6a0429f8a8bd",
+            "REPORT RequestId: ffa53e8c-e2a8-4147-81a3-6a0429f8a8bd\tDuration: 640.18 ms\tBilled Duration: 641 ms\tMemory Size: 1024 MB\tMax Memory Used: 219 MB",
+            "START RequestId: 16f97abe-03ec-49ab-a245-163ab75fd5f0 Version: $LATEST",
+            "2026-11-06T05:04:03.991Z\t16f97abe-03ec-49ab-a245-163ab75fd5f0\tERROR\tBatch explanation generation failed: ThrottlingException: Too many tokens, please wait before trying again.\n    at de_ThrottlingExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1146:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 429,\n    requestId: 'F66C20449746A9510C44',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "2026-11-06T05:04:03.991Z\t16f97abe-03ec-49ab-a245-163ab75fd5f0\tERROR\tRaw response: ",
+            "{\"_aws\":{\"Timestamp\":1793941443991,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":1,\"LLMLatency\":512}",
+            "END RequestId: 16f97abe-03ec-49ab-a245-163ab75fd5f0",
+            "REPORT RequestId: 16f97abe-03ec-49ab-a245-163ab75fd5f0\tDuration: 640.18 ms\tBilled Duration: 641 ms\tMemory Size: 1024 MB\tMax Memory Used: 219 MB"
+          ],
+          "errorSummary": [
+            [
+              "ThrottlingException",
+              61
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "중복 제거",
+          "중복 알림",
+          "dedup",
+          "Duplicate error suppressed",
+          "억제",
+          "suppress",
+          "5분",
+          "5 분",
+          "five minutes",
+          "DEDUP_WINDOW",
+          "의도된 동작",
+          "설계된 동작",
+          "의도한 동작"
+        ],
+        "fix": [
+          "조치는 필요 없",
+          "조치가 필요 없",
+          "조치할 필요 없",
+          "메모리를 늘릴 필요",
+          "메모리 증설은 필요",
+          "메모리는 충분",
+          "그대로 두",
+          "회 더 발생",
+          "다음 알림에",
+          "억제 시간을 줄",
+          "DEDUP_WINDOW_SECONDS",
+          "정상 동작",
+          "설계대로",
+          "메모리 때문이 아",
+          "메모리 문제가 아",
+          "메모리와 무관",
+          "메모리와는 무관",
+          "메모리 부족이 아"
+        ],
+        "mustNot": [
+          "메모리 부족 때문입니다",
+          "메모리를 늘리세요",
+          "메모리를 512MB로",
+          "타임아웃 때문입니다",
+          "알림이 유실되고 있습니다",
+          "처리를 못 따라가고 있습니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-18",
+      "source": "format-based",
+      "category": "config",
+      "title": "합성 데이터 설명이 전부 템플릿 문장",
+      "message": "합성 데이터 API로 모터 20개 만들었는데 description이 전부 '정상 작동 확인된 ○○ 제조 motor입니다' 같은 틀에 박힌 문장이에요. 오늘 오전에 설명 품질 좀 올려 보겠다고 누가 설정을 만졌다던데 그거랑 관련 있나요?",
+      "functions": {
+        "SyntheticDataFunction": {
+          "status": {
+            "invocations": 3,
+            "errors": 0,
+            "avgDuration": 8400
+          },
+          "logs": [
+            "START RequestId: ceccd19e-e311-4a73-814b-7c8ff491ffed Version: $LATEST",
+            "2026-11-06T02:09:30.441Z\tceccd19e-e311-4a73-814b-7c8ff491ffed\tINFO\tGenerating 20 synthetic parts for category: motor",
+            "2026-11-06T02:09:30.593Z\tceccd19e-e311-4a73-814b-7c8ff491ffed\tWARN\tClaude description generation failed, using fallback: ValidationException: Invocation of model ID anthropic.claude-sonnet-4-5-20250929-v1:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.\n    at de_ValidationExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1163:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'B711075C6F7A56470D69',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "2026-11-06T02:09:30.893Z\tceccd19e-e311-4a73-814b-7c8ff491ffed\tINFO\tSuccessfully uploaded vector to S3 Vectors: 7e9243f5-caa8-48fa-8cd4-9cc900db4865",
+            "2026-11-06T02:09:30.893Z\tceccd19e-e311-4a73-814b-7c8ff491ffed\tINFO\tGenerated part 1/20: 7e9243f5-caa8-48fa-8cd4-9cc900db4865 (452ms)",
+            "2026-11-06T02:09:31.012Z\tceccd19e-e311-4a73-814b-7c8ff491ffed\tWARN\tClaude description generation failed, using fallback: ValidationException: Invocation of model ID anthropic.claude-sonnet-4-5-20250929-v1:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.\n    at de_ValidationExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1163:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '629AB2F4F9ADF45B58C7',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "2026-11-06T02:09:31.312Z\tceccd19e-e311-4a73-814b-7c8ff491ffed\tINFO\tSuccessfully uploaded vector to S3 Vectors: b6090fa8-a7a0-4676-b9a7-62a58d6fddf7",
+            "2026-11-06T02:09:31.312Z\tceccd19e-e311-4a73-814b-7c8ff491ffed\tINFO\tGenerated part 2/20: b6090fa8-a7a0-4676-b9a7-62a58d6fddf7 (871ms)",
+            "2026-11-06T02:09:31.450Z\tceccd19e-e311-4a73-814b-7c8ff491ffed\tWARN\tClaude description generation failed, using fallback: ValidationException: Invocation of model ID anthropic.claude-sonnet-4-5-20250929-v1:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.\n    at de_ValidationExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1163:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'EAE07CEA8984742ED868',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "2026-11-06T02:09:31.750Z\tceccd19e-e311-4a73-814b-7c8ff491ffed\tINFO\tSuccessfully uploaded vector to S3 Vectors: 77c47269-359a-41f2-81ee-4b255d763a34",
+            "2026-11-06T02:09:31.750Z\tceccd19e-e311-4a73-814b-7c8ff491ffed\tINFO\tGenerated part 3/20: 77c47269-359a-41f2-81ee-4b255d763a34 (1309ms)",
+            "2026-11-06T02:09:38.752Z\tceccd19e-e311-4a73-814b-7c8ff491ffed\tINFO\tSuccessfully uploaded vector to S3 Vectors: 1c4400eb-8506-475f-91df-97cd12683340",
+            "2026-11-06T02:09:38.752Z\tceccd19e-e311-4a73-814b-7c8ff491ffed\tINFO\tGenerated part 20/20: 1c4400eb-8506-475f-91df-97cd12683340 (8311ms)",
+            "END RequestId: ceccd19e-e311-4a73-814b-7c8ff491ffed",
+            "REPORT RequestId: ceccd19e-e311-4a73-814b-7c8ff491ffed\tDuration: 8402.77 ms\tBilled Duration: 8403 ms\tMemory Size: 1024 MB\tMax Memory Used: 166 MB"
+          ],
+          "errorSummary": [
+            [
+              "ValidationException",
+              60
+            ]
+          ],
+          "config": {
+            "lastModified": "2026-11-06T01:47:12.000+0000",
+            "environment": {
+              "BEDROCK_MODEL_ID": "anthropic.claude-sonnet-4-5-20250929-v1:0"
+            }
+          }
+        }
+      },
+      "label": {
+        "cause": [
+          "inference profile",
+          "추론 프로필",
+          "추론 프로파일",
+          "인퍼런스 프로필",
+          "인퍼런스 프로파일",
+          "on-demand",
+          "온디맨드",
+          "BEDROCK_MODEL_ID",
+          "global. 접두",
+          "global 접두",
+          "global.이 빠",
+          "global 프리픽스",
+          "프로필 ID가 아니"
+        ],
+        "fix": [
+          "global.anthropic",
+          "apac.anthropic",
+          "inference profile ID",
+          "추론 프로필 ID",
+          "프로필 ID로",
+          "global. 접두사를 붙",
+          "global 접두사를 붙",
+          "원래 값으로 되돌",
+          "원래 값으로 복구",
+          "이전 값으로 되돌",
+          "환경 변수를 되돌",
+          "환경 변수를 삭제",
+          "함수 단위 설정을 제거",
+          "Globals 값"
+        ],
+        "mustNot": [
+          "권한이 부족합니다",
+          "AccessDenied 때문입니다",
+          "스로틀링 때문입니다",
+          "모델 액세스를 활성화하세요",
+          "모델 접근을 요청하세요"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-19",
+      "source": "format-based",
+      "category": "data",
+      "title": "배터리 데이터 일괄 적재 후 SOH 검색 실패",
+      "message": "어제 오후에 배터리 재고 데이터를 엑셀에서 변환해서 DynamoDB에 일괄로 넣었는데요, 그 뒤로 배터리 SOH 검색이 거의 다 실패해요. 이상한 건 SOH 95% 이상처럼 범위를 좁히면 가끔 결과가 나와요.",
+      "functions": {
+        "BatteryHealthAssessmentFunction": {
+          "status": {
+            "invocations": 31,
+            "errors": 27,
+            "avgDuration": 790
+          },
+          "logs": [
+            "START RequestId: cfecdb27-6f63-4854-b3ef-915e2e980c31 Version: $LATEST",
+            "2026-11-06T01:30:12.508Z\tcfecdb27-6f63-4854-b3ef-915e2e980c31\tERROR\tBattery health assessment error: TypeError: batteryHealth.suitableApplications.slice(...).join is not a function\n    at generateAssessmentReason (file:///var/task/index.js:182:66)\n    at file:///var/task/index.js:41:21\n    at Array.map (<anonymous>)\n    at Runtime.handler (file:///var/task/index.js:30:14)",
+            "END RequestId: cfecdb27-6f63-4854-b3ef-915e2e980c31",
+            "REPORT RequestId: cfecdb27-6f63-4854-b3ef-915e2e980c31\tDuration: 812.40 ms\tBilled Duration: 813 ms\tMemory Size: 512 MB\tMax Memory Used: 131 MB",
+            "START RequestId: cb24fd6b-90b1-4bee-9fba-7ff01ac20115 Version: $LATEST",
+            "END RequestId: cb24fd6b-90b1-4bee-9fba-7ff01ac20115",
+            "REPORT RequestId: cb24fd6b-90b1-4bee-9fba-7ff01ac20115\tDuration: 744.91 ms\tBilled Duration: 745 ms\tMemory Size: 512 MB\tMax Memory Used: 129 MB",
+            "START RequestId: 0aa1883c-6411-4787-bcb8-3dacb17b0afc Version: $LATEST",
+            "2026-11-06T02:44:51.019Z\t0aa1883c-6411-4787-bcb8-3dacb17b0afc\tERROR\tBattery health assessment error: TypeError: batteryHealth.suitableApplications.slice(...).join is not a function\n    at generateAssessmentReason (file:///var/task/index.js:182:66)\n    at file:///var/task/index.js:41:21\n    at Array.map (<anonymous>)\n    at Runtime.handler (file:///var/task/index.js:30:14)",
+            "END RequestId: 0aa1883c-6411-4787-bcb8-3dacb17b0afc",
+            "REPORT RequestId: 0aa1883c-6411-4787-bcb8-3dacb17b0afc\tDuration: 821.40 ms\tBilled Duration: 822 ms\tMemory Size: 512 MB\tMax Memory Used: 131 MB"
+          ],
+          "errorSummary": [
+            [
+              "TypeError",
+              27
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "suitableApplications",
+          "배열이 아니",
+          "배열이 아닌",
+          "문자열로 저장",
+          "문자열로 들어",
+          "문자열이라",
+          "string으로",
+          "string 타입",
+          "배열 대신 문자열",
+          "데이터 형식",
+          "데이터 타입",
+          "타입이 다",
+          "형식이 잘못",
+          "형식이 맞지"
+        ],
+        "fix": [
+          "배열로 고치",
+          "배열로 변환",
+          "배열로 바꾸",
+          "배열로 수정",
+          "배열 형태로",
+          "데이터를 수정",
+          "데이터 수정",
+          "데이터를 고치",
+          "Array.isArray",
+          "방어 코드",
+          "타입 검사",
+          "타입 체크",
+          "다시 넣",
+          "다시 적재",
+          "재적재",
+          "변환 스크립트"
+        ],
+        "mustNot": [
+          "레이어 버전이 오래되었습니다",
+          "레이어를 27로",
+          "권한이 부족합니다",
+          "메모리 부족 때문입니다",
+          "타임아웃 때문입니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-20",
+      "source": "format-based",
+      "category": "iam",
+      "title": "부품 목록에 샘플 데이터만 보임",
+      "message": "구매자 화면 부품 목록에 오늘 등록한 부품이 하나도 없고 예전에 보던 샘플 부품들만 떠요. 근데 부품 상세 페이지 링크로 직접 들어가면 새 부품도 잘 열려요. 스크롤 내려도 더 안 불러와지고요.",
+      "functions": {
+        "GetPartsFunction": {
+          "status": {
+            "invocations": 210,
+            "errors": 143,
+            "avgDuration": 96
+          },
+          "logs": [
+            "START RequestId: 3644a684-f98e-48fe-a23c-713b77189a77 Version: $LATEST",
+            "2026-11-06T01:58:03.227Z\t3644a684-f98e-48fe-a23c-713b77189a77\tERROR\tError in get-parts: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-GetPartsFunctionRole-jrlvazVqsSho/eecar-stack-GetPartsFunction-Hy7cV2pLm9Qe is not authorized to perform: dynamodb:Query on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/GSI2 because no identity-based policy allows the dynamodb:Query action\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async queryAllMetadataWithPagination (file:///opt/nodejs/utils/dynamodb.js:184:20)\n    at async listParts (file:///var/task/index.js:71:18) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '9F9AF029585BA014E07C',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.service#AccessDeniedException'\n}",
+            "END RequestId: 3644a684-f98e-48fe-a23c-713b77189a77",
+            "REPORT RequestId: 3644a684-f98e-48fe-a23c-713b77189a77\tDuration: 52.08 ms\tBilled Duration: 53 ms\tMemory Size: 512 MB\tMax Memory Used: 92 MB",
+            "START RequestId: 757b505c-fd34-464c-85ca-5b5690ee5293 Version: $LATEST",
+            "END RequestId: 757b505c-fd34-464c-85ca-5b5690ee5293",
+            "REPORT RequestId: 757b505c-fd34-464c-85ca-5b5690ee5293\tDuration: 38.61 ms\tBilled Duration: 39 ms\tMemory Size: 512 MB\tMax Memory Used: 91 MB",
+            "START RequestId: 854d6fae-5ee4-4911-a77c-739ee1734486 Version: $LATEST",
+            "2026-11-06T01:58:21.404Z\t854d6fae-5ee4-4911-a77c-739ee1734486\tERROR\tError in get-parts: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-GetPartsFunctionRole-jrlvazVqsSho/eecar-stack-GetPartsFunction-Hy7cV2pLm9Qe is not authorized to perform: dynamodb:Query on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/GSI1 because no identity-based policy allows the dynamodb:Query action\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async queryGSI1WithPagination (file:///opt/nodejs/utils/dynamodb.js:157:20)\n    at async listParts (file:///var/task/index.js:71:18) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '1E7B95C5614637FDCDE7',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.service#AccessDeniedException'\n}",
+            "END RequestId: 854d6fae-5ee4-4911-a77c-739ee1734486",
+            "REPORT RequestId: 854d6fae-5ee4-4911-a77c-739ee1734486\tDuration: 54.08 ms\tBilled Duration: 55 ms\tMemory Size: 512 MB\tMax Memory Used: 92 MB",
+            "START RequestId: e2c0be24-560d-48c5-a599-c2a9c9d0bbd2 Version: $LATEST",
+            "2026-11-06T02:03:44.618Z\te2c0be24-560d-48c5-a599-c2a9c9d0bbd2\tERROR\tError in get-parts: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-GetPartsFunctionRole-jrlvazVqsSho/eecar-stack-GetPartsFunction-Hy7cV2pLm9Qe is not authorized to perform: dynamodb:Query on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/GSI2 because no identity-based policy allows the dynamodb:Query action\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\n    at async queryAllMetadataWithPagination (file:///opt/nodejs/utils/dynamodb.js:184:20)\n    at async listParts (file:///var/task/index.js:71:18) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'A165FBD61C277745F187',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  __type: 'com.amazon.coral.service#AccessDeniedException'\n}",
+            "END RequestId: e2c0be24-560d-48c5-a599-c2a9c9d0bbd2",
+            "REPORT RequestId: e2c0be24-560d-48c5-a599-c2a9c9d0bbd2\tDuration: 55.08 ms\tBilled Duration: 56 ms\tMemory Size: 512 MB\tMax Memory Used: 92 MB"
+          ],
+          "errorSummary": [
+            [
+              "AccessDeniedException",
+              143
+            ]
+          ],
+          "permissions": {
+            "statements": [
+              {
+                "policy": "GetPartsFunctionRolePolicy0",
+                "effect": "Allow",
+                "actions": [
+                  "dynamodb:GetItem",
+                  "dynamodb:Scan",
+                  "dynamodb:Query",
+                  "dynamodb:BatchGetItem",
+                  "dynamodb:DescribeTable"
+                ],
+                "resources": [
+                  "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table"
+                ]
+              },
+              {
+                "policy": "AWSXrayWriteOnlyAccess",
+                "effect": "Allow",
+                "actions": [
+                  "xray:PutTraceSegments",
+                  "xray:PutTelemetryRecords",
+                  "xray:GetSamplingRules",
+                  "xray:GetSamplingTargets",
+                  "xray:GetSamplingStatisticSummaries"
+                ],
+                "resources": [
+                  "*"
+                ]
+              },
+              {
+                "policy": "AWSLambdaBasicExecutionRole",
+                "effect": "Allow",
+                "actions": [
+                  "logs:CreateLogGroup",
+                  "logs:CreateLogStream",
+                  "logs:PutLogEvents"
+                ],
+                "resources": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "label": {
+        "cause": [
+          "index/*",
+          "/index/",
+          "인덱스 ARN",
+          "인덱스 리소스",
+          "GSI 리소스",
+          "GSI ARN",
+          "GSI 권한",
+          "GSI에 대한 권한",
+          "GSI2에 대한 권한",
+          "GSI2 권한",
+          "인덱스 권한",
+          "인덱스에 대한 권한",
+          "인덱스 Query 권한",
+          "인덱스가 빠",
+          "인덱스 ARN이 빠",
+          "인덱스에 대한 Query",
+          "GSI Query",
+          "GSI 쿼리",
+          "인덱스 쿼리"
+        ],
+        "fix": [
+          "table/eecar-parts-table/index/*",
+          "index/*를 추가",
+          "index/*을 추가",
+          "index/* 추가",
+          "index/* 리소스",
+          "인덱스 ARN을 추가",
+          "인덱스 ARN 추가",
+          "인덱스 리소스를 추가",
+          "DynamoDBReadPolicy"
+        ],
+        "mustNot": [
+          "데이터가 삭제되었습니다",
+          "테이블이 비어 있습니다",
+          "CloudFront 캐시를 무효화하세요",
+          "브라우저 캐시를 지우세요",
+          "스로틀링 때문입니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-21",
+      "source": "format-based",
+      "category": "ambiguous",
+      "title": "막연한 이상 징후 문의",
+      "message": "어제 저녁에 뭔가 좀 이상했다는 얘기가 있던데... 혹시 뭐 있었어요?",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 380,
+            "errors": 0,
+            "avgDuration": 610
+          },
+          "logs": [
+            "START RequestId: 7378bfed-68f8-4ff9-9e4c-60884628cb16 Version: $LATEST",
+            "2026-11-05T10:41:20.117Z\t7378bfed-68f8-4ff9-9e4c-60884628cb16\tINFO\tProcessing search query: 포터 EV 배터리",
+            "2026-11-05T10:41:20.429Z\t7378bfed-68f8-4ff9-9e4c-60884628cb16\tINFO\tvector 100, bm25 100 (index 191, loaded) -> ranked 146, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"포터\"]}",
+            "{\"_aws\":{\"Timestamp\":1793875280117,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":138,\"VectorSearchMs\":92,\"IndexLoadMs\":412,\"FusionMs\":9,\"TotalMs\":590}",
+            "END RequestId: 7378bfed-68f8-4ff9-9e4c-60884628cb16",
+            "REPORT RequestId: 7378bfed-68f8-4ff9-9e4c-60884628cb16\tDuration: 596.31 ms\tBilled Duration: 597 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB",
+            "START RequestId: f74068ea-c285-414d-a5ef-06da6e9010e3 Version: $LATEST",
+            "{\"_aws\":{\"Timestamp\":1793875280790,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":2033}",
+            "END RequestId: f74068ea-c285-414d-a5ef-06da6e9010e3",
+            "REPORT RequestId: f74068ea-c285-414d-a5ef-06da6e9010e3\tDuration: 2166.42 ms\tBilled Duration: 2167 ms\tMemory Size: 1024 MB\tMax Memory Used: 221 MB",
+            "START RequestId: 0de4a754-b71d-4086-b23f-693052fb7ed2 Version: $LATEST",
+            "2026-11-05T11:02:55.604Z\t0de4a754-b71d-4086-b23f-693052fb7ed2\tINFO\tProcessing search query: 아이오닉5 모터",
+            "2026-11-05T11:02:55.604Z\t0de4a754-b71d-4086-b23f-693052fb7ed2\tINFO\tCache hit!",
+            "{\"_aws\":{\"Timestamp\":1793876575604,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":1,\"ZeroResult\":0,\"TotalMs\":38}",
+            "END RequestId: 0de4a754-b71d-4086-b23f-693052fb7ed2",
+            "REPORT RequestId: 0de4a754-b71d-4086-b23f-693052fb7ed2\tDuration: 44.18 ms\tBilled Duration: 45 ms\tMemory Size: 1024 MB\tMax Memory Used: 209 MB"
+          ]
+        },
+        "PartRegistrationFunction": {
+          "status": {
+            "invocations": 12,
+            "errors": 0,
+            "avgDuration": 1720
+          },
+          "logs": [
+            "START RequestId: 401bb8d0-fc11-40f7-bf82-ff40e43ee2e9 Version: $LATEST",
+            "2026-11-05T11:15:02.330Z\t401bb8d0-fc11-40f7-bf82-ff40e43ee2e9\tINFO\tRegistering new part: f66798d0-ffcd-4b50-b1eb-d385dc7e2548",
+            "2026-11-05T11:15:02.392Z\t401bb8d0-fc11-40f7-bf82-ff40e43ee2e9\tINFO\tPart metadata stored",
+            "2026-11-05T11:15:02.393Z\t401bb8d0-fc11-40f7-bf82-ff40e43ee2e9\tINFO\tGenerating embedding...",
+            "2026-11-05T11:15:02.701Z\t401bb8d0-fc11-40f7-bf82-ff40e43ee2e9\tINFO\tVector uploaded to S3 (JSON)",
+            "2026-11-05T11:15:03.009Z\t401bb8d0-fc11-40f7-bf82-ff40e43ee2e9\tINFO\tVector uploaded to S3 Vectors: f66798d0-ffcd-4b50-b1eb-d385dc7e2548",
+            "2026-11-05T11:15:03.010Z\t401bb8d0-fc11-40f7-bf82-ff40e43ee2e9\tINFO\tInvoking compliance check...",
+            "2026-11-05T11:15:03.118Z\t401bb8d0-fc11-40f7-bf82-ff40e43ee2e9\tINFO\tCompliance check invoked",
+            "END RequestId: 401bb8d0-fc11-40f7-bf82-ff40e43ee2e9",
+            "REPORT RequestId: 401bb8d0-fc11-40f7-bf82-ff40e43ee2e9\tDuration: 1688.30 ms\tBilled Duration: 2377 ms\tMemory Size: 1024 MB\tMax Memory Used: 149 MB\tInit Duration: 688.12 ms"
+          ]
+        },
+        "GetPartsFunction": {
+          "status": {
+            "invocations": 520,
+            "errors": 0,
+            "avgDuration": 80
+          },
+          "logs": [
+            "START RequestId: 346970e2-fae9-4776-a6c3-cc26b74cb88a Version: $LATEST",
+            "END RequestId: 346970e2-fae9-4776-a6c3-cc26b74cb88a",
+            "REPORT RequestId: 346970e2-fae9-4776-a6c3-cc26b74cb88a\tDuration: 77.63 ms\tBilled Duration: 78 ms\tMemory Size: 512 MB\tMax Memory Used: 88 MB"
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "특별한 이상",
+          "이상 징후가 없",
+          "이상 징후는 없",
+          "에러가 없",
+          "에러는 없",
+          "오류가 없",
+          "오류는 없",
+          "문제가 보이지",
+          "문제는 보이지",
+          "이상이 보이지",
+          "이상은 보이지",
+          "특이 사항이 없",
+          "특이사항이 없",
+          "특이 사항은 없",
+          "특이사항은 없",
+          "정상입니다",
+          "정상이었",
+          "정상으로 보",
+          "에러 0건",
+          "오류 0건"
+        ],
+        "fix": [
+          "어떤 기능",
+          "어떤 화면",
+          "구체적",
+          "언제쯤",
+          "몇 시",
+          "어떤 증상",
+          "어떤 문제",
+          "알려주시면",
+          "알려 주시면",
+          "말씀해 주시면",
+          "말씀해주시면",
+          "공유해 주시면",
+          "공유해주시면"
+        ],
+        "mustNot": [
+          "장애가 발생했습니다",
+          "권한이 부족합니다",
+          "타임아웃이 발생했습니다",
+          "스로틀링이 발생했습니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-22",
+      "source": "format-based",
+      "category": "data",
+      "title": "특정 판매자 등록만 실패, 부품은 중복 생성",
+      "message": "배터리 재제조 업체 한 곳이 부품을 등록할 때마다 실패한대요. 설명란에 자기네 검사 성적서를 통째로 붙여 넣는다고 하더라고요. 다른 판매자들은 잘 되는데... 그리고 실패했다는데 목록에는 그 부품이 세 개나 떠 있어요.",
+      "functions": {
+        "PartRegistrationFunction": {
+          "status": {
+            "invocations": 27,
+            "errors": 3,
+            "avgDuration": 1380
+          },
+          "logs": [
+            "START RequestId: 368f787b-7826-4ed0-b331-6a61dd0ccbf2 Version: $LATEST",
+            "2026-11-06T01:20:33.604Z\t368f787b-7826-4ed0-b331-6a61dd0ccbf2\tINFO\tRegistering new part: e270dca5-6f2b-4c02-9e4e-a5364d4bac0c",
+            "2026-11-06T01:20:33.671Z\t368f787b-7826-4ed0-b331-6a61dd0ccbf2\tINFO\tPart metadata stored",
+            "2026-11-06T01:20:33.730Z\t368f787b-7826-4ed0-b331-6a61dd0ccbf2\tINFO\tPart specifications stored",
+            "2026-11-06T01:20:33.731Z\t368f787b-7826-4ed0-b331-6a61dd0ccbf2\tINFO\tGenerating embedding...",
+            "2026-11-06T01:20:33.912Z\t368f787b-7826-4ed0-b331-6a61dd0ccbf2\tERROR\tError in part registration: ValidationException: 400 Bad Request: Too many input tokens. Max input tokens: 8192, request input token count: 21467\n    at de_ValidationExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1163:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async generateEmbedding (file:///opt/nodejs/utils/bedrock.js:79:20)\n    at async Runtime.handler (file:///var/task/index.js:139:23) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: '97A5ECEAE7416ABF645C',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "END RequestId: 368f787b-7826-4ed0-b331-6a61dd0ccbf2",
+            "REPORT RequestId: 368f787b-7826-4ed0-b331-6a61dd0ccbf2\tDuration: 341.27 ms\tBilled Duration: 342 ms\tMemory Size: 1024 MB\tMax Memory Used: 158 MB",
+            "START RequestId: 01b27d0d-5047-4fc9-90b5-24c05f5ea5b6 Version: $LATEST",
+            "2026-11-06T01:24:10.115Z\t01b27d0d-5047-4fc9-90b5-24c05f5ea5b6\tINFO\tRegistering new part: c9fbac52-41c9-4d3e-9e65-1073624c9423",
+            "2026-11-06T01:24:10.177Z\t01b27d0d-5047-4fc9-90b5-24c05f5ea5b6\tINFO\tPart metadata stored",
+            "2026-11-06T01:24:10.178Z\t01b27d0d-5047-4fc9-90b5-24c05f5ea5b6\tINFO\tGenerating embedding...",
+            "2026-11-06T01:24:10.512Z\t01b27d0d-5047-4fc9-90b5-24c05f5ea5b6\tINFO\tVector uploaded to S3 (JSON)",
+            "2026-11-06T01:24:10.807Z\t01b27d0d-5047-4fc9-90b5-24c05f5ea5b6\tINFO\tVector uploaded to S3 Vectors: c9fbac52-41c9-4d3e-9e65-1073624c9423",
+            "2026-11-06T01:24:10.808Z\t01b27d0d-5047-4fc9-90b5-24c05f5ea5b6\tINFO\tInvoking compliance check...",
+            "2026-11-06T01:24:10.915Z\t01b27d0d-5047-4fc9-90b5-24c05f5ea5b6\tINFO\tCompliance check invoked",
+            "END RequestId: 01b27d0d-5047-4fc9-90b5-24c05f5ea5b6",
+            "REPORT RequestId: 01b27d0d-5047-4fc9-90b5-24c05f5ea5b6\tDuration: 812.66 ms\tBilled Duration: 813 ms\tMemory Size: 1024 MB\tMax Memory Used: 150 MB",
+            "START RequestId: a4ddb655-5746-4e04-80c8-5156d4e6ec64 Version: $LATEST",
+            "2026-11-06T01:26:51.240Z\ta4ddb655-5746-4e04-80c8-5156d4e6ec64\tINFO\tRegistering new part: 1c9c1876-6b5f-4a60-a8bd-0abe54b418f0",
+            "2026-11-06T01:26:51.302Z\ta4ddb655-5746-4e04-80c8-5156d4e6ec64\tINFO\tPart metadata stored",
+            "2026-11-06T01:26:51.360Z\ta4ddb655-5746-4e04-80c8-5156d4e6ec64\tINFO\tPart specifications stored",
+            "2026-11-06T01:26:51.361Z\ta4ddb655-5746-4e04-80c8-5156d4e6ec64\tINFO\tGenerating embedding...",
+            "2026-11-06T01:26:51.533Z\ta4ddb655-5746-4e04-80c8-5156d4e6ec64\tERROR\tError in part registration: ValidationException: 400 Bad Request: Too many input tokens. Max input tokens: 8192, request input token count: 21467\n    at de_ValidationExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1163:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async generateEmbedding (file:///opt/nodejs/utils/bedrock.js:79:20)\n    at async Runtime.handler (file:///var/task/index.js:139:23) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 400,\n    requestId: 'FC3E3C959B92506AC142',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "END RequestId: a4ddb655-5746-4e04-80c8-5156d4e6ec64",
+            "REPORT RequestId: a4ddb655-5746-4e04-80c8-5156d4e6ec64\tDuration: 329.91 ms\tBilled Duration: 330 ms\tMemory Size: 1024 MB\tMax Memory Used: 160 MB"
+          ],
+          "errorSummary": [
+            [
+              "ValidationException",
+              3
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "8192",
+          "8,192",
+          "8K 토큰",
+          "8k 토큰",
+          "토큰 한도",
+          "토큰 제한",
+          "토큰 수 제한",
+          "입력 토큰",
+          "token limit",
+          "Too many input tokens",
+          "임베딩 입력 한도",
+          "임베딩 입력 제한",
+          "입력 길이 제한",
+          "입력 한도를 초과",
+          "토큰 수를 초과"
+        ],
+        "fix": [
+          "잘라",
+          "자르",
+          "truncate",
+          "요약",
+          "길이 제한",
+          "글자 수 제한",
+          "길이를 제한",
+          "청크",
+          "chunk",
+          "앞부분만",
+          "설명 길이",
+          "중복 항목",
+          "중복 부품",
+          "중복된 부품",
+          "고아",
+          "롤백",
+          "트랜잭션",
+          "임베딩을 먼저",
+          "순서를 바꾸"
+        ],
+        "mustNot": [
+          "400KB를 초과했습니다",
+          "아이템 크기 제한 때문입니다",
+          "Bedrock 권한이 부족합니다",
+          "권한이 부족합니다",
+          "AccessDenied 때문입니다",
+          "타임아웃 때문입니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-23",
+      "source": "format-based",
+      "category": "limit",
+      "title": "장애 때 슬랙 알림 일부 누락",
+      "message": "아까 2시쯤 여러 함수가 한꺼번에 에러 났을 때 슬랙 알림이 몇 개만 오고 나머지는 안 왔어요. 알림 함수 로그에 실패 같은 게 찍혀 있던데, 그때 뭐가 문제였는지 봐줄 수 있어요?",
+      "functions": {
+        "SlackNotificationFunction": {
+          "status": {
+            "invocations": 64,
+            "errors": 0,
+            "avgDuration": 640
+          },
+          "logs": [
+            "START RequestId: 6da9003b-743b-45f4-80cc-d295cc484e57 Version: $LATEST",
+            "2026-11-06T05:00:14.208Z\t6da9003b-743b-45f4-80cc-d295cc484e57\tINFO\tProcessing 4 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX",
+            "2026-11-06T05:00:14.208Z\t6da9003b-743b-45f4-80cc-d295cc484e57\tINFO\tFound 4 error events",
+            "2026-11-06T05:00:14.298Z\t6da9003b-743b-45f4-80cc-d295cc484e57\tINFO\tSent CRITICAL alert for eecar-stack-VectorSearchFunction-yXyHE1D702wX: BedrockThrottling",
+            "2026-11-06T05:00:14.388Z\t6da9003b-743b-45f4-80cc-d295cc484e57\tERROR\tFailed to send Slack notification: 429 Too Many Requests",
+            "2026-11-06T05:00:14.478Z\t6da9003b-743b-45f4-80cc-d295cc484e57\tERROR\tFailed to send Slack notification: 429 Too Many Requests",
+            "2026-11-06T05:00:14.568Z\t6da9003b-743b-45f4-80cc-d295cc484e57\tINFO\tSent CRITICAL alert for eecar-stack-VectorSearchFunction-yXyHE1D702wX: BedrockThrottling",
+            "2026-11-06T05:00:14.908Z\t6da9003b-743b-45f4-80cc-d295cc484e57\tINFO\tSuccessfully sent 2/4 notifications to Slack",
+            "END RequestId: 6da9003b-743b-45f4-80cc-d295cc484e57",
+            "REPORT RequestId: 6da9003b-743b-45f4-80cc-d295cc484e57\tDuration: 790.42 ms\tBilled Duration: 791 ms\tMemory Size: 256 MB\tMax Memory Used: 94 MB",
+            "START RequestId: 9b04d152-845e-40a3-b839-4003c96da594 Version: $LATEST",
+            "2026-11-06T05:00:15.010Z\t9b04d152-845e-40a3-b839-4003c96da594\tINFO\tProcessing 3 log events from /aws/lambda/eecar-stack-PartRegistrationFunction-Kd83nQz1Lw5e",
+            "2026-11-06T05:00:15.010Z\t9b04d152-845e-40a3-b839-4003c96da594\tINFO\tFound 3 error events",
+            "2026-11-06T05:00:15.100Z\t9b04d152-845e-40a3-b839-4003c96da594\tERROR\tFailed to send Slack notification: 429 Too Many Requests",
+            "2026-11-06T05:00:15.190Z\t9b04d152-845e-40a3-b839-4003c96da594\tERROR\tFailed to send Slack notification: 429 Too Many Requests",
+            "2026-11-06T05:00:15.280Z\t9b04d152-845e-40a3-b839-4003c96da594\tERROR\tFailed to send Slack notification: 429 Too Many Requests",
+            "2026-11-06T05:00:15.710Z\t9b04d152-845e-40a3-b839-4003c96da594\tINFO\tSuccessfully sent 0/3 notifications to Slack",
+            "END RequestId: 9b04d152-845e-40a3-b839-4003c96da594",
+            "REPORT RequestId: 9b04d152-845e-40a3-b839-4003c96da594\tDuration: 801.42 ms\tBilled Duration: 802 ms\tMemory Size: 256 MB\tMax Memory Used: 94 MB",
+            "START RequestId: be83ab3e-cd0d-4773-ab2d-c1b0a17836a1 Version: $LATEST",
+            "2026-11-06T05:00:15.802Z\tbe83ab3e-cd0d-4773-ab2d-c1b0a17836a1\tINFO\tProcessing 2 log events from /aws/lambda/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd",
+            "2026-11-06T05:00:15.802Z\tbe83ab3e-cd0d-4773-ab2d-c1b0a17836a1\tINFO\tFound 2 error events",
+            "2026-11-06T05:00:15.892Z\tbe83ab3e-cd0d-4773-ab2d-c1b0a17836a1\tINFO\tSent WARNING alert for eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd: Exception",
+            "2026-11-06T05:00:15.982Z\tbe83ab3e-cd0d-4773-ab2d-c1b0a17836a1\tERROR\tFailed to send Slack notification: 429 Too Many Requests",
+            "2026-11-06T05:00:16.502Z\tbe83ab3e-cd0d-4773-ab2d-c1b0a17836a1\tINFO\tSuccessfully sent 1/2 notifications to Slack",
+            "END RequestId: be83ab3e-cd0d-4773-ab2d-c1b0a17836a1",
+            "REPORT RequestId: be83ab3e-cd0d-4773-ab2d-c1b0a17836a1\tDuration: 812.42 ms\tBilled Duration: 813 ms\tMemory Size: 256 MB\tMax Memory Used: 94 MB",
+            "START RequestId: e1654211-10ba-4309-9a1c-0393373c5b43 Version: $LATEST",
+            "2026-11-06T05:00:16.611Z\te1654211-10ba-4309-9a1c-0393373c5b43\tINFO\tProcessing 3 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX",
+            "2026-11-06T05:00:16.611Z\te1654211-10ba-4309-9a1c-0393373c5b43\tINFO\tFound 3 error events",
+            "2026-11-06T05:00:16.701Z\te1654211-10ba-4309-9a1c-0393373c5b43\tERROR\tFailed to send Slack notification: 429 Too Many Requests",
+            "2026-11-06T05:00:16.791Z\te1654211-10ba-4309-9a1c-0393373c5b43\tERROR\tFailed to send Slack notification: 429 Too Many Requests",
+            "2026-11-06T05:00:16.881Z\te1654211-10ba-4309-9a1c-0393373c5b43\tINFO\tSent CRITICAL alert for eecar-stack-VectorSearchFunction-yXyHE1D702wX: Exception",
+            "2026-11-06T05:00:17.311Z\te1654211-10ba-4309-9a1c-0393373c5b43\tINFO\tSuccessfully sent 1/3 notifications to Slack",
+            "END RequestId: e1654211-10ba-4309-9a1c-0393373c5b43",
+            "REPORT RequestId: e1654211-10ba-4309-9a1c-0393373c5b43\tDuration: 823.42 ms\tBilled Duration: 824 ms\tMemory Size: 256 MB\tMax Memory Used: 94 MB"
+          ],
+          "errorSummary": [
+            [
+              "429 Too Many Requests",
+              37
+            ]
+          ]
+        },
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 420,
+            "errors": 58,
+            "avgDuration": 2100
+          },
+          "logs": [
+            "START RequestId: af535967-4d0a-47db-8fa2-e5ff5fd83c8b Version: $LATEST",
+            "2026-11-06T05:00:11.930Z\taf535967-4d0a-47db-8fa2-e5ff5fd83c8b\tINFO\tProcessing search query: 아이오닉5 배터리 팩",
+            "2026-11-06T05:00:12.455Z\taf535967-4d0a-47db-8fa2-e5ff5fd83c8b\tERROR\tError in vector search: ThrottlingException: Too many requests, please wait before trying again.\n    at de_ThrottlingExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1146:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async generateEmbedding (file:///opt/nodejs/utils/bedrock.js:79:20) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 429,\n    requestId: '0E055F86427F10282B6A',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "END RequestId: af535967-4d0a-47db-8fa2-e5ff5fd83c8b",
+            "REPORT RequestId: af535967-4d0a-47db-8fa2-e5ff5fd83c8b\tDuration: 731.05 ms\tBilled Duration: 732 ms\tMemory Size: 1024 MB\tMax Memory Used: 216 MB",
+            "START RequestId: ae186c8e-4e43-4044-88cb-cbebb362cec5 Version: $LATEST",
+            "2026-11-06T05:00:12.604Z\tae186c8e-4e43-4044-88cb-cbebb362cec5\tINFO\tProcessing search query: 아이오닉5 배터리 팩",
+            "2026-11-06T05:00:13.129Z\tae186c8e-4e43-4044-88cb-cbebb362cec5\tERROR\tError in vector search: ThrottlingException: Too many requests, please wait before trying again.\n    at de_ThrottlingExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1146:21)\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\n    at async generateEmbedding (file:///opt/nodejs/utils/bedrock.js:79:20) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 429,\n    requestId: '96EFD3D205F52F92A92C',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "END RequestId: ae186c8e-4e43-4044-88cb-cbebb362cec5",
+            "REPORT RequestId: ae186c8e-4e43-4044-88cb-cbebb362cec5\tDuration: 731.05 ms\tBilled Duration: 732 ms\tMemory Size: 1024 MB\tMax Memory Used: 216 MB"
+          ],
+          "errorSummary": [
+            [
+              "ThrottlingException",
+              74
+            ]
+          ]
+        },
+        "PartRegistrationFunction": {
+          "status": {
+            "invocations": 15,
+            "errors": 6,
+            "avgDuration": 1900
+          },
+          "logs": [
+            "START RequestId: c67c5a60-bab2-43ff-8557-612aa2ae9eda Version: $LATEST",
+            "2026-11-06T05:00:12.881Z\tc67c5a60-bab2-43ff-8557-612aa2ae9eda\tINFO\tRegistering new part: 49e2d98d-0106-4b8f-87e3-2b8d0e3b43df",
+            "2026-11-06T05:00:12.950Z\tc67c5a60-bab2-43ff-8557-612aa2ae9eda\tINFO\tPart metadata stored",
+            "2026-11-06T05:00:12.951Z\tc67c5a60-bab2-43ff-8557-612aa2ae9eda\tINFO\tGenerating embedding...",
+            "2026-11-06T05:00:13.402Z\tc67c5a60-bab2-43ff-8557-612aa2ae9eda\tERROR\tError in part registration: ThrottlingException: Too many requests, please wait before trying again.\n    at de_ThrottlingExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1146:21)\n    at async generateEmbedding (file:///opt/nodejs/utils/bedrock.js:79:20) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 429,\n    requestId: 'B1BA7391B809C8AAB298',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "END RequestId: c67c5a60-bab2-43ff-8557-612aa2ae9eda",
+            "REPORT RequestId: c67c5a60-bab2-43ff-8557-612aa2ae9eda\tDuration: 588.20 ms\tBilled Duration: 589 ms\tMemory Size: 1024 MB\tMax Memory Used: 149 MB"
+          ],
+          "errorSummary": [
+            [
+              "ThrottlingException",
+              6
+            ]
+          ]
+        },
+        "ComplianceCheckFunction": {
+          "status": {
+            "invocations": 20,
+            "errors": 0,
+            "avgDuration": 910
+          },
+          "logs": [
+            "START RequestId: 6e7bb725-c7a8-4e1f-ad9c-9790eefa5651 Version: $LATEST",
+            "2026-11-06T05:00:13.640Z\t6e7bb725-c7a8-4e1f-ad9c-9790eefa5651\tINFO\tRunning compliance check for part: 6ebcb695-104f-44f8-bfdc-4dc8d203721d",
+            "2026-11-06T05:00:14.105Z\t6e7bb725-c7a8-4e1f-ad9c-9790eefa5651\tERROR\tFailed to check compliance with AI: ThrottlingException: Too many requests, please wait before trying again.\n    at de_ThrottlingExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1146:21)\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 429,\n    requestId: 'DC6F2FB82D1812BC87DF',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  }\n}",
+            "2026-11-06T05:00:14.106Z\t6e7bb725-c7a8-4e1f-ad9c-9790eefa5651\tINFO\tNo compliance violations found",
+            "END RequestId: 6e7bb725-c7a8-4e1f-ad9c-9790eefa5651",
+            "REPORT RequestId: 6e7bb725-c7a8-4e1f-ad9c-9790eefa5651\tDuration: 492.77 ms\tBilled Duration: 493 ms\tMemory Size: 512 MB\tMax Memory Used: 98 MB"
+          ],
+          "errorSummary": [
+            [
+              "ThrottlingException",
+              9
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "rate limit",
+          "rate-limit",
+          "rate limiting",
+          "레이트 리밋",
+          "레이트리밋",
+          "속도 제한",
+          "전송 속도 제한",
+          "전송 한도",
+          "요청 한도",
+          "호출 한도",
+          "초당 1",
+          "1초에 1",
+          "1초당 1",
+          "1 per second",
+          "one per second",
+          "1건/초",
+          "1 msg/sec"
+        ],
+        "fix": [
+          "재시도",
+          "retry",
+          "Retry-After",
+          "백오프",
+          "backoff",
+          "SQS",
+          "큐에 넣",
+          "큐로",
+          "묶어서",
+          "합쳐서",
+          "모아서",
+          "배치로",
+          "요약 알림",
+          "하나로 묶",
+          "chat.postMessage",
+          "간격을 두",
+          "순차 전송",
+          "지연 전송"
+        ],
+        "mustNot": [
+          "웹훅 URL이 잘못되었습니다",
+          "웹훅이 삭제되었습니다",
+          "SSM 권한이 부족합니다",
+          "Lambda 동시성 한도 때문입니다",
+          "Lambda 스로틀링 때문입니다",
+          "메모리 부족 때문입니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-24",
+      "source": "format-based",
+      "category": "trap",
+      "title": "TTL 지난 캐시 항목이 테이블에 남아 있음",
+      "message": "DynamoDB 콘솔에서 MATCH#로 시작하는 검색 캐시 항목들을 보다가 발견했는데요, TTL 값이 이틀 전 시각으로 찍힌 항목이 아직도 그대로 있어요. TTL이 고장 난 거 아닌가요? 만료된 검색 결과가 사용자한테 나가고 있는 건 아닌지 걱정돼요.",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 350,
+            "errors": 0,
+            "avgDuration": 640
+          },
+          "logs": [
+            "START RequestId: f34d4aca-94ce-4e5d-965a-e4d2bfb1b793 Version: $LATEST",
+            "2026-11-06T03:15:30.402Z\tf34d4aca-94ce-4e5d-965a-e4d2bfb1b793\tINFO\tProcessing search query: EV6 배터리",
+            "2026-11-06T03:15:30.402Z\tf34d4aca-94ce-4e5d-965a-e4d2bfb1b793\tINFO\tCache hit!",
+            "{\"_aws\":{\"Timestamp\":1793934930402,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":1,\"ZeroResult\":0,\"TotalMs\":38}",
+            "END RequestId: f34d4aca-94ce-4e5d-965a-e4d2bfb1b793",
+            "REPORT RequestId: f34d4aca-94ce-4e5d-965a-e4d2bfb1b793\tDuration: 44.18 ms\tBilled Duration: 45 ms\tMemory Size: 1024 MB\tMax Memory Used: 209 MB",
+            "START RequestId: 8068ee07-5cab-4d3a-b6b8-29c3ad1a582e Version: $LATEST",
+            "2026-11-06T03:16:02.118Z\t8068ee07-5cab-4d3a-b6b8-29c3ad1a582e\tINFO\tProcessing search query: 쏘울 EV 인버터",
+            "2026-11-06T03:16:02.430Z\t8068ee07-5cab-4d3a-b6b8-29c3ad1a582e\tINFO\tvector 100, bm25 100 (index 191) -> ranked 129, constraints {\"categories\":[\"inverter\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"쏘울\"]}",
+            "{\"_aws\":{\"Timestamp\":1793934962118,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":138,\"VectorSearchMs\":92,\"IndexLoadMs\":2,\"FusionMs\":9,\"TotalMs\":270}",
+            "END RequestId: 8068ee07-5cab-4d3a-b6b8-29c3ad1a582e",
+            "REPORT RequestId: 8068ee07-5cab-4d3a-b6b8-29c3ad1a582e\tDuration: 276.31 ms\tBilled Duration: 277 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB",
+            "START RequestId: 32830230-ddd4-4600-8472-56c255d7a25e Version: $LATEST",
+            "{\"_aws\":{\"Timestamp\":1793934962790,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":1810}",
+            "END RequestId: 32830230-ddd4-4600-8472-56c255d7a25e",
+            "REPORT RequestId: 32830230-ddd4-4600-8472-56c255d7a25e\tDuration: 1943.42 ms\tBilled Duration: 1944 ms\tMemory Size: 1024 MB\tMax Memory Used: 221 MB",
+            "START RequestId: cf89bb02-21eb-4cee-9bf6-14e23f6ce7e4 Version: $LATEST",
+            "2026-11-06T03:21:47.660Z\tcf89bb02-21eb-4cee-9bf6-14e23f6ce7e4\tINFO\tProcessing search query: 중고 배터리 모듈",
+            "2026-11-06T03:21:47.660Z\tcf89bb02-21eb-4cee-9bf6-14e23f6ce7e4\tINFO\tCache hit!",
+            "{\"_aws\":{\"Timestamp\":1793935307660,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":1,\"ZeroResult\":0,\"TotalMs\":38}",
+            "END RequestId: cf89bb02-21eb-4cee-9bf6-14e23f6ce7e4",
+            "REPORT RequestId: cf89bb02-21eb-4cee-9bf6-14e23f6ce7e4\tDuration: 44.18 ms\tBilled Duration: 45 ms\tMemory Size: 1024 MB\tMax Memory Used: 209 MB"
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "며칠",
+          "48시간",
+          "즉시 삭제되지",
+          "바로 삭제되지",
+          "즉시 지워지지",
+          "바로 지워지지",
+          "곧바로 삭제되지",
+          "삭제가 지연",
+          "삭제 지연",
+          "지연되어 삭제",
+          "백그라운드",
+          "best effort",
+          "best-effort",
+          "비동기적으로 삭제",
+          "비동기로 삭제",
+          "삭제 시점이 보장되지",
+          "보장하지 않"
+        ],
+        "fix": [
+          "조치는 필요 없",
+          "조치가 필요 없",
+          "조치할 필요 없",
+          "그대로 두",
+          "정상 동작",
+          "의도된 동작",
+          "직접 비교",
+          "만료 여부를 확인",
+          "만료 여부를 직접",
+          "만료를 확인",
+          "TTL을 비교",
+          "TTL 값을 비교",
+          "Date.now()",
+          "코드에서 만료",
+          "코드에서 TTL",
+          "만료 시간을 확인",
+          "만료 시각을 확인",
+          "TTL을 확인",
+          "TTL 값을 확인",
+          "걱정하지 않으셔도",
+          "반환되지 않",
+          "나가지 않"
+        ],
+        "mustNot": [
+          "TTL이 비활성화되어 있습니다",
+          "TTL을 다시 활성화하세요",
+          "TTL을 활성화하세요",
+          "TTL 설정을 켜세요",
+          "만료된 결과가 사용자에게 나가고 있습니다",
+          "만료된 캐시가 반환되고 있습니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-25",
+      "source": "format-based",
+      "category": "config",
+      "title": "재질 검색이 간헐적으로 실패",
+      "message": "재질 물성 검색이 될 때도 있고 안 될 때도 있어요. 카테고리 안 고르고 전체에서 찾으면 거의 다 실패하는 것 같고요. 화면엔 그냥 Internal server error만 나와요.",
+      "functions": {
+        "MaterialPropertySearchFunction": {
+          "status": {
+            "invocations": 52,
+            "errors": 29,
+            "avgDuration": 3350
+          },
+          "logs": [
+            "INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:9c3e7a1f0b2d4e6a8c5b7d9f1e3a5c7b9d1f3e5a7c9b1d3f5e7a9c1b3d5f7e9a",
+            "START RequestId: 1f965c4b-fb31-4420-8c61-9453909426bb Version: $LATEST",
+            "RequestId: 1f965c4b-fb31-4420-8c61-9453909426bb Error: Runtime exited with error: signal: killed\nRuntime.ExitError",
+            "END RequestId: 1f965c4b-fb31-4420-8c61-9453909426bb",
+            "REPORT RequestId: 1f965c4b-fb31-4420-8c61-9453909426bb\tDuration: 4127.55 ms\tBilled Duration: 5516 ms\tMemory Size: 128 MB\tMax Memory Used: 128 MB\tInit Duration: 1388.20 ms\tStatus: error\tError Type: Runtime.OutOfMemory",
+            "INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:9c3e7a1f0b2d4e6a8c5b7d9f1e3a5c7b9d1f3e5a7c9b1d3f5e7a9c1b3d5f7e9a",
+            "START RequestId: b5835ca3-ff01-45d1-b52c-f0b4119fe454 Version: $LATEST",
+            "END RequestId: b5835ca3-ff01-45d1-b52c-f0b4119fe454",
+            "REPORT RequestId: b5835ca3-ff01-45d1-b52c-f0b4119fe454\tDuration: 1382.10 ms\tBilled Duration: 2785 ms\tMemory Size: 128 MB\tMax Memory Used: 117 MB\tInit Duration: 1402.77 ms",
+            "START RequestId: 0408ab45-0f04-4cd3-b25a-f5e38053f810 Version: $LATEST",
+            "RequestId: 0408ab45-0f04-4cd3-b25a-f5e38053f810 Error: Runtime exited with error: signal: killed\nRuntime.ExitError",
+            "END RequestId: 0408ab45-0f04-4cd3-b25a-f5e38053f810",
+            "REPORT RequestId: 0408ab45-0f04-4cd3-b25a-f5e38053f810\tDuration: 3896.02 ms\tBilled Duration: 3897 ms\tMemory Size: 128 MB\tMax Memory Used: 128 MB\tStatus: error\tError Type: Runtime.OutOfMemory"
+          ],
+          "errorSummary": [
+            [
+              "Runtime.OutOfMemory",
+              29
+            ]
+          ],
+          "config": {
+            "memoryMB": 128,
+            "lastModified": "2026-11-06T01:05:33.000+0000"
+          }
+        }
+      },
+      "label": {
+        "cause": [
+          "메모리 부족",
+          "메모리가 부족",
+          "OutOfMemory",
+          "out of memory",
+          "OOM",
+          "128MB",
+          "128 MB",
+          "메모리 한도",
+          "메모리를 다 써",
+          "메모리를 모두 사용",
+          "메모리 초과"
+        ],
+        "fix": [
+          "512MB",
+          "512 MB",
+          "메모리를 늘",
+          "메모리 증설",
+          "메모리를 올",
+          "MemorySize를 늘",
+          "MemorySize를 512",
+          "메모리 크기를 늘",
+          "메모리를 원래"
+        ],
+        "mustNot": [
+          "타임아웃 때문입니다",
+          "스로틀링 때문입니다",
+          "권한이 부족합니다",
+          "BatchGetItem 권한이 없습니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-26",
+      "source": "format-based",
+      "category": "code",
+      "title": "새 부품이 특정 검색어로만 안 나옴",
+      "message": "어제 오후에 등록한 코나 배터리팩이 '코나 배터리'로 검색하면 안 나오고 '코나 배터리 팩'으로 검색하면 1등으로 나와요. 등록한 지 하루가 지났는데도 그래요. 띄어쓰기 처리 문제인가요?",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 380,
+            "errors": 0,
+            "avgDuration": 620
+          },
+          "logs": [
+            "START RequestId: 26eb4fcb-1164-4608-b7f9-57749a0f1e73 Version: $LATEST",
+            "2026-11-06T02:40:15.522Z\t26eb4fcb-1164-4608-b7f9-57749a0f1e73\tINFO\tProcessing search query: 코나 배터리",
+            "2026-11-06T02:40:15.522Z\t26eb4fcb-1164-4608-b7f9-57749a0f1e73\tINFO\tCache hit!",
+            "{\"_aws\":{\"Timestamp\":1793932815522,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":1,\"ZeroResult\":0,\"TotalMs\":38}",
+            "END RequestId: 26eb4fcb-1164-4608-b7f9-57749a0f1e73",
+            "REPORT RequestId: 26eb4fcb-1164-4608-b7f9-57749a0f1e73\tDuration: 44.18 ms\tBilled Duration: 45 ms\tMemory Size: 1024 MB\tMax Memory Used: 209 MB",
+            "START RequestId: bfcecaaa-7ef0-4a1f-aaf8-2eeed09ade80 Version: $LATEST",
+            "2026-11-06T02:41:03.318Z\tbfcecaaa-7ef0-4a1f-aaf8-2eeed09ade80\tINFO\tProcessing search query: 코나 배터리 팩",
+            "2026-11-06T02:41:03.630Z\tbfcecaaa-7ef0-4a1f-aaf8-2eeed09ade80\tINFO\tvector 100, bm25 100 (index 191) -> ranked 152, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[],\"vehicles\":[\"코나\"]}",
+            "{\"_aws\":{\"Timestamp\":1793932863318,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":138,\"VectorSearchMs\":92,\"IndexLoadMs\":2,\"FusionMs\":9,\"TotalMs\":270}",
+            "END RequestId: bfcecaaa-7ef0-4a1f-aaf8-2eeed09ade80",
+            "REPORT RequestId: bfcecaaa-7ef0-4a1f-aaf8-2eeed09ade80\tDuration: 276.31 ms\tBilled Duration: 277 ms\tMemory Size: 1024 MB\tMax Memory Used: 214 MB",
+            "START RequestId: c3648373-2d8d-4bfb-b78b-273367efadcb Version: $LATEST",
+            "{\"_aws\":{\"Timestamp\":1793932863990,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":1950}",
+            "END RequestId: c3648373-2d8d-4bfb-b78b-273367efadcb",
+            "REPORT RequestId: c3648373-2d8d-4bfb-b78b-273367efadcb\tDuration: 2083.42 ms\tBilled Duration: 2084 ms\tMemory Size: 1024 MB\tMax Memory Used: 221 MB",
+            "START RequestId: 7a900bb7-4d40-4cb6-8a8f-a53ce0725dd4 Version: $LATEST",
+            "2026-11-06T03:55:41.006Z\t7a900bb7-4d40-4cb6-8a8f-a53ce0725dd4\tINFO\tProcessing search query: 코나 배터리",
+            "2026-11-06T03:55:41.006Z\t7a900bb7-4d40-4cb6-8a8f-a53ce0725dd4\tINFO\tCache hit!",
+            "{\"_aws\":{\"Timestamp\":1793937341006,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":1,\"ZeroResult\":0,\"TotalMs\":38}",
+            "END RequestId: 7a900bb7-4d40-4cb6-8a8f-a53ce0725dd4",
+            "REPORT RequestId: 7a900bb7-4d40-4cb6-8a8f-a53ce0725dd4\tDuration: 44.18 ms\tBilled Duration: 45 ms\tMemory Size: 1024 MB\tMax Memory Used: 209 MB"
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "Cache hit",
+          "캐시된 결과",
+          "캐시된 검색 결과",
+          "캐시 결과",
+          "캐시에 저장된",
+          "결과 캐시",
+          "검색 캐시",
+          "검색 결과 캐시",
+          "캐시 적중",
+          "캐시 히트",
+          "캐시가 남아",
+          "7일",
+          "7 일",
+          "7 days",
+          "MATCH#",
+          "캐시되",
+          "캐시된",
+          "캐시에서 반환",
+          "캐시에서 응답",
+          "캐시를 반환",
+          "캐시가 반환",
+          "캐시 TTL"
+        ],
+        "fix": [
+          "캐시 무효화",
+          "캐시를 무효화",
+          "캐시 삭제",
+          "캐시를 삭제",
+          "캐시 항목을 삭제",
+          "캐시 항목 삭제",
+          "캐시를 지우",
+          "캐시를 비우",
+          "MATCH#",
+          "TTL을 줄",
+          "TTL 단축",
+          "TTL을 짧",
+          "SEARCH_PIPELINE_VERSION",
+          "파이프라인 버전",
+          "등록 시 캐시",
+          "등록할 때 캐시"
+        ],
+        "mustNot": [
+          "띄어쓰기 때문입니다",
+          "토크나이저 문제입니다",
+          "토크나이저 때문입니다",
+          "S3 Vectors 업로드가 실패했습니다",
+          "벡터 업로드에 실패했습니다",
+          "임베딩이 생성되지 않았습니다",
+          "BM25 색인에 아직 반영되지 않았습니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-27",
+      "source": "format-based",
+      "category": "trap",
+      "title": "문의 내역이 DB에 없음",
+      "message": "고객 문의 이력 정리하려고 DynamoDB 테이블에서 문의 항목을 찾아봤는데 하나도 없어요. 문의하기 기능이 망가진 건가요? 고객들은 '문의가 접수되었습니다' 메시지 받았다고 하던데.",
+      "functions": {
+        "ContactInquiryFunction": {
+          "status": {
+            "invocations": 19,
+            "errors": 0,
+            "avgDuration": 160
+          },
+          "logs": [
+            "START RequestId: 39059724-f73a-4969-845d-fe4146c5660e Version: $LATEST",
+            "2026-11-06T00:58:21.330Z\t39059724-f73a-4969-845d-fe4146c5660e\tINFO\tProcessing contact inquiry from: buyer.park@example.com",
+            "2026-11-06T00:58:21.498Z\t39059724-f73a-4969-845d-fe4146c5660e\tINFO\tContact inquiry notification sent successfully",
+            "END RequestId: 39059724-f73a-4969-845d-fe4146c5660e",
+            "REPORT RequestId: 39059724-f73a-4969-845d-fe4146c5660e\tDuration: 163.71 ms\tBilled Duration: 164 ms\tMemory Size: 512 MB\tMax Memory Used: 91 MB",
+            "START RequestId: 7f100b7b-3609-4fb9-b06d-fb4fac360931 Version: $LATEST",
+            "2026-11-06T02:12:09.774Z\t7f100b7b-3609-4fb9-b06d-fb4fac360931\tINFO\tProcessing contact inquiry from: sourcing@example.co.kr",
+            "2026-11-06T02:12:09.942Z\t7f100b7b-3609-4fb9-b06d-fb4fac360931\tINFO\tContact inquiry notification sent successfully",
+            "END RequestId: 7f100b7b-3609-4fb9-b06d-fb4fac360931",
+            "REPORT RequestId: 7f100b7b-3609-4fb9-b06d-fb4fac360931\tDuration: 164.71 ms\tBilled Duration: 165 ms\tMemory Size: 512 MB\tMax Memory Used: 91 MB",
+            "START RequestId: 7a614fd0-6c32-4499-b168-0b9896beedeb Version: $LATEST",
+            "2026-11-06T04:03:47.115Z\t7a614fd0-6c32-4499-b168-0b9896beedeb\tINFO\tProcessing contact inquiry from: ess.lab@example.org",
+            "2026-11-06T04:03:47.283Z\t7a614fd0-6c32-4499-b168-0b9896beedeb\tINFO\tContact inquiry notification sent successfully",
+            "END RequestId: 7a614fd0-6c32-4499-b168-0b9896beedeb",
+            "REPORT RequestId: 7a614fd0-6c32-4499-b168-0b9896beedeb\tDuration: 165.71 ms\tBilled Duration: 166 ms\tMemory Size: 512 MB\tMax Memory Used: 91 MB"
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "저장하지 않",
+          "저장하는 로직이 없",
+          "저장 로직이 없",
+          "저장하는 코드가 없",
+          "저장 기능이 없",
+          "저장하는 기능이 없",
+          "DB에 저장하지",
+          "DynamoDB에 저장하지",
+          "테이블에 저장하지",
+          "SNS로만",
+          "SNS 알림만",
+          "SNS 이메일만",
+          "이메일로만",
+          "메일로만",
+          "알림만 보내",
+          "알림만 발송",
+          "설계상",
+          "DynamoDB 권한이 없",
+          "DynamoDB 권한 자체가"
+        ],
+        "fix": [
+          "메일함",
+          "이메일 수신함",
+          "inha2025vip",
+          "구독 이메일",
+          "구독된 이메일",
+          "팀 메일",
+          "저장 기능을 추가",
+          "저장하도록 추가",
+          "저장 로직을 추가",
+          "저장하는 로직을 추가",
+          "PutItem을 추가",
+          "기능을 추가",
+          "기능 추가"
+        ],
+        "mustNot": [
+          "권한이 없어서 저장에 실패",
+          "권한 부족으로 저장에 실패",
+          "저장에 실패하고 있습니다",
+          "AccessDenied 때문입니다",
+          "고장났습니다",
+          "망가졌습니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-28",
+      "source": "format-based",
+      "category": "iam",
+      "title": "계약 제안 알림 메일 미수신",
+      "message": "계약 제안을 넣으면 화면엔 '제안 완료'까지 뜨는데 알림 메일이 안 와요. 팀 메일함에 이번 주 들어서 제안 알림이 하나도 없습니다.",
+      "functions": {
+        "ProposalFunction": {
+          "status": {
+            "invocations": 12,
+            "errors": 0,
+            "avgDuration": 260
+          },
+          "logs": [
+            "START RequestId: 92c8c96e-4c37-4007-b7c7-190b76d28233 Version: $LATEST",
+            "2026-11-06T00:47:15.204Z\t92c8c96e-4c37-4007-b7c7-190b76d28233\tINFO\tCreating proposal: b554f548-341d-47fb-8723-17380173d8b8",
+            "2026-11-06T00:47:15.381Z\t92c8c96e-4c37-4007-b7c7-190b76d28233\tERROR\tFailed to send proposal notification: AuthorizationErrorException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ProposalFunctionRole-iY7UEsytI37s/eecar-stack-ProposalFunction-Zx8mN3bV5cQ2 is not authorized to perform: SNS:Publish on resource: arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications because no identity-based policy allows the SNS:Publish action\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_AuthorizationErrorExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1859:21)\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\n    at async sendProposalNotification (file:///var/task/index.js:117:5) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 403,\n    requestId: 'BA613D1FC0D930017561',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  Type: 'Sender',\n  Code: 'AuthorizationError'\n}",
+            "END RequestId: 92c8c96e-4c37-4007-b7c7-190b76d28233",
+            "REPORT RequestId: 92c8c96e-4c37-4007-b7c7-190b76d28233\tDuration: 251.33 ms\tBilled Duration: 252 ms\tMemory Size: 512 MB\tMax Memory Used: 95 MB",
+            "START RequestId: e3796ae8-3883-4da0-b6f6-ea37bcf8bcb7 Version: $LATEST",
+            "2026-11-06T02:58:40.660Z\te3796ae8-3883-4da0-b6f6-ea37bcf8bcb7\tINFO\tCreating proposal: 0e291fc8-de6f-4b5f-900f-8dae175d1b3b",
+            "2026-11-06T02:58:40.837Z\te3796ae8-3883-4da0-b6f6-ea37bcf8bcb7\tERROR\tFailed to send proposal notification: AuthorizationErrorException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ProposalFunctionRole-iY7UEsytI37s/eecar-stack-ProposalFunction-Zx8mN3bV5cQ2 is not authorized to perform: SNS:Publish on resource: arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications because no identity-based policy allows the SNS:Publish action\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_AuthorizationErrorExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1859:21)\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\n    at async sendProposalNotification (file:///var/task/index.js:117:5) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 403,\n    requestId: 'D8502B7D774861547D38',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  Type: 'Sender',\n  Code: 'AuthorizationError'\n}",
+            "END RequestId: e3796ae8-3883-4da0-b6f6-ea37bcf8bcb7",
+            "REPORT RequestId: e3796ae8-3883-4da0-b6f6-ea37bcf8bcb7\tDuration: 266.10 ms\tBilled Duration: 267 ms\tMemory Size: 512 MB\tMax Memory Used: 95 MB",
+            "START RequestId: 6a9aeddf-c689-41d0-a3b9-ccc3ab651bc5 Version: $LATEST",
+            "2026-11-06T04:31:02.917Z\t6a9aeddf-c689-41d0-a3b9-ccc3ab651bc5\tINFO\tCreating proposal: 3dcc1d6c-080c-4586-8b65-a94b78e214cd",
+            "2026-11-06T04:31:03.094Z\t6a9aeddf-c689-41d0-a3b9-ccc3ab651bc5\tERROR\tFailed to send proposal notification: AuthorizationErrorException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ProposalFunctionRole-iY7UEsytI37s/eecar-stack-ProposalFunction-Zx8mN3bV5cQ2 is not authorized to perform: SNS:Publish on resource: arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications because no identity-based policy allows the SNS:Publish action\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\n    at de_AuthorizationErrorExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1859:21)\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\n    at async sendProposalNotification (file:///var/task/index.js:117:5) {\n  '$fault': 'client',\n  '$metadata': {\n    httpStatusCode: 403,\n    requestId: '267B976F6F335984AB90',\n    extendedRequestId: undefined,\n    cfId: undefined,\n    attempts: 1,\n    totalRetryDelay: 0\n  },\n  Type: 'Sender',\n  Code: 'AuthorizationError'\n}",
+            "END RequestId: 6a9aeddf-c689-41d0-a3b9-ccc3ab651bc5",
+            "REPORT RequestId: 6a9aeddf-c689-41d0-a3b9-ccc3ab651bc5\tDuration: 248.75 ms\tBilled Duration: 249 ms\tMemory Size: 512 MB\tMax Memory Used: 95 MB"
+          ],
+          "errorSummary": [
+            [
+              "AuthorizationErrorException",
+              12
+            ]
+          ],
+          "permissions": {
+            "statements": [
+              {
+                "policy": "ProposalFunctionRolePolicy0",
+                "effect": "Allow",
+                "actions": [
+                  "dynamodb:GetItem",
+                  "dynamodb:DeleteItem",
+                  "dynamodb:PutItem",
+                  "dynamodb:Scan",
+                  "dynamodb:Query",
+                  "dynamodb:UpdateItem",
+                  "dynamodb:BatchWriteItem",
+                  "dynamodb:BatchGetItem",
+                  "dynamodb:DescribeTable",
+                  "dynamodb:ConditionCheckItem"
+                ],
+                "resources": [
+                  "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table",
+                  "arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*"
+                ]
+              },
+              {
+                "policy": "ProposalFunctionRolePolicy1",
+                "effect": "Allow",
+                "actions": [
+                  "sns:Publish"
+                ],
+                "resources": [
+                  "arn:aws:sns:ap-northeast-2:425454508084:eecar-notification"
+                ]
+              },
+              {
+                "policy": "AWSXrayWriteOnlyAccess",
+                "effect": "Allow",
+                "actions": [
+                  "xray:PutTraceSegments",
+                  "xray:PutTelemetryRecords",
+                  "xray:GetSamplingRules",
+                  "xray:GetSamplingTargets",
+                  "xray:GetSamplingStatisticSummaries"
+                ],
+                "resources": [
+                  "*"
+                ]
+              },
+              {
+                "policy": "AWSLambdaBasicExecutionRole",
+                "effect": "Allow",
+                "actions": [
+                  "logs:CreateLogGroup",
+                  "logs:CreateLogStream",
+                  "logs:PutLogEvents"
+                ],
+                "resources": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "label": {
+        "cause": [
+          "오타",
+          "eecar-notification으로",
+          "eecar-notification이",
+          "eecar-notification`",
+          "eecar-notification'",
+          "eecar-notification\"",
+          "eecar-notification)",
+          "eecar-notification(",
+          "eecar-notification 으로",
+          "eecar-notification로",
+          "eecar-notification만",
+          "s가 빠",
+          "토픽 ARN이 잘못",
+          "토픽 ARN이 틀",
+          "토픽 ARN이 다",
+          "토픽 이름이 다",
+          "토픽 이름이 틀",
+          "토픽 이름이 잘못",
+          "ARN이 일치하지",
+          "ARN 불일치",
+          "리소스 ARN이 잘못",
+          "리소스 ARN이 틀",
+          "다른 토픽"
+        ],
+        "fix": [
+          "eecar-notifications로",
+          "eecar-notifications으로",
+          "SNSPublishMessagePolicy",
+          "!Ref NotificationTopic",
+          "NotificationTopic",
+          "토픽 ARN을 수정",
+          "토픽 ARN을 고치",
+          "ARN을 수정",
+          "ARN을 고치",
+          "리소스를 수정",
+          "리소스를 고치",
+          "올바른 토픽",
+          "정확한 토픽",
+          "오타를 수정",
+          "오타 수정",
+          "오타를 고치"
+        ],
+        "mustNot": [
+          "구독이 해지되었습니다",
+          "구독이 취소되었습니다",
+          "구독 확인이 되지 않았습니다",
+          "이메일 구독이 없습니다",
+          "스로틀링 때문입니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-29",
+      "source": "format-based",
+      "category": "code",
+      "title": "유틸 수정 배포 후 부품 등록 전부 실패",
+      "message": "방금 배포했는데 부품 등록이 전부 실패해요. 이번에 임베딩 텍스트 길이를 자르는 함수를 search-document 유틸에 새로 추가하고 part-registration에서 쓰도록 바꿨어요. 검색이나 다른 건 멀쩡합니다.",
+      "functions": {
+        "PartRegistrationFunction": {
+          "status": {
+            "invocations": 9,
+            "errors": 9,
+            "avgDuration": 250
+          },
+          "logs": [
+            "INIT_START Runtime Version: nodejs:24.v14\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:9c3e7a1f0b2d4e6a8c5b7d9f1e3a5c7b9d1f3e5a7c9b1d3f5e7a9c1b3d5f7e9a",
+            "2026-11-06T06:43:10.554Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\":\"SyntaxError\",\"errorMessage\":\"The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\",\"stack\":[\"file:///var/task/index.js:8\",\"  truncateForEmbedding,\",\"  ^^^^^^^^^^^^^^^^^^^^\",\"SyntaxError: The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\",\"    at ModuleJob._instantiate (node:internal/modules/esm/module_job:180:21)\",\"    at async ModuleJob.run (node:internal/modules/esm/module_job:263:25)\"]}",
+            "INIT_REPORT Init Duration: 244.90 ms\tPhase: init\tStatus: error\tError Type: Runtime.Unknown",
+            "START RequestId: f90f2aca-5c64-4289-90a2-9417bcb63a37 Version: $LATEST",
+            "2026-11-06T06:43:11.102Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\":\"SyntaxError\",\"errorMessage\":\"The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\",\"stack\":[\"file:///var/task/index.js:8\",\"  truncateForEmbedding,\",\"  ^^^^^^^^^^^^^^^^^^^^\",\"SyntaxError: The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\",\"    at ModuleJob._instantiate (node:internal/modules/esm/module_job:180:21)\",\"    at async ModuleJob.run (node:internal/modules/esm/module_job:263:25)\"]}",
+            "INIT_REPORT Init Duration: 239.71 ms\tPhase: invoke\tStatus: error\tError Type: Runtime.Unknown",
+            "END RequestId: f90f2aca-5c64-4289-90a2-9417bcb63a37",
+            "REPORT RequestId: f90f2aca-5c64-4289-90a2-9417bcb63a37\tDuration: 251.06 ms\tBilled Duration: 252 ms\tMemory Size: 1024 MB\tMax Memory Used: 63 MB\tStatus: error\tError Type: Runtime.Unknown",
+            "START RequestId: 9c838d2e-45b2-4d10-94d4-2f4ef36764f6 Version: $LATEST",
+            "2026-11-06T06:47:38.690Z\tundefined\tERROR\tUncaught Exception \t{\"errorType\":\"SyntaxError\",\"errorMessage\":\"The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\",\"stack\":[\"file:///var/task/index.js:8\",\"  truncateForEmbedding,\",\"  ^^^^^^^^^^^^^^^^^^^^\",\"SyntaxError: The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\",\"    at ModuleJob._instantiate (node:internal/modules/esm/module_job:180:21)\",\"    at async ModuleJob.run (node:internal/modules/esm/module_job:263:25)\"]}",
+            "INIT_REPORT Init Duration: 244.91 ms\tPhase: invoke\tStatus: error\tError Type: Runtime.Unknown",
+            "END RequestId: 9c838d2e-45b2-4d10-94d4-2f4ef36764f6",
+            "REPORT RequestId: 9c838d2e-45b2-4d10-94d4-2f4ef36764f6\tDuration: 253.06 ms\tBilled Duration: 254 ms\tMemory Size: 1024 MB\tMax Memory Used: 63 MB\tStatus: error\tError Type: Runtime.Unknown"
+          ],
+          "errorSummary": [
+            [
+              "SyntaxError",
+              9
+            ]
+          ],
+          "config": {
+            "lastModified": "2026-11-06T06:41:27.000+0000"
+          }
+        }
+      },
+      "label": {
+        "cause": [
+          "레이어에 반영되지",
+          "레이어에 포함되지",
+          "레이어에 없",
+          "레이어가 갱신되지",
+          "레이어가 업데이트되지",
+          "레이어가 새로 배포되지",
+          "레이어가 새로 만들어지지",
+          "새 레이어 버전이 생성되지",
+          "새 레이어 버전이 만들어지지",
+          "레이어 버전이 새로",
+          "레이어를 빌드하지",
+          "레이어 빌드",
+          "build:layer",
+          "레이어 코드가 이전",
+          "레이어 내용이 이전",
+          "레이어는 오전",
+          "00:52",
+          "레이어가 함수보다 먼저",
+          "레이어가 예전 코드",
+          "레이어에는",
+          "레이어 v27에",
+          "레이어(v27)에",
+          "레이어 27에",
+          "레이어가 오래",
+          "레이어가 이전",
+          "레이어 빌드가 빠",
+          "레이어가 재빌드되지",
+          "레이어 재빌드"
+        ],
+        "fix": [
+          "build:layer",
+          "build:all",
+          "레이어를 다시 빌드",
+          "레이어를 빌드",
+          "레이어 재빌드",
+          "레이어를 재빌드",
+          "새 레이어 버전",
+          "레이어를 재배포",
+          "레이어를 다시 배포",
+          "레이어도 함께 배포",
+          "레이어도 같이 배포"
+        ],
+        "mustNot": [
+          ".js 확장자를 붙이세요",
+          "확장자가 빠져 있습니다",
+          "권한이 부족합니다",
+          "레이어 버전을 27로 올리세요",
+          "메모리 부족 때문입니다"
+        ],
+        "tools": []
+      }
+    },
+    {
+      "id": "v2-30",
+      "source": "format-based",
+      "category": "ambiguous",
+      "title": "함수 이름 오타 (재질 검색)",
+      "message": "MaterialSearchFunction 로그 좀 봐 주세요. 재질 검색이 안 된다는 제보가 하나 있었어요.",
+      "functions": {
+        "MaterialSearchFunction": {
+          "status": {
+            "invocations": 0,
+            "errors": 0,
+            "avgDuration": 0
+          },
+          "logs": [],
+          "config": {
+            "found": false
+          },
+          "permissions": {
+            "found": false,
+            "statements": []
+          }
+        },
+        "MaterialPropertySearchFunction": {
+          "status": {
+            "invocations": 37,
+            "errors": 0,
+            "avgDuration": 760
+          },
+          "logs": [
+            "START RequestId: 21f64e3e-c833-40fb-8425-f52ff209c835 Version: $LATEST",
+            "END RequestId: 21f64e3e-c833-40fb-8425-f52ff209c835",
+            "REPORT RequestId: 21f64e3e-c833-40fb-8425-f52ff209c835\tDuration: 812.40 ms\tBilled Duration: 813 ms\tMemory Size: 512 MB\tMax Memory Used: 141 MB",
+            "START RequestId: d423104a-94cb-42fa-a1c9-ba9f06e1679e Version: $LATEST",
+            "END RequestId: d423104a-94cb-42fa-a1c9-ba9f06e1679e",
+            "REPORT RequestId: d423104a-94cb-42fa-a1c9-ba9f06e1679e\tDuration: 690.17 ms\tBilled Duration: 691 ms\tMemory Size: 512 MB\tMax Memory Used: 143 MB",
+            "START RequestId: 52530e5f-548a-4366-b2fd-d6a3d6afa14a Version: $LATEST",
+            "END RequestId: 52530e5f-548a-4366-b2fd-d6a3d6afa14a",
+            "REPORT RequestId: 52530e5f-548a-4366-b2fd-d6a3d6afa14a\tDuration: 733.58 ms\tBilled Duration: 734 ms\tMemory Size: 512 MB\tMax Memory Used: 142 MB"
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "MaterialPropertySearchFunction",
+          "존재하지 않",
+          "찾을 수 없",
+          "없는 함수",
+          "오타",
+          "이름이 다",
+          "이름이 조금 다",
+          "정확한 이름은"
+        ],
+        "fix": [
+          "에러가 없",
+          "에러는 없",
+          "오류가 없",
+          "오류는 없",
+          "정상입니다",
+          "정상 동작",
+          "정상적으로 동작",
+          "이상이 없",
+          "이상은 없",
+          "이상 없",
+          "어떤 조건",
+          "어떤 필터",
+          "구체적",
+          "재현",
+          "알려주시면",
+          "알려 주시면",
+          "공유해 주시면",
+          "에러 0건",
+          "오류 0건",
+          "errors 0",
+          "에러: 0"
+        ],
+        "mustNot": [
+          "메모리 부족 때문입니다",
+          "권한이 부족합니다",
+          "타임아웃이 발생하고 있습니다",
+          "스로틀링 때문입니다"
+        ],
+        "tools": []
+      }
+    }
+  ]
+}

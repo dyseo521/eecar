@@ -127,14 +127,21 @@ function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, legacyT
       }
       case 'get_function_status': {
         if (fn === 'all') {
-          const names = [...new Set([...KNOWN_FUNCTIONS, ...Object.keys(scenario.functions)])];
+          // 운영 도구(getAllLambdaStatuses)처럼 스택에 있는 함수만 나열한다. 시나리오의 없는 함수 이름은 나오지 않는다
           return {
             success: true,
-            data: names.map(n => {
-              const f = scenario.functions[n];
+            data: KNOWN_FUNCTIONS.map(n => {
+              const f = findFixture(scenario, n)?.fixture;
               return f?.status ? { functionName: n, ...f.status, errorRate: f.status.invocations ? (f.status.errors / f.status.invocations) * 100 : 0 } : healthy(n);
             }),
           };
+        }
+        // 운영 도구처럼 스택에 없는 함수는 고정 데이터가 있어도 found=false (홀드아웃 v2 실행 전에 맞춤)
+        if (!legacyTools && !isKnown(fn)) {
+          return { success: true, data: {
+            functionName: fn, found: false, note: `'${fn}' 함수를 스택에서 찾지 못했습니다. 함수 이름을 확인하세요.`,
+            invocations: 0, errors: 0, errorRate: 0, avgDuration: 0,
+          } };
         }
         if (found?.fixture.status) {
           const s = found.fixture.status;
