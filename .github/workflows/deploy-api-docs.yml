@@ -1,4 +1,5 @@
-name: Generate & Deploy API Docs
+# GitHub Pages는 끈 상태로 둔다 (사용자 결정, 2026-11-06). OpenAPI 명세 생성과 커밋만 한다.
+name: Generate API Docs
 
 on:
   push:
@@ -14,11 +15,9 @@ on:
 
 permissions:
   contents: write    # For committing generated spec
-  pages: write
-  id-token: write
 
 concurrency:
-  group: 'pages'
+  group: 'api-docs'
   cancel-in-progress: false
 
 jobs:
@@ -55,30 +54,3 @@ jobs:
           commit_message: 'docs: auto-generate OpenAPI spec from Zod schemas'
           file_pattern: 'docs/openapi.yaml'
           commit_author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
-
-  deploy:
-    needs: generate
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Checkout (latest)
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref }}
-
-      - name: Pull latest changes
-        run: git pull origin ${{ github.ref_name }}
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'docs'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
