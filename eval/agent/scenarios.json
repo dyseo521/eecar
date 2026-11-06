@@ -1,0 +1,1057 @@
+{
+  "description": "자동이 진단 평가 시나리오 (DECISION_LOG E-29). source=prod-log는 운영 CloudWatch 로그 원문, format-based는 AWS SDK·Lambda의 실제 오류 형식으로 만든 합성 로그다. label: cause는 원인을 맞혔다고 볼 표현(하나라도), fix는 조치 표현(하나라도), mustNot은 오진 표현(하나라도 있으면 실패), tools는 호출해야 하는 도구('a|b'는 둘 중 하나). 채점 규칙은 파일럿·기준값 실행의 응답을 직접 판정해 보정했다. 보정은 이미 저장된 모든 실행(기준값 포함)에 같이 다시 적용한다(E-29): 오진 표현은 원인을 단정하는 문구만 두고, 시나리오에 고정 데이터가 있으면 그 함수를 도구로 실제 조회해야 통과한다(증거 조건).",
+  "scenarios": [
+    {
+      "id": "s01",
+      "source": "prod-log",
+      "title": "퇴역(Legacy) 모델 접근 거부 (C-09 실제 장애)",
+      "message": "VectorSearch 검색 결과에 AI 설명이 안 나오고 '유사도 기반 매칭'만 떠요. 원인 확인해줘",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 42,
+            "errors": 0,
+            "avgDuration": 1900
+          },
+          "logs": [
+            "ERROR Query expansion failed: ResourceNotFoundException: Access denied. This Model is marked by provider as Legacy and you have not been actively using the model in the last 30 days. Please upgrade to an active model on Amazon Bedrock at de_ResourceNotFoundExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1945:21)",
+            "ERROR Batch explanation generation failed: ResourceNotFoundException: Access denied. This Model is marked by provider as Legacy and you have not been actively using the model in the last 30 days. Please upgrade to an active model on Amazon Bedrock",
+            "ERROR Raw response:"
+          ],
+          "errorSummary": [
+            [
+              "ResourceNotFoundException",
+              24
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "Legacy",
+          "레거시",
+          "퇴역",
+          "지원 종료",
+          "모델 접근",
+          "model access",
+          "비활성 모델",
+          "30일"
+        ],
+        "fix": [
+          "모델 ID",
+          "모델을 교체",
+          "모델 교체",
+          "최신 모델",
+          "활성 모델",
+          "active model",
+          "inference profile",
+          "추론 프로필",
+          "업그레이드",
+          "변경"
+        ],
+        "mustNot": [
+          "원인은 스로틀",
+          "스로틀링 때문",
+          "권한이 없어서",
+          "타임아웃 때문"
+        ],
+        "tools": [
+          "get_logs|get_error_summary|analyze_error"
+        ]
+      }
+    },
+    {
+      "id": "s02",
+      "source": "prod-log",
+      "title": "ERROR로 찍힌 Node 버전 경고 (장애 아님)",
+      "message": "SlackAgent 로그에 ERROR가 떠 있던데 장애야?",
+      "functions": {
+        "SlackAgentFunction": {
+          "status": {
+            "invocations": 18,
+            "errors": 0,
+            "avgDuration": 4100
+          },
+          "logs": [
+            "ERROR (node:2) Warning: NodeVersionSupportWarning: The AWS SDK for JavaScript (v3) versions published after the first week of January 2027 will require node >=22. You are running node v20.20.2. To continue receiving updates to AWS services, bug fixes, and security updates please upgrade to node >=22. More information can be found at: https://a.co/c895JFp (Use `node --trace-warnings ...` to show where the warning was created)"
+          ],
+          "errorSummary": [
+            [
+              "NodeVersionSupportWarning",
+              2
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "경고",
+          "warning",
+          "Warning",
+          "장애가 아",
+          "장애는 아",
+          "에러가 아",
+          "오류가 아",
+          "정상 동작",
+          "영향 없",
+          "당장 문제"
+        ],
+        "fix": [
+          "node 22",
+          "Node.js 22",
+          "nodejs22",
+          "nodejs24",
+          "22 이상",
+          "런타임",
+          "runtime",
+          "업그레이드"
+        ],
+        "mustNot": [
+          "장애입니다",
+          "장애가 발생했습니다",
+          "긴급합니다",
+          "긴급 조치가 필요",
+          "즉시 조치가 필요"
+        ],
+        "tools": [
+          "get_logs|get_function_status|get_error_summary"
+        ]
+      }
+    },
+    {
+      "id": "s03",
+      "source": "format-based",
+      "title": "Bedrock 호출 스로틀링",
+      "message": "오늘 오후부터 VectorSearch가 간헐적으로 500 에러를 내요",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 310,
+            "errors": 37,
+            "avgDuration": 2600
+          },
+          "logs": [
+            "ERROR Error in vector search: ThrottlingException: Too many requests, please wait before trying again. at de_ThrottlingExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:2021:21)",
+            "ERROR Error in vector search: ThrottlingException: Too many requests, please wait before trying again."
+          ],
+          "errorSummary": [
+            [
+              "ThrottlingException",
+              37
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "스로틀",
+          "쓰로틀",
+          "Throttl",
+          "throttl",
+          "요청 한도",
+          "호출 한도",
+          "rate limit",
+          "Too many requests",
+          "요청이 너무 많"
+        ],
+        "fix": [
+          "재시도",
+          "retry",
+          "백오프",
+          "backoff",
+          "쿼터",
+          "quota",
+          "한도 상향",
+          "동시성",
+          "캐시"
+        ],
+        "mustNot": [
+          "원인은 권한",
+          "권한 문제입니다",
+          "원인은 타임아웃",
+          "Legacy"
+        ],
+        "tools": [
+          "get_logs|get_error_summary|analyze_error"
+        ]
+      }
+    },
+    {
+      "id": "s04",
+      "source": "format-based",
+      "title": "Lambda 타임아웃",
+      "message": "검색이 엄청 느리다가 실패해요. VectorSearch 함수 봐줄래?",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 95,
+            "errors": 11,
+            "avgDuration": 28500
+          },
+          "logs": [
+            "ERROR Task timed out after 30.03 seconds",
+            "INFO REPORT RequestId: 6f1c Duration: 30030.12 ms Billed Duration: 30000 ms Memory Size: 1024 MB Max Memory Used: 211 MB",
+            "ERROR Task timed out after 30.02 seconds"
+          ],
+          "errorSummary": [
+            [
+              "TimeoutError",
+              11
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "타임아웃",
+          "timeout",
+          "Timeout",
+          "timed out",
+          "시간 초과",
+          "30초"
+        ],
+        "fix": [
+          "Timeout 설정",
+          "타임아웃을 늘",
+          "타임아웃 증가",
+          "timeout 증가",
+          "시간 제한",
+          "비동기",
+          "병목",
+          "지연",
+          "최적화"
+        ],
+        "mustNot": [
+          "메모리 부족",
+          "OOM",
+          "out of memory",
+          "Legacy"
+        ],
+        "tools": [
+          "get_logs|get_function_status|get_error_summary"
+        ]
+      }
+    },
+    {
+      "id": "s05",
+      "source": "format-based",
+      "title": "DynamoDB 처리량 초과",
+      "message": "부품 목록 API(GetParts)가 피크 시간에 실패한다는 제보가 있어",
+      "functions": {
+        "GetPartsFunction": {
+          "status": {
+            "invocations": 1200,
+            "errors": 64,
+            "avgDuration": 380
+          },
+          "logs": [
+            "ERROR Error listing parts: ProvisionedThroughputExceededException: The level of configured provisioned throughput for the table was exceeded. Consider increasing your provisioning level with the UpdateTable API.",
+            "ERROR Error listing parts: ProvisionedThroughputExceededException: The level of configured provisioned throughput for the table was exceeded."
+          ],
+          "errorSummary": [
+            [
+              "ProvisionedThroughputExceededException",
+              64
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "처리량",
+          "throughput",
+          "Throughput",
+          "용량 초과",
+          "capacity",
+          "ProvisionedThroughputExceeded",
+          "프로비저닝"
+        ],
+        "fix": [
+          "온디맨드",
+          "on-demand",
+          "On-Demand",
+          "용량",
+          "capacity",
+          "Auto Scaling",
+          "오토스케일",
+          "백오프",
+          "재시도",
+          "UpdateTable",
+          "캐시"
+        ],
+        "mustNot": [
+          "원인은 Bedrock",
+          "Bedrock 스로틀",
+          "Legacy"
+        ],
+        "tools": [
+          "get_logs|get_error_summary|analyze_error"
+        ]
+      }
+    },
+    {
+      "id": "s06",
+      "source": "format-based",
+      "title": "IAM 권한 부족",
+      "message": "PartRegistration으로 부품 등록하면 임베딩 생성에서 실패해요",
+      "functions": {
+        "PartRegistrationFunction": {
+          "status": {
+            "invocations": 14,
+            "errors": 14,
+            "avgDuration": 640
+          },
+          "logs": [
+            "ERROR Error in part registration: AccessDeniedException: User: arn:aws:sts::123456789012:assumed-role/eecar-stack-PartRegistrationFunctionRole-1A2B3C/eecar-stack-PartRegistrationFunction-x is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:ap-northeast-2::foundation-model/amazon.titan-embed-text-v2:0 because no identity-based policy allows the bedrock:InvokeModel action"
+          ],
+          "errorSummary": [
+            [
+              "AccessDeniedException",
+              14
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "권한",
+          "AccessDenied",
+          "not authorized",
+          "IAM",
+          "정책"
+        ],
+        "fix": [
+          "bedrock:InvokeModel",
+          "정책 추가",
+          "정책에 추가",
+          "권한 추가",
+          "권한을 추가",
+          "Policies",
+          "template.yaml",
+          "IAM 역할",
+          "역할에"
+        ],
+        "mustNot": [
+          "원인은 스로틀",
+          "스로틀링 때문",
+          "Legacy"
+        ],
+        "tools": [
+          "get_logs|get_error_summary|analyze_error"
+        ]
+      }
+    },
+    {
+      "id": "s07",
+      "source": "format-based",
+      "title": "클라이언트의 잘못된 JSON (서버 문제 아님)",
+      "message": "VectorSearch에서 SyntaxError가 계속 찍히는데 코드 버그야?",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 220,
+            "errors": 0,
+            "avgDuration": 310
+          },
+          "logs": [
+            "WARN Invalid JSON body: SyntaxError: Unexpected token 'q', \"query=배터리\" is not valid JSON",
+            "WARN Invalid JSON body: SyntaxError: Unexpected end of JSON input"
+          ],
+          "errorSummary": [
+            [
+              "SyntaxError",
+              9
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "클라이언트",
+          "요청 본문",
+          "잘못된 JSON",
+          "JSON 형식",
+          "invalid JSON",
+          "Invalid JSON",
+          "요청 형식",
+          "입력"
+        ],
+        "fix": [
+          "400",
+          "Content-Type",
+          "application/json",
+          "요청을 확인",
+          "호출 측",
+          "클라이언트",
+          "검증",
+          "형식"
+        ],
+        "mustNot": [
+          "코드 버그입니다",
+          "서버 장애"
+        ],
+        "tools": [
+          "get_logs|get_error_summary|get_function_status"
+        ]
+      }
+    },
+    {
+      "id": "s08",
+      "source": "format-based",
+      "title": "Lambda Layer 모듈 누락 (배포 불일치)",
+      "message": "배포하고 나서 VectorSearch가 전부 실패해요",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 58,
+            "errors": 58,
+            "avgDuration": 45
+          },
+          "logs": [
+            "ERROR Uncaught Exception {\"errorType\":\"Runtime.ImportModuleError\",\"errorMessage\":\"Error: Cannot find module '/opt/nodejs/utils/search-ranking.js'\\nRequire stack:\\n- /var/task/index.js\",\"stack\":[\"Runtime.ImportModuleError: Error: Cannot find module '/opt/nodejs/utils/search-ranking.js'\"]}",
+            "INIT_REPORT Init Duration: 412.03 ms Phase: invoke Status: error Error Type: Runtime.ImportModuleError"
+          ],
+          "errorSummary": [
+            [
+              "ImportModuleError",
+              58
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "ImportModuleError",
+          "모듈",
+          "module",
+          "Layer",
+          "레이어",
+          "search-ranking"
+        ],
+        "fix": [
+          "Layer",
+          "레이어",
+          "build:layer",
+          "build:all",
+          "재배포",
+          "다시 배포",
+          "배포",
+          "버전"
+        ],
+        "mustNot": [
+          "원인은 스로틀",
+          "원인은 권한",
+          "Legacy"
+        ],
+        "tools": [
+          "get_logs|get_error_summary|analyze_error"
+        ]
+      }
+    },
+    {
+      "id": "s09",
+      "source": "format-based",
+      "title": "SSM 파라미터 없음",
+      "message": "자동이가 슬랙에 메시지를 못 보내는 것 같아. SlackNotification 확인해줘",
+      "functions": {
+        "SlackNotificationFunction": {
+          "status": {
+            "invocations": 33,
+            "errors": 33,
+            "avgDuration": 210
+          },
+          "logs": [
+            "ERROR Failed to get webhook URL: ParameterNotFound: Parameter /eecar/slack/webhook-url not found. at de_ParameterNotFoundRes (/var/runtime/node_modules/@aws-sdk/client-ssm/dist-cjs/index.js:7302:21)"
+          ],
+          "errorSummary": [
+            [
+              "ParameterNotFound",
+              33
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "ParameterNotFound",
+          "파라미터",
+          "SSM",
+          "webhook-url"
+        ],
+        "fix": [
+          "SSM",
+          "파라미터를 생성",
+          "파라미터 생성",
+          "put-parameter",
+          "Parameter Store",
+          "등록",
+          "설정"
+        ],
+        "mustNot": [
+          "원인은 스로틀",
+          "Legacy",
+          "원인은 타임아웃"
+        ],
+        "tools": [
+          "get_logs|get_error_summary|analyze_error"
+        ]
+      }
+    },
+    {
+      "id": "s10",
+      "source": "format-based",
+      "title": "S3 객체 없음 (벡터 manifest)",
+      "message": "VectorSearch 결과가 계속 0건이에요",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 40,
+            "errors": 0,
+            "avgDuration": 260
+          },
+          "logs": [
+            "ERROR Failed to load vectors manifest: NoSuchKey: The specified key does not exist. Key: vectors-manifest.json",
+            "INFO vector 0, bm25 0 (index 0, loaded) -> ranked 0"
+          ],
+          "errorSummary": [
+            [
+              "NoSuchKey",
+              40
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "NoSuchKey",
+          "manifest",
+          "매니페스트",
+          "객체가 없",
+          "키가 없",
+          "존재하지 않",
+          "S3"
+        ],
+        "fix": [
+          "재색인",
+          "reindex",
+          "업로드",
+          "manifest",
+          "벡터를 다시",
+          "생성",
+          "복구"
+        ],
+        "mustNot": [
+          "원인은 스로틀",
+          "원인은 권한",
+          "권한 문제입니다",
+          "Legacy"
+        ],
+        "tools": [
+          "get_logs|get_error_summary|analyze_error"
+        ]
+      }
+    },
+    {
+      "id": "s11",
+      "source": "format-based",
+      "title": "잘못된 모델 ID",
+      "message": "모델 바꾼 뒤로 SlackAgent가 답을 못 해",
+      "functions": {
+        "SlackAgentFunction": {
+          "status": {
+            "invocations": 12,
+            "errors": 0,
+            "avgDuration": 900
+          },
+          "logs": [
+            "ERROR Agent error: ValidationException: The provided model identifier is invalid. at de_ValidationExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:2101:21)"
+          ],
+          "errorSummary": [
+            [
+              "ValidationException",
+              12
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "model identifier",
+          "모델 ID",
+          "모델 식별자",
+          "ValidationException",
+          "잘못된 모델"
+        ],
+        "fix": [
+          "AGENT_MODEL_ID",
+          "모델 ID",
+          "환경 변수",
+          "inference profile",
+          "추론 프로필",
+          "올바른",
+          "수정"
+        ],
+        "mustNot": [
+          "원인은 스로틀",
+          "원인은 타임아웃"
+        ],
+        "tools": [
+          "get_logs|get_error_summary|analyze_error"
+        ]
+      }
+    },
+    {
+      "id": "s12",
+      "source": "format-based",
+      "title": "계정 토큰 쿼터 소진 (A-12 경험 기반)",
+      "message": "Sonnet으로 바꾼 기능이 하루 종일 실패해요. VectorSearch 로그 좀",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 150,
+            "errors": 0,
+            "avgDuration": 1200
+          },
+          "logs": [
+            "ERROR Batch explanation generation failed: ThrottlingException: Too many tokens per day, please wait before trying again.",
+            "ERROR Batch explanation generation failed: ThrottlingException: Too many tokens per day, please wait before trying again."
+          ],
+          "errorSummary": [
+            [
+              "ThrottlingException",
+              150
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "tokens per day",
+          "일일",
+          "하루",
+          "토큰 쿼터",
+          "토큰 한도",
+          "쿼터",
+          "quota",
+          "Quota"
+        ],
+        "fix": [
+          "Service Quotas",
+          "쿼터 상향",
+          "한도 상향",
+          "증가 요청",
+          "quota increase",
+          "다른 모델",
+          "Haiku",
+          "모델 변경"
+        ],
+        "mustNot": [
+          "원인은 권한",
+          "권한 문제입니다",
+          "Legacy"
+        ],
+        "tools": [
+          "get_logs|get_error_summary|analyze_error"
+        ]
+      }
+    },
+    {
+      "id": "s13",
+      "source": "format-based",
+      "title": "중복 제거용 조건부 쓰기 실패 (정상 동작)",
+      "message": "SlackNotification에 ConditionalCheckFailedException이 많이 찍혀. 문제 있어?",
+      "functions": {
+        "SlackNotificationFunction": {
+          "status": {
+            "invocations": 410,
+            "errors": 0,
+            "avgDuration": 95
+          },
+          "logs": [
+            "INFO Duplicate alert suppressed (ConditionalCheckFailedException) errorHash=9f1c... suppressedCount=12",
+            "INFO Duplicate alert suppressed (ConditionalCheckFailedException) errorHash=9f1c... suppressedCount=13"
+          ],
+          "errorSummary": [
+            [
+              "ConditionalCheckFailedException",
+              380
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "정상 동작",
+          "정상적인 동작",
+          "의도된 동작",
+          "의도된",
+          "설계대로",
+          "문제가 아니",
+          "오류가 아니",
+          "에러가 아니",
+          "장애가 아니"
+        ],
+        "fix": [
+          "조치가 필요 없",
+          "조치 불필요",
+          "문제가 아",
+          "문제는 아",
+          "정상",
+          "로그 레벨",
+          "INFO"
+        ],
+        "mustNot": [
+          "장애입니다",
+          "DynamoDB 장애",
+          "심각",
+          "문제가 있는 것",
+          "근본 원인 해결",
+          "동시성 문제"
+        ],
+        "tools": [
+          "get_logs|get_error_summary|get_function_status"
+        ]
+      }
+    },
+    {
+      "id": "s14",
+      "source": "format-based",
+      "title": "정상 상태 (거짓 경보 방지)",
+      "message": "VectorSearch 함수 상태 괜찮아?",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 520,
+            "errors": 0,
+            "avgDuration": 330
+          },
+          "logs": [],
+          "errorSummary": []
+        }
+      },
+      "label": {
+        "cause": [
+          "정상",
+          "문제 없",
+          "문제가 없",
+          "에러 없",
+          "에러가 없",
+          "0건",
+          "0%",
+          "양호",
+          "안정"
+        ],
+        "fix": [
+          "정상",
+          "모니터링",
+          "문제 없",
+          "괜찮",
+          "안정"
+        ],
+        "mustNot": [
+          "장애가 발생",
+          "원인은",
+          "스로틀"
+        ],
+        "tools": [
+          "get_function_status|get_logs"
+        ]
+      }
+    },
+    {
+      "id": "s15",
+      "source": "format-based",
+      "title": "에러 없는 결과 0건 (C-06 유형의 조용한 장애)",
+      "message": "배터리 검색(BatteryHealthAssessment)이 에러는 없는데 항상 결과가 0건이래",
+      "functions": {
+        "BatteryHealthAssessmentFunction": {
+          "status": {
+            "invocations": 88,
+            "errors": 0,
+            "avgDuration": 140
+          },
+          "logs": [
+            "INFO Scanned 0 battery items (filter: SK ends with #METADATA)",
+            "INFO Returning 0 results"
+          ],
+          "errorSummary": []
+        }
+      },
+      "label": {
+        "cause": [
+          "0개",
+          "0건",
+          "필터",
+          "filter",
+          "#METADATA",
+          "SK",
+          "조회 조건",
+          "데이터가 조회되지",
+          "키 형식",
+          "스캔"
+        ],
+        "fix": [
+          "필터",
+          "filter",
+          "SK",
+          "조건",
+          "키",
+          "수정",
+          "METADATA"
+        ],
+        "mustNot": [
+          "원인은 스로틀",
+          "원인은 권한",
+          "정상입니다"
+        ],
+        "tools": [
+          "get_logs|get_function_status"
+        ]
+      }
+    },
+    {
+      "id": "s16",
+      "source": "format-based",
+      "title": "콜드 스타트 지연",
+      "message": "아침 첫 검색만 유독 느려요. 왜 그래?",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 60,
+            "errors": 0,
+            "avgDuration": 900
+          },
+          "logs": [
+            "INFO REPORT RequestId: a1 Duration: 2310.55 ms Billed Duration: 2311 ms Memory Size: 1024 MB Max Memory Used: 190 MB Init Duration: 1450.21 ms",
+            "INFO REPORT RequestId: a2 Duration: 280.10 ms Billed Duration: 281 ms Memory Size: 1024 MB Max Memory Used: 192 MB",
+            "INFO REPORT RequestId: a3 Duration: 301.44 ms Billed Duration: 302 ms Memory Size: 1024 MB Max Memory Used: 192 MB"
+          ],
+          "errorSummary": []
+        }
+      },
+      "label": {
+        "cause": [
+          "콜드 스타트",
+          "cold start",
+          "Cold Start",
+          "Init Duration",
+          "초기화"
+        ],
+        "fix": [
+          "Provisioned Concurrency",
+          "프로비저닝된 동시성",
+          "워밍",
+          "warm",
+          "번들",
+          "초기화 시간",
+          "SnapStart"
+        ],
+        "mustNot": [
+          "원인은 스로틀",
+          "원인은 권한"
+        ],
+        "tools": [
+          "get_logs|get_function_status"
+        ]
+      }
+    },
+    {
+      "id": "s17",
+      "source": "format-based",
+      "title": "메모리 부족으로 런타임 종료",
+      "message": "SyntheticData 대량 생성하면 중간에 죽어",
+      "functions": {
+        "SyntheticDataFunction": {
+          "status": {
+            "invocations": 6,
+            "errors": 6,
+            "avgDuration": 41000
+          },
+          "logs": [
+            "ERROR RequestId: 9c2 Error: Runtime exited with error: signal: killed Runtime.ExitError",
+            "INFO REPORT RequestId: 9c2 Duration: 41022.61 ms Billed Duration: 41023 ms Memory Size: 512 MB Max Memory Used: 512 MB"
+          ],
+          "errorSummary": [
+            [
+              "ExitError",
+              6
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "메모리",
+          "memory",
+          "Memory",
+          "OOM",
+          "signal: killed",
+          "Max Memory Used"
+        ],
+        "fix": [
+          "MemorySize",
+          "메모리를 늘",
+          "메모리 증가",
+          "메모리 상향",
+          "배치",
+          "나눠",
+          "분할"
+        ],
+        "mustNot": [
+          "원인은 스로틀",
+          "원인은 권한",
+          "Legacy"
+        ],
+        "tools": [
+          "get_logs|get_error_summary|analyze_error"
+        ]
+      }
+    },
+    {
+      "id": "s18",
+      "source": "format-based",
+      "title": "Slack 3초 제한 초과로 인한 재시도 (C-13 유형)",
+      "message": "자동이 답변이 가끔 두 번씩 오거나 안 와. SlackAgent 확인해줘",
+      "functions": {
+        "SlackAgentFunction": {
+          "status": {
+            "invocations": 74,
+            "errors": 0,
+            "avgDuration": 6200
+          },
+          "logs": [
+            "INFO Slack retry detected: { retryNum: '1', retryReason: 'http_timeout' }",
+            "INFO Slack retry detected: { retryNum: '2', retryReason: 'http_timeout' }",
+            "INFO REPORT RequestId: b7 Duration: 6830.02 ms Billed Duration: 6831 ms Memory Size: 1024 MB Max Memory Used: 260 MB"
+          ],
+          "errorSummary": []
+        }
+      },
+      "label": {
+        "cause": [
+          "3초",
+          "http_timeout",
+          "재시도",
+          "retry",
+          "응답 시간",
+          "응답이 늦"
+        ],
+        "fix": [
+          "비동기",
+          "즉시 응답",
+          "ack",
+          "SQS",
+          "큐",
+          "멱등",
+          "중복 처리"
+        ],
+        "mustNot": [
+          "원인은 스로틀",
+          "원인은 권한",
+          "Legacy"
+        ],
+        "tools": [
+          "get_logs|get_function_status"
+        ]
+      }
+    },
+    {
+      "id": "s19",
+      "source": "format-based",
+      "title": "존재하지 않는 함수 (지어내기 방지)",
+      "message": "PaymentFunction 에러율 알려줘",
+      "functions": {},
+      "label": {
+        "cause": [
+          "찾을 수 없",
+          "존재하지 않",
+          "존재 여부",
+          "함수명이 정확하지",
+          "확인되지 않",
+          "데이터가 없",
+          "목록에 없",
+          "없는 함수"
+        ],
+        "fix": [
+          "함수 이름",
+          "함수명",
+          "확인",
+          "목록"
+        ],
+        "mustNot": [
+          "에러율은 0",
+          "에러율이 0",
+          "정상입니다",
+          "정상 상태",
+          "에러가 없는 상태",
+          "에러가 발생하지 않았",
+          "상태**: 정상",
+          "정상 ✅"
+        ],
+        "tools": [
+          "get_function_status|get_logs"
+        ]
+      }
+    },
+    {
+      "id": "s20",
+      "source": "format-based",
+      "title": "스로틀링과 무관한 경고가 섞인 로그 (주원인 식별)",
+      "message": "MaterialPropertySearch가 실패하는 이유가 뭐야?",
+      "functions": {
+        "MaterialPropertySearchFunction": {
+          "status": {
+            "invocations": 140,
+            "errors": 21,
+            "avgDuration": 700
+          },
+          "logs": [
+            "ERROR (node:2) Warning: NodeVersionSupportWarning: The AWS SDK for JavaScript (v3) versions published after the first week of January 2027 will require node >=22.",
+            "ERROR Error in material search: ProvisionedThroughputExceededException: Throughput exceeds the current capacity of your table or index. DynamoDB is automatically scaling your table or index so please try again shortly.",
+            "ERROR Error in material search: ProvisionedThroughputExceededException: Throughput exceeds the current capacity of your table or index."
+          ],
+          "errorSummary": [
+            [
+              "ProvisionedThroughputExceededException",
+              21
+            ],
+            [
+              "NodeVersionSupportWarning",
+              1
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "처리량",
+          "throughput",
+          "Throughput",
+          "용량",
+          "capacity",
+          "ProvisionedThroughputExceeded"
+        ],
+        "fix": [
+          "재시도",
+          "백오프",
+          "backoff",
+          "용량",
+          "온디맨드",
+          "on-demand",
+          "Scan",
+          "Query",
+          "GSI",
+          "인덱스"
+        ],
+        "mustNot": [
+          "원인은 Node",
+          "Node 버전 때문",
+          "NodeVersionSupportWarning 때문"
+        ],
+        "tools": [
+          "get_logs|get_error_summary|analyze_error"
+        ]
+      }
+    }
+  ]
+}
