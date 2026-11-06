@@ -56,16 +56,18 @@ describe('runReActAgent', () => {
     expect(JSON.stringify(secondCall.messages)).toContain('ThrottlingException');
   });
 
-  it('offers the config tools by default and only the named tools when toolNames is given', async () => {
+  it('offers only production tools by default; evaluation can turn on the experimental config tools', async () => {
     const seen: string[][] = [];
     const converse = jest.fn(async (input: ConverseCommandInput) => {
       seen.push((input.toolConfig?.tools ?? []).map(t => t.toolSpec?.name ?? ''));
       return finalTurn('정상입니다.');
     });
     await runReActAgent('상태 알려줘', context, { converse, emit: false, modelOverride: HAIKU });
-    await runReActAgent('상태 알려줘', context, { converse, emit: false, modelOverride: HAIKU, toolNames: ['get_logs'] });
-    expect(seen[0]).toEqual(expect.arrayContaining(['get_function_config', 'get_function_permissions', 'get_logs']));
-    expect(seen[1]).toEqual(['get_logs']);
+    await runReActAgent('상태 알려줘', context, { converse, emit: false, modelOverride: HAIKU, toolNames: ['get_logs', 'get_function_config'] });
+    // 홀드아웃 v2에서 채택 기준을 넘지 못해 운영에는 노출하지 않는다 (E-32)
+    expect(seen[0]).toHaveLength(6);
+    expect(seen[0]).not.toContain('get_function_config');
+    expect(seen[1]).toEqual(['get_logs', 'get_function_config']);
   });
 
   it('counts tool errors and passes the error text to the model', async () => {

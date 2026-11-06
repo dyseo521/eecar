@@ -9,7 +9,13 @@ import { recallMemory, saveMemory } from './memory.js';
 import { getFunctionConfig, getFunctionPermissions } from './config.js';
 
 /**
- * 사용 가능한 도구 목록
+ * 운영에서 모델에 보여주는 도구. 설정·권한 조회 도구(get_function_config, get_function_permissions)는
+ * 홀드아웃 v2에서 사전 등록 기준을 넘지 못해 운영에는 노출하지 않고 평가에서만 켠다 (E-32, A-38)
+ */
+export const PRODUCTION_TOOL_NAMES = ['analyze_error', 'get_logs', 'get_function_status', 'get_error_summary', 'recall_memory', 'save_memory'];
+
+/**
+ * 도구 정의 전체 (평가용 실험 도구 포함)
  */
 export const TOOLS: Tool[] = [
   {

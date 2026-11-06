@@ -17,7 +17,7 @@ import {
 } from '@aws-sdk/client-bedrock-runtime';
 import { AgentStep, ToolResult } from './types.js';
 import { JADONG_SYSTEM_PROMPT } from './prompts/system.js';
-import { TOOLS, executeTool } from './tools/index.js';
+import { PRODUCTION_TOOL_NAMES, TOOLS, executeTool } from './tools/index.js';
 import { emitMetrics } from '/opt/nodejs/utils/emf.js';
 
 const bedrockClient = new BedrockRuntimeClient({ region: 'ap-northeast-2' });
@@ -64,7 +64,7 @@ export interface AgentDeps {
   systemPrompt?: string;
   /** false면 앞 턴의 분석을 최종 답에 붙이지 않는다 (평가에서 이전 동작 재현) */
   mergeAnalysis?: boolean;
-  /** 모델에 보여줄 도구 이름. 없으면 전부 (평가에서 도구를 추가하기 전 동작 재현) */
+  /** 모델에 보여줄 도구 이름. 없으면 운영 도구(PRODUCTION_TOOL_NAMES). 평가에서 실험 도구를 켤 때 쓴다 */
   toolNames?: string[];
 }
 
@@ -143,7 +143,8 @@ export async function runReActAgent(
   let lastAnalysis = '';
 
   // Bedrock Converse API용 도구 정의
-  const tools = TOOLS.filter(tool => !deps.toolNames || deps.toolNames.includes(tool.name)).map((tool) => ({
+  const offered = deps.toolNames ?? PRODUCTION_TOOL_NAMES;
+  const tools = TOOLS.filter(tool => offered.includes(tool.name)).map((tool) => ({
     toolSpec: {
       name: tool.name,
       description: tool.description,
