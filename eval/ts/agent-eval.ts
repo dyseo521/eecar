@@ -183,14 +183,14 @@ function logEntries(lines: string[]) {
   });
 }
 
-/** 시나리오의 "지금": 로그와 변경 이력에서 가장 늦은 시각의 5분 뒤. 시각이 없으면 고정 시각 */
+/** 시나리오의 "지금": 작성자 노트대로 마지막 로그 직후(가장 늦은 시각의 1분 뒤). 시각이 없으면 고정 시각 */
 export function scenarioClock(scenario: Scenario): string {
   normalizeScenario(scenario);
   const times = [
     ...Object.values(scenario.functions).flatMap(f => (f.logs ?? []).map(l => ISO_PREFIX.exec(l)?.[0])),
     ...(scenario.world?.changes ?? []).map(c => c.time),
   ].map(t => (t ? Date.parse(t) : NaN)).filter(t => !Number.isNaN(t));
-  return new Date(times.length ? Math.max(...times) + 5 * 60_000 : FIXED_CLOCK).toISOString();
+  return new Date(times.length ? Math.max(...times) + 60_000 : FIXED_CLOCK).toISOString();
 }
 
 function healthy(name: string) {

@@ -87,7 +87,7 @@ export const DIAGNOSIS_INVESTIGATE_PROMPT = '결론을 내기 전에 도구로 �
 
 /** 시스템 프롬프트에 붙이는 현재 시각. 없으면 모델은 "최근"이나 "이미 회복됨"을 판단할 기준이 없다 (A-40) */
 export const currentTimeSection = (iso: string): string =>
-  `\n\n# 현재 시각\n${iso} (UTC). 로그와 변경 이력의 시각도 UTC다. "최근"과 "이미 회복됨"은 이 시각을 기준으로 판단한다.`;
+  `\n\n# 현재 시각\n${iso} (UTC). 로그와 변경 이력의 시각도 UTC이고, 사용자는 보통 한국 시간(KST, UTC+9)으로 말한다. "최근"과 "이미 회복됨"은 이 시각을 기준으로 판단한다.`;
 
 const VERDICT_LABEL: Record<string, string> = {
   root_cause: '🎯 원인 확인',
