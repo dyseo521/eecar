@@ -1,0 +1,1467 @@
+{
+  "description": "자동이 블라인드 홀드아웃 장애 진단 시나리오 15개 (2026-11-06 작성). 에이전트 프롬프트·오케스트레이터·기존 시나리오·평가 보고서를 보지 않고 infrastructure/template.yaml과 backend/src/functions 코드만 참고해 작성했다. 로그는 이 코드베이스가 실제로 남기는 문구와 AWS SDK v3·Lambda 런타임 메시지 형식을 따른다. 핸들러가 catch해서 500을 돌려주는 에러는 Lambda Errors 지표에 잡히지 않으므로 status.errors를 0으로 두었다 (로그에는 ERROR가 남는다). errorSummary는 get_error_summary의 정규식([A-Za-z]+Exception|[A-Za-z]+Error)이 뽑을 유형을 따랐다 (일치하지 않으면 Unknown, 'Task timed out'은 집계되지 않음). 장애 없음/무해: h11, h12, h13, h14(모호한 질문). 레드 헤링 포함: h01, h03, h07, h08, h15. mustNot은 부정문('~때문은 아닙니다')에 걸리지 않도록 단정형 어미로 적었다.",
+  "scenarios": [
+    {
+      "id": "h01",
+      "source": "format-based",
+      "title": "사진 첨부 시 부품 등록 실패",
+      "message": "판매자분들이 부품 등록할 때 '서버 오류가 발생했습니다'가 뜬다고 하네요. 사진 없이 올리면 되고, 사진 4~5장 첨부하면 실패한대요. 지난 한 시간 로그 좀 봐주실래요?",
+      "functions": {
+        "PartRegistrationFunction": {
+          "status": {
+            "invocations": 57,
+            "errors": 0,
+            "avgDuration": 710
+          },
+          "logs": [
+            "INFO Registering new part: 3f1c9a7e-5d2b-4c8e-9a61-0b7d2e4f8c13",
+            "ERROR Error in part registration: ValidationException: Item size has exceeded the maximum allowed size",
+            "REPORT Duration: 186.42 ms Billed Duration: 187 ms Memory Size: 1024 MB Max Memory Used: 243 MB",
+            "INFO Registering new part: 9b2e4d10-7a3f-4e55-8c21-6f0a1d9e3b47",
+            "INFO Part metadata stored",
+            "INFO Part specifications stored",
+            "INFO Generating embedding...",
+            "INFO Vector uploaded to S3 (JSON)",
+            "ERROR Failed to upload to S3 Vectors: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-PartRegistrationFunctionRole-3XN8C1V5B7QZ/eecar-stack-PartRegistrationFunction-Wm4kR9tY2uPa is not authorized to perform: s3vectors:PutVectors on resource: arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/parts-vectors because no identity-based policy allows the s3vectors:PutVectors action",
+            "INFO Invoking compliance check...",
+            "INFO Compliance check invoked",
+            "REPORT Duration: 912.77 ms Billed Duration: 913 ms Memory Size: 1024 MB Max Memory Used: 251 MB",
+            "INFO Registering new part: c7d8e9f0-1a2b-4c3d-8e5f-6a7b8c9d0e1f",
+            "ERROR Error in part registration: ValidationException: Item size has exceeded the maximum allowed size",
+            "REPORT Duration: 171.05 ms Billed Duration: 172 ms Memory Size: 1024 MB Max Memory Used: 262 MB",
+            "INFO Registering new part: 1d4e7a2b-3c6f-4a19-b8d0-5e2f9c7a6b31",
+            "INFO Part metadata stored",
+            "INFO Generating embedding...",
+            "INFO Vector uploaded to S3 (JSON)",
+            "ERROR Failed to upload to S3 Vectors: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-PartRegistrationFunctionRole-3XN8C1V5B7QZ/eecar-stack-PartRegistrationFunction-Wm4kR9tY2uPa is not authorized to perform: s3vectors:PutVectors on resource: arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/parts-vectors because no identity-based policy allows the s3vectors:PutVectors action",
+            "INFO Invoking compliance check...",
+            "INFO Compliance check invoked",
+            "INFO Registering new part: 6a9b3c5d-8e1f-4072-a4b6-c3d2e1f0a9b8",
+            "ERROR Error in part registration: ValidationException: Item size has exceeded the maximum allowed size"
+          ],
+          "errorSummary": [
+            [
+              "AccessDeniedException",
+              48
+            ],
+            [
+              "ValidationException",
+              9
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "400KB",
+          "400 KB",
+          "400킬로",
+          "400kb",
+          "base64",
+          "Base64",
+          "BASE64",
+          "인라인",
+          "inline",
+          "이미지 데이터가",
+          "이미지 데이터를",
+          "사진 데이터",
+          "이미지를 그대로",
+          "사진을 그대로",
+          "이미지를 항목에",
+          "이미지가 항목에",
+          "이미지가 아이템에",
+          "이미지를 아이템에",
+          "이미지를 DynamoDB에",
+          "이미지가 DynamoDB에",
+          "images 필드",
+          "images 배열"
+        ],
+        "fix": [
+          "S3에 업로드",
+          "S3에 올리",
+          "S3에 저장",
+          "S3로 옮",
+          "S3로 분리",
+          "S3에 따로",
+          "presigned",
+          "Presigned",
+          "사전 서명",
+          "URL만 저장",
+          "키만 저장",
+          "URL만 DynamoDB",
+          "참조만 저장",
+          "경로만 저장",
+          "URL만 남"
+        ],
+        "mustNot": [
+          "등록 실패의 원인은 S3 Vectors 권한",
+          "S3 Vectors 권한 때문입니다",
+          "PutVectors 권한 때문입니다",
+          "PutVectors 권한이 없어서 등록이 실패",
+          "권한 문제로 등록이 실패",
+          "원인은 IAM 권한 부족입니다",
+          "6MB 제한 때문입니다",
+          "10MB 제한 때문입니다",
+          "Bedrock 스로틀링 때문입니다",
+          "임베딩 생성 실패 때문입니다"
+        ],
+        "tools": [
+          "get_logs"
+        ]
+      }
+    },
+    {
+      "id": "h02",
+      "source": "format-based",
+      "title": "배포 후 검색 대부분 실패, 일부 검색어만 성공",
+      "message": "어제 저녁에 v2.6.0 배포했는데 오늘 아침부터 검색이 대부분 500이에요. 근데 '코나 배터리' 같은 몇몇 검색어는 또 결과가 잘 나오고요. 배포 내용은 리랭킹 실험 코드랑 설정값 몇 개 정리한 거라고 들었어요. 원인 좀 찾아줘.",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 412,
+            "errors": 0,
+            "avgDuration": 690
+          },
+          "logs": [
+            "INFO Processing search query: 아이오닉5 배터리 팩 70kWh",
+            "ERROR Error in vector search: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-VectorSearchFunctionRole-7KQ2M9XW4D1A/eecar-stack-VectorSearchFunction-hT3pLq8RvZ2e is not authorized to perform: s3vectors:QueryVectors on resource: arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/parts-vectors-v2 because no identity-based policy allows the s3vectors:QueryVectors action",
+            "INFO Processing search query: 코나 배터리",
+            "INFO Cache hit!",
+            "REPORT Duration: 52.31 ms Billed Duration: 53 ms Memory Size: 1024 MB Max Memory Used: 214 MB",
+            "INFO Processing search query: 모터 인버터 세트",
+            "ERROR Error in vector search: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-VectorSearchFunctionRole-7KQ2M9XW4D1A/eecar-stack-VectorSearchFunction-hT3pLq8RvZ2e is not authorized to perform: s3vectors:QueryVectors on resource: arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/parts-vectors-v2 because no identity-based policy allows the s3vectors:QueryVectors action",
+            "INFO Processing search query: 니로 EV 구동모터",
+            "ERROR Error in vector search: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-VectorSearchFunctionRole-7KQ2M9XW4D1A/eecar-stack-VectorSearchFunction-hT3pLq8RvZ2e is not authorized to perform: s3vectors:QueryVectors on resource: arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/parts-vectors-v2 because no identity-based policy allows the s3vectors:QueryVectors action",
+            "INFO Processing search query: 코나 배터리",
+            "INFO Cache hit!",
+            "INFO Processing search query: 알루미늄 서브프레임",
+            "ERROR Error in vector search: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-VectorSearchFunctionRole-7KQ2M9XW4D1A/eecar-stack-VectorSearchFunction-hT3pLq8RvZ2e is not authorized to perform: s3vectors:QueryVectors on resource: arn:aws:s3vectors:ap-northeast-2:425454508084:bucket/eecar-vectors-index-12234628/index/parts-vectors-v2 because no identity-based policy allows the s3vectors:QueryVectors action",
+            "REPORT Duration: 388.90 ms Billed Duration: 389 ms Memory Size: 1024 MB Max Memory Used: 221 MB"
+          ],
+          "errorSummary": [
+            [
+              "AccessDeniedException",
+              287
+            ]
+          ],
+          "config": {
+            "lastModified": "2026-11-05T11:42:10.000+0000",
+            "environment": {
+              "S3_VECTORS_INDEX": "parts-vectors-v2"
+            }
+          }
+        }
+      },
+      "label": {
+        "cause": [
+          "S3_VECTORS_INDEX",
+          "인덱스 이름이 바뀌",
+          "인덱스 이름을 바꾸",
+          "인덱스 이름 변경",
+          "인덱스 이름이 변경",
+          "인덱스명이 바뀌",
+          "인덱스명 변경",
+          "인덱스명이 변경",
+          "새 인덱스",
+          "환경 변수",
+          "환경변수",
+          "env var",
+          "environment variable",
+          "정책의 Resource",
+          "정책 리소스",
+          "정책의 리소스",
+          "기존 인덱스(parts-vectors)만",
+          "parts-vectors만 허용",
+          "parts-vectors 인덱스만"
+        ],
+        "fix": [
+          "정책에 추가",
+          "정책에 parts-vectors-v2",
+          "Resource에 추가",
+          "리소스에 추가",
+          "리소스 ARN에",
+          "권한을 추가",
+          "권한 추가",
+          "parts-vectors로 되돌",
+          "원래 값으로",
+          "이전 값으로",
+          "롤백",
+          "rollback",
+          "revert",
+          "되돌리",
+          "되돌려"
+        ],
+        "mustNot": [
+          "검색어 때문입니다",
+          "특정 검색어가 문제입니다",
+          "Bedrock 스로틀링 때문입니다",
+          "bedrock:InvokeModel 권한이 없",
+          "캐시가 원인입니다",
+          "캐시 때문에 실패",
+          "DynamoDB 스로틀링 때문입니다"
+        ],
+        "tools": [
+          "get_logs"
+        ]
+      }
+    },
+    {
+      "id": "h03",
+      "source": "format-based",
+      "title": "필터 변경 후 부품 목록 다음 페이지 500",
+      "message": "부품 목록에서 카테고리 필터 걸었다가 '전체'로 바꾸고 스크롤 내리면 다음 페이지 불러올 때 500이 난다는 제보가 있어요. 첫 페이지는 잘 나오고요. GetParts 쪽 좀 봐줄래요?",
+      "functions": {
+        "GetPartsFunction": {
+          "status": {
+            "invocations": 1840,
+            "errors": 0,
+            "avgDuration": 74
+          },
+          "logs": [
+            "(node:2) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.",
+            "REPORT Duration: 612.18 ms Billed Duration: 1001 ms Memory Size: 512 MB Max Memory Used: 97 MB Init Duration: 388.40 ms",
+            "REPORT Duration: 58.02 ms Billed Duration: 59 ms Memory Size: 512 MB Max Memory Used: 98 MB",
+            "ERROR Error in get-parts: ValidationException: The provided starting key is invalid: The provided key element does not match the schema",
+            "REPORT Duration: 41.87 ms Billed Duration: 42 ms Memory Size: 512 MB Max Memory Used: 98 MB",
+            "(node:2) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.",
+            "REPORT Duration: 63.55 ms Billed Duration: 64 ms Memory Size: 512 MB Max Memory Used: 99 MB",
+            "ERROR Error in get-parts: ValidationException: The provided starting key is invalid: The provided key element does not match the schema",
+            "ERROR Error in get-parts: ValidationException: The provided starting key is invalid: The provided key element does not match the schema",
+            "REPORT Duration: 39.20 ms Billed Duration: 40 ms Memory Size: 512 MB Max Memory Used: 99 MB"
+          ],
+          "errorSummary": [
+            [
+              "ValidationException",
+              23
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "커서",
+          "cursor",
+          "Cursor",
+          "ExclusiveStartKey",
+          "LastEvaluatedKey",
+          "페이지네이션 토큰",
+          "페이지 토큰",
+          "nextCursor",
+          "다른 인덱스의 키",
+          "GSI1의 키",
+          "GSI1 키",
+          "GSI2PK가 없",
+          "GSI2 키가 없"
+        ],
+        "fix": [
+          "커서를 초기화",
+          "커서 초기화",
+          "커서를 리셋",
+          "커서 리셋",
+          "cursor reset",
+          "reset the cursor",
+          "reset cursor",
+          "커서를 버리",
+          "커서를 비우",
+          "커서를 새로",
+          "쿼리 키에 카테고리",
+          "queryKey에",
+          "query key에",
+          "커서를 검증",
+          "커서 검증",
+          "validate the cursor",
+          "400을 반환",
+          "400으로 응답",
+          "400 응답",
+          "400 에러로"
+        ],
+        "mustNot": [
+          "punycode 때문입니다",
+          "punycode가 원인입니다",
+          "punycode 모듈이 원인",
+          "DeprecationWarning 때문입니다",
+          "Node.js 버전 문제입니다",
+          "테이블 스키마가 변경되었",
+          "테이블을 다시 만들",
+          "GSI를 다시 생성",
+          "원인은 IAM 권한 부족입니다",
+          "스로틀링 때문입니다"
+        ],
+        "tools": [
+          "get_logs"
+        ]
+      }
+    },
+    {
+      "id": "h04",
+      "source": "format-based",
+      "title": "배터리 SOH 검색 간헐적 실패",
+      "message": "배터리 SOH 검색이 오늘 오후부터 열 번에 두세 번꼴로 실패해요. 같은 조건으로 다시 누르면 될 때도 있고요. 뭐가 문제인지 봐줘.",
+      "functions": {
+        "BatteryHealthAssessmentFunction": {
+          "status": {
+            "invocations": 286,
+            "errors": 0,
+            "avgDuration": 2350
+          },
+          "logs": [
+            "REPORT Duration: 1810.44 ms Billed Duration: 1811 ms Memory Size: 512 MB Max Memory Used: 268 MB",
+            "ERROR Battery health assessment error: Error: BatchGetItem left 64 keys unprocessed after 4 attempts",
+            "REPORT Duration: 3120.55 ms Billed Duration: 3121 ms Memory Size: 512 MB Max Memory Used: 287 MB",
+            "REPORT Duration: 1954.02 ms Billed Duration: 1955 ms Memory Size: 512 MB Max Memory Used: 289 MB",
+            "ERROR Battery health assessment error: Error: BatchGetItem left 37 keys unprocessed after 4 attempts",
+            "ERROR Battery health assessment error: Error: BatchGetItem left 100 keys unprocessed after 4 attempts",
+            "REPORT Duration: 3388.71 ms Billed Duration: 3389 ms Memory Size: 512 MB Max Memory Used: 301 MB"
+          ],
+          "errorSummary": [
+            [
+              "Unknown",
+              71
+            ]
+          ]
+        },
+        "SyntheticDataFunction": {
+          "status": {
+            "invocations": 34,
+            "errors": 0,
+            "avgDuration": 62000
+          },
+          "logs": [
+            "INFO Generating 50 synthetic parts for category: battery",
+            "INFO Generated part 1/50: 0e5c7a91-2d4b-4f86-b3a0-91c7e2d8f4a5 (1288ms)",
+            "INFO Generated part 50/50: 7b1d3e5f-9a2c-4e68-8d0b-f4a6c2e9b137 (61234ms)",
+            "INFO Generating 50 synthetic parts for category: battery",
+            "INFO Generated part 50/50: a2c4e6f8-1b3d-4f5a-9c7e-0d2f4b6a8c91 (60871ms)"
+          ],
+          "errorSummary": []
+        }
+      },
+      "label": {
+        "cause": [
+          "스로틀",
+          "Throttl",
+          "throttl",
+          "처리량",
+          "용량 초과",
+          "읽기 용량",
+          "read capacity",
+          "RCU",
+          "한꺼번에 너무 많은 키",
+          "읽어야 할 키가 늘",
+          "키 수가 늘",
+          "배터리 부품 수가 늘",
+          "부품 수가 급증",
+          "부품 수가 늘",
+          "데이터가 급증",
+          "합성 데이터로 부품",
+          "합성 데이터가 계속"
+        ],
+        "fix": [
+          "백오프",
+          "backoff",
+          "지터",
+          "jitter",
+          "재시도 횟수를 늘",
+          "재시도를 늘",
+          "재시도 한도를 늘",
+          "캐시",
+          "cache",
+          "미리 계산",
+          "사전 계산",
+          "비정규화",
+          "denormaliz",
+          "METADATA에 함께 저장",
+          "METADATA에 포함",
+          "읽는 키 수를 줄",
+          "읽는 양을 줄",
+          "필요한 부품만",
+          "warm throughput",
+          "웜 처리량",
+          "프로비저닝 용량",
+          "합성 데이터 생성을 멈",
+          "합성 데이터 생성 속도",
+          "생성 속도를 제한"
+        ],
+        "mustNot": [
+          "원인은 IAM 권한 부족입니다",
+          "권한 문제입니다",
+          "Bedrock 스로틀링 때문입니다",
+          "키 형식이 잘못되었",
+          "100개 제한을 초과해서",
+          "100개 한도를 넘겨서",
+          "코드 버그로 키가 잘못"
+        ],
+        "tools": [
+          "get_logs"
+        ]
+      }
+    },
+    {
+      "id": "h05",
+      "source": "format-based",
+      "title": "긴 설명 부품 등록 실패와 중복 생성",
+      "message": "협력사 한 곳이 배터리 팩 등록하면서 데이터시트 내용을 설명란에 통째로 붙여넣었는데 계속 '등록 실패'가 떠서 세 번이나 다시 눌렀대요. 근데 부품 목록엔 같은 부품이 3개 생겨 있다네요. 무슨 일인지 봐줄래요?",
+      "functions": {
+        "PartRegistrationFunction": {
+          "status": {
+            "invocations": 31,
+            "errors": 0,
+            "avgDuration": 820
+          },
+          "logs": [
+            "INFO Registering new part: 5e0d2c1b-8f4a-4b7e-9c3d-2a1f0e9d8c7b",
+            "INFO Part metadata stored",
+            "INFO Part specifications stored",
+            "INFO Stored 4 use cases",
+            "INFO Generating embedding...",
+            "ERROR Error in part registration: ValidationException: 400 Bad Request: Too many input tokens. Max input tokens: 8192, request input token count: 15873",
+            "REPORT Duration: 642.19 ms Billed Duration: 643 ms Memory Size: 1024 MB Max Memory Used: 233 MB",
+            "INFO Registering new part: 8a7b6c5d-4e3f-4a2b-9c1d-0e9f8a7b6c5d",
+            "INFO Part metadata stored",
+            "INFO Part specifications stored",
+            "INFO Stored 4 use cases",
+            "INFO Generating embedding...",
+            "ERROR Error in part registration: ValidationException: 400 Bad Request: Too many input tokens. Max input tokens: 8192, request input token count: 15873",
+            "INFO Registering new part: b3c4d5e6-f7a8-4b9c-8d0e-1f2a3b4c5d6e",
+            "INFO Part metadata stored",
+            "INFO Part specifications stored",
+            "INFO Stored 4 use cases",
+            "INFO Generating embedding...",
+            "ERROR Error in part registration: ValidationException: 400 Bad Request: Too many input tokens. Max input tokens: 8192, request input token count: 15873",
+            "REPORT Duration: 598.03 ms Billed Duration: 599 ms Memory Size: 1024 MB Max Memory Used: 236 MB"
+          ],
+          "errorSummary": [
+            [
+              "ValidationException",
+              3
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "토큰 한도",
+          "토큰 제한",
+          "토큰 상한",
+          "토큰 수가 초과",
+          "토큰 수 초과",
+          "토큰을 초과",
+          "입력이 너무 길",
+          "입력 길이",
+          "설명이 너무 길",
+          "설명 길이",
+          "텍스트가 너무 길",
+          "임베딩 입력",
+          "임베딩 모델의 입력",
+          "token limit",
+          "too long"
+        ],
+        "fix": [
+          "잘라",
+          "자르",
+          "truncate",
+          "길이 제한",
+          "길이를 제한",
+          "길이 검증",
+          "글자 수 제한",
+          "청크",
+          "chunk",
+          "분할해서"
+        ],
+        "mustNot": [
+          "원인은 IAM 권한 부족입니다",
+          "권한 문제입니다",
+          "Bedrock 스로틀링 때문입니다",
+          "모델 접근 권한이 없",
+          "아이템 크기 제한 때문입니다",
+          "400KB 제한 때문입니다",
+          "DynamoDB 400KB 제한을 초과"
+        ],
+        "tools": [
+          "get_logs"
+        ]
+      }
+    },
+    {
+      "id": "h06",
+      "source": "format-based",
+      "title": "새 도메인에서만 부품 목록이 안 뜸",
+      "message": "새 도메인(https://www.eecar.co.kr) 연결하고 나서 거기로 들어가면 부품 목록이 안 떠요. 크롬 콘솔에는 이렇게 나와요:\nAccess to fetch at 'https://k2x9q7m1ab.execute-api.ap-northeast-2.amazonaws.com/prod/api/parts?limit=20' from origin 'https://www.eecar.co.kr' has been blocked by CORS policy: The 'Access-Control-Allow-Origin' header has a value 'http://localhost:3000' that is not equal to the supplied origin. Have the server send the header with a valid value, or, if an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.\n기존 CloudFront 주소로 들어가면 잘 되고요. API가 죽은 건가요?",
+      "functions": {
+        "GetPartsFunction": {
+          "status": {
+            "invocations": 2210,
+            "errors": 0,
+            "avgDuration": 68
+          },
+          "logs": [
+            "REPORT Duration: 63.21 ms Billed Duration: 64 ms Memory Size: 512 MB Max Memory Used: 104 MB",
+            "REPORT Duration: 71.90 ms Billed Duration: 72 ms Memory Size: 512 MB Max Memory Used: 104 MB",
+            "REPORT Duration: 58.47 ms Billed Duration: 59 ms Memory Size: 512 MB Max Memory Used: 105 MB",
+            "REPORT Duration: 66.12 ms Billed Duration: 67 ms Memory Size: 512 MB Max Memory Used: 105 MB"
+          ],
+          "errorSummary": []
+        }
+      },
+      "label": {
+        "cause": [
+          "ALLOWED_ORIGINS",
+          "허용 목록",
+          "허용 오리진",
+          "허용된 오리진",
+          "허용된 origin",
+          "허용 origin",
+          "allowlist",
+          "allow list",
+          "allowed origins",
+          "오리진 목록",
+          "origin 목록",
+          "등록되지 않은 도메인",
+          "등록되지 않은 origin",
+          "등록되지 않은 오리진",
+          "기본값인 localhost",
+          "기본값 localhost",
+          "localhost로 응답",
+          "localhost를 돌려",
+          "localhost:3000으로 응답",
+          "localhost:3000을 돌려",
+          "localhost로 대체",
+          "localhost로 폴백"
+        ],
+        "fix": [
+          "ALLOWED_ORIGINS에",
+          "허용 목록에 추가",
+          "허용 목록에 새",
+          "오리진을 추가",
+          "origin을 추가",
+          "도메인을 추가",
+          "도메인 추가",
+          "add the origin",
+          "response.ts"
+        ],
+        "mustNot": [
+          "OPTIONS 메서드를 추가하",
+          "OPTIONS 메서드가 없어서",
+          "no-cors로 설정하세요",
+          "no-cors 모드로 바꾸",
+          "API Gateway가 다운되었",
+          "Lambda 장애입니다",
+          "Lambda 에러 때문입니다",
+          "타임아웃 때문입니다"
+        ],
+        "tools": [
+          "get_logs|get_function_status"
+        ]
+      }
+    },
+    {
+      "id": "h07",
+      "source": "format-based",
+      "title": "에러 없이 검색이 점점 느려짐",
+      "message": "검색이 2주 전보다 확실히 느려진 것 같아요. 에러는 안 나고요. 체감상 1초 남짓이던 게 요즘은 4~5초씩 걸릴 때가 많아요. 뭐 때문인지 봐줄 수 있어?",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 6420,
+            "errors": 0,
+            "avgDuration": 3870
+          },
+          "logs": [
+            "INFO Processing search query: 아이오닉5 배터리 모듈",
+            "INFO vector 30, bm25 30 (index 1243, loaded) -> ranked 41, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[]}",
+            "{\"_aws\":{\"Timestamp\":1792800000000,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":148,\"VectorSearchMs\":91,\"IndexLoadMs\":1020,\"FusionMs\":37,\"TotalMs\":1262}",
+            "REPORT Duration: 1288.40 ms Billed Duration: 1289 ms Memory Size: 1024 MB Max Memory Used: 318 MB",
+            "{\"_aws\":{\"Timestamp\":1792800004000,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":1270}",
+            "INFO Processing search query: 코나 일렉트릭 인버터",
+            "INFO vector 30, bm25 30 (index 3518, loaded) -> ranked 44, constraints {\"categories\":[\"inverter\"],\"numeric\":[],\"conditions\":[]}",
+            "{\"_aws\":{\"Timestamp\":1793404800000,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":151,\"VectorSearchMs\":94,\"IndexLoadMs\":2880,\"FusionMs\":74,\"TotalMs\":3191}",
+            "REPORT Duration: 3214.77 ms Billed Duration: 3215 ms Memory Size: 1024 MB Max Memory Used: 547 MB",
+            "{\"_aws\":{\"Timestamp\":1793404804000,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":1302}",
+            "WARN Expected 10 explanations, got 9",
+            "INFO Processing search query: 니로 EV 구동모터 150kW",
+            "INFO vector 30, bm25 30 (index 5862, loaded) -> ranked 47, constraints {\"categories\":[\"motor\"],\"numeric\":[{\"field\":\"powerKw\",\"op\":\"gte\",\"value\":150}],\"conditions\":[]}",
+            "{\"_aws\":{\"Timestamp\":1793919600000,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":149,\"VectorSearchMs\":97,\"IndexLoadMs\":4710,\"FusionMs\":118,\"TotalMs\":4985}",
+            "REPORT Duration: 5012.33 ms Billed Duration: 5013 ms Memory Size: 1024 MB Max Memory Used: 761 MB",
+            "{\"_aws\":{\"Timestamp\":1793919604000,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":1315}",
+            "INFO Processing search query: 니로 EV 구동모터",
+            "INFO vector 30, bm25 30 (index 5862) -> ranked 45, constraints {\"categories\":[\"motor\"],\"numeric\":[],\"conditions\":[]}",
+            "{\"_aws\":{\"Timestamp\":1793920200000,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":146,\"VectorSearchMs\":92,\"IndexLoadMs\":0,\"FusionMs\":112,\"TotalMs\":361}",
+            "REPORT Duration: 380.12 ms Billed Duration: 381 ms Memory Size: 1024 MB Max Memory Used: 763 MB"
+          ],
+          "errorSummary": []
+        },
+        "SyntheticDataFunction": {
+          "status": {
+            "invocations": 61,
+            "errors": 0,
+            "avgDuration": 71000
+          },
+          "logs": [
+            "INFO Generating 50 synthetic parts for category: motor",
+            "INFO Generated part 50/50: 4c2a8e6b-1f3d-4a5c-9e7b-2d0f8a6c4e12 (71240ms)",
+            "INFO Generating 50 synthetic parts for category: battery",
+            "INFO Generated part 50/50: 9e1b3d5f-7a2c-4b4e-8f6a-1c3e5a7b9d20 (70385ms)"
+          ],
+          "errorSummary": []
+        }
+      },
+      "label": {
+        "cause": [
+          "색인 크기",
+          "인덱스 크기",
+          "색인 적재",
+          "인덱스 적재",
+          "색인 로딩",
+          "인덱스 로딩",
+          "색인을 다시 읽",
+          "인덱스를 다시 읽",
+          "색인 재적재",
+          "인덱스 재적재",
+          "색인을 매번",
+          "인덱스를 매번",
+          "BM25 색인",
+          "BM25 인덱스",
+          "부품 수가 늘",
+          "부품 수 증가",
+          "부품 수가 증가",
+          "부품 수가 크게",
+          "데이터 양이 늘",
+          "데이터가 늘",
+          "코퍼스",
+          "corpus"
+        ],
+        "fix": [
+          "S3에 직렬화",
+          "직렬화",
+          "serializ",
+          "미리 빌드",
+          "사전 빌드",
+          "미리 만들어",
+          "prebuilt",
+          "precompute",
+          "OpenSearch",
+          "외부 검색 엔진",
+          "검색 엔진으로",
+          "합성 데이터 정리",
+          "합성 데이터를 삭제",
+          "합성 데이터 삭제",
+          "합성 데이터를 정리",
+          "테스트 데이터 정리",
+          "테스트 데이터를 삭제",
+          "증분",
+          "incremental",
+          "TTL을 늘",
+          "TTL 연장",
+          "캐시 유지 시간을 늘"
+        ],
+        "mustNot": [
+          "Bedrock 응답이 느려져서",
+          "설명 생성이 원인입니다",
+          "LLM 설명 생성 때문입니다",
+          "Bedrock 때문입니다",
+          "Bedrock 지연 때문입니다",
+          "콜드 스타트 때문입니다",
+          "메모리 부족 때문입니다",
+          "임베딩 생성이 원인입니다",
+          "S3 Vectors가 느려져서"
+        ],
+        "tools": [
+          "get_logs",
+          "get_function_status"
+        ]
+      }
+    },
+    {
+      "id": "h08",
+      "source": "format-based",
+      "title": "에러 알림이 Slack에 안 옴",
+      "message": "어제 오후부터 #eecar-alerts 채널에 에러 알림이 하나도 안 와요. 오늘 검색 에러 났다는 제보는 있었거든요. 알림 쪽이 고장 난 건지 확인 좀 해줘.",
+      "functions": {
+        "SlackNotificationFunction": {
+          "status": {
+            "invocations": 46,
+            "errors": 46,
+            "avgDuration": 210
+          },
+          "logs": [
+            "INFO Processing 2 log events from /aws/lambda/eecar-stack-VectorSearchFunction-hT3pLq8RvZ2e",
+            "INFO Found 2 error events",
+            "ERROR Failed to process CloudWatch Logs event: AccessDeniedException: The ciphertext refers to a customer master key that does not exist, does not exist in this region, or you are not allowed to access.",
+            "ERROR Invoke Error {\"errorType\":\"AccessDeniedException\",\"errorMessage\":\"The ciphertext refers to a customer master key that does not exist, does not exist in this region, or you are not allowed to access.\",\"name\":\"AccessDeniedException\",\"$fault\":\"client\",\"$metadata\":{\"httpStatusCode\":400,\"requestId\":\"8c1f2a9e-4b7d-4e3a-9f60-2d5c8b1e7a43\",\"attempts\":1,\"totalRetryDelay\":0}}",
+            "REPORT Duration: 204.66 ms Billed Duration: 205 ms Memory Size: 256 MB Max Memory Used: 92 MB",
+            "INFO Processing 1 log events from /aws/lambda/eecar-stack-PartRegistrationFunction-Wm4kR9tY2uPa",
+            "INFO Found 1 error events",
+            "ERROR Failed to process CloudWatch Logs event: AccessDeniedException: The ciphertext refers to a customer master key that does not exist, does not exist in this region, or you are not allowed to access.",
+            "ERROR Invoke Error {\"errorType\":\"AccessDeniedException\",\"errorMessage\":\"The ciphertext refers to a customer master key that does not exist, does not exist in this region, or you are not allowed to access.\",\"name\":\"AccessDeniedException\",\"$fault\":\"client\",\"$metadata\":{\"httpStatusCode\":400,\"requestId\":\"8c1f2a9e-4b7d-4e3a-9f60-2d5c8b1e7a43\",\"attempts\":1,\"totalRetryDelay\":0}}",
+            "REPORT Duration: 188.31 ms Billed Duration: 189 ms Memory Size: 256 MB Max Memory Used: 92 MB"
+          ],
+          "errorSummary": [
+            [
+              "AccessDeniedException",
+              92
+            ]
+          ]
+        },
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 940,
+            "errors": 0,
+            "avgDuration": 1450
+          },
+          "logs": [
+            "INFO Processing search query: EV6 배터리 팩",
+            "ERROR Error in vector search: ThrottlingException: Too many requests, please wait before trying again.",
+            "INFO Processing search query: EV6 배터리 팩",
+            "INFO vector 30, bm25 28 (index 214) -> ranked 36, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[]}"
+          ],
+          "errorSummary": [
+            [
+              "ThrottlingException",
+              6
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "KMS",
+          "kms:Decrypt",
+          "고객 관리형 키",
+          "고객 관리 키",
+          "customer managed key",
+          "CMK",
+          "SecureString",
+          "복호화",
+          "decrypt",
+          "Decrypt"
+        ],
+        "fix": [
+          "kms:Decrypt 권한",
+          "kms:Decrypt를",
+          "kms:Decrypt 추가",
+          "Decrypt 권한",
+          "복호화 권한",
+          "키 정책",
+          "key policy",
+          "aws/ssm",
+          "기본 키로",
+          "기본 KMS 키",
+          "AWS 관리형 키",
+          "AWS managed key",
+          "다시 암호화",
+          "재암호화",
+          "파라미터를 다시 생성",
+          "파라미터를 다시 만들"
+        ],
+        "mustNot": [
+          "웹훅 URL이 만료되었",
+          "webhook URL이 만료되었",
+          "Webhook URL이 만료되었",
+          "Slack 쪽 장애입니다",
+          "Slack 서버 장애",
+          "구독 필터가 삭제되었",
+          "알림이 안 오는 원인은 스로틀링",
+          "스로틀링 때문에 알림이",
+          "ThrottlingException 때문에 알림"
+        ],
+        "tools": [
+          "get_logs"
+        ]
+      }
+    },
+    {
+      "id": "h09",
+      "source": "format-based",
+      "title": "배포 직후 검색 API만 전부 502",
+      "message": "방금 검색 동의어 사전 따로 파일로 분리한 PR 머지하고 v2.7.1 태그로 배포했는데, 검색 API만 전부 502가 나요. 부품 목록이나 등록은 멀쩡하고요. 급해요 ㅠㅠ",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 188,
+            "errors": 188,
+            "avgDuration": 340
+          },
+          "logs": [
+            "INIT_START Runtime Version: nodejs:24.v12 Runtime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:3b6f0c1e9d2a7f4b8e5c1a0d9f3e7b2c6a4d8e1f0b5c9a3d7e2f6b1c4a8d0e3f",
+            "ERROR Uncaught Exception {\"errorType\":\"Runtime.ImportModuleError\",\"errorMessage\":\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/search-synonyms.js' imported from /var/task/index.js\",\"stack\":[\"Runtime.ImportModuleError: Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/search-synonyms.js' imported from /var/task/index.js\",\"    at _loadUserApp (file:///var/runtime/index.mjs:1106:17)\",\"    at async UserFunction.js.module.exports.load (file:///var/runtime/index.mjs:1148:21)\"]}",
+            "INIT_REPORT Init Duration: 286.41 ms Phase: init Status: error Error Type: Runtime.ImportModuleError",
+            "ERROR Uncaught Exception {\"errorType\":\"Runtime.ImportModuleError\",\"errorMessage\":\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/search-synonyms.js' imported from /var/task/index.js\",\"stack\":[\"Runtime.ImportModuleError: Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/search-synonyms.js' imported from /var/task/index.js\",\"    at _loadUserApp (file:///var/runtime/index.mjs:1106:17)\",\"    at async UserFunction.js.module.exports.load (file:///var/runtime/index.mjs:1148:21)\"]}",
+            "INIT_REPORT Init Duration: 301.77 ms Phase: invoke Status: error Error Type: Runtime.ImportModuleError",
+            "REPORT Duration: 318.02 ms Billed Duration: 319 ms Memory Size: 1024 MB Max Memory Used: 88 MB Status: error Error Type: Runtime.ImportModuleError",
+            "ERROR Uncaught Exception {\"errorType\":\"Runtime.ImportModuleError\",\"errorMessage\":\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/search-synonyms.js' imported from /var/task/index.js\",\"stack\":[\"Runtime.ImportModuleError: Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/search-synonyms.js' imported from /var/task/index.js\",\"    at _loadUserApp (file:///var/runtime/index.mjs:1106:17)\",\"    at async UserFunction.js.module.exports.load (file:///var/runtime/index.mjs:1148:21)\"]}"
+          ],
+          "errorSummary": [
+            [
+              "ImportModuleError",
+              188
+            ]
+          ],
+          "config": {
+            "lastModified": "2026-11-06T05:31:44.000+0000",
+            "layers": [
+              {
+                "name": "eecar-utils-layer",
+                "version": 27,
+                "createdDate": "2026-11-01T02:10:05.000+0000",
+                "latestVersion": 27,
+                "latestCreatedDate": "2026-11-01T02:10:05.000+0000",
+                "isLatest": true
+              }
+            ]
+          }
+        },
+        "GetPartsFunction": {
+          "status": {
+            "invocations": 1320,
+            "errors": 0,
+            "avgDuration": 70
+          },
+          "logs": [
+            "REPORT Duration: 64.80 ms Billed Duration: 65 ms Memory Size: 512 MB Max Memory Used: 101 MB"
+          ],
+          "errorSummary": []
+        },
+        "PartRegistrationFunction": {
+          "status": {
+            "invocations": 12,
+            "errors": 0,
+            "avgDuration": 1040
+          },
+          "logs": [
+            "INFO Registering new part: 2f8e6d4c-0b1a-4e9d-8c7b-6a5f4e3d2c1b",
+            "INFO Part metadata stored",
+            "INFO Generating embedding...",
+            "INFO Vector uploaded to S3 (JSON)",
+            "INFO Vector uploaded to S3 Vectors: 2f8e6d4c-0b1a-4e9d-8c7b-6a5f4e3d2c1b",
+            "INFO Invoking compliance check...",
+            "INFO Compliance check invoked"
+          ],
+          "errorSummary": []
+        }
+      },
+      "label": {
+        "cause": [
+          "레이어",
+          "Layer",
+          "layer",
+          "build:layer",
+          "레이어에 없",
+          "레이어에 포함되지",
+          "레이어가 갱신되지",
+          "레이어를 빌드하지",
+          "stale"
+        ],
+        "fix": [
+          "build:layer",
+          "build:all",
+          "레이어를 다시 빌드",
+          "레이어 재빌드",
+          "레이어를 재빌드",
+          "레이어를 다시 배포",
+          "레이어 재배포",
+          "레이어를 재배포",
+          "rebuild the layer",
+          "redeploy the layer",
+          "레이어를 빌드",
+          "이전 버전으로 롤백",
+          "롤백",
+          "rollback"
+        ],
+        "mustNot": [
+          "원인은 IAM 권한 부족입니다",
+          "권한 문제입니다",
+          "Bedrock 스로틀링 때문입니다",
+          "DynamoDB 스로틀링 때문입니다",
+          "타임아웃 때문입니다",
+          "메모리 부족 때문입니다",
+          "npm install로 설치하",
+          "package.json dependencies에 추가",
+          "dependencies에 search-synonyms"
+        ],
+        "tools": [
+          "get_logs"
+        ]
+      }
+    },
+    {
+      "id": "h10",
+      "source": "format-based",
+      "title": "일부 사용자만 문의 접수 실패",
+      "message": "문의하기 폼에서 몇몇 분한테만 '문의 접수에 실패했습니다'가 뜬대요. 대부분은 잘 들어오는데 오늘 대여섯 건 정도요. 원인 좀 찾아줄래요?",
+      "functions": {
+        "ContactInquiryFunction": {
+          "status": {
+            "invocations": 64,
+            "errors": 0,
+            "avgDuration": 160
+          },
+          "logs": [
+            "INFO Processing contact inquiry from: purchase.kim@example.com",
+            "INFO Contact inquiry notification sent successfully",
+            "INFO Processing contact inquiry from: jh.lee@example.co.kr",
+            "ERROR Failed to send contact inquiry notification: InvalidParameterException: Invalid parameter: Subject",
+            "ERROR Error in contact-inquiry: InvalidParameterException: Invalid parameter: Subject",
+            "INFO Processing contact inquiry from: sales@example.net",
+            "INFO Contact inquiry notification sent successfully",
+            "INFO Processing contact inquiry from: k.park@example.org",
+            "ERROR Failed to send contact inquiry notification: InvalidParameterException: Invalid parameter: Subject",
+            "ERROR Error in contact-inquiry: InvalidParameterException: Invalid parameter: Subject",
+            "INFO Processing contact inquiry from: buyer01@example.com",
+            "INFO Contact inquiry notification sent successfully",
+            "REPORT Duration: 142.66 ms Billed Duration: 143 ms Memory Size: 512 MB Max Memory Used: 89 MB"
+          ],
+          "errorSummary": [
+            [
+              "InvalidParameterException",
+              12
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "제목 길이",
+          "제목이 너무 길",
+          "제목이 길",
+          "100자",
+          "100 자",
+          "100 characters",
+          "줄바꿈",
+          "개행",
+          "제어 문자",
+          "control character",
+          "Subject 제약",
+          "Subject 길이",
+          "Subject 형식",
+          "subject length",
+          "Subject 제한",
+          "제목 제한",
+          "제목 제약"
+        ],
+        "fix": [
+          "제목을 자르",
+          "제목을 잘라",
+          "잘라서",
+          "100자 이내",
+          "100자 미만",
+          "100자 이하",
+          "99자",
+          "줄바꿈을 제거",
+          "개행을 제거",
+          "제어 문자를 제거",
+          "sanitize",
+          "정제",
+          "본문에 넣",
+          "Message에 넣",
+          "고정 제목",
+          "고정된 제목",
+          "제목 길이를 검증",
+          "제목 길이 검증",
+          "입력 검증",
+          "길이 검증",
+          "truncate"
+        ],
+        "mustNot": [
+          "SNS 권한이 없",
+          "sns:Publish 권한이 없",
+          "토픽이 삭제되었",
+          "구독이 확인되지 않아서",
+          "이메일 형식이 잘못되어",
+          "이메일 주소가 잘못되어",
+          "권한 문제입니다",
+          "스로틀링 때문입니다"
+        ],
+        "tools": [
+          "get_logs"
+        ]
+      }
+    },
+    {
+      "id": "h11",
+      "source": "format-based",
+      "title": "새벽 단발성 에러 알림 문의",
+      "message": "새벽 3시쯤 Slack에 VectorSearch 에러 알림이 하나 와 있더라고요. 출근해서 써보니 검색은 멀쩡한 것 같은데, 이거 뭔가 조치해야 하는 건가요?",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 2380,
+            "errors": 0,
+            "avgDuration": 1320
+          },
+          "logs": [
+            "INFO Processing search query: 쏘울 EV 배터리 모듈",
+            "ERROR Error in vector search: ServiceUnavailableException: Bedrock is unable to process your request.",
+            "REPORT Duration: 3204.18 ms Billed Duration: 3205 ms Memory Size: 1024 MB Max Memory Used: 233 MB",
+            "INFO Processing search query: 쏘울 EV 배터리 모듈",
+            "INFO vector 30, bm25 22 (index 214) -> ranked 34, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[]}",
+            "REPORT Duration: 402.55 ms Billed Duration: 403 ms Memory Size: 1024 MB Max Memory Used: 235 MB",
+            "INFO Processing search query: EV6 구동 모터",
+            "INFO Cache hit!",
+            "INFO Processing search query: 볼트 EV 충전 포트",
+            "INFO vector 30, bm25 17 (index 214, loaded) -> ranked 33, constraints {\"categories\":[],\"numeric\":[],\"conditions\":[]}",
+            "REPORT Duration: 588.90 ms Billed Duration: 589 ms Memory Size: 1024 MB Max Memory Used: 241 MB"
+          ],
+          "errorSummary": [
+            [
+              "ServiceUnavailableException",
+              1
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "일시적",
+          "단발",
+          "한 번만",
+          "1건",
+          "한 건",
+          "transient",
+          "재발하지",
+          "재발은 없",
+          "이후로는 정상",
+          "이후 정상",
+          "재시도해서 성공",
+          "다시 검색해서 성공",
+          "다시 시도해 성공",
+          "곧바로 성공",
+          "바로 성공"
+        ],
+        "fix": [
+          "조치는 필요 없",
+          "조치가 필요 없",
+          "조치는 필요하지 않",
+          "조치가 필요하지 않",
+          "추가 조치는 필요",
+          "추가 조치 불필요",
+          "별도 조치는",
+          "별도 조치 없이",
+          "지켜보",
+          "모니터링",
+          "재발하면",
+          "재시도 로직"
+        ],
+        "mustNot": [
+          "롤백하세요",
+          "롤백해야 합니다",
+          "긴급 조치가 필요",
+          "즉시 조치가 필요",
+          "장애가 지속되고",
+          "계속 실패하고 있습니다",
+          "모델 접근 권한이 없",
+          "할당량을 늘려야",
+          "쿼터 증설이 필요"
+        ],
+        "tools": [
+          "get_logs|get_error_summary"
+        ]
+      }
+    },
+    {
+      "id": "h12",
+      "source": "format-based",
+      "title": "배포 후 전체 상태 점검",
+      "message": "방금 v2.8.0 백엔드 배포 끝났어요. 전체 함수 상태 한 번 훑어보고 문제 있는 거 있으면 알려줘.",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 132,
+            "errors": 0,
+            "avgDuration": 1580
+          },
+          "logs": [
+            "INFO Processing search query: 아이오닉6 후방 모터",
+            "INFO vector 30, bm25 30 (index 214, loaded) -> ranked 39, constraints {\"categories\":[\"motor\"],\"numeric\":[],\"conditions\":[]}",
+            "REPORT Duration: 2140.55 ms Billed Duration: 2953 ms Memory Size: 1024 MB Max Memory Used: 231 MB Init Duration: 811.87 ms",
+            "INFO Processing search query: 아이오닉6 후방 모터",
+            "INFO Cache hit!",
+            "REPORT Duration: 48.12 ms Billed Duration: 49 ms Memory Size: 1024 MB Max Memory Used: 233 MB",
+            "INFO Processing search query: 6061 알루미늄 브래킷",
+            "INFO vector 30, bm25 30 (index 214) -> ranked 42, constraints {\"categories\":[\"frame\"],\"numeric\":[],\"conditions\":[]}",
+            "REPORT Duration: 366.40 ms Billed Duration: 367 ms Memory Size: 1024 MB Max Memory Used: 236 MB"
+          ],
+          "errorSummary": []
+        },
+        "GetPartsFunction": {
+          "status": {
+            "invocations": 540,
+            "errors": 0,
+            "avgDuration": 71
+          },
+          "logs": [
+            "REPORT Duration: 612.40 ms Billed Duration: 1013 ms Memory Size: 512 MB Max Memory Used: 96 MB Init Duration: 400.12 ms",
+            "REPORT Duration: 58.33 ms Billed Duration: 59 ms Memory Size: 512 MB Max Memory Used: 97 MB"
+          ],
+          "errorSummary": []
+        },
+        "PartRegistrationFunction": {
+          "status": {
+            "invocations": 6,
+            "errors": 0,
+            "avgDuration": 1150
+          },
+          "logs": [
+            "INFO Registering new part: 7c6b5a49-3e2d-4f1c-8b0a-9d8e7f6a5b4c",
+            "INFO Part metadata stored",
+            "INFO Generating embedding...",
+            "INFO Vector uploaded to S3 (JSON)",
+            "INFO Vector uploaded to S3 Vectors: 7c6b5a49-3e2d-4f1c-8b0a-9d8e7f6a5b4c",
+            "INFO Invoking compliance check...",
+            "INFO Compliance check invoked",
+            "REPORT Duration: 1820.66 ms Billed Duration: 2523 ms Memory Size: 1024 MB Max Memory Used: 244 MB Init Duration: 702.31 ms"
+          ],
+          "errorSummary": []
+        },
+        "SlackAgentFunction": {
+          "status": {
+            "invocations": 4,
+            "errors": 0,
+            "avgDuration": 2900
+          },
+          "logs": [],
+          "errorSummary": []
+        }
+      },
+      "label": {
+        "cause": [
+          "에러 없",
+          "에러가 없",
+          "에러는 없",
+          "에러 0",
+          "오류 없",
+          "오류가 없",
+          "오류는 없",
+          "이상 없",
+          "이상이 없",
+          "이상은 없",
+          "문제 없",
+          "문제없",
+          "문제가 없",
+          "문제는 없",
+          "정상적으로",
+          "정상입니다",
+          "정상 동작",
+          "정상 범위",
+          "모두 정상",
+          "전부 정상",
+          "healthy"
+        ],
+        "fix": [
+          "조치는 필요 없",
+          "조치가 필요 없",
+          "조치는 필요하지 않",
+          "조치가 필요하지 않",
+          "추가 조치는 필요",
+          "추가 조치 불필요",
+          "별도 조치는",
+          "별도 조치 없이",
+          "콜드 스타트",
+          "cold start",
+          "Cold start",
+          "초기화 시간"
+        ],
+        "mustNot": [
+          "롤백하세요",
+          "롤백해야 합니다",
+          "롤백을 권장",
+          "장애가 발생했습니다",
+          "에러가 급증",
+          "즉시 조치가 필요",
+          "권한 문제입니다",
+          "스로틀링 때문입니다"
+        ],
+        "tools": [
+          "get_function_status"
+        ]
+      }
+    },
+    {
+      "id": "h13",
+      "source": "format-based",
+      "title": "explanations 개수 WARN 로그 문의",
+      "message": "VectorSearch 로그 보다가 'Expected 10 explanations, got 9' 같은 WARN이 가끔 찍히던데, 이거 검색이 깨진 건가요? 그냥 둬도 되는 거예요?",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 1960,
+            "errors": 0,
+            "avgDuration": 1410
+          },
+          "logs": [
+            "INFO Processing search query: 포터2 EV 배터리 팩",
+            "INFO vector 30, bm25 26 (index 214) -> ranked 37, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[]}",
+            "{\"_aws\":{\"Timestamp\":1793916000000,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Operation\"]],\"Metrics\":[{\"Name\":\"SearchRequests\",\"Unit\":\"Count\"},{\"Name\":\"CacheHit\",\"Unit\":\"Count\"},{\"Name\":\"ZeroResult\",\"Unit\":\"Count\"},{\"Name\":\"EmbeddingMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"VectorSearchMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"IndexLoadMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"FusionMs\",\"Unit\":\"Milliseconds\"},{\"Name\":\"TotalMs\",\"Unit\":\"Milliseconds\"}]}]},\"Operation\":\"Search\",\"SearchRequests\":1,\"CacheHit\":0,\"ZeroResult\":0,\"EmbeddingMs\":150,\"VectorSearchMs\":93,\"IndexLoadMs\":0,\"FusionMs\":41,\"TotalMs\":312}",
+            "{\"_aws\":{\"Timestamp\":1793916004000,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":1240}",
+            "WARN Expected 10 explanations, got 9",
+            "INFO Processing search query: 알루미늄 서브프레임 6061",
+            "INFO vector 30, bm25 30 (index 214) -> ranked 41, constraints {\"categories\":[\"frame\"],\"numeric\":[],\"conditions\":[]}",
+            "{\"_aws\":{\"Timestamp\":1793917804000,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":1188}",
+            "INFO Processing search query: 봉고3 EV 모터",
+            "INFO vector 30, bm25 19 (index 214, loaded) -> ranked 31, constraints {\"categories\":[\"motor\"],\"numeric\":[],\"conditions\":[]}",
+            "{\"_aws\":{\"Timestamp\":1793919604000,\"CloudWatchMetrics\":[{\"Namespace\":\"EECAR/Search\",\"Dimensions\":[[\"Feature\"],[]],\"Metrics\":[{\"Name\":\"LLMCalls\",\"Unit\":\"Count\"},{\"Name\":\"LLMFallback\",\"Unit\":\"Count\"},{\"Name\":\"LLMLatency\",\"Unit\":\"Milliseconds\"}]}]},\"Feature\":\"Explanation\",\"LLMCalls\":1,\"LLMFallback\":0,\"LLMLatency\":1302}",
+            "WARN Expected 8 explanations, got 7",
+            "REPORT Duration: 1291.44 ms Billed Duration: 1292 ms Memory Size: 1024 MB Max Memory Used: 240 MB"
+          ],
+          "errorSummary": []
+        }
+      },
+      "label": {
+        "cause": [
+          "설명 개수",
+          "설명 하나가 빠",
+          "하나가 빠",
+          "하나 적게",
+          "한 개 적게",
+          "하나 덜",
+          "개수가 모자",
+          "개수 불일치",
+          "개수가 맞지 않",
+          "기본 문구",
+          "기본 설명",
+          "기본값 설명",
+          "대체 문구",
+          "유사도 기반 매칭",
+          "모델이 9개",
+          "LLM이 9개",
+          "9개만"
+        ],
+        "fix": [
+          "조치는 필요 없",
+          "조치가 필요 없",
+          "조치는 필요하지 않",
+          "조치가 필요하지 않",
+          "추가 조치는 필요",
+          "추가 조치 불필요",
+          "별도 조치는",
+          "별도 조치 없이",
+          "급하지 않",
+          "긴급하지 않",
+          "무시해도",
+          "그냥 두셔도",
+          "그냥 둬도",
+          "두셔도 됩니다",
+          "둬도 됩니다",
+          "영향은 미미",
+          "영향이 미미",
+          "영향이 작",
+          "영향이 크지 않",
+          "지켜보",
+          "모니터링",
+          "프롬프트 개선",
+          "프롬프트를 개선",
+          "프롬프트 보강"
+        ],
+        "mustNot": [
+          "검색이 깨졌습니다",
+          "검색이 실패하고 있습니다",
+          "장애가 발생했습니다",
+          "롤백하세요",
+          "롤백해야 합니다",
+          "즉시 조치가 필요",
+          "Bedrock 스로틀링 때문입니다"
+        ],
+        "tools": [
+          "get_logs"
+        ]
+      }
+    },
+    {
+      "id": "h14",
+      "source": "format-based",
+      "title": "막연한 이상 징후 문의",
+      "message": "자동아 어제부터 뭔가 좀 이상한 것 같은데 한번 봐줄래?",
+      "functions": {
+        "VectorSearchFunction": {
+          "status": {
+            "invocations": 1730,
+            "errors": 0,
+            "avgDuration": 1240
+          },
+          "logs": [
+            "INFO Processing search query: 아이오닉5 배터리",
+            "INFO vector 30, bm25 30 (index 214) -> ranked 40, constraints {\"categories\":[\"battery\"],\"numeric\":[],\"conditions\":[]}",
+            "REPORT Duration: 352.71 ms Billed Duration: 353 ms Memory Size: 1024 MB Max Memory Used: 238 MB"
+          ],
+          "errorSummary": []
+        },
+        "GetPartsFunction": {
+          "status": {
+            "invocations": 3920,
+            "errors": 0,
+            "avgDuration": 66
+          },
+          "logs": [
+            "REPORT Duration: 61.04 ms Billed Duration: 62 ms Memory Size: 512 MB Max Memory Used: 99 MB"
+          ],
+          "errorSummary": []
+        },
+        "PartRegistrationFunction": {
+          "status": {
+            "invocations": 22,
+            "errors": 0,
+            "avgDuration": 1090
+          },
+          "logs": [
+            "INFO Registering new part: e1d2c3b4-a5f6-4e7d-8c9b-0a1f2e3d4c5b",
+            "INFO Part metadata stored",
+            "INFO Generating embedding...",
+            "INFO Vector uploaded to S3 (JSON)",
+            "INFO Vector uploaded to S3 Vectors: e1d2c3b4-a5f6-4e7d-8c9b-0a1f2e3d4c5b",
+            "INFO Invoking compliance check...",
+            "INFO Compliance check invoked"
+          ],
+          "errorSummary": []
+        }
+      },
+      "label": {
+        "cause": [
+          "에러 없",
+          "에러가 없",
+          "에러는 없",
+          "에러 0",
+          "오류 없",
+          "오류가 없",
+          "오류는 없",
+          "이상 없",
+          "이상이 없",
+          "이상은 없",
+          "문제 없",
+          "문제없",
+          "문제가 없",
+          "문제는 없",
+          "정상적으로",
+          "정상입니다",
+          "정상 동작",
+          "정상 범위",
+          "모두 정상",
+          "전부 정상",
+          "healthy",
+          "이상 징후는 없",
+          "특이사항 없",
+          "특이 사항 없",
+          "특이사항은 없",
+          "특이 사항은 없"
+        ],
+        "fix": [
+          "어떤 기능",
+          "어떤 화면",
+          "어떤 증상",
+          "어느 기능",
+          "어느 화면",
+          "어느 부분",
+          "어떤 부분",
+          "어떤 점이",
+          "구체적으로",
+          "자세히 알려",
+          "언제부터",
+          "어떤 현상",
+          "어떤 동작",
+          "어떤 문제"
+        ],
+        "mustNot": [
+          "장애가 발생했습니다",
+          "롤백하세요",
+          "롤백해야 합니다",
+          "에러가 급증",
+          "스로틀링 때문입니다",
+          "권한 문제입니다",
+          "즉시 조치가 필요"
+        ],
+        "tools": [
+          "get_function_status"
+        ]
+      }
+    },
+    {
+      "id": "h15",
+      "source": "format-based",
+      "title": "합성 데이터 생성 504인데 데이터는 생성됨",
+      "message": "테스트용으로 합성 데이터 API에 count 100 넣고 호출하면 30초쯤 뒤에 504 Gateway Timeout이 떠요. 근데 부품 목록 보면 데이터는 몇십 개씩 들어가 있고요. 그래서 몇 번 더 눌렀더니 중복 데이터도 잔뜩 생겼어요. 뭐가 문제예요?",
+      "functions": {
+        "SyntheticDataFunction": {
+          "status": {
+            "invocations": 5,
+            "errors": 5,
+            "avgDuration": 120000
+          },
+          "logs": [
+            "INFO Generating 100 synthetic parts for category: motor",
+            "INFO Generated part 1/100: 2b7f4c1e-9a3d-4e8b-b6c2-5d1f7a9e3c08 (1712ms)",
+            "WARN Claude description generation failed, using fallback: ThrottlingException: Too many requests, please wait before trying again.",
+            "INFO Generated part 2/100: 6d0a8c3f-1e5b-4a7d-9c2e-8f4b6d0a2c71 (3398ms)",
+            "INFO Generated part 17/100: 0c9e7a5b-3d1f-4b8e-a6c4-2e0d8f6b4a93 (29644ms)",
+            "INFO Generated part 18/100: 8f6d4b2a-0e9c-4d7b-b5a3-1c9e7f5d3b20 (31310ms)",
+            "WARN Claude description generation failed, using fallback: ThrottlingException: Too many requests, please wait before trying again.",
+            "INFO Generated part 68/100: 3a1c9e7f-5b3d-4f2a-8e0c-6d4b2f0a8e57 (118902ms)",
+            "Task timed out after 120.12 seconds",
+            "REPORT Duration: 120000.00 ms Billed Duration: 120001 ms Memory Size: 1024 MB Max Memory Used: 236 MB Status: timeout"
+          ],
+          "errorSummary": [
+            [
+              "ThrottlingException",
+              14
+            ]
+          ]
+        }
+      },
+      "label": {
+        "cause": [
+          "29초",
+          "29 초",
+          "29s",
+          "29 seconds",
+          "30초 제한",
+          "통합 타임아웃",
+          "integration timeout",
+          "API Gateway 타임아웃",
+          "API Gateway의 타임아웃",
+          "API Gateway 제한 시간",
+          "API Gateway의 제한 시간",
+          "순차적으로",
+          "순차 처리",
+          "하나씩 순서대로",
+          "sequential",
+          "120초 안에",
+          "제한 시간 안에 끝나지",
+          "Lambda 타임아웃(120초)",
+          "한 번에 100개",
+          "100개를 한 번에"
+        ],
+        "fix": [
+          "비동기",
+          "async",
+          "SQS",
+          "Step Functions",
+          "202",
+          "작업 ID",
+          "job id",
+          "jobId",
+          "배치 크기를 줄",
+          "개수를 줄",
+          "count를 줄",
+          "나눠서 호출",
+          "나눠 호출",
+          "여러 번 나눠",
+          "작은 배치",
+          "병렬",
+          "멱등",
+          "idempot"
+        ],
+        "mustNot": [
+          "원인은 Bedrock 스로틀링입니다",
+          "스로틀링 때문입니다",
+          "스로틀링 때문에 504",
+          "스로틀링이 원인입니다",
+          "스로틀링 때문에 타임아웃",
+          "메모리 부족 때문입니다",
+          "DynamoDB 쓰기 용량 부족 때문입니다"
+        ],
+        "tools": [
+          "get_logs"
+        ]
+      }
+    }
+  ],
+  "version": "dev-from-holdout-v1",
+  "note": "홀드아웃 v1(h01~h15)은 E-30에서 한 번 썼으므로 dev로 쓴다. 설정이 원인인 h02·h09에만 세계 상태(설정)를 덧붙였다 (A-38). 원본은 holdout_scenarios.json."
+}
