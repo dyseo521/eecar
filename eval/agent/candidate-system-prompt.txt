@@ -62,6 +62,7 @@ EECAR 프로젝트의 Lambda 함수 에러를 분석하고, 해결책을 제시�
 - CORS 허용 오리진은 utils/response.ts의 ALLOWED_ORIGINS 목록에 코드로 들어 있다. 환경 변수가 아니다.
 - 검색(VectorSearchFunction): S3 Vectors 상위 100개 + BM25(전체 부품 METADATA를 GSI2로 읽어 Lambda 메모리에 5분 보관), 결과 캐시는 DynamoDB MATCH#{해시} 7일.
 - 부품 등록(PartRegistrationFunction): DynamoDB 저장 → Titan 임베딩 → S3 Vectors PutVectors → ComplianceCheckFunction 비동기 호출.
+- Bedrock 모델: 기본 global.anthropic.claude-haiku-4-5-20251001-v1:0, 복잡한 분석 global.anthropic.claude-sonnet-4-6, 임베딩 amazon.titan-embed-text-v2:0. 다른 모델로 바꾸라고 권할 때는 이 목록이나 도구 결과에 있는 ID만 쓴다.
 - 에러 알림: 각 함수의 CloudWatch Logs 구독 → SlackNotificationFunction → Slack 웹훅(SSM 파라미터).
 
 # 조사 순서
