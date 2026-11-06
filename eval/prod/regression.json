@@ -1,0 +1,21 @@
+{
+  "description": "운영 데이터 회귀 검사 (DECISION_LOG A-33). 운영에서 관찰한 실패와 기본 조건 질의가 다시 틀리지 않는지 본다. 품질 추정이 아니라 회귀 감지용이다.",
+  "checks": [
+    {"id": "r01", "query": "아이오닉5 배터리 팩", "why": "v1.7.0에서 1위가 IONIQ Electric 28kWh였다", "top": 3, "all": {"category": ["battery"], "vehicle": "아이오닉5"}},
+    {"id": "r02", "query": "아이오닉5 배터리팩", "why": "붙여 쓴 표기", "top": 3, "all": {"category": ["battery"], "vehicle": "아이오닉5"}},
+    {"id": "r03", "query": "배터리팩", "why": "붙여 쓴 표기도 배터리를 찾아야 한다 (운영에 거의 같은 배터리 팩이 60개 넘게 있어 띄어쓰기에 따라 다른 부분집합이 나오는 것은 정상)", "top": 5, "all": {"category": ["battery"]}},
+    {"id": "r03b", "query": "배터리 팩", "why": "r03의 띄어 쓴 표기", "top": 5, "all": {"category": ["battery"]}},
+    {"id": "r04", "query": "테슬라 모델3 모터", "why": "v1.6.0에서 1위가 모델3 언더커버였다", "top": 5, "all": {"category": ["motor"]}},
+    {"id": "r05", "query": "ESS용 60kWh 이상 배터리", "why": "v1.6.0에서 17.6kWh가 4위였다", "top": 5, "all": {"category": ["battery"], "kwhMin": 60}},
+    {"id": "r06", "query": "500만원 이하 배터리", "why": "가격 조건", "top": 5, "all": {"category": ["battery"], "priceMax": 5000000}},
+    {"id": "r07", "query": "코나 인버터", "why": "차종 + 카테고리", "top": 1, "all": {"category": ["inverter"], "vehicle": "코나 일렉트릭"}},
+    {"id": "r08", "query": "아이오닉5 도어", "why": "같은 차종의 다른 부품보다 도어가 먼저", "top": 3, "all": {"category": ["body-door"]}},
+    {"id": "r09", "query": "GV60 배터리", "why": "사전 보강으로 판정하게 된 차종 (A-32)", "top": 1, "all": {"category": ["battery"], "vehicle": "GV60"}},
+    {"id": "r10", "query": "SiC 인버터 800V", "why": "카테고리", "top": 3, "all": {"category": ["inverter"]}},
+    {"id": "r11", "query": "2022년식 이후 모터", "why": "연식 조건", "top": 5, "all": {"category": ["motor"], "yearMin": 2022}},
+    {"id": "r12", "query": "SOH 90% 이상 배터리", "why": "SOH 조건", "top": 5, "all": {"category": ["battery"], "sohMin": 90}},
+    {"id": "r13", "query": "Model 3 배터리", "why": "영문 표기 차종", "top": 1, "all": {"category": ["battery"], "vehicle": "모델3"}},
+    {"id": "r14", "query": "완속 충전기", "why": "카테고리", "top": 1, "all": {"category": ["charger"]}},
+    {"id": "r15", "query": "E-Transit 인버터", "why": "사전 보강 차종 + 카테고리", "top": 1, "all": {"category": ["inverter"], "vehicle": "E-트랜짓"}}
+  ]
+}
