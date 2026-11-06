@@ -8,6 +8,8 @@
 
 이 하네스는 고정된 ID의 코퍼스를 직접 들고 다니고, 프로덕션 검색 코드(`backend/src/utils`)를 그대로 호출한다.
 
+자동이(Slack DevOps 에이전트) 진단 평가는 [agent/README.md](agent/README.md)에 따로 정리했다.
+
 ## 구성
 
 | 경로 | 내용 |
