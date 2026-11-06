@@ -51,7 +51,13 @@ interface AnalyzeErrorInput {
 /**
  * 에러 분석 수행
  */
-export async function analyzeError(input: AnalyzeErrorInput): Promise<ErrorAnalysis> {
+/** 평가에서 외부 컨텍스트(Bedrock KB, 장기 기억)를 비워 두기 위한 의존성 (DECISION_LOG E-29) */
+export interface AnalyzeErrorDeps {
+  searchCodebase?: (errorType: string, functionName: string) => Promise<string[]>;
+  recallMemory?: typeof recallMemory;
+}
+
+export async function analyzeError(input: AnalyzeErrorInput, deps: AnalyzeErrorDeps = {}): Promise<ErrorAnalysis> {
   const { errorMessage, functionName, stackTrace } = input;
 
   console.log('Analyzing error:', { errorMessage, functionName });
@@ -61,8 +67,8 @@ export async function analyzeError(input: AnalyzeErrorInput): Promise<ErrorAnaly
 
   // 병렬로 컨텍스트 수집
   const [codeContext, pastSolutions] = await Promise.all([
-    searchCodebase(errorType, functionName),
-    recallMemory({ query: `${errorType} ${functionName}`, topK: 3 }),
+    (deps.searchCodebase ?? searchCodebase)(errorType, functionName),
+    (deps.recallMemory ?? recallMemory)({ query: `${errorType} ${functionName}`, topK: 3 }),
   ]);
 
   // Claude로 분석

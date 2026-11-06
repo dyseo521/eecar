@@ -98,6 +98,9 @@ export interface MemoryResult {
 // Lambda 상태
 export interface LambdaStatus {
   functionName: string;
+  /** false면 이 이름의 함수가 스택에 없다 (0으로 채운 지표를 정상으로 오해하지 않게 한다, A-35) */
+  found?: boolean;
+  note?: string;
   invocations: number;
   errors: number;
   errorRate: number;
