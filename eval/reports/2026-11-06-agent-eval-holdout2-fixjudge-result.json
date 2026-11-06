@@ -1,0 +1,242 @@
+[
+  {
+    "id": "J01",
+    "fix_correct": "partial",
+    "reason": "Inference profile direction is right, but the given ARN (no account, invented 'default-claude-sonnet-4-5') is invalid and the 'recommended' rollback is to another bare model ID edited in code instead of the env var."
+  },
+  {
+    "id": "J02",
+    "fix_correct": "yes",
+    "reason": "Raises the Lambda timeout from 3s (to 15s), which removes the timeout that causes the false failure and duplicate registrations."
+  },
+  {
+    "id": "J03",
+    "fix_correct": "yes",
+    "reason": "Raises the timeout from 3s to 30s; the CLI uses the logical name instead of the physical function name, but the fix itself is correct."
+  },
+  {
+    "id": "J04",
+    "fix_correct": "partial",
+    "reason": "Suspects missing save logic but only says to check for it (Python snippet, mixed with wrong IAM/table/capacity hypotheses) and never points to the SNS email where inquiries actually are."
+  },
+  {
+    "id": "J05",
+    "fix_correct": "partial",
+    "reason": "Inference profile direction is right, but the example ARN (no account, no global./apac. prefix) is invalid and the fallback model IDs are bare/invalid IDs."
+  },
+  {
+    "id": "J06",
+    "fix_correct": "partial",
+    "reason": "Targets Subject length, but the code throws when Subject > 100 before truncating, so long subjects still fail (and SNS needs < 100)."
+  },
+  {
+    "id": "J07",
+    "fix_correct": "yes",
+    "reason": "Adds .js to the /opt/nodejs/utils/dynamodb import, which fixes ERR_MODULE_NOT_FOUND."
+  },
+  {
+    "id": "J08",
+    "fix_correct": "no",
+    "reason": "Recommends raising SlackNotification memory; the gaps come from intended 5-minute dedup, not memory."
+  },
+  {
+    "id": "J09",
+    "fix_correct": "no",
+    "reason": "Recommends moving to nodejs22.x to drop punycode, which is wrong (22 also warns, and it is a downgrade); does not address cold start correctly."
+  },
+  {
+    "id": "J10",
+    "fix_correct": "yes",
+    "reason": "Shows the correct .js-suffixed import as the fix; the suggested rollback CLI uses a made-up bucket/key but the real fix is present."
+  },
+  {
+    "id": "J11",
+    "fix_correct": "yes",
+    "reason": "Changes the import to '/opt/nodejs/utils/dynamodb.js' and checks the other layer imports."
+  },
+  {
+    "id": "J12",
+    "fix_correct": "no",
+    "reason": "Says IAM is missing and to add DynamoDB permissions; the function has no save code at all, so adding permissions stores nothing."
+  },
+  {
+    "id": "J13",
+    "fix_correct": "no",
+    "reason": "Recommended option (drop global.) fails because Haiku 4.5 has no in-region on-demand; option B adds the wrong resource (arn:aws:bedrock:::inference-profile/*) instead of arn:aws:bedrock:::foundation-model/*."
+  },
+  {
+    "id": "J14",
+    "fix_correct": "yes",
+    "reason": "Fixes the IAM policy resource to the eecar-notifications topic ARN."
+  },
+  {
+    "id": "J15",
+    "fix_correct": "partial",
+    "reason": "Correctly says it is intended dedup, not memory, but still recommends a 512MB memory bump and claims the dedup window is unlimited (it is 5 min)."
+  },
+  {
+    "id": "J16",
+    "fix_correct": "yes",
+    "reason": "Says it is not a problem because USE_KNOWLEDGE_BASE=false and S3 Vectors is used, so the value can stay empty."
+  },
+  {
+    "id": "J17",
+    "fix_correct": "yes",
+    "reason": "Adds table/eecar-parts-table/index/GSI1 and GSI2 ARNs to the GetParts policy (and suggests fixing template.yaml)."
+  },
+  {
+    "id": "J18",
+    "fix_correct": "no",
+    "reason": "Claims punycode slows the first request and recommends a Node downgrade; the cause is cold start."
+  },
+  {
+    "id": "J19",
+    "fix_correct": "yes",
+    "reason": "Raises the timeout from 3s to 15s; correct fix (CLI uses logical function name)."
+  },
+  {
+    "id": "J20",
+    "fix_correct": "yes",
+    "reason": "Says the function is not in the stack and asks for the exact name and the alert/error details."
+  },
+  {
+    "id": "J21",
+    "fix_correct": "yes",
+    "reason": "Recommended option fixes the IAM policy to the eecar-notifications ARN; option 2 (point env var at the typo topic) is wrong but secondary."
+  },
+  {
+    "id": "J22",
+    "fix_correct": "yes",
+    "reason": "Adds Query/Scan on the GSI1/GSI2 index ARNs for the GetParts role."
+  },
+  {
+    "id": "J23",
+    "fix_correct": "partial",
+    "reason": "Says an empty value is fine, but then recommends filling in a KB ID anyway (plus enabling query expansion), which is contradictory."
+  },
+  {
+    "id": "J24",
+    "fix_correct": "yes",
+    "reason": "Adds dynamodb:PutItem (and UpdateItem) to the WatchPart role, restoring the write permission the function needs."
+  },
+  {
+    "id": "J25",
+    "fix_correct": "yes",
+    "reason": "Reports 0 errors after deploy and no action needed beyond asking to report future errors."
+  },
+  {
+    "id": "J26",
+    "fix_correct": "partial",
+    "reason": "Correctly targets the foundation-model resource ARN, but the ARNs it writes include the account ID (foundation-model ARNs have none) and omit arn:aws:bedrock:::foundation-model/*, so it would still be denied."
+  },
+  {
+    "id": "J27",
+    "fix_correct": "partial",
+    "reason": "Points to MaterialPropertySearchFunction but neither checks its logs nor asks for reproduction details; only asks the user to confirm the name."
+  },
+  {
+    "id": "J28",
+    "fix_correct": "yes",
+    "reason": "Adds .js to the utils imports (dynamodb -> dynamodb.js) and redeploys."
+  },
+  {
+    "id": "J29",
+    "fix_correct": "yes",
+    "reason": "Raises the timeout from the estimated 3s to 10s, which resolves the timeouts."
+  },
+  {
+    "id": "J30",
+    "fix_correct": "yes",
+    "reason": "Adds the GSI1/GSI2 index ARNs to the GetParts policy; the extra update-function-code step is unnecessary but does not change the fix."
+  },
+  {
+    "id": "J31",
+    "fix_correct": "yes",
+    "reason": "Reports all functions healthy and says monitoring will continue (no action needed)."
+  },
+  {
+    "id": "J32",
+    "fix_correct": "yes",
+    "reason": "Reports all functions healthy after v1.9.2, which implies no action is needed."
+  },
+  {
+    "id": "J33",
+    "fix_correct": "partial",
+    "reason": "Correctly says no action is needed and TTL deletion is delayed, but falsely claims DynamoDB hides expired items from Query/Scan; the real protection is the code's Date.now() < TTL check."
+  },
+  {
+    "id": "J34",
+    "fix_correct": "partial",
+    "reason": "Inference profile direction is right, but the ARN ('::inference-profile/default/...') is invalid, it edits the function source instead of the env var, and build:all does not deploy."
+  },
+  {
+    "id": "J35",
+    "fix_correct": "partial",
+    "reason": "Inference profile direction is right, but the ARN (no account, no global./apac. prefix) is invalid, it edits utils/bedrock.js, and the rollback is to an obsolete bare model ID."
+  },
+  {
+    "id": "J36",
+    "fix_correct": "partial",
+    "reason": "Truncates Subject to 100 chars (the right idea), but it misdiagnoses empty/special chars, uses 100 instead of <100, and ignores the '[EECAR] 일반 문의 - ' prefix."
+  },
+  {
+    "id": "J37",
+    "fix_correct": "no",
+    "reason": "Calls the empty value a silent failure and says to fill in a KB ID; the KB path is disabled, so it is not needed."
+  },
+  {
+    "id": "J38",
+    "fix_correct": "yes",
+    "reason": "Adds the GSI1/GSI2 index ARNs to GetPartsFunctionRolePolicy0."
+  },
+  {
+    "id": "J39",
+    "fix_correct": "yes",
+    "reason": "Adds the GSI1/GSI2 index ARNs to the GetParts role policy."
+  },
+  {
+    "id": "J40",
+    "fix_correct": "partial",
+    "reason": "Right direction (stale layer, redeploy), but 'npm run build:all' only builds and deploys nothing, and it never says to point the function at the latest layer version (27) or run sam deploy."
+  },
+  {
+    "id": "J41",
+    "fix_correct": "yes",
+    "reason": "Adds a DynamoDB save step (saveInquiryToDB) before the notification and checks PutItem permission."
+  },
+  {
+    "id": "J42",
+    "fix_correct": "partial",
+    "reason": "Inference profile direction is right, but the ARN format is invalid and the 'rollback' option reuses the same failing model ID."
+  },
+  {
+    "id": "J43",
+    "fix_correct": "yes",
+    "reason": "Restores dynamodb:PutItem on the WatchPart role (or rolls back the stack), which fixes the write denial."
+  },
+  {
+    "id": "J44",
+    "fix_correct": "partial",
+    "reason": "Right direction (use an inference profile), but the ARN template has an empty account and it suggests creating a profile instead of using the existing global./apac. ID; the fallback is an obsolete model."
+  },
+  {
+    "id": "J45",
+    "fix_correct": "no",
+    "reason": "Only handles an empty/undefined Subject; it never limits Subject length, so long subjects still fail."
+  },
+  {
+    "id": "J46",
+    "fix_correct": "yes",
+    "reason": "Raises the timeout from 3s to 10s; the memory suggestion has a wrong baseline (128MB vs 1024MB) but the main fix works."
+  },
+  {
+    "id": "J47",
+    "fix_correct": "partial",
+    "reason": "Correctly says punycode is not the cause and the delay is cold start, but the remedy is vague with a wrong example (require('aws-sdk') in an ESM nodejs24 function) and mentions neither 'no action needed' nor provisioned concurrency."
+  },
+  {
+    "id": "J48",
+    "fix_correct": "yes",
+    "reason": "Adds the GSI1/GSI2 index ARNs to GetPartsFunctionRolePolicy0."
+  }
+]
