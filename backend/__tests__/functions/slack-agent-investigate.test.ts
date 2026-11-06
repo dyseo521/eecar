@@ -273,7 +273,7 @@ describe('orchestrator with submit_diagnosis', () => {
   it('tells the model the current time only when given', async () => {
     const systems: string[] = [];
     const converse = jest.fn(async (input: ConverseCommandInput) => {
-      systems.push(String(input.system?.[0]?.text ?? ''));
+      systems.push((input.system ?? []).map(b => ('text' in b ? b.text : '')).join(''));
       return reply([{ text: '정상입니다.' }]);
     });
     await runReActAgent('상태', { userId: 'U', channelId: 'C' }, { converse, emit: false, modelOverride: HAIKU, systemPrompt: '기본', currentTime: '2026-11-06T10:10:00.000Z' });
@@ -290,6 +290,31 @@ describe('orchestrator with submit_diagnosis', () => {
     });
     await runReActAgent('상태', { userId: 'U', channelId: 'C' }, { converse, emit: false, modelOverride: HAIKU });
     expect(choices).toEqual([undefined]);
+  });
+
+  it('puts the cache point after the fixed prompt and before the current time', async () => {
+    const blocks: unknown[][] = [];
+    const converse = jest.fn(async (input: ConverseCommandInput) => {
+      blocks.push(input.system ?? []);
+      return reply([{ text: '정상입니다.' }]);
+    });
+    await runReActAgent('상태', { userId: 'U', channelId: 'C' }, { converse, emit: false, modelOverride: HAIKU, systemPrompt: '기본', cachePrompt: true, currentTime: '2026-11-06T10:10:00.000Z' });
+    await runReActAgent('상태', { userId: 'U', channelId: 'C' }, { converse, emit: false, modelOverride: HAIKU, systemPrompt: '기본' });
+    expect(blocks[0][0]).toEqual({ text: '기본' });
+    expect(blocks[0][1]).toEqual({ cachePoint: { type: 'default' } });
+    expect(JSON.stringify(blocks[0][2])).toContain('2026-11-06T10:10:00.000Z');
+    expect(blocks[1]).toEqual([{ text: '기본' }]);
+  });
+
+  it('prices cached tokens at the cache rates', async () => {
+    const replies = [
+      { output: { message: { role: 'assistant', content: [{ text: '정상입니다.' }] } }, usage: { inputTokens: 1000, outputTokens: 100, totalTokens: 1100, cacheReadInputTokens: 10_000, cacheWriteInputTokens: 2000 } },
+    ] as unknown as ConverseCommandOutput[];
+    const converse = jest.fn(async (_: ConverseCommandInput) => replies.shift()!);
+    const { metrics } = await runReActAgent('상태', { userId: 'U', channelId: 'C' }, { converse, emit: false, modelOverride: HAIKU });
+    expect(metrics).toMatchObject({ inputTokens: 1000, cacheReadTokens: 10_000, cacheWriteTokens: 2000 });
+    // 입력 1000 + 읽기 10000×0.1 + 쓰기 2000×1.25 = 4500 상당, Haiku 입력 $1/M, 출력 100×$5/M
+    expect(metrics.estimatedCostUsd).toBeCloseTo((4500 * 1 + 100 * 5) / 1_000_000, 8);
   });
 
   it('does not offer the investigation tools in production', async () => {

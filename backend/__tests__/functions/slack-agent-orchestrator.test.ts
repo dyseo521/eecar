@@ -162,7 +162,7 @@ describe('agent metrics', () => {
     const lines: string[] = [];
     jest.spyOn(process.stdout, 'write').mockImplementation(chunk => { lines.push(String(chunk)); return true; });
     emitAgentMetrics({
-      runId: 'r', turns: 2, stopReason: 'final', modelCalls: {}, inputTokens: 10, outputTokens: 2,
+      runId: 'r', turns: 2, stopReason: 'final', modelCalls: {}, inputTokens: 10, outputTokens: 2, cacheReadTokens: 0, cacheWriteTokens: 0,
       estimatedCostUsd: 0.000123, toolCalls: 1, toolErrors: 0, modelFallbacks: 1, latencyMs: 50,
       tools: [{ name: 'get_logs', ok: true, latencyMs: 20, resultChars: 100 }],
     });

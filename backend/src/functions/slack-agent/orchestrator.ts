@@ -32,10 +32,15 @@ const PRICE_PER_MTOK: Array<{ match: RegExp; input: number; output: number }> = 
   { match: /sonnet-4-6/, input: 3, output: 15 },
 ];
 
-export function estimateCostUsd(modelId: string, inputTokens: number, outputTokens: number): number {
+/** 프롬프트 캐시 가격: 읽기는 입력의 약 0.1배, 쓰기는 약 1.25배 (공식 문서) */
+const CACHE_READ_MULTIPLIER = 0.1;
+const CACHE_WRITE_MULTIPLIER = 1.25;
+
+export function estimateCostUsd(modelId: string, inputTokens: number, outputTokens: number, cacheReadTokens = 0, cacheWriteTokens = 0): number {
   const price = PRICE_PER_MTOK.find(p => p.match.test(modelId));
   if (!price) return 0;
-  return (inputTokens * price.input + outputTokens * price.output) / 1_000_000;
+  const input = inputTokens + cacheReadTokens * CACHE_READ_MULTIPLIER + cacheWriteTokens * CACHE_WRITE_MULTIPLIER;
+  return (input * price.input + outputTokens * price.output) / 1_000_000;
 }
 
 /** 실행 1회의 관측 지표 (C-14) */
@@ -46,6 +51,9 @@ export interface AgentRunMetrics {
   modelCalls: Record<string, number>;
   inputTokens: number;
   outputTokens: number;
+  /** 프롬프트 캐시에서 읽거나 쓴 입력 토큰. inputTokens에는 포함되지 않는다 */
+  cacheReadTokens: number;
+  cacheWriteTokens: number;
   estimatedCostUsd: number;
   toolCalls: number;
   toolErrors: number;
@@ -77,6 +85,8 @@ export interface AgentDeps {
   requireDiagnosis?: boolean;
   /** 시스템 프롬프트에 넣을 현재 시각(ISO). 평가에서는 시나리오 시계를 쓴다 */
   currentTime?: string;
+  /** 도구 정의와 시스템 프롬프트를 캐시한다 (A-44). Haiku 4.5의 최소 크기 4,096토큰을 넘을 때만 효과가 있다 */
+  cachePrompt?: boolean;
 }
 
 // 기본 모델과 복잡한 분석용 모델 (template.yaml에서 주입, 퇴역 모델 하드코딩 제거: DECISION_LOG A-11)
@@ -133,6 +143,8 @@ export async function runReActAgent(
     modelCalls: {},
     inputTokens: 0,
     outputTokens: 0,
+    cacheReadTokens: 0,
+    cacheWriteTokens: 0,
     estimatedCostUsd: 0,
     toolCalls: 0,
     toolErrors: 0,
@@ -195,7 +207,12 @@ export async function runReActAgent(
       const modelId = deps.modelOverride ?? selectModel(userMessage, turnCount);
       const response = await converse({
         modelId,
-        system: [{ text: (deps.systemPrompt ?? JADONG_SYSTEM_PROMPT) + (deps.currentTime ? currentTimeSection(deps.currentTime) : '') }],
+        // 현재 시각은 실행마다 바뀌므로 캐시 지점 뒤에 둔다
+        system: [
+          { text: deps.systemPrompt ?? JADONG_SYSTEM_PROMPT },
+          ...(deps.cachePrompt ? [{ cachePoint: { type: 'default' as const } }] : []),
+          ...(deps.currentTime ? [{ text: currentTimeSection(deps.currentTime) }] : []),
+        ],
         messages,
         toolConfig: {
           tools,
@@ -212,9 +229,13 @@ export async function runReActAgent(
       metrics.modelCalls[usedModel] = (metrics.modelCalls[usedModel] ?? 0) + 1;
       const inputTokens = response.usage?.inputTokens ?? 0;
       const outputTokens = response.usage?.outputTokens ?? 0;
+      const cacheReadTokens = response.usage?.cacheReadInputTokens ?? 0;
+      const cacheWriteTokens = response.usage?.cacheWriteInputTokens ?? 0;
       metrics.inputTokens += inputTokens;
       metrics.outputTokens += outputTokens;
-      metrics.estimatedCostUsd += estimateCostUsd(usedModel, inputTokens, outputTokens);
+      metrics.cacheReadTokens += cacheReadTokens;
+      metrics.cacheWriteTokens += cacheWriteTokens;
+      metrics.estimatedCostUsd += estimateCostUsd(usedModel, inputTokens, outputTokens, cacheReadTokens, cacheWriteTokens);
 
       const assistantMessage = response.output?.message;
       if (!assistantMessage?.content) {
@@ -352,6 +373,8 @@ export async function runReActAgent(
     'gen_ai.conversation.id': metrics.runId,
     'gen_ai.usage.input_tokens': metrics.inputTokens,
     'gen_ai.usage.output_tokens': metrics.outputTokens,
+    'eecar.agent.cache_read_tokens': metrics.cacheReadTokens,
+    'eecar.agent.cache_write_tokens': metrics.cacheWriteTokens,
     'eecar.agent.turns': metrics.turns,
     'eecar.agent.stop_reason': metrics.stopReason,
     'eecar.agent.models': metrics.modelCalls,
