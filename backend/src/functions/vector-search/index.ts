@@ -41,12 +41,24 @@ function recordLlmCall(feature: string, latencyMs: number, fallback: boolean): v
 /**
  * 검색 SLI: 요청 수, 캐시 적중, 결과 0건 (C-06처럼 에러 없는 조용한 장애를 잡기 위함)과
  * 단계별 지연 (어느 단계가 응답 시간을 차지하는지 보기 위함, C-08)
+ * 검색기별 후보 수도 남긴다. 벡터 후보가 0이면 오류 없이 벡터 검색이 꺼진 것이다 (C-26 유형, A-39).
+ * 합성 검사(canary) 요청은 Operation=Canary로 따로 남겨 사용자 지표를 흐리지 않는다.
  */
-function recordSearch(cached: boolean, resultCount: number, timings: Record<string, number>): void {
-  emitMetrics(METRICS_NAMESPACE, { Operation: 'Search' }, {
+function recordSearch(
+  cached: boolean,
+  resultCount: number,
+  timings: Record<string, number>,
+  candidates?: { vector: number; bm25: number },
+  canary = false
+): void {
+  emitMetrics(METRICS_NAMESPACE, { Operation: canary ? 'Canary' : 'Search' }, {
     SearchRequests: { value: 1, unit: 'Count' },
     CacheHit: { value: cached ? 1 : 0, unit: 'Count' },
     ZeroResult: { value: resultCount === 0 ? 1 : 0, unit: 'Count' },
+    ...(candidates ? {
+      VectorCandidates: { value: candidates.vector, unit: 'Count' as const },
+      Bm25Candidates: { value: candidates.bm25, unit: 'Count' as const },
+    } : {}),
     ...Object.fromEntries(Object.entries(timings).map(([name, ms]) => [name, { value: ms, unit: 'Milliseconds' as const }])),
   });
 }
@@ -271,7 +283,9 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     }
     const body = parsed.body;
     // explain=false: LLM 설명 없이 바로 응답하고, 설명은 /api/search/explain으로 따로 받는다 (C-08, A-30)
+    // canary=true: 합성 검사 요청. 캐시를 읽지도 쓰지도 않고 진단 정보를 함께 돌려준다 (A-39)
     const { query, filters, topK = 10, explain = true } = body;
+    const canary = body.canary === true;
 
     if (!query) {
       return errorResponse('Query is required', undefined, 400, event);
@@ -281,7 +295,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     // Step 1: Check cache
     const queryHash = searchCacheKey(query, filters, topK, explain);
-    const cachedResult = await getItem(`MATCH#${queryHash}`, 'RESULT');
+    const cachedResult = canary ? undefined : await getItem(`MATCH#${queryHash}`, 'RESULT');
 
     if (cachedResult && cachedResult.TTL && Date.now() < cachedResult.TTL * 1000) {
       console.log('Cache hit!');
@@ -341,9 +355,9 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       ? await timed(timings, 'ExplanationMs', () => enrichWithAISequential(query, topMatches, parts))
       : buildResults(topMatches, parts, null);
 
-    // Step 10: Cache the results (7 days TTL)
+    // Step 10: Cache the results (7 days TTL). 합성 검사 결과는 캐시에 남기지 않는다
     const ttl = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60;
-    await putItem({
+    if (!canary) await putItem({
       PK: `MATCH#${queryHash}`,
       SK: 'RESULT',
       query,
@@ -360,11 +374,20 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     });
 
     timings.TotalMs = Date.now() - started;
-    recordSearch(false, filteredResults.length, timings);
+    recordSearch(false, filteredResults.length, timings, { vector: vectorMatches.length, bm25: bm25Matches.length }, canary);
     return successResponse({
       results: filteredResults,
       expandedQueries, // Include expanded queries in response for transparency
       cached: false,
+      ...(canary ? {
+        diagnostics: {
+          vectorCandidates: vectorMatches.length,
+          bm25Candidates: bm25Matches.length,
+          indexSize: index.bm25.size,
+          pipelineVersion: SEARCH_PIPELINE_VERSION,
+          timings,
+        },
+      } : {}),
     }, 200, event);
   } catch (error: any) {
     console.error('Error in vector search:', error);
@@ -526,13 +549,14 @@ async function explainHandler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     const parsed = parseJsonBody(event);
     if (!parsed.ok) return parsed.response;
     const { query, partIds } = parsed.body;
+    const canary = parsed.body.canary === true;
     if (!query || !Array.isArray(partIds) || partIds.length === 0 || partIds.some(id => typeof id !== 'string')) {
       return errorResponse('query and partIds are required', undefined, 400, event);
     }
     const ids = [...new Set(partIds as string[])].slice(0, MAX_EXPLAIN_PARTS);
 
     const key = explainCacheKey(query, ids);
-    const cached = await getItem(`MATCH#${key}`, 'EXPLAIN');
+    const cached = canary ? undefined : await getItem(`MATCH#${key}`, 'EXPLAIN');
     if (cached && cached.TTL && Date.now() < cached.TTL * 1000) {
       return successResponse({ explanations: cached.explanations, cached: true }, 200, event);
     }
@@ -562,7 +586,7 @@ async function explainHandler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     recordLlmCall('Explanation', Date.now() - started, fallback);
     const byId = Object.fromEntries(present.map((id, i) => [id, explanations[i] || FALLBACK_REASON]));
 
-    if (!fallback) {
+    if (!fallback && !canary) {
       await putItem({
         PK: `MATCH#${key}`,
         SK: 'EXPLAIN',
@@ -574,7 +598,8 @@ async function explainHandler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
         TTL: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60,
       });
     }
-    return successResponse({ explanations: byId, cached: false }, 200, event);
+    // 합성 검사에는 폴백 여부를 돌려준다 (C-09: 폴백이 200 응답 뒤에 숨어 AI 기능이 꺼진 줄 몰랐다)
+    return successResponse({ explanations: byId, cached: false, ...(canary ? { fallback } : {}) }, 200, event);
   } catch (error: any) {
     console.error('Error in search explanation:', error);
     return errorResponse('Internal server error', error.message, 500, event);

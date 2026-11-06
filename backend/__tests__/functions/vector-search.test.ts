@@ -130,6 +130,36 @@ describe('vector-search handler', () => {
     expect(JSON.parse(res.body)).toEqual({ explanations: { a: '캐시된 설명' }, cached: true });
   });
 
+  it('serves canary searches without touching the cache and reports retriever diagnostics', async () => {
+    const writes: string[] = [];
+    (process.stdout.write as unknown as jest.Mock).mockImplementation(((chunk: string) => { writes.push(String(chunk)); return true; }) as any);
+    const res = await handler(event({ query: '배터리', topK: 3, explain: false, canary: true }));
+    const parsed = JSON.parse(res.body);
+    expect(parsed.diagnostics).toMatchObject({ vectorCandidates: 4, indexSize: 3 });
+    expect(parsed.diagnostics.bm25Candidates).toBeGreaterThan(0);
+    expect(docMock.commandCalls(GetCommand).filter(c => String(c.args[0].input.Key?.PK).startsWith('MATCH#'))).toHaveLength(0);
+    expect(docMock.commandCalls(PutCommand).filter(c => String(c.args[0].input.Item?.PK).startsWith('MATCH#'))).toHaveLength(0);
+    const emf = writes.map(w => JSON.parse(w)).find(r => r.Operation === 'Canary');
+    expect(emf).toMatchObject({ VectorCandidates: 4, SearchRequests: 1 });
+  });
+
+  it('records retriever candidate counts for user searches under Operation=Search', async () => {
+    const writes: string[] = [];
+    (process.stdout.write as unknown as jest.Mock).mockImplementation(((chunk: string) => { writes.push(String(chunk)); return true; }) as any);
+    const res = await handler(event({ query: '배터리', topK: 3, explain: false }));
+    expect(JSON.parse(res.body).diagnostics).toBeUndefined();
+    const emf = writes.map(w => JSON.parse(w)).find(r => r.Operation === 'Search');
+    expect(emf.VectorCandidates).toBe(4);
+  });
+
+  it('bypasses the explanation cache for canaries and reports fallback', async () => {
+    docMock.on(GetCommand).resolves({ Item: { explanations: { a: '캐시된 설명' }, TTL: Math.floor(Date.now() / 1000) + 60 } });
+    const res = await handler(event({ query: '배터리', partIds: ['a'], canary: true }, '/api/search/explain'));
+    const parsed = JSON.parse(res.body);
+    expect(parsed).toMatchObject({ cached: false, fallback: true });
+    expect(docMock.commandCalls(PutCommand).filter(c => c.args[0].input.Item?.SK === 'EXPLAIN')).toHaveLength(0);
+  });
+
   it('does not cache fallback explanations and validates the request', async () => {
     const res = await handler(event({ query: '배터리', partIds: ['a'] }, '/api/search/explain'));
     expect(res.statusCode).toBe(200);
