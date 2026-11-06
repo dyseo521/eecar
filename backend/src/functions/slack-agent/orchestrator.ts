@@ -64,6 +64,8 @@ export interface AgentDeps {
   systemPrompt?: string;
   /** false면 앞 턴의 분석을 최종 답에 붙이지 않는다 (평가에서 이전 동작 재현) */
   mergeAnalysis?: boolean;
+  /** 모델에 보여줄 도구 이름. 없으면 전부 (평가에서 도구를 추가하기 전 동작 재현) */
+  toolNames?: string[];
 }
 
 // 기본 모델과 복잡한 분석용 모델 (template.yaml에서 주입, 퇴역 모델 하드코딩 제거: DECISION_LOG A-11)
@@ -141,7 +143,7 @@ export async function runReActAgent(
   let lastAnalysis = '';
 
   // Bedrock Converse API용 도구 정의
-  const tools = TOOLS.map((tool) => ({
+  const tools = TOOLS.filter(tool => !deps.toolNames || deps.toolNames.includes(tool.name)).map((tool) => ({
     toolSpec: {
       name: tool.name,
       description: tool.description,

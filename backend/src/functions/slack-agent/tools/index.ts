@@ -6,6 +6,7 @@ import { Tool, ToolResult } from '../types.js';
 import { analyzeError } from './analyze-error.js';
 import { getLambdaStatus, getRecentLogs, getErrorSummary, getAllLambdaStatuses } from './cloudwatch.js';
 import { recallMemory, saveMemory } from './memory.js';
+import { getFunctionConfig, getFunctionPermissions } from './config.js';
 
 /**
  * 사용 가능한 도구 목록
@@ -68,6 +69,36 @@ export const TOOLS: Tool[] = [
         days: {
           type: 'number',
           description: '조회 기간 (일, 기본 1일, 최대 30일)',
+        },
+      },
+      required: ['functionName'],
+    },
+  },
+  {
+    name: 'get_function_config',
+    description:
+      'Lambda 함수 설정을 조회합니다: 런타임, 제한 시간, 메모리, 환경 변수(비밀값은 가림), 레이어 버전과 최신 여부, 마지막 배포 시각. 배포 직후 장애, 설정값·환경 변수 문제, 타임아웃·메모리 문제를 확인할 때 사용합니다.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        functionName: {
+          type: 'string',
+          description: 'Lambda 함수명',
+        },
+      },
+      required: ['functionName'],
+    },
+  },
+  {
+    name: 'get_function_permissions',
+    description:
+      'Lambda 실행 역할의 IAM 정책(허용·거부 액션과 리소스)을 조회합니다. AccessDenied 같은 권한 오류의 원인을 확인할 때 사용합니다.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        functionName: {
+          type: 'string',
+          description: 'Lambda 함수명',
         },
       },
       required: ['functionName'],
@@ -187,6 +218,12 @@ export async function executeTool(
           return { success: true, data: status };
         }
       }
+
+      case 'get_function_config':
+        return { success: true, data: await getFunctionConfig(String(input.functionName)) };
+
+      case 'get_function_permissions':
+        return { success: true, data: await getFunctionPermissions(String(input.functionName)) };
 
       case 'get_error_summary': {
         const summary = await getErrorSummary(
