@@ -442,6 +442,30 @@ Resources:
               Action:
                 - lambda:ListFunctions
               Resource: '*'
+        # 함수 설정·실행 역할 권한 조회 (읽기 전용, 이 스택의 함수·역할만, DECISION_LOG A-38)
+        - Statement:
+            - Effect: Allow
+              Action:
+                - lambda:GetFunctionConfiguration
+              Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-*'
+            - Effect: Allow
+              Action:
+                - lambda:GetLayerVersion
+                - lambda:ListLayerVersions
+              Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:*'
+            - Effect: Allow
+              Action:
+                - iam:ListRolePolicies
+                - iam:GetRolePolicy
+                - iam:ListAttachedRolePolicies
+              Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${AWS::StackName}-*'
+            - Effect: Allow
+              Action:
+                - iam:GetPolicy
+                - iam:GetPolicyVersion
+              Resource:
+                - 'arn:aws:iam::aws:policy/*'
+                - !Sub 'arn:aws:iam::${AWS::AccountId}:policy/*'
         # Lambda: 자기 자신을 비동기 호출해 Slack에 즉시 응답한 뒤 처리 (C-13, DECISION_LOG A-36)
         # 자기 참조(!GetAtt)는 순환 의존이 되므로 스택 이름 접두사로 범위를 한정한다
         - Statement:

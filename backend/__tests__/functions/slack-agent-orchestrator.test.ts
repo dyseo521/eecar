@@ -56,6 +56,18 @@ describe('runReActAgent', () => {
     expect(JSON.stringify(secondCall.messages)).toContain('ThrottlingException');
   });
 
+  it('offers the config tools by default and only the named tools when toolNames is given', async () => {
+    const seen: string[][] = [];
+    const converse = jest.fn(async (input: ConverseCommandInput) => {
+      seen.push((input.toolConfig?.tools ?? []).map(t => t.toolSpec?.name ?? ''));
+      return finalTurn('정상입니다.');
+    });
+    await runReActAgent('상태 알려줘', context, { converse, emit: false, modelOverride: HAIKU });
+    await runReActAgent('상태 알려줘', context, { converse, emit: false, modelOverride: HAIKU, toolNames: ['get_logs'] });
+    expect(seen[0]).toEqual(expect.arrayContaining(['get_function_config', 'get_function_permissions', 'get_logs']));
+    expect(seen[1]).toEqual(['get_logs']);
+  });
+
   it('counts tool errors and passes the error text to the model', async () => {
     const replies = [toolTurn('get_function_status', { functionName: 'x' }), finalTurn('권한 문제로 조회하지 못했습니다.')];
     const converse = jest.fn(async () => replies.shift()!);
