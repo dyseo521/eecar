@@ -323,7 +323,7 @@ async function main(): Promise<void> {
         : variant === 'tools-only'
           ? { systemPrompt: shippedPrompt(), toolNames: CONFIG_TOOLS }
           : variant === 'candidate'
-            ? { systemPrompt: promptFile(arg('prompt') ?? 'eval/agent/candidate-system-prompt.txt'), toolNames: [...CONFIG_TOOLS, 'get_recent_changes', 'get_service_metrics', 'get_provider_status', 'submit_diagnosis'] }
+            ? { systemPrompt: promptFile(arg('prompt') ?? 'eval/agent/candidate-system-prompt.txt'), toolNames: [...CONFIG_TOOLS, 'get_recent_changes', 'get_service_metrics', 'get_provider_status', 'submit_diagnosis'], requireDiagnosis: !process.argv.includes('--free-text') }
             : {};
   const { runReActAgent } = await import('../../backend/src/functions/slack-agent/orchestrator.js');
   const { analyzeError } = await import('../../backend/src/functions/slack-agent/tools/analyze-error.js');
