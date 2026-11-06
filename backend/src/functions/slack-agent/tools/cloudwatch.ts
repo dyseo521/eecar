@@ -57,12 +57,27 @@ async function loadFunctionNameCache(): Promise<void> {
   }
 }
 
+function normalizeName(name: string): string {
+  return name.toLowerCase().replace(/^eecar-stack-/, '').replace(/[^a-z0-9]/g, '').replace(/function$/, '');
+}
+
 /**
- * 짧은 함수 이름을 실제 Lambda 함수 이름으로 변환
+ * 짧은 함수 이름을 실제 Lambda 함수 이름으로 변환. 대소문자와 Function 접미사는 무시한다 ("VectorSearch" = "VectorSearchFunction").
+ * found=false면 스택에 그런 함수가 없다 (함수 목록을 읽지 못했으면 판단하지 않고 true로 둔다).
  */
-async function resolveActualFunctionName(shortName: string): Promise<string> {
+export async function resolveFunction(shortName: string): Promise<{ fullName: string; found: boolean }> {
   await loadFunctionNameCache();
-  return functionNameCache.get(shortName) || `${STACK_PREFIX}-${shortName}`;
+  const exact = functionNameCache.get(shortName);
+  if (exact) return { fullName: exact, found: true };
+  const n = normalizeName(shortName);
+  for (const [key, full] of functionNameCache) {
+    if (normalizeName(key) === n || normalizeName(full) === n) return { fullName: full, found: true };
+  }
+  return { fullName: `${STACK_PREFIX}-${shortName}`, found: !cacheLoaded || functionNameCache.size === 0 };
+}
+
+async function resolveActualFunctionName(shortName: string): Promise<string> {
+  return (await resolveFunction(shortName)).fullName;
 }
 
 /**
@@ -74,7 +89,19 @@ export async function getLambdaStatus(
   functionName: string,
   days: number = 1
 ): Promise<LambdaStatus> {
-  const fullFunctionName = await resolveActualFunctionName(functionName);
+  const { fullName: fullFunctionName, found } = await resolveFunction(functionName);
+  if (!found) {
+    // 이전에는 없는 함수도 지표를 0으로 채워 돌려줘, 에이전트가 "정상"이라고 답했다 (A-35)
+    return {
+      functionName,
+      found: false,
+      note: `'${functionName}' 함수를 스택에서 찾지 못했습니다. 함수 이름을 확인하세요.`,
+      invocations: 0,
+      errors: 0,
+      errorRate: 0,
+      avgDuration: 0,
+    };
+  }
   const endTime = new Date();
   // days 파라미터에 따라 조회 기간 설정
   const startTime = new Date(endTime.getTime() - days * 24 * 60 * 60 * 1000);
