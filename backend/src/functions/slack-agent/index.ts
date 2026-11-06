@@ -1,50 +1,60 @@
 /**
  * 자동이 2.0: AI DevOps 어시스턴트
  * Slack 이벤트 수신 및 라우팅
+ *
+ * 수신 경로(API Gateway): 서명 검증 → (이벤트면) event_id 선점 → 비동기 작업 전달 → 즉시 응답
+ * 작업 경로(같은 함수의 비동기 호출): 에이전트·슬래시 커맨드 실행 → Slack으로 결과 전송 (C-13, A-36)
  */
 
-import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { verifySlackRequest } from './slack-verifier.js';
 import { handleSlashCommand } from './handlers/slash-command.js';
 import { handleAppMention } from './handlers/app-mention.js';
 import { handleInteraction } from './handlers/interaction.js';
 import { SlackEvent } from './types.js';
+import { claimSlackEvent, dispatchJob, isJobEvent, JadongJob, postToResponseUrl } from './async-dispatch.js';
+import { emitMetrics } from '/opt/nodejs/utils/emf.js';
 
-/**
- * Slack 재시도 요청 감지
- * Slack은 3초 내 응답 없으면 X-Slack-Retry-Num 헤더와 함께 재시도
- */
-function isSlackRetry(headers: Record<string, string | undefined>): boolean {
-  const retryNum = headers['x-slack-retry-num'] || headers['X-Slack-Retry-Num'];
-  const retryReason = headers['x-slack-retry-reason'] || headers['X-Slack-Retry-Reason'];
+/** 즉시 처리해도 3초 안에 끝나는 슬래시 커맨드 (외부 조회 없음) */
+const INLINE_SLASH_COMMANDS = new Set(['', '도움말', 'help']);
 
-  if (retryNum) {
-    console.log('Slack retry detected:', { retryNum, retryReason });
-    return true;
-  }
-  return false;
+function header(headers: Record<string, string | undefined>, name: string): string | undefined {
+  return headers[name] ?? headers[name.toLowerCase()] ?? Object.entries(headers).find(([k]) => k.toLowerCase() === name.toLowerCase())?.[1];
+}
+
+/** Slack 수신 지표: 응답 시간, 재시도 수신, 중복 이벤트 (C-13 검증 기준) */
+function recordIngress(kind: string, started: number, retry: boolean, duplicate: boolean): void {
+  emitMetrics('EECAR/Agent', { Ingress: kind }, {
+    SlackRequests: { value: 1, unit: 'Count' },
+    SlackAckLatency: { value: Date.now() - started, unit: 'Milliseconds' },
+    SlackRetries: { value: retry ? 1 : 0, unit: 'Count' },
+    SlackDuplicates: { value: duplicate ? 1 : 0, unit: 'Count' },
+  }, [['Ingress'], []]);
 }
 
 /**
  * Lambda 핸들러
  */
-export const handler: APIGatewayProxyHandler = async (event): Promise<APIGatewayProxyResult> => {
-  console.log('Received Slack event:', JSON.stringify(event, null, 2));
+export const handler = async (
+  event: APIGatewayProxyEvent | { jadongJob: JadongJob }
+): Promise<APIGatewayProxyResult | void> => {
+  if (isJobEvent(event)) {
+    return runJob(event.jadongJob);
+  }
+  const started = Date.now();
 
   try {
     const body = event.body || '';
     const headers = event.headers || {};
+    const retryNum = header(headers, 'X-Slack-Retry-Num');
+    // 요청 전체(서명 헤더·사용자 메시지)를 로그에 남기지 않는다 (이전에는 이벤트 전체를 INFO로 남겼다)
+    console.log('Slack request:', { retryNum, retryReason: header(headers, 'X-Slack-Retry-Reason'), bytes: body.length });
 
-    // Slack 재시도 요청은 즉시 200 응답 (중복 메시지 방지)
-    if (isSlackRetry(headers)) {
-      return response(200, { ok: true, message: 'Retry acknowledged' });
-    }
-
-    // Slack 요청 검증
+    // 재시도도 서명부터 검증한다. 이전에는 서명 검증 전에 재시도를 일괄로 버려, 첫 요청이 실패한 이벤트가 유실됐다
     const isValid = await verifySlackRequest(
       body,
-      headers['x-slack-request-timestamp'] || headers['X-Slack-Request-Timestamp'],
-      headers['x-slack-signature'] || headers['X-Slack-Signature']
+      header(headers, 'X-Slack-Request-Timestamp'),
+      header(headers, 'X-Slack-Signature')
     );
 
     if (!isValid) {
@@ -53,7 +63,7 @@ export const handler: APIGatewayProxyHandler = async (event): Promise<APIGateway
     }
 
     // Content-Type에 따라 파싱
-    const contentType = headers['content-type'] || headers['Content-Type'] || '';
+    const contentType = header(headers, 'Content-Type') || '';
     let slackEvent: SlackEvent;
 
     if (contentType.includes('application/x-www-form-urlencoded')) {
@@ -85,13 +95,19 @@ export const handler: APIGatewayProxyHandler = async (event): Promise<APIGateway
 
     // URL 검증 (Slack App 설정 시 필요)
     if (slackEvent.type === 'url_verification') {
-      console.log('URL verification challenge');
       return response(200, { challenge: slackEvent.challenge });
     }
 
-    // 이벤트 타입별 라우팅
     if (slackEvent.type === 'slash_command') {
-      return await handleSlashCommandWithAck(slackEvent);
+      const command = (slackEvent.text || '').trim().split(/\s+/)[0].toLowerCase();
+      if (INLINE_SLASH_COMMANDS.has(command)) {
+        const result = await handleSlashCommand(slackEvent);
+        recordIngress('slash_inline', started, false, false);
+        return response(200, result);
+      }
+      await dispatchJob({ type: 'slash_command', event: slackEvent });
+      recordIngress('slash_async', started, false, false);
+      return response(200, { response_type: 'ephemeral', text: ':robot_face: 자동이가 처리 중입니다...' });
     }
 
     if (slackEvent.type === 'interactive') {
@@ -103,12 +119,16 @@ export const handler: APIGatewayProxyHandler = async (event): Promise<APIGateway
 
       // 봇 자신의 메시지는 무시
       if (eventPayload?.bot_id) {
-        console.log('Ignoring bot message');
         return response(200, { ok: true });
       }
 
       if (eventPayload?.type === 'app_mention') {
-        return await handleAppMentionWithAck(slackEvent);
+        // 같은 이벤트는 한 번만 처리한다 (Slack 재시도·중복 전달)
+        const eventId = slackEvent.event_id;
+        const first = eventId ? await claimSlackEvent(eventId) : true;
+        if (first) await dispatchJob({ type: 'app_mention', event: slackEvent });
+        recordIngress('app_mention', started, Boolean(retryNum), !first);
+        return response(200, { ok: true });
       }
 
       // 기타 이벤트 (message 등)
@@ -125,48 +145,23 @@ export const handler: APIGatewayProxyHandler = async (event): Promise<APIGateway
 };
 
 /**
- * Slash Command 처리 (3초 내 응답 + 비동기 처리)
+ * 비동기 작업 실행 (같은 함수의 Event 호출로 들어온다)
  */
-async function handleSlashCommandWithAck(slackEvent: SlackEvent): Promise<APIGatewayProxyResult> {
-  // Slack은 3초 내 응답 필요
-  // 복잡한 처리는 response_url로 나중에 전송
-
-  // 즉시 응답: "처리 중..." 메시지
-  const immediateResponse = {
-    response_type: 'ephemeral',
-    text: ':robot_face: 자동이가 처리 중입니다...',
-  };
-
-  // 비동기로 실제 처리 수행
-  // Lambda에서는 동기적으로 처리하고 response_url로 업데이트
+async function runJob(job: JadongJob): Promise<void> {
+  if (job.type === 'app_mention') {
+    await handleAppMention(job.event);
+    return;
+  }
+  const responseUrl = job.event.response_url;
   try {
-    // 간단한 명령은 즉시 응답
-    const result = await handleSlashCommand(slackEvent);
-
-    if (result) {
-      return response(200, result);
+    const result = await handleSlashCommand(job.event);
+    if (responseUrl && result) await postToResponseUrl(responseUrl, result);
+  } catch (error) {
+    console.error('Error handling slash command job:', error);
+    if (responseUrl) {
+      await postToResponseUrl(responseUrl, { response_type: 'ephemeral', text: '처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.' });
     }
-  } catch (error) {
-    console.error('Error handling slash command:', error);
   }
-
-  return response(200, immediateResponse);
-}
-
-/**
- * App Mention 처리
- */
-async function handleAppMentionWithAck(slackEvent: SlackEvent): Promise<APIGatewayProxyResult> {
-  // 즉시 200 응답 (Slack 재시도 방지)
-  // 비동기로 처리 후 chat.postMessage로 응답
-
-  try {
-    await handleAppMention(slackEvent);
-  } catch (error) {
-    console.error('Error handling app mention:', error);
-  }
-
-  return response(200, { ok: true });
 }
 
 /**
