@@ -4,21 +4,26 @@
  *
  *   npx tsx eval/ts/agent-judge-to-report.ts <판정>.json --variant shipped --out <보고서>.json
  *   [--tpr 0.81 --tnr 0.92]  # 판정 모델 오차로 통과율을 보정한 값(Rogan-Gladen)도 함께 적는다
+ *   [--scenarios <파일>]     # v3 시나리오의 범주를 함께 적어 agent-compare가 범주별로 비교하게 한다
  */
 import { readFileSync, writeFileSync } from 'fs';
 
 const args = process.argv.slice(2);
 const opt = (n: string) => { const i = args.indexOf(`--${n}`); return i >= 0 ? args[i + 1] : undefined; };
-const input = args.find(a => a.endsWith('.json') && a !== opt('out'))!;
+const input = args.find(a => a.endsWith('.json') && a !== opt('out') && a !== opt('scenarios'))!;
 const variant = opt('variant')!;
 const tpr = opt('tpr') ? Number(opt('tpr')) : undefined;
 const tnr = opt('tnr') ? Number(opt('tnr')) : undefined;
 
 const judgments = (JSON.parse(readFileSync(input, 'utf-8')).judgments as any[]).filter(j => j.variant === variant);
+const GROUP: Record<string, string> = { A: '변경', B: '외부', C: '용량', D: '잠복', E: 'LLM', F: '정상·오경보' };
+const scenarioFile = opt('scenarios');
+const codes = new Map<string, string>(scenarioFile ? (JSON.parse(readFileSync(scenarioFile, 'utf-8')).scenarios as any[]).map(s => [s.id, String(s.code ?? '')]) : []);
 const byId = new Map<string, any[]>();
 for (const j of judgments) byId.set(j.scenario, [...(byId.get(j.scenario) ?? []), j]);
 const byScenario = [...byId.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([id, js]) => ({
   id, passRate: js.filter(j => j.pass).length / js.length, runs: js.length,
+  ...(codes.get(id) ? { category: GROUP[codes.get(id)![0]] ?? codes.get(id) } : {}),
 }));
 const observed = judgments.filter(j => j.pass).length / judgments.length;
 /** Rogan-Gladen: 판정 모델의 TPR·TNR을 알 때 실제 통과율 추정 = (관측 + TNR − 1) / (TPR + TNR − 1) */
