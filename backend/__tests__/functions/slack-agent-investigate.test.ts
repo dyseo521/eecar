@@ -204,6 +204,37 @@ describe('orchestrator with submit_diagnosis', () => {
     expect(seen[0]).toEqual(['get_recent_changes', 'submit_diagnosis']);
   });
 
+  it('forces a tool call on every turn and the submission on the last turn when a diagnosis is required', async () => {
+    const choices: unknown[] = [];
+    const converse = jest.fn(async (input: ConverseCommandInput) => {
+      choices.push(input.toolConfig?.toolChoice);
+      const last = choices.length === 10;
+      const toolUse = last
+        ? { toolUseId: 'end', name: 'submit_diagnosis', input: { verdict: 'insufficient_evidence', summary: '근거가 부족합니다.' } }
+        : { toolUseId: `t${choices.length}`, name: 'get_recent_changes', input: {} };
+      return { output: { message: { role: 'assistant', content: [{ toolUse }] } }, usage } as unknown as ConverseCommandOutput;
+    });
+    const executeTool = jest.fn(async () => ({ success: true, data: { changes: [] } }));
+    const result = await runReActAgent('원인 찾아줘', { userId: 'U', channelId: 'C' }, {
+      converse, executeTool, emit: false, modelOverride: HAIKU, toolNames: ['get_recent_changes', 'submit_diagnosis'], requireDiagnosis: true,
+    });
+    expect(choices[0]).toEqual({ any: {} });
+    expect(choices[8]).toEqual({ any: {} });
+    expect(choices[9]).toEqual({ tool: { name: 'submit_diagnosis' } });
+    expect(result.diagnosis).toMatchObject({ verdict: 'insufficient_evidence' });
+    expect(result.metrics.stopReason).toBe('final');
+  });
+
+  it('leaves the tool choice to the model by default', async () => {
+    const choices: unknown[] = [];
+    const converse = jest.fn(async (input: ConverseCommandInput) => {
+      choices.push(input.toolConfig?.toolChoice);
+      return { output: { message: { role: 'assistant', content: [{ text: '정상입니다.' }] } }, usage } as unknown as ConverseCommandOutput;
+    });
+    await runReActAgent('상태', { userId: 'U', channelId: 'C' }, { converse, emit: false, modelOverride: HAIKU });
+    expect(choices).toEqual([undefined]);
+  });
+
   it('does not offer the investigation tools in production', async () => {
     const seen: string[][] = [];
     const converse = jest.fn(async (input: ConverseCommandInput) => {

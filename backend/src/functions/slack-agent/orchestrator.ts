@@ -69,6 +69,11 @@ export interface AgentDeps {
   mergeAnalysis?: boolean;
   /** 모델에 보여줄 도구 이름. 없으면 운영 도구(PRODUCTION_TOOL_NAMES). 평가에서 실험 도구를 켤 때 쓴다 */
   toolNames?: string[];
+  /**
+   * 구조화 진단으로만 끝나게 한다 (A-40). 프롬프트로 요청하면 Haiku 4.5는 60회 중 1회만 제출했다(dev 측정).
+   * 매 턴 도구 호출을 강제하고, 마지막 턴에는 제출을 강제해 한도에 닿아도 빈손으로 끝나지 않게 한다.
+   */
+  requireDiagnosis?: boolean;
 }
 
 // 기본 모델과 복잡한 분석용 모델 (template.yaml에서 주입, 퇴역 모델 하드코딩 제거: DECISION_LOG A-11)
@@ -189,6 +194,9 @@ export async function runReActAgent(
         messages,
         toolConfig: {
           tools,
+          ...(deps.requireDiagnosis
+            ? { toolChoice: turnCount === MAX_TURNS ? { tool: { name: 'submit_diagnosis' } } : { any: {} } }
+            : {}),
         },
         inferenceConfig: {
           maxTokens: 2048,
