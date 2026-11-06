@@ -115,6 +115,10 @@ jobs:
       - name: Search quality regression gate (production ranking, v4 blind holdout)
         run: cd eval && uv run python -m eecar_eval.gate --dataset v4 --system prod-hybrid
 
+      # 운영 부품 스냅숏으로 관찰된 실패가 다시 생기지 않는지 확인 (DECISION_LOG A-33)
+      - name: Production data regression checks
+        run: npx tsx eval/ts/prod-regression.ts
+
   # E2E tests (only on master)
   e2e:
     name: E2E Tests
