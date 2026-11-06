@@ -111,6 +111,20 @@ export async function updateItem(
 }
 
 /**
+ * 숫자 속성을 원자적으로 올린다 (읽고 덮어쓰지 않으므로 동시 요청이 값을 잃지 않는다)
+ */
+export async function incrementAttribute(pk: string, sk: string, attribute: string, by = 1): Promise<void> {
+  await ddbDocClient.send(new UpdateCommand({
+    TableName: TABLE_NAME,
+    Key: { PK: pk, SK: sk },
+    UpdateExpression: 'ADD #attr :by',
+    ConditionExpression: 'attribute_exists(PK)',
+    ExpressionAttributeNames: { '#attr': attribute },
+    ExpressionAttributeValues: { ':by': by },
+  }));
+}
+
+/**
  * Batch get items
  */
 const BATCH_GET_MAX_KEYS = 100; // DynamoDB BatchGetItem hard limit

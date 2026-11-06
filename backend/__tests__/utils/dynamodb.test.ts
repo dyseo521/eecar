@@ -12,6 +12,7 @@ import {
   queryByPK,
   queryGSI1,
   updateItem,
+  incrementAttribute,
   queryGSI1WithPagination,
   queryAllMetadataWithPagination,
 } from '../../src/utils/dynamodb.js';
@@ -93,6 +94,19 @@ describe('updateItem', () => {
       ExpressionAttributeNames: { '#attr0': 'price', '#attr1': 'status' },
       ExpressionAttributeValues: { ':val0': 100, ':val1': 'sold' },
     });
+  });
+});
+
+describe('incrementAttribute', () => {
+  it('adds atomically and only to an existing item', async () => {
+    docMock.on(UpdateCommand).resolves({});
+    await incrementAttribute('MATCH#h', 'RESULT', 'hitCount');
+    const input = docMock.commandCalls(UpdateCommand)[0].args[0].input;
+    expect(input.Key).toEqual({ PK: 'MATCH#h', SK: 'RESULT' });
+    expect(input.UpdateExpression).toBe('ADD #attr :by');
+    expect(input.ConditionExpression).toBe('attribute_exists(PK)');
+    expect(input.ExpressionAttributeNames).toEqual({ '#attr': 'hitCount' });
+    expect(input.ExpressionAttributeValues).toEqual({ ':by': 1 });
   });
 });
 

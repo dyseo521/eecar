@@ -30,13 +30,26 @@ export function partIdOf(item: DynamoDBItem): string {
 }
 
 export function buildSearchIndex(items: DynamoDBItem[], loadedAt = Date.now()): SearchIndex {
-  const docs = items.map(item => ({ id: partIdOf(item), text: searchTextOf(item) }));
-  return {
-    bm25: Bm25Index.fromTexts(docs),
-    parts: new Map(items.map(item => [partIdOf(item), item])),
-    attributes: new Map(items.map(item => [partIdOf(item), searchAttributesOf(item)])),
-    loadedAt,
-  };
+  // 형태가 이상한 레코드 하나 때문에 전체 BM25 색인이 실패하면 안 된다. 그 레코드만 빼고, 건수를 남긴다 (A-41)
+  const docs: Array<{ id: string; text: string }> = [];
+  const parts = new Map<string, DynamoDBItem>();
+  const attributes = new Map<string, ReturnType<typeof searchAttributesOf>>();
+  let skipped = 0;
+  for (const item of items) {
+    try {
+      const id = partIdOf(item);
+      const text = searchTextOf(item);
+      const attrs = searchAttributesOf(item);
+      docs.push({ id, text });
+      parts.set(id, item);
+      attributes.set(id, attrs);
+    } catch (error) {
+      skipped++;
+      console.warn('Skipped part in search index:', { pk: item.PK, reason: (error as Error)?.message });
+    }
+  }
+  if (skipped > 0) console.warn(`Search index skipped ${skipped} of ${items.length} parts`);
+  return { bm25: Bm25Index.fromTexts(docs), parts, attributes, loadedAt };
 }
 
 /** 캐시된 색인을 돌려주고, 없거나 TTL이 지났으면 다시 읽는다. loaded는 이번 호출에서 새로 읽었는지 */

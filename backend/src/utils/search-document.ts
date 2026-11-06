@@ -60,7 +60,9 @@ const RECOMMENDED_USE_LABELS: Record<string, string> = {
 };
 
 /** 양극재 계열의 한국어 이름 (화학 조성에서 나오는 사실) */
-function cathodeFamily(cathode: string): string | undefined {
+function cathodeFamily(cathode: unknown): string | undefined {
+  // 문자열이 아닌 값이 들어오면 예외로 전체 색인 적재가 실패했다 (A-41)
+  if (typeof cathode !== 'string') return undefined;
   const c = cathode.toUpperCase();
   if (c.startsWith('NCM') || c.startsWith('NMC')) {
     const ni = Number(/NI\s*(\d+)/.exec(c)?.[1]);

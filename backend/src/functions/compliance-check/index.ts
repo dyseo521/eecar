@@ -1,6 +1,7 @@
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { callClaude } from '/opt/nodejs/utils/bedrock.js';
 import { getDocument } from '/opt/nodejs/utils/s3.js';
+import { emitMetrics } from '/opt/nodejs/utils/emf.js';
 
 const snsClient = new SNSClient({});
 const SNS_TOPIC_ARN = process.env.SNS_TOPIC_ARN!;
@@ -21,6 +22,13 @@ export async function handler(event: any): Promise<void> {
 
     // Step 2: Check compliance using Claude
     const violations = await checkCompliance(partData, complianceRules);
+
+    // 검사 자체가 실패하면 "위반 없음"이 아니다. 조용히 넘어가면 규정 검사가 꺼진 줄 모른다 (A-41)
+    if (violations === null) {
+      console.error('Compliance check could not run for part:', partId);
+      emitMetrics('EECAR/Compliance', {}, { ComplianceCheckFailed: { value: 1, unit: 'Count' } }, [[]]);
+      return;
+    }
 
     // Step 3: If violations found, send SNS notification
     if (violations.length > 0) {
@@ -74,7 +82,7 @@ async function loadComplianceRules(): Promise<string> {
 /**
  * Check compliance using Claude
  */
-async function checkCompliance(partData: any, rules: string): Promise<string[]> {
+async function checkCompliance(partData: any, rules: string): Promise<string[] | null> {
   const prompt = `다음은 전기차 부품 규성 준수 사항입니다:
 
 ${rules}
@@ -95,16 +103,19 @@ ${rules}
       500
     );
 
-    const violations = response
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line && line !== '없음' && !line.includes('위반 사항이 없'));
-
-    return violations;
+    return parseViolations(response);
   } catch (error) {
     console.error('Failed to check compliance with AI:', error);
-    return [];
+    return null;
   }
+}
+
+/** "없음", "위반 사항 없음", "위반 사항이 없습니다" 같은 줄은 위반이 아니다 (이전에는 "위반 사항 없음"을 위반으로 셌다) */
+export function parseViolations(response: string): string[] {
+  return response
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line && !/^[-*\d.\s]*(없음|없습니다)[.\s]*$/.test(line) && !/위반\s*(사항|항목)?\s*(이|은|는)?\s*없/.test(line));
 }
 
 /**

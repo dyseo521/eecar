@@ -121,6 +121,13 @@ describe('buildSearchText', () => {
   });
 });
 
+describe('buildSearchText with malformed values', () => {
+  it.each([[811], [null], [{ code: 'NCM' }]])('does not throw on a non-string cathode type %j', cathodeType => {
+    const text = buildSearchText({ name: '코나 배터리', category: 'battery', manufacturer: '현대', batteryHealth: { cathodeType } } as any);
+    expect(text).toContain('코나 배터리');
+  });
+});
+
 describe('buildEmbeddingText', () => {
   it('is the search document without trade lines', () => {
     expect(buildEmbeddingText(battery)).toBe(buildSearchText(battery, { trade: false }));

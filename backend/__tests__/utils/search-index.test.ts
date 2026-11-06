@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { mockClient } from 'aws-sdk-client-mock';
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import {
@@ -54,5 +55,27 @@ describe('search index', () => {
     expect(second.index).toBe(first.index);
     expect(third.loaded).toBe(true);
     expect(docMock.commandCalls(QueryCommand)).toHaveLength(2);
+  });
+});
+
+describe('buildSearchIndex with malformed records', () => {
+  const good = { PK: 'PART#good', SK: 'METADATA', name: '아이오닉5 배터리 팩', category: 'battery', manufacturer: '현대' };
+
+  it('survives a non-string cathode type and still indexes the part', () => {
+    const odd = { PK: 'PART#odd', SK: 'METADATA', name: '코나 배터리', category: 'battery', manufacturer: '현대', batteryHealth: { cathodeType: 811 } };
+    const index = buildSearchIndex([good, odd] as any);
+    expect(index.bm25.size).toBe(2);
+    expect(index.parts.has('odd')).toBe(true);
+  });
+
+  it('skips a record that cannot be indexed instead of failing the whole index', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const broken = { PK: 'PART#broken', SK: 'METADATA', get name(): string { throw new Error('bad record'); } };
+    const index = buildSearchIndex([good, broken] as any);
+    expect(index.bm25.size).toBe(1);
+    expect(index.parts.has('good')).toBe(true);
+    expect(index.parts.has('broken')).toBe(false);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
   });
 });
