@@ -16,8 +16,9 @@ import { existsSync, readFileSync } from 'fs';
 
 type Label = { cause?: string; fix?: string; wrong?: string; pass?: boolean };
 
-function keyOf(v: { variant?: string; scenario?: string; run?: number; item?: string }): string {
-  return v.item ?? `${v.variant}|${v.scenario}|${v.run}`;
+function keyOf(v: { variant?: string; scenario?: string; run?: number; item?: string; id?: string }): string {
+  // 표본 id(개발용 L01.., 시험용 T01..)가 있으면 그것으로, 없으면 실행 단위로 짝짓는다 (사람·검토자 판정은 id, 판정 모델 결과는 item)
+  return v.item ?? (v.id && /^[LT]\d+$/.test(v.id) ? v.id : `${v.variant}|${v.scenario}|${v.run}`);
 }
 
 function load(spec: string, phraseFrom?: string): Map<string, Label> {

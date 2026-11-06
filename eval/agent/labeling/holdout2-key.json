@@ -1,0 +1,562 @@
+[
+ {
+  "id": "L01",
+  "variant": "toolsonly",
+  "scenario": "v2-27",
+  "run": 2,
+  "stratum": "cause",
+  "grader": {
+   "cause": false,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L02",
+  "variant": "config",
+  "scenario": "v2-13",
+  "run": 1,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ },
+ {
+  "id": "L03",
+  "variant": "config",
+  "scenario": "v2-19",
+  "run": 0,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ },
+ {
+  "id": "L04",
+  "variant": "toolsonly",
+  "scenario": "v2-19",
+  "run": 2,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ },
+ {
+  "id": "L05",
+  "variant": "config",
+  "scenario": "v2-22",
+  "run": 2,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ },
+ {
+  "id": "L06",
+  "variant": "shipped",
+  "scenario": "v2-09",
+  "run": 1,
+  "stratum": "cause",
+  "grader": {
+   "cause": false,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L07",
+  "variant": "config",
+  "scenario": "v2-12",
+  "run": 2,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L08",
+  "variant": "toolsonly",
+  "scenario": "v2-13",
+  "run": 0,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ },
+ {
+  "id": "L09",
+  "variant": "config",
+  "scenario": "v2-28",
+  "run": 1,
+  "stratum": "cause",
+  "grader": {
+   "cause": false,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L10",
+  "variant": "config",
+  "scenario": "v2-29",
+  "run": 1,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ },
+ {
+  "id": "L11",
+  "variant": "toolsonly",
+  "scenario": "v2-06",
+  "run": 1,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ },
+ {
+  "id": "L12",
+  "variant": "shipped",
+  "scenario": "v2-10",
+  "run": 2,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L13",
+  "variant": "toolsonly",
+  "scenario": "v2-27",
+  "run": 1,
+  "stratum": "cause",
+  "grader": {
+   "cause": false,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L14",
+  "variant": "shipped",
+  "scenario": "v2-11",
+  "run": 1,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L15",
+  "variant": "shipped",
+  "scenario": "v2-30",
+  "run": 2,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L16",
+  "variant": "shipped",
+  "scenario": "v2-11",
+  "run": 0,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L17",
+  "variant": "shipped",
+  "scenario": "v2-15",
+  "run": 1,
+  "stratum": "cause",
+  "grader": {
+   "cause": false,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L18",
+  "variant": "config",
+  "scenario": "v2-28",
+  "run": 0,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L19",
+  "variant": "config",
+  "scenario": "v2-14",
+  "run": 2,
+  "stratum": "cause",
+  "grader": {
+   "cause": false,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L20",
+  "variant": "config",
+  "scenario": "v2-23",
+  "run": 0,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ },
+ {
+  "id": "L21",
+  "variant": "shipped",
+  "scenario": "v2-29",
+  "run": 0,
+  "stratum": "cause",
+  "grader": {
+   "cause": false,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L22",
+  "variant": "toolsonly",
+  "scenario": "v2-16",
+  "run": 1,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ },
+ {
+  "id": "L23",
+  "variant": "config",
+  "scenario": "v2-21",
+  "run": 0,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ },
+ {
+  "id": "L24",
+  "variant": "toolsonly",
+  "scenario": "v2-04",
+  "run": 0,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ },
+ {
+  "id": "L25",
+  "variant": "config",
+  "scenario": "v2-03",
+  "run": 1,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L26",
+  "variant": "shipped",
+  "scenario": "v2-15",
+  "run": 0,
+  "stratum": "cause",
+  "grader": {
+   "cause": false,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L27",
+  "variant": "shipped",
+  "scenario": "v2-04",
+  "run": 0,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ },
+ {
+  "id": "L28",
+  "variant": "config",
+  "scenario": "v2-18",
+  "run": 2,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L29",
+  "variant": "config",
+  "scenario": "v2-21",
+  "run": 2,
+  "stratum": "cause",
+  "grader": {
+   "cause": false,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L30",
+  "variant": "config",
+  "scenario": "v2-20",
+  "run": 2,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L31",
+  "variant": "toolsonly",
+  "scenario": "v2-02",
+  "run": 1,
+  "stratum": "cause",
+  "grader": {
+   "cause": false,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L32",
+  "variant": "shipped",
+  "scenario": "v2-14",
+  "run": 0,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L33",
+  "variant": "shipped",
+  "scenario": "v2-02",
+  "run": 1,
+  "stratum": "cause",
+  "grader": {
+   "cause": false,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L34",
+  "variant": "config",
+  "scenario": "v2-10",
+  "run": 0,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L35",
+  "variant": "config",
+  "scenario": "v2-03",
+  "run": 2,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L36",
+  "variant": "toolsonly",
+  "scenario": "v2-23",
+  "run": 2,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ },
+ {
+  "id": "L37",
+  "variant": "shipped",
+  "scenario": "v2-06",
+  "run": 2,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L38",
+  "variant": "toolsonly",
+  "scenario": "v2-30",
+  "run": 1,
+  "stratum": "cause",
+  "grader": {
+   "cause": false,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L39",
+  "variant": "config",
+  "scenario": "v2-12",
+  "run": 1,
+  "stratum": "fixonly",
+  "grader": {
+   "cause": true,
+   "fix": false,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": false
+  }
+ },
+ {
+  "id": "L40",
+  "variant": "config",
+  "scenario": "v2-26",
+  "run": 2,
+  "stratum": "pass",
+  "grader": {
+   "cause": true,
+   "fix": true,
+   "noWrongClaim": true,
+   "evidence": true,
+   "pass": true
+  }
+ }
+]

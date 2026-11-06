@@ -1,0 +1,1283 @@
+{
+ "L01": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "ContactInquiryFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"ContactInquiryFunction\",\"invocations\":19,\"errors\":0,\"avgDuration\":160,\"errorRate\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "ContactInquiryFunction",
+    "filter": "ALL",
+    "minutes": 120
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:06:38.054Z\",\"message\":\"2026-11-06T05:06:38.054Z\\treq-0\\tSTART RequestId: 39059724-f73a-4969-845d-fe4146c5660e Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:07:38.054Z\",\"message\":\"2026-11-06T05:07:38.054Z\\treq-1\\t2026-11-06T00:58:21.330Z\\t39059724-f73a-4969-845d-fe4146c5660e\\tINFO\\tProcessing contact inquiry from: buyer.park@example.com\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:08:38.054Z\",\"message\":\"2026-11-06T05:08:38.054Z\\treq-2\\t2026-11-06T00:58:21.498Z\\t39059724-f73a-4969-845d-fe4146c5660e\\tINFO\\tContact inquiry notification sent successfully\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:09:38.054Z\",\"message\":\"2026-11-06T05:09:38.054Z\\treq-3\\tEND RequestId: 39059724-f73a-4969-845d-fe4146c5660e\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:10:38.054Z\",\"message\":\"2026-11-06T05:10:38.054Z\\treq-4\\tREPORT RequestId: 39059724-f73a-4969-845d-fe4146c5660e\\tDuration: 163.71 ms\\tBilled Duration: 164 ms\\tMemory Size: 512 MB\\tMax Memory Used: 91 MB\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:11:38.054Z\",\"message\":\"2026-11-06T05:11:38.054Z\\treq-5\\tSTART RequestId: 7f100b7b-3609-4fb9-b06d-fb4fac360931 Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:12:38.054Z\",\"message\":\"2026-11-06T05:12:38.054Z\\treq-6\\t2026-11-06T02:12:09.774Z\\t7f100b7b-3609-4fb9-b06d-fb4fac360931\\tINFO\\tProcessing contact inquiry from: sourcing@example.co.kr\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:13:38.054Z\",\"message\":\"2026-11-06T05:13:38.054Z\\treq-7\\t2026-11-06T02:12:09.942Z\\t7f100b7b-3609-4fb9-b06d-fb4fac360931\\tINFO\\tContact inquiry notification sent successfully\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:14:38.054Z\",\"message\":\"2026-11-06T05:14:38.054Z\\treq-8\\tEND RequestId: 7f100b7b-3609-4fb9-b06d-fb4fac360931\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:15:38.054Z\",\"message\":\"2026-11-06T05:15:38.054Z\\treq-9\\tREPORT RequestId: 7f100b7b-3609-4fb9-b06d-fb4fac360931\\tDuration: 164.71 ms\\tBilled Duration: 165 ms\\tMemory Size: 512 MB\\tMax Memory Used: 91 MB\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:16:38.054Z\",\"message\":\"2026-11-06T05:16:38.054Z\\treq-10\\tSTART RequestId: 7a614fd0-6c32-4499-b168-0b9896beedeb Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:17:38.054Z\",\"message\":\"2026-11-06T05:17:38.054Z\\treq-11\\t2026-11-06T04:03:47.115Z\\t7a614fd0-6c32-4499-b168-0b9896beedeb\\tINFO\\tProcessing contact inquiry from: ess.lab@example.org\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:18:38.054Z\",\"message\":\"2026-11-06T05:18:38.054Z\\treq-12\\t2026-11-06T04:03:47.283Z\\t7a614fd0-6c32-4499-b168-0b9896beedeb\\tINFO\\tContact inquiry notification sent successfully\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:19:38.054Z\",\"message\":\"2026-11-06T05:19:38.054Z\\treq-13\\tEND RequestId: 7a614fd0-6c32-4499-b168-0b9896beedeb\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:20:38.054Z\",\"message\":\"2026-11-06T05:20:38.054Z\\treq-14\\tREPORT RequestId: 7a614fd0-6c32-4499-b168-0b9896beedeb\\tDuration: 165.71 ms\\tBilled Duration: 166 ms\\tMemory Size: 512 MB\\tMax Memory Used: 91 MB\",\"level\":\"INFO\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "ContactInquiryFunction",
+    "hours": 24
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_config",
+   "input": {
+    "functionName": "ContactInquiryFunction"
+   },
+   "result": "{\"functionName\":\"ContactInquiryFunction\",\"found\":true,\"runtime\":\"nodejs24.x\",\"handler\":\"index.handler\",\"timeoutSec\":30,\"memoryMB\":512,\"ephemeralStorageMB\":512,\"architecture\":\"x86_64\",\"lastModified\":\"2026-11-06T00:52:56.000+0000\",\"state\":\"Active\",\"lastUpdateStatus\":\"Successful\",\"environment\":{\"DOCUMENTS_BUCKET_NAME\":\"eecar-documents-425454508084\",\"KNOWLEDGE_BASE_ID\":\"\",\"SNS_TOPIC_ARN\":\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications\",\"PARTS_TABLE_NAME\":\"eecar-parts-table\",\"S3_VECTORS_INDEX\":\"parts-vectors\",\"S3_VECTORS_BUCKET\":\"eecar-vectors-index-12234628\",\"USE_S3_VECTORS\":\"true\",\"VECTORS_BUCKET_NAME\":\"eecar-vectors-425454508084\",\"USE_KNOWLEDGE_BASE\":\"false\",\"QUERY_EXPANSION_ENABLED\":\"false\",\"BEDROCK_MODEL_ID\":\"global.anthropic.claude-haiku-4-5-20251001-v1:0\"},\"layers\":[{\"name\":\"eecar-utils-layer\",\"version\":27,\"createdDate\":\"2026-11-06T00:52:52.734+0000\",\"latestVersion\":27,\"latestCreatedDate\":\"2026-11-06T00:52:52.734+0000\",\"isLatest\":true}],\"roleName\":\"eecar-stack-ContactInquiryFunctionRole-yTkugjZUgwvD\"}",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_permissions",
+   "input": {
+    "functionName": "ContactInquiryFunction"
+   },
+   "result": "{\"functionName\":\"ContactInquiryFunction\",\"found\":true,\"roleName\":\"eecar-stack-ContactInquiryFunctionRole-yTkugjZUgwvD\",\"statements\":[{\"policy\":\"ContactInquiryFunctionRolePolicy0\",\"effect\":\"Allow\",\"actions\":[\"sns:Publish\"],\"resources\":[\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications\"]},{\"policy\":\"AWSXrayWriteOnlyAccess\",\"effect\":\"Allow\",\"actions\":[\"xray:PutTraceSegments\",\"xray:PutTelemetryRecords\",\"xray:GetSamplingRules\",\"xray:GetSamplingTargets\",\"xray:GetSamplingStatisticSummaries\"],\"resources\":[\"*\"]},{\"policy\":\"AWSLambdaBasicExecutionRole\",\"effect\":\"Allow\",\"actions\":[\"logs:CreateLogGroup\",\"logs:CreateLogStream\",\"logs:PutLogEvents\"],\"resources\":[\"*\"]}]}",
+   "replayed": true
+  }
+ ],
+ "L02": [
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "ContactInquiryFunction",
+    "hours": 24
+   },
+   "result": "[{\"errorType\":\"InvalidParameterException\",\"count\":4,\"lastOccurred\":\"2026-11-06T05:21:38.059Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "ContactInquiryFunction",
+    "filter": "ERROR",
+    "minutes": 1440
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:06:38.059Z\",\"message\":\"2026-11-06T05:06:38.059Z\\treq-7\\t2026-11-06T02:26:40.281Z\\tc5803c20-6fa6-4c01-9590-a92e009e1e3e\\tERROR\\tFailed to send contact inquiry notification: InvalidParameterException: Invalid parameter: Subject\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendContactNotification (file:///var/task/index.js:63:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '71EB43BA81E5398F165A',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'InvalidParameter'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:07:38.059Z\",\"message\":\"2026-11-06T05:07:38.059Z\\treq-8\\t2026-11-06T02:26:40.282Z\\tc5803c20-6fa6-4c01-9590-a92e009e1e3e\\tERROR\\tError in contact-inquiry: InvalidParameterException: Invalid parameter: Subject\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendContactNotification (file:///var/task/index.js:63:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '71EB43BA81E5398F165A',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'InvalidParameter'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:17:38.059Z\",\"message\":\"2026-11-06T05:17:38.059Z\\treq-18\\t2026-11-06T04:47:06.066Z\\tb017172d-5ba9-4996-b77b-c83ff1573963\\tERROR\\tFailed to send contact inquiry notification: InvalidParameterException: Invalid parameter: Subject\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendContactNotification (file:///var/task/index.js:63:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '4039777851E9301410AA',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'InvalidParameter'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.059Z\",\"message\":\"2026-11-06T05:18:38.059Z\\treq-19\\t2026-11-06T04:47:06.067Z\\tb017172d-5ba9-4996-b77b-c83ff1573963\\tERROR\\tError in contact-inquiry: InvalidParameterException: Invalid parameter: Subject\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendContactNotification (file:///var/task/index.js:63:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '4039777851E9301410AA',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'InvalidParameter'\\n}\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "ContactInquiryFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"ContactInquiryFunction\",\"invocations\":23,\"errors\":4,\"avgDuration\":175,\"errorRate\":17.391304347826086,\"lastError\":{\"message\":\"2026-11-06T02:26:40.281Z\\tc5803c20-6fa6-4c01-9590-a92e009e1e3e\\tERROR\\tFailed to send contact inquiry notification: InvalidParameterException: Invalid parameter: Subject\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendContactNotification (file:///var/task/index.js:63:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '71EB43BA81E5398F165A',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'InvalidParameter'\\n}\",\"timestamp\":\"2026-11-06T05:21:38.059Z\"}}",
+   "replayed": true
+  }
+ ],
+ "L03": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "BatteryHealthAssessmentFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"BatteryHealthAssessmentFunction\",\"invocations\":31,\"errors\":27,\"avgDuration\":790,\"errorRate\":87.09677419354838,\"lastError\":{\"message\":\"2026-11-06T01:30:12.508Z\\tcfecdb27-6f63-4854-b3ef-915e2e980c31\\tERROR\\tBattery health assessment error: TypeError: batteryHealth.suitableApplications.slice(...).join is not a function\\n    at generateAssessmentReason (file:///var/task/index.js:182:66)\\n    at file:///var/task/index.js:41:21\\n    at Array.map (<anonymous>)\\n    at Runtime.handler (file:///var/task/index.js:30:14)\",\"timestamp\":\"2026-11-06T05:21:38.059Z\"}}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "BatteryHealthAssessmentFunction",
+    "hours": 24
+   },
+   "result": "[{\"errorType\":\"TypeError\",\"count\":27,\"lastOccurred\":\"2026-11-06T05:21:38.059Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "배터리 SOH 검색 실패 DynamoDB 일괄 로드",
+    "topK": 3
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "BatteryHealthAssessmentFunction",
+    "filter": "ERROR",
+    "minutes": 1440
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:11:38.059Z\",\"message\":\"2026-11-06T05:11:38.059Z\\treq-1\\t2026-11-06T01:30:12.508Z\\tcfecdb27-6f63-4854-b3ef-915e2e980c31\\tERROR\\tBattery health assessment error: TypeError: batteryHealth.suitableApplications.slice(...).join is not a function\\n    at generateAssessmentReason (file:///var/task/index.js:182:66)\\n    at file:///var/task/index.js:41:21\\n    at Array.map (<anonymous>)\\n    at Runtime.handler (file:///var/task/index.js:30:14)\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.059Z\",\"message\":\"2026-11-06T05:18:38.059Z\\treq-8\\t2026-11-06T02:44:51.019Z\\t0aa1883c-6411-4787-bcb8-3dacb17b0afc\\tERROR\\tBattery health assessment error: TypeError: batteryHealth.suitableApplications.slice(...).join is not a function\\n    at generateAssessmentReason (file:///var/task/index.js:182:66)\\n    at file:///var/task/index.js:41:21\\n    at Array.map (<anonymous>)\\n    at Runtime.handler (file:///var/task/index.js:30:14)\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_config",
+   "input": {
+    "functionName": "BatteryHealthAssessmentFunction"
+   },
+   "result": "{\"functionName\":\"BatteryHealthAssessmentFunction\",\"found\":true,\"runtime\":\"nodejs24.x\",\"handler\":\"index.handler\",\"timeoutSec\":30,\"memoryMB\":512,\"ephemeralStorageMB\":512,\"architecture\":\"x86_64\",\"lastModified\":\"2026-11-06T00:52:56.000+0000\",\"state\":\"Active\",\"lastUpdateStatus\":\"Successful\",\"environment\":{\"DOCUMENTS_BUCKET_NAME\":\"eecar-documents-425454508084\",\"KNOWLEDGE_BASE_ID\":\"\",\"SNS_TOPIC_ARN\":\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications\",\"PARTS_TABLE_NAME\":\"eecar-parts-table\",\"S3_VECTORS_INDEX\":\"parts-vectors\",\"S3_VECTORS_BUCKET\":\"eecar-vectors-index-12234628\",\"USE_S3_VECTORS\":\"true\",\"VECTORS_BUCKET_NAME\":\"eecar-vectors-425454508084\",\"USE_KNOWLEDGE_BASE\":\"false\",\"QUERY_EXPANSION_ENABLED\":\"false\",\"BEDROCK_MODEL_ID\":\"global.anthropic.claude-haiku-4-5-20251001-v1:0\"},\"layers\":[{\"name\":\"eecar-utils-layer\",\"version\":27,\"createdDate\":\"2026-11-06T00:52:52.734+0000\",\"latestVersion\":27,\"latestCreatedDate\":\"2026-11-06T00:52:52.734+0000\",\"isLatest\":true}],\"roleName\":\"eecar-stack-BatteryHealthAssessmentFunctionRole-QDGnoDxeHzlV\"}",
+   "replayed": true
+  }
+ ],
+ "L04": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "BatteryHealthAssessmentFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"BatteryHealthAssessmentFunction\",\"invocations\":31,\"errors\":27,\"avgDuration\":790,\"errorRate\":87.09677419354838,\"lastError\":{\"message\":\"2026-11-06T01:30:12.508Z\\tcfecdb27-6f63-4854-b3ef-915e2e980c31\\tERROR\\tBattery health assessment error: TypeError: batteryHealth.suitableApplications.slice(...).join is not a function\\n    at generateAssessmentReason (file:///var/task/index.js:182:66)\\n    at file:///var/task/index.js:41:21\\n    at Array.map (<anonymous>)\\n    at Runtime.handler (file:///var/task/index.js:30:14)\",\"timestamp\":\"2026-11-06T05:21:38.059Z\"}}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "BatteryHealthAssessmentFunction",
+    "hours": 24
+   },
+   "result": "[{\"errorType\":\"TypeError\",\"count\":27,\"lastOccurred\":\"2026-11-06T05:21:38.059Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "BatteryHealthAssessmentFunction",
+    "filter": "ERROR",
+    "minutes": 1440
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:11:38.059Z\",\"message\":\"2026-11-06T05:11:38.059Z\\treq-1\\t2026-11-06T01:30:12.508Z\\tcfecdb27-6f63-4854-b3ef-915e2e980c31\\tERROR\\tBattery health assessment error: TypeError: batteryHealth.suitableApplications.slice(...).join is not a function\\n    at generateAssessmentReason (file:///var/task/index.js:182:66)\\n    at file:///var/task/index.js:41:21\\n    at Array.map (<anonymous>)\\n    at Runtime.handler (file:///var/task/index.js:30:14)\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.059Z\",\"message\":\"2026-11-06T05:18:38.059Z\\treq-8\\t2026-11-06T02:44:51.019Z\\t0aa1883c-6411-4787-bcb8-3dacb17b0afc\\tERROR\\tBattery health assessment error: TypeError: batteryHealth.suitableApplications.slice(...).join is not a function\\n    at generateAssessmentReason (file:///var/task/index.js:182:66)\\n    at file:///var/task/index.js:41:21\\n    at Array.map (<anonymous>)\\n    at Runtime.handler (file:///var/task/index.js:30:14)\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "DynamoDB 데이터 형식 변환 배열 문자열 TypeError",
+    "topK": 3
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L05": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "filter": "ERROR",
+    "minutes": 120
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:00:38.059Z\",\"message\":\"2026-11-06T05:00:38.059Z\\treq-5\\t2026-11-06T01:20:33.912Z\\t368f787b-7826-4ed0-b331-6a61dd0ccbf2\\tERROR\\tError in part registration: ValidationException: 400 Bad Request: Too many input tokens. Max input tokens: 8192, request input token count: 21467\\n    at de_ValidationExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1163:21)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\\n    at async generateEmbedding (file:///opt/nodejs/utils/bedrock.js:79:20)\\n    at async Runtime.handler (file:///var/task/index.js:139:23) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '97A5ECEAE7416ABF645C',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  }\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.059Z\",\"message\":\"2026-11-06T05:18:38.059Z\\treq-23\\t2026-11-06T01:26:51.533Z\\ta4ddb655-5746-4e04-80c8-5156d4e6ec64\\tERROR\\tError in part registration: ValidationException: 400 Bad Request: Too many input tokens. Max input tokens: 8192, request input token count: 21467\\n    at de_ValidationExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1163:21)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\\n    at async generateEmbedding (file:///opt/nodejs/utils/bedrock.js:79:20)\\n    at async Runtime.handler (file:///var/task/index.js:139:23) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: 'FC3E3C959B92506AC142',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  }\\n}\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "hours": 24
+   },
+   "result": "[{\"errorType\":\"ValidationException\",\"count\":3,\"lastOccurred\":\"2026-11-06T05:21:38.059Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_config",
+   "input": {
+    "functionName": "PartRegistrationFunction"
+   },
+   "result": "{\"functionName\":\"PartRegistrationFunction\",\"found\":true,\"runtime\":\"nodejs24.x\",\"handler\":\"index.handler\",\"timeoutSec\":60,\"memoryMB\":1024,\"ephemeralStorageMB\":512,\"architecture\":\"x86_64\",\"lastModified\":\"2026-11-06T00:53:06.000+0000\",\"state\":\"Active\",\"lastUpdateStatus\":\"Successful\",\"environment\":{\"COMPLIANCE_FUNCTION_NAME\":\"eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd\",\"DOCUMENTS_BUCKET_NAME\":\"eecar-documents-425454508084\",\"KNOWLEDGE_BASE_ID\":\"\",\"SNS_TOPIC_ARN\":\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications\",\"PARTS_TABLE_NAME\":\"eecar-parts-table\",\"S3_VECTORS_INDEX\":\"parts-vectors\",\"S3_VECTORS_BUCKET\":\"eecar-vectors-index-12234628\",\"USE_S3_VECTORS\":\"true\",\"VECTORS_BUCKET_NAME\":\"eecar-vectors-425454508084\",\"USE_KNOWLEDGE_BASE\":\"false\",\"QUERY_EXPANSION_ENABLED\":\"false\",\"BEDROCK_MODEL_ID\":\"global.anthropic.claude-haiku-4-5-20251001-v1:0\"},\"layers\":[{\"name\":\"eecar-utils-layer\",\"version\":27,\"createdDate\":\"2026-11-06T00:52:52.734+0000\",\"latestVersion\":27,\"latestCreatedDate\":\"2026-11-06T00:52:52.734+0000\",\"isLatest\":true}],\"roleName\":\"eecar-stack-PartRegistrationFunctionRole-HqattZHu26oP\"}",
+   "replayed": true
+  }
+ ],
+ "L06": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "SlackNotificationFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"SlackNotificationFunction\",\"invocations\":96,\"errors\":0,\"avgDuration\":430,\"errorRate\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "VectorSearchFunction",
+    "filter": "ERROR",
+    "minutes": 30
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:04:38.062Z\",\"message\":\"2026-11-06T05:04:38.062Z\\treq-1\\t2026-11-06T04:20:01.640Z\\t6311aca2-2c1a-4f79-af64-75e52ace4bdc\\tERROR\\tBatch explanation generation failed: SyntaxError: Expected ',' or ']' after array element in JSON at position 38 (line 1 column 39)\\n    at JSON.parse (<anonymous>)\\n    at parseExplanations (file:///opt/nodejs/utils/search-llm.js:118:31)\\n    at generateExplanations (file:///opt/nodejs/utils/search-llm.js:136:16)\\n    at async explainHandler (file:///var/task/index.js:449:41)\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:05:38.062Z\",\"message\":\"2026-11-06T05:05:38.062Z\\treq-2\\t2026-11-06T04:20:01.640Z\\t6311aca2-2c1a-4f79-af64-75e52ace4bdc\\tERROR\\tRaw response: [\\\"용량 64kWh로 조건 일치\\\",\\\"전압 800V로 조건 일치\\\",\\\"\\\"아이오닉5\\\" 표기 있음, 연식 조건 확인 필요\\\",\\\"SOH 91%로 조건 일치\\\"]\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:10:38.062Z\",\"message\":\"2026-11-06T05:10:38.062Z\\treq-7\\t2026-11-06T04:20:40.017Z\\t90baadc1-e37c-4d64-9f3f-1f7d6dee9c2b\\tERROR\\tBatch explanation generation failed: SyntaxError: Expected ',' or ']' after array element in JSON at position 38 (line 1 column 39)\\n    at JSON.parse (<anonymous>)\\n    at parseExplanations (file:///opt/nodejs/utils/search-llm.js:118:31)\\n    at generateExplanations (file:///opt/nodejs/utils/search-llm.js:136:16)\\n    at async explainHandler (file:///var/task/index.js:449:41)\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:11:38.062Z\",\"message\":\"2026-11-06T05:11:38.062Z\\treq-8\\t2026-11-06T04:20:40.017Z\\t90baadc1-e37c-4d64-9f3f-1f7d6dee9c2b\\tERROR\\tRaw response: [\\\"용량 64kWh로 조건 일치\\\",\\\"전압 800V로 조건 일치\\\",\\\"\\\"아이오닉5\\\" 표기 있음, 연식 조건 확인 필요\\\",\\\"SOH 91%로 조건 일치\\\"]\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:16:38.062Z\",\"message\":\"2026-11-06T05:16:38.062Z\\treq-13\\t2026-11-06T04:21:18.390Z\\taab71649-033d-475a-9f4a-8f0fa7013064\\tERROR\\tBatch explanation generation failed: SyntaxError: Expected ',' or ']' after array element in JSON at position 38 (line 1 column 39)\\n    at JSON.parse (<anonymous>)\\n    at parseExplanations (file:///opt/nodejs/utils/search-llm.js:118:31)\\n    at generateExplanations (file:///opt/nodejs/utils/search-llm.js:136:16)\\n    at async explainHandler (file:///var/task/index.js:449:41)\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:17:38.062Z\",\"message\":\"2026-11-06T05:17:38.062Z\\treq-14\\t2026-11-06T04:21:18.390Z\\taab71649-033d-475a-9f4a-8f0fa7013064\\tERROR\\tRaw response: [\\\"용량 64kWh로 조건 일치\\\",\\\"전압 800V로 조건 일치\\\",\\\"\\\"아이오닉5\\\" 표기 있음, 연식 조건 확인 필요\\\",\\\"SOH 91%로 조건 일치\\\"]\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "VectorSearchFunction",
+    "hours": 1
+   },
+   "result": "[{\"errorType\":\"SyntaxError\",\"count\":93,\"lastOccurred\":\"2026-11-06T05:21:38.062Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "analyze_error",
+   "input": {
+    "errorMessage": "Batch explanation generation failed: SyntaxError: Expected ',' or ']' after array element in JSON at position 38",
+    "functionName": "VectorSearchFunction"
+   },
+   "result": "{\"errorType\":\"SyntaxError\",\"functionName\":\"VectorSearchFunction\",\"cause\":\"item.explanation?.replace(/[\\\\n\\\\r]/g, ' ').trim()\",\"solutions\":[\"item.explanation?.replace(/[\\\\n\\\\r]/g, ' ').trim()\",\"**JSON 생성 시 안전한 직렬화**\",\"- `JSON.stringify()` 사용 시 replacer 함수 활용\",\"- 배열 요소 개별 검증\",\"**에러 로깅 강화**\",\"```javascript\",\"JSON.parse(jsonString);\",\"} catch(e) {\",\"console.error('JSON 파싱 실패:', jsonString.substring(30, 50));\",\"**입력 데이터 타입 확인**\",\"- 배열 요소가 모두 유효한 객체인지 확인\",\"- null/undefined 값 처리\"],\"relatedCode\":[\"`Vect",
+   "replayed": false
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "SlackNotificationFunction 알림 중복 집계 기능",
+    "topK": 3
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L07": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "ProposalFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"ProposalFunction\",\"invocations\":22,\"errors\":22,\"avgDuration\":205,\"errorRate\":100,\"lastError\":{\"message\":\"2026-11-06T05:51:02.330Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"Error\\\",\\\"errorMessage\\\":\\\"Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\\nDid you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"code\\\":\\\"ERR_MODULE_NOT_FOUND\\\",\\\"url\\\":\\\"file:///opt/nodejs/utils/dynamodb\\\",\\\"stack\\\":[\\\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\",\\\"Did you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\\\",\\\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\\\",\\\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\\\"]}\",\"timestamp\":\"2026-11-06T05:21:38.062Z\"}}",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "ProposalFunction",
+    "filter": "ERROR",
+    "minutes": 120
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:09:38.062Z\",\"message\":\"2026-11-06T05:09:38.062Z\\treq-1\\t2026-11-06T05:51:02.330Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"Error\\\",\\\"errorMessage\\\":\\\"Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\\nDid you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"code\\\":\\\"ERR_MODULE_NOT_FOUND\\\",\\\"url\\\":\\\"file:///opt/nodejs/utils/dynamodb\\\",\\\"stack\\\":[\\\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\",\\\"Did you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\\\",\\\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\\\",\\\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\\\"]}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:10:38.062Z\",\"message\":\"2026-11-06T05:10:38.062Z\\treq-2\\tINIT_REPORT Init Duration: 198.67 ms\\tPhase: init\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:12:38.062Z\",\"message\":\"2026-11-06T05:12:38.062Z\\treq-4\\t2026-11-06T05:51:02.871Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"Error\\\",\\\"errorMessage\\\":\\\"Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\\nDid you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"code\\\":\\\"ERR_MODULE_NOT_FOUND\\\",\\\"url\\\":\\\"file:///opt/nodejs/utils/dynamodb\\\",\\\"stack\\\":[\\\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\",\\\"Did you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\\\",\\\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\\\",\\\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\\\"]}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:13:38.062Z\",\"message\":\"2026-11-06T05:13:38.062Z\\treq-5\\tINIT_REPORT Init Duration: 201.13 ms\\tPhase: invoke\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:15:38.062Z\",\"message\":\"2026-11-06T05:15:38.062Z\\treq-7\\tREPORT RequestId: da4fb5c6-e93e-44d3-9f85-27599fa62642\\tDuration: 214.50 ms\\tBilled Duration: 215 ms\\tMemory Size: 512 MB\\tMax Memory Used: 57 MB\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:17:38.062Z\",\"message\":\"2026-11-06T05:17:38.062Z\\treq-9\\t2026-11-06T06:02:39.115Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"Error\\\",\\\"errorMessage\\\":\\\"Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\\nDid you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"code\\\":\\\"ERR_MODULE_NOT_FOUND\\\",\\\"url\\\":\\\"file:///opt/nodejs/utils/dynamodb\\\",\\\"stack\\\":[\\\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\",\\\"Did you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\\\",\\\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\\\",\\\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\\\"]}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.062Z\",\"message\":\"2026-11-06T05:18:38.062Z\\treq-10\\tINIT_REPORT Init Duration: 205.53 ms\\tPhase: invoke\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:20:38.062Z\",\"message\":\"2026-11-06T05:20:38.062Z\\treq-12\\tREPORT RequestId: 4c56ff4c-e4aa-4957-baa5-dff913df997a\\tDuration: 217.80 ms\\tBilled Duration: 218 ms\\tMemory Size: 512 MB\\tMax Memory Used: 57 MB\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "import 리팩터링 유틸 함수 에러",
+    "topK": 5
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L08": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "ContactInquiryFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"ContactInquiryFunction\",\"invocations\":23,\"errors\":4,\"avgDuration\":175,\"errorRate\":17.391304347826086,\"lastError\":{\"message\":\"2026-11-06T02:26:40.281Z\\tc5803c20-6fa6-4c01-9590-a92e009e1e3e\\tERROR\\tFailed to send contact inquiry notification: InvalidParameterException: Invalid parameter: Subject\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendContactNotification (file:///var/task/index.js:63:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '71EB43BA81E5398F165A',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'InvalidParameter'\\n}\",\"timestamp\":\"2026-11-06T05:21:38.062Z\"}}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "ContactInquiryFunction",
+    "hours": 24
+   },
+   "result": "[{\"errorType\":\"InvalidParameterException\",\"count\":4,\"lastOccurred\":\"2026-11-06T05:21:38.062Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "ContactInquiryFunction",
+    "filter": "ERROR",
+    "minutes": 1440
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:06:38.062Z\",\"message\":\"2026-11-06T05:06:38.062Z\\treq-7\\t2026-11-06T02:26:40.281Z\\tc5803c20-6fa6-4c01-9590-a92e009e1e3e\\tERROR\\tFailed to send contact inquiry notification: InvalidParameterException: Invalid parameter: Subject\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendContactNotification (file:///var/task/index.js:63:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '71EB43BA81E5398F165A',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'InvalidParameter'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:07:38.062Z\",\"message\":\"2026-11-06T05:07:38.062Z\\treq-8\\t2026-11-06T02:26:40.282Z\\tc5803c20-6fa6-4c01-9590-a92e009e1e3e\\tERROR\\tError in contact-inquiry: InvalidParameterException: Invalid parameter: Subject\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendContactNotification (file:///var/task/index.js:63:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '71EB43BA81E5398F165A',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'InvalidParameter'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:17:38.062Z\",\"message\":\"2026-11-06T05:17:38.062Z\\treq-18\\t2026-11-06T04:47:06.066Z\\tb017172d-5ba9-4996-b77b-c83ff1573963\\tERROR\\tFailed to send contact inquiry notification: InvalidParameterException: Invalid parameter: Subject\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendContactNotification (file:///var/task/index.js:63:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '4039777851E9301410AA',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'InvalidParameter'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.062Z\",\"message\":\"2026-11-06T05:18:38.062Z\\treq-19\\t2026-11-06T04:47:06.067Z\\tb017172d-5ba9-4996-b77b-c83ff1573963\\tERROR\\tError in contact-inquiry: InvalidParameterException: Invalid parameter: Subject\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_InvalidParameterExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1937:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendContactNotification (file:///var/task/index.js:63:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '4039777851E9301410AA',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'InvalidParameter'\\n}\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  }
+ ],
+ "L09": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "ProposalFunction",
+    "filter": "ERROR",
+    "minutes": 10080
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:08:38.062Z\",\"message\":\"2026-11-06T05:08:38.062Z\\treq-2\\t2026-11-06T00:47:15.381Z\\t92c8c96e-4c37-4007-b7c7-190b76d28233\\tERROR\\tFailed to send proposal notification: AuthorizationErrorException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ProposalFunctionRole-iY7UEsytI37s/eecar-stack-ProposalFunction-Zx8mN3bV5cQ2 is not authorized to perform: SNS:Publish on resource: arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications because no identity-based policy allows the SNS:Publish action\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_AuthorizationErrorExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1859:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendProposalNotification (file:///var/task/index.js:117:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 403,\\n    requestId: 'BA613D1FC0D930017561',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'AuthorizationError'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:13:38.062Z\",\"message\":\"2026-11-06T05:13:38.062Z\\treq-7\\t2026-11-06T02:58:40.837Z\\te3796ae8-3883-4da0-b6f6-ea37bcf8bcb7\\tERROR\\tFailed to send proposal notification: AuthorizationErrorException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ProposalFunctionRole-iY7UEsytI37s/eecar-stack-ProposalFunction-Zx8mN3bV5cQ2 is not authorized to perform: SNS:Publish on resource: arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications because no identity-based policy allows the SNS:Publish action\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_AuthorizationErrorExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1859:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendProposalNotification (file:///var/task/index.js:117:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 403,\\n    requestId: 'D8502B7D774861547D38',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'AuthorizationError'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.062Z\",\"message\":\"2026-11-06T05:18:38.062Z\\treq-12\\t2026-11-06T04:31:03.094Z\\t6a9aeddf-c689-41d0-a3b9-ccc3ab651bc5\\tERROR\\tFailed to send proposal notification: AuthorizationErrorException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ProposalFunctionRole-iY7UEsytI37s/eecar-stack-ProposalFunction-Zx8mN3bV5cQ2 is not authorized to perform: SNS:Publish on resource: arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications because no identity-based policy allows the SNS:Publish action\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_AuthorizationErrorExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1859:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendProposalNotification (file:///var/task/index.js:117:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 403,\\n    requestId: '267B976F6F335984AB90',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'AuthorizationError'\\n}\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "ProposalFunction",
+    "hours": 168
+   },
+   "result": "[{\"errorType\":\"AuthorizationErrorException\",\"count\":12,\"lastOccurred\":\"2026-11-06T05:21:38.062Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "ProposalFunction",
+    "days": 7
+   },
+   "result": "{\"functionName\":\"ProposalFunction\",\"invocations\":12,\"errors\":0,\"avgDuration\":260,\"errorRate\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_config",
+   "input": {
+    "functionName": "ProposalFunction"
+   },
+   "result": "{\"functionName\":\"ProposalFunction\",\"found\":true,\"runtime\":\"nodejs24.x\",\"handler\":\"index.handler\",\"timeoutSec\":30,\"memoryMB\":512,\"ephemeralStorageMB\":512,\"architecture\":\"x86_64\",\"lastModified\":\"2026-11-06T00:52:56.000+0000\",\"state\":\"Active\",\"lastUpdateStatus\":\"Successful\",\"environment\":{\"DOCUMENTS_BUCKET_NAME\":\"eecar-documents-425454508084\",\"KNOWLEDGE_BASE_ID\":\"\",\"SNS_TOPIC_ARN\":\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications\",\"PARTS_TABLE_NAME\":\"eecar-parts-table\",\"S3_VECTORS_INDEX\":\"parts-vectors\",\"S3_VECTORS_BUCKET\":\"eecar-vectors-index-12234628\",\"USE_S3_VECTORS\":\"true\",\"VECTORS_BUCKET_NAME\":\"eecar-vectors-425454508084\",\"USE_KNOWLEDGE_BASE\":\"false\",\"QUERY_EXPANSION_ENABLED\":\"false\",\"BEDROCK_MODEL_ID\":\"global.anthropic.claude-haiku-4-5-20251001-v1:0\"},\"layers\":[{\"name\":\"eecar-utils-layer\",\"version\":27,\"createdDate\":\"2026-11-06T00:52:52.734+0000\",\"latestVersion\":27,\"latestCreatedDate\":\"2026-11-06T00:52:52.734+0000\",\"isLatest\":true}],\"roleName\":\"eecar-stack-ProposalFunctionRole-iY7UEsytI37s\"}",
+   "replayed": true
+  }
+ ],
+ "L10": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "filter": "ERROR",
+    "minutes": 30
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:09:38.062Z\",\"message\":\"2026-11-06T05:09:38.062Z\\treq-1\\t2026-11-06T06:43:10.554Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"SyntaxError\\\",\\\"errorMessage\\\":\\\"The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"stack\\\":[\\\"file:///var/task/index.js:8\\\",\\\"  truncateForEmbedding,\\\",\\\"  ^^^^^^^^^^^^^^^^^^^^\\\",\\\"SyntaxError: The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"    at ModuleJob._instantiate (node:internal/modules/esm/module_job:180:21)\\\",\\\"    at async ModuleJob.run (node:internal/modules/esm/module_job:263:25)\\\"]}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:10:38.062Z\",\"message\":\"2026-11-06T05:10:38.062Z\\treq-2\\tINIT_REPORT Init Duration: 244.90 ms\\tPhase: init\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:12:38.062Z\",\"message\":\"2026-11-06T05:12:38.062Z\\treq-4\\t2026-11-06T06:43:11.102Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"SyntaxError\\\",\\\"errorMessage\\\":\\\"The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"stack\\\":[\\\"file:///var/task/index.js:8\\\",\\\"  truncateForEmbedding,\\\",\\\"  ^^^^^^^^^^^^^^^^^^^^\\\",\\\"SyntaxError: The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"    at ModuleJob._instantiate (node:internal/modules/esm/module_job:180:21)\\\",\\\"    at async ModuleJob.run (node:internal/modules/esm/module_job:263:25)\\\"]}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:13:38.062Z\",\"message\":\"2026-11-06T05:13:38.062Z\\treq-5\\tINIT_REPORT Init Duration: 239.71 ms\\tPhase: invoke\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:15:38.062Z\",\"message\":\"2026-11-06T05:15:38.062Z\\treq-7\\tREPORT RequestId: f90f2aca-5c64-4289-90a2-9417bcb63a37\\tDuration: 251.06 ms\\tBilled Duration: 252 ms\\tMemory Size: 1024 MB\\tMax Memory Used: 63 MB\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:17:38.062Z\",\"message\":\"2026-11-06T05:17:38.062Z\\treq-9\\t2026-11-06T06:47:38.690Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"SyntaxError\\\",\\\"errorMessage\\\":\\\"The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"stack\\\":[\\\"file:///var/task/index.js:8\\\",\\\"  truncateForEmbedding,\\\",\\\"  ^^^^^^^^^^^^^^^^^^^^\\\",\\\"SyntaxError: The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"    at ModuleJob._instantiate (node:internal/modules/esm/module_job:180:21)\\\",\\\"    at async ModuleJob.run (node:internal/modules/esm/module_job:263:25)\\\"]}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.062Z\",\"message\":\"2026-11-06T05:18:38.062Z\\treq-10\\tINIT_REPORT Init Duration: 244.91 ms\\tPhase: invoke\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:20:38.062Z\",\"message\":\"2026-11-06T05:20:38.062Z\\treq-12\\tREPORT RequestId: 9c838d2e-45b2-4d10-94d4-2f4ef36764f6\\tDuration: 253.06 ms\\tBilled Duration: 254 ms\\tMemory Size: 1024 MB\\tMax Memory Used: 63 MB\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"PartRegistrationFunction\",\"invocations\":9,\"errors\":9,\"avgDuration\":250,\"errorRate\":100,\"lastError\":{\"message\":\"2026-11-06T06:43:10.554Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"SyntaxError\\\",\\\"errorMessage\\\":\\\"The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"stack\\\":[\\\"file:///var/task/index.js:8\\\",\\\"  truncateForEmbedding,\\\",\\\"  ^^^^^^^^^^^^^^^^^^^^\\\",\\\"SyntaxError: The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"    at ModuleJob._instantiate (node:internal/modules/esm/module_job:180:21)\\\",\\\"    at async ModuleJob.run (node:internal/modules/esm/module_job:263:25)\\\"]}\",\"timestamp\":\"2026-11-06T05:21:38.062Z\"}}",
+   "replayed": true
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "부품 등록 실패 임베딩 텍스트 길이",
+    "topK": 3
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L11": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "PaymentWebhookFunction",
+    "filter": "ERROR",
+    "minutes": 30
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "PaymentWebhookFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"PaymentWebhookFunction\",\"found\":false,\"note\":\"'PaymentWebhookFunction' 함수를 스택에서 찾지 못했습니다. 함수 이름을 확인하세요.\",\"invocations\":0,\"errors\":0,\"errorRate\":0,\"avgDuration\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "PaymentWebhookFunction",
+    "hours": 24
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L12": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "WatchPartFunction",
+    "filter": "WARN",
+    "minutes": 120
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:08:38.062Z\",\"message\":\"2026-11-06T05:08:38.062Z\\treq-1\\t(node:2) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\\n(Use `node --trace-deprecation ...` to show where the warning was created)\",\"level\":\"WARN\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "WatchPartFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"WatchPartFunction\",\"invocations\":14,\"errors\":0,\"avgDuration\":410,\"errorRate\":0}",
+   "replayed": true
+  }
+ ],
+ "L13": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "ContactInquiryFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"ContactInquiryFunction\",\"invocations\":19,\"errors\":0,\"avgDuration\":160,\"errorRate\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "ContactInquiryFunction",
+    "filter": "ALL",
+    "minutes": 60
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:06:38.063Z\",\"message\":\"2026-11-06T05:06:38.063Z\\treq-0\\tSTART RequestId: 39059724-f73a-4969-845d-fe4146c5660e Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:07:38.063Z\",\"message\":\"2026-11-06T05:07:38.063Z\\treq-1\\t2026-11-06T00:58:21.330Z\\t39059724-f73a-4969-845d-fe4146c5660e\\tINFO\\tProcessing contact inquiry from: buyer.park@example.com\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:08:38.063Z\",\"message\":\"2026-11-06T05:08:38.063Z\\treq-2\\t2026-11-06T00:58:21.498Z\\t39059724-f73a-4969-845d-fe4146c5660e\\tINFO\\tContact inquiry notification sent successfully\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:09:38.063Z\",\"message\":\"2026-11-06T05:09:38.063Z\\treq-3\\tEND RequestId: 39059724-f73a-4969-845d-fe4146c5660e\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:10:38.063Z\",\"message\":\"2026-11-06T05:10:38.063Z\\treq-4\\tREPORT RequestId: 39059724-f73a-4969-845d-fe4146c5660e\\tDuration: 163.71 ms\\tBilled Duration: 164 ms\\tMemory Size: 512 MB\\tMax Memory Used: 91 MB\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:11:38.063Z\",\"message\":\"2026-11-06T05:11:38.063Z\\treq-5\\tSTART RequestId: 7f100b7b-3609-4fb9-b06d-fb4fac360931 Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:12:38.063Z\",\"message\":\"2026-11-06T05:12:38.063Z\\treq-6\\t2026-11-06T02:12:09.774Z\\t7f100b7b-3609-4fb9-b06d-fb4fac360931\\tINFO\\tProcessing contact inquiry from: sourcing@example.co.kr\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:13:38.063Z\",\"message\":\"2026-11-06T05:13:38.063Z\\treq-7\\t2026-11-06T02:12:09.942Z\\t7f100b7b-3609-4fb9-b06d-fb4fac360931\\tINFO\\tContact inquiry notification sent successfully\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:14:38.063Z\",\"message\":\"2026-11-06T05:14:38.063Z\\treq-8\\tEND RequestId: 7f100b7b-3609-4fb9-b06d-fb4fac360931\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:15:38.063Z\",\"message\":\"2026-11-06T05:15:38.063Z\\treq-9\\tREPORT RequestId: 7f100b7b-3609-4fb9-b06d-fb4fac360931\\tDuration: 164.71 ms\\tBilled Duration: 165 ms\\tMemory Size: 512 MB\\tMax Memory Used: 91 MB\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:16:38.063Z\",\"message\":\"2026-11-06T05:16:38.063Z\\treq-10\\tSTART RequestId: 7a614fd0-6c32-4499-b168-0b9896beedeb Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:17:38.063Z\",\"message\":\"2026-11-06T05:17:38.063Z\\treq-11\\t2026-11-06T04:03:47.115Z\\t7a614fd0-6c32-4499-b168-0b9896beedeb\\tINFO\\tProcessing contact inquiry from: ess.lab@example.org\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:18:38.063Z\",\"message\":\"2026-11-06T05:18:38.063Z\\treq-12\\t2026-11-06T04:03:47.283Z\\t7a614fd0-6c32-4499-b168-0b9896beedeb\\tINFO\\tContact inquiry notification sent successfully\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:19:38.063Z\",\"message\":\"2026-11-06T05:19:38.063Z\\treq-13\\tEND RequestId: 7a614fd0-6c32-4499-b168-0b9896beedeb\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:20:38.063Z\",\"message\":\"2026-11-06T05:20:38.063Z\\treq-14\\tREPORT RequestId: 7a614fd0-6c32-4499-b168-0b9896beedeb\\tDuration: 165.71 ms\\tBilled Duration: 166 ms\\tMemory Size: 512 MB\\tMax Memory Used: 91 MB\",\"level\":\"INFO\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "ContactInquiryFunction",
+    "hours": 24
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_config",
+   "input": {
+    "functionName": "ContactInquiryFunction"
+   },
+   "result": "{\"functionName\":\"ContactInquiryFunction\",\"found\":true,\"runtime\":\"nodejs24.x\",\"handler\":\"index.handler\",\"timeoutSec\":30,\"memoryMB\":512,\"ephemeralStorageMB\":512,\"architecture\":\"x86_64\",\"lastModified\":\"2026-11-06T00:52:56.000+0000\",\"state\":\"Active\",\"lastUpdateStatus\":\"Successful\",\"environment\":{\"DOCUMENTS_BUCKET_NAME\":\"eecar-documents-425454508084\",\"KNOWLEDGE_BASE_ID\":\"\",\"SNS_TOPIC_ARN\":\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications\",\"PARTS_TABLE_NAME\":\"eecar-parts-table\",\"S3_VECTORS_INDEX\":\"parts-vectors\",\"S3_VECTORS_BUCKET\":\"eecar-vectors-index-12234628\",\"USE_S3_VECTORS\":\"true\",\"VECTORS_BUCKET_NAME\":\"eecar-vectors-425454508084\",\"USE_KNOWLEDGE_BASE\":\"false\",\"QUERY_EXPANSION_ENABLED\":\"false\",\"BEDROCK_MODEL_ID\":\"global.anthropic.claude-haiku-4-5-20251001-v1:0\"},\"layers\":[{\"name\":\"eecar-utils-layer\",\"version\":27,\"createdDate\":\"2026-11-06T00:52:52.734+0000\",\"latestVersion\":27,\"latestCreatedDate\":\"2026-11-06T00:52:52.734+0000\",\"isLatest\":true}],\"roleName\":\"eecar-stack-ContactInquiryFunctionRole-yTkugjZUgwvD\"}",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_permissions",
+   "input": {
+    "functionName": "ContactInquiryFunction"
+   },
+   "result": "{\"functionName\":\"ContactInquiryFunction\",\"found\":true,\"roleName\":\"eecar-stack-ContactInquiryFunctionRole-yTkugjZUgwvD\",\"statements\":[{\"policy\":\"ContactInquiryFunctionRolePolicy0\",\"effect\":\"Allow\",\"actions\":[\"sns:Publish\"],\"resources\":[\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications\"]},{\"policy\":\"AWSXrayWriteOnlyAccess\",\"effect\":\"Allow\",\"actions\":[\"xray:PutTraceSegments\",\"xray:PutTelemetryRecords\",\"xray:GetSamplingRules\",\"xray:GetSamplingTargets\",\"xray:GetSamplingStatisticSummaries\"],\"resources\":[\"*\"]},{\"policy\":\"AWSLambdaBasicExecutionRole\",\"effect\":\"Allow\",\"actions\":[\"logs:CreateLogGroup\",\"logs:CreateLogStream\",\"logs:PutLogEvents\"],\"resources\":[\"*\"]}]}",
+   "replayed": true
+  }
+ ],
+ "L14": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"PartRegistrationFunction\",\"invocations\":38,\"errors\":14,\"avgDuration\":2710,\"errorRate\":36.84210526315789}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "hours": 12
+   },
+   "result": "[{\"errorType\":\"Task timed out\",\"count\":14,\"lastOccurred\":\"2026-11-06T05:21:38.063Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "filter": "ERROR",
+    "minutes": 720
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "PartRegistrationFunction timeout 임베딩 생성",
+    "topK": 3
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "analyze_error",
+   "input": {
+    "errorMessage": "Task timed out after 2710ms during part registration with embedding generation",
+    "functionName": "PartRegistrationFunction"
+   },
+   "result": "{\"errorType\":\"UnknownError\",\"functionName\":\"PartRegistrationFunction\",\"cause\":\"Date.now() - startTime,\",\"solutions\":[\"Date.now() - startTime,\",\"dataSize: data.length\",\"throw error;\",\"정기적인 성능 모니터링 및 타임아웃 값 재검토\",\"임베딩 생성 성능 벤치마크 수립\",\"서킷 브레이커 패턴 도입으로 연쇄 실패 방지\"],\"relatedCode\":[\"Date.now() - startTime,\",\"dataSize: data.length\",\"});\",\"throw error;\",\"}\",\"}\",\"```\",\"정기적인 성능 모니터링 및 타임아웃 값 재검토\",\"임베딩 생성 성능 벤치마크 수립\",\"서킷 브레이커 패턴 도입으로 연쇄 실패 방지\"],\"pastSolutions\":[]}",
+   "replayed": false
+  }
+ ],
+ "L15": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "MaterialSearchFunction",
+    "filter": "ERROR",
+    "minutes": 60
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "MaterialSearchFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"MaterialSearchFunction\",\"found\":false,\"note\":\"'MaterialSearchFunction' 함수를 스택에서 찾지 못했습니다. 함수 이름을 확인하세요.\",\"invocations\":0,\"errors\":0,\"errorRate\":0,\"avgDuration\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "MaterialSearchFunction",
+    "hours": 24
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L16": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"PartRegistrationFunction\",\"invocations\":38,\"errors\":14,\"avgDuration\":2710,\"errorRate\":36.84210526315789}",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "filter": "ERROR",
+    "minutes": 360
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "부품 등록 실패 에러 응답 타임아웃",
+    "topK": 5
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "hours": 12
+   },
+   "result": "[{\"errorType\":\"Task timed out\",\"count\":14,\"lastOccurred\":\"2026-11-06T05:21:38.064Z\"}]",
+   "replayed": true
+  }
+ ],
+ "L17": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "ComplianceCheckFunction",
+    "days": 7
+   },
+   "result": "{\"functionName\":\"ComplianceCheckFunction\",\"invocations\":41,\"errors\":0,\"avgDuration\":640,\"errorRate\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "ComplianceCheckFunction",
+    "hours": 168
+   },
+   "result": "[{\"errorType\":\"AccessDeniedException\",\"count\":41,\"lastOccurred\":\"2026-11-06T05:21:38.064Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "ComplianceCheckFunction",
+    "filter": "ERROR",
+    "minutes": 10080
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:05:38.064Z\",\"message\":\"2026-11-06T05:05:38.064Z\\treq-2\\t2026-11-06T01:12:41.006Z\\t7ef605fc-8dba-4425-9696-5fbd4c8fbe1f\\tERROR\\tFailed to check compliance with AI: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ComplianceCheckFunctionRole-xbXyccpNGbWj/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0 because no identity-based policy allows the bedrock:InvokeModel action\\n    at de_AccessDeniedExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1062:21)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22)\\n    at async callClaude (file:///opt/nodejs/utils/bedrock.js:50:17) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 403,\\n    requestId: '13682AC418603AA09663',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  }\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:11:38.064Z\",\"message\":\"2026-11-06T05:11:38.064Z\\treq-8\\t2026-11-06T02:33:09.472Z\\ta8f15eda-80c5-4adb-8e71-943adc8015cf\\tERROR\\tFailed to check compliance with AI: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ComplianceCheckFunctionRole-xbXyccpNGbWj/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0 because no identity-based policy allows the bedrock:InvokeModel action\\n    at de_AccessDeniedExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1062:21)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22)\\n    at async callClaude (file:///opt/nodejs/utils/bedrock.js:50:17) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 403,\\n    requestId: 'B16A457A3302D7C1F456',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  }\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:17:38.064Z\",\"message\":\"2026-11-06T05:17:38.064Z\\treq-14\\t2026-11-06T03:51:23.361Z\\t37a749d8-08e4-4495-a8da-1e5352d03cae\\tERROR\\tFailed to check compliance with AI: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ComplianceCheckFunctionRole-xbXyccpNGbWj/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0 because no identity-based policy allows the bedrock:InvokeModel action\\n    at de_AccessDeniedExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1062:21)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22)\\n    at async callClaude (file:///opt/nodejs/utils/bedrock.js:50:17) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 403,\\n    requestId: 'AC2646028F5B8B9BBF7A',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  }\\n}\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  }
+ ],
+ "L18": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "ProposalFunction",
+    "days": 7
+   },
+   "result": "{\"functionName\":\"ProposalFunction\",\"invocations\":12,\"errors\":0,\"avgDuration\":260,\"errorRate\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "ProposalFunction",
+    "hours": 168
+   },
+   "result": "[{\"errorType\":\"AuthorizationErrorException\",\"count\":12,\"lastOccurred\":\"2026-11-06T05:21:38.064Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "ProposalFunction",
+    "filter": "ERROR",
+    "minutes": 10080
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:08:38.064Z\",\"message\":\"2026-11-06T05:08:38.064Z\\treq-2\\t2026-11-06T00:47:15.381Z\\t92c8c96e-4c37-4007-b7c7-190b76d28233\\tERROR\\tFailed to send proposal notification: AuthorizationErrorException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ProposalFunctionRole-iY7UEsytI37s/eecar-stack-ProposalFunction-Zx8mN3bV5cQ2 is not authorized to perform: SNS:Publish on resource: arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications because no identity-based policy allows the SNS:Publish action\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_AuthorizationErrorExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1859:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendProposalNotification (file:///var/task/index.js:117:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 403,\\n    requestId: 'BA613D1FC0D930017561',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'AuthorizationError'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:13:38.064Z\",\"message\":\"2026-11-06T05:13:38.064Z\\treq-7\\t2026-11-06T02:58:40.837Z\\te3796ae8-3883-4da0-b6f6-ea37bcf8bcb7\\tERROR\\tFailed to send proposal notification: AuthorizationErrorException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ProposalFunctionRole-iY7UEsytI37s/eecar-stack-ProposalFunction-Zx8mN3bV5cQ2 is not authorized to perform: SNS:Publish on resource: arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications because no identity-based policy allows the SNS:Publish action\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_AuthorizationErrorExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1859:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendProposalNotification (file:///var/task/index.js:117:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 403,\\n    requestId: 'D8502B7D774861547D38',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'AuthorizationError'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.064Z\",\"message\":\"2026-11-06T05:18:38.064Z\\treq-12\\t2026-11-06T04:31:03.094Z\\t6a9aeddf-c689-41d0-a3b9-ccc3ab651bc5\\tERROR\\tFailed to send proposal notification: AuthorizationErrorException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ProposalFunctionRole-iY7UEsytI37s/eecar-stack-ProposalFunction-Zx8mN3bV5cQ2 is not authorized to perform: SNS:Publish on resource: arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications because no identity-based policy allows the SNS:Publish action\\n    at throwDefaultError (/var/task/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_AuthorizationErrorExceptionRes (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1859:21)\\n    at de_CommandError (/var/task/node_modules/@aws-sdk/client-sns/dist-cjs/index.js:1648:19)\\n    at async sendProposalNotification (file:///var/task/index.js:117:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 403,\\n    requestId: '267B976F6F335984AB90',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  Type: 'Sender',\\n  Code: 'AuthorizationError'\\n}\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_permissions",
+   "input": {
+    "functionName": "ProposalFunction"
+   },
+   "result": "{\"functionName\":\"ProposalFunction\",\"found\":true,\"roleName\":\"eecar-stack-ProposalFunctionRole-iY7UEsytI37s\",\"statements\":[{\"policy\":\"ProposalFunctionRolePolicy0\",\"effect\":\"Allow\",\"actions\":[\"dynamodb:GetItem\",\"dynamodb:DeleteItem\",\"dynamodb:PutItem\",\"dynamodb:Scan\",\"dynamodb:Query\",\"dynamodb:UpdateItem\",\"dynamodb:BatchWriteItem\",\"dynamodb:BatchGetItem\",\"dynamodb:DescribeTable\",\"dynamodb:ConditionCheckItem\"],\"resources\":[\"arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table\",\"arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*\"]},{\"policy\":\"ProposalFunctionRolePolicy1\",\"effect\":\"Allow\",\"actions\":[\"sns:Publish\"],\"resources\":[\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notification\"]},{\"policy\":\"AWSXrayWriteOnlyAccess\",\"effect\":\"Allow\",\"actions\":[\"xray:PutTraceSegments\",\"xray:PutTelemetryRecords\",\"xray:GetSamplingRules\",\"xray:GetSamplingTargets\",\"xray:GetSamplingStatisticSummaries\"],\"resources\":[\"*\"]},{\"policy\":\"AWSLambdaBasicExecutionRole\",\"effect\":\"Allow\",\"actions\":[\"logs:CreateLogGroup\",\"logs:CreateLogStream\",\"logs:PutLogEvents\"],\"resources\":[\"*\"]}]}",
+   "replayed": true
+  },
+  {
+   "tool": "save_memory",
+   "input": {
+    "errorType": "AuthorizationErrorException",
+    "functionName": "ProposalFunction",
+    "resolution": "SNS 토픽 ARN 불일치: 정책에 'eecar-notification'으로 설정되어 있지만 실제 토픽은 'eecar-notifications' (복수형). IAM 정책의 Resource ARN을 수정하여 해결.",
+    "codeChanges": "CloudFormation 템플릿 또는 IAM 정책: ProposalFunctionRolePolicy1의 Resource를 'arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications'로 변경"
+   },
+   "result": "{\"saved\":false,\"note\":\"평가에서는 저장하지 않음\"}",
+   "replayed": true
+  }
+ ],
+ "L19": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "all",
+    "days": 1
+   },
+   "result": "[{\"functionName\":\"VectorSearchFunction\",\"invocations\":182,\"errors\":0,\"avgDuration\":710,\"errorRate\":0},{\"functionName\":\"PartRegistrationFunction\",\"invocations\":9,\"errors\":0,\"avgDuration\":1650,\"errorRate\":0},{\"functionName\":\"ComplianceCheckFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"GetPartsFunction\",\"invocations\":240,\"errors\":0,\"avgDuration\":85,\"errorRate\":0},{\"functionName\":\"WatchPartFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"ProposalFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"SyntheticDataFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"BatteryHealthAssessmentFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"MaterialPropertySearchFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"ContactInquiryFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"SlackNotificationFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"SlackAgentFunction\",\"invocations\":6,\"errors\":0,\"avgDuration\":2100,\"errorRate\":0}]",
+   "replayed": true
+  }
+ ],
+ "L20": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "SlackNotificationFunction",
+    "filter": "ERROR",
+    "minutes": 120
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T04:47:38.064Z\",\"message\":\"2026-11-06T04:47:38.064Z\\treq-2\\t2026-11-06T05:00:14.208Z\\t6da9003b-743b-45f4-80cc-d295cc484e57\\tINFO\\tFound 4 error events\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T04:49:38.064Z\",\"message\":\"2026-11-06T04:49:38.064Z\\treq-4\\t2026-11-06T05:00:14.388Z\\t6da9003b-743b-45f4-80cc-d295cc484e57\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T04:50:38.064Z\",\"message\":\"2026-11-06T04:50:38.064Z\\treq-5\\t2026-11-06T05:00:14.478Z\\t6da9003b-743b-45f4-80cc-d295cc484e57\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T04:57:38.064Z\",\"message\":\"2026-11-06T04:57:38.064Z\\treq-12\\t2026-11-06T05:00:15.010Z\\t9b04d152-845e-40a3-b839-4003c96da594\\tINFO\\tFound 3 error events\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T04:58:38.064Z\",\"message\":\"2026-11-06T04:58:38.064Z\\treq-13\\t2026-11-06T05:00:15.100Z\\t9b04d152-845e-40a3-b839-4003c96da594\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T04:59:38.064Z\",\"message\":\"2026-11-06T04:59:38.064Z\\treq-14\\t2026-11-06T05:00:15.190Z\\t9b04d152-845e-40a3-b839-4003c96da594\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:00:38.064Z\",\"message\":\"2026-11-06T05:00:38.064Z\\treq-15\\t2026-11-06T05:00:15.280Z\\t9b04d152-845e-40a3-b839-4003c96da594\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:06:38.064Z\",\"message\":\"2026-11-06T05:06:38.064Z\\treq-21\\t2026-11-06T05:00:15.802Z\\tbe83ab3e-cd0d-4773-ab2d-c1b0a17836a1\\tINFO\\tFound 2 error events\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:07:38.064Z\",\"message\":\"2026-11-06T05:07:38.064Z\\treq-22\\t2026-11-06T05:00:15.892Z\\tbe83ab3e-cd0d-4773-ab2d-c1b0a17836a1\\tINFO\\tSent WARNING alert for eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd: Exception\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:08:38.064Z\",\"message\":\"2026-11-06T05:08:38.064Z\\treq-23\\t2026-11-06T05:00:15.982Z\\tbe83ab3e-cd0d-4773-ab2d-c1b0a17836a1\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:14:38.064Z\",\"message\":\"2026-11-06T05:14:38.064Z\\treq-29\\t2026-11-06T05:00:16.611Z\\te1654211-10ba-4309-9a1c-0393373c5b43\\tINFO\\tFound 3 error events\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:15:38.064Z\",\"message\":\"2026-11-06T05:15:38.064Z\\treq-30\\t2026-11-06T05:00:16.701Z\\te1654211-10ba-4309-9a1c-0393373c5b43\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:16:38.064Z\",\"message\":\"2026-11-06T05:16:38.064Z\\treq-31\\t2026-11-06T05:00:16.791Z\\te1654211-10ba-4309-9a1c-0393373c5b43\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:17:38.064Z\",\"message\":\"2026-11-06T05:17:38.064Z\\treq-32\\t2026-11-06T05:00:16.881Z\\te1654211-10ba-4309-9a1c-0393373c5b43\\tINFO\\tSent CRITICAL alert for eecar-stack-VectorSearchFunction-yXyHE1D702wX: Exception\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "SlackNotificationFunction",
+    "hours": 3
+   },
+   "result": "[{\"errorType\":\"429 Too Many Requests\",\"count\":37,\"lastOccurred\":\"2026-11-06T05:21:38.064Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "SlackNotificationFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"SlackNotificationFunction\",\"invocations\":64,\"errors\":0,\"avgDuration\":640,\"errorRate\":0}",
+   "replayed": true
+  }
+ ],
+ "L21": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "filter": "ERROR",
+    "minutes": 30
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:09:38.064Z\",\"message\":\"2026-11-06T05:09:38.064Z\\treq-1\\t2026-11-06T06:43:10.554Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"SyntaxError\\\",\\\"errorMessage\\\":\\\"The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"stack\\\":[\\\"file:///var/task/index.js:8\\\",\\\"  truncateForEmbedding,\\\",\\\"  ^^^^^^^^^^^^^^^^^^^^\\\",\\\"SyntaxError: The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"    at ModuleJob._instantiate (node:internal/modules/esm/module_job:180:21)\\\",\\\"    at async ModuleJob.run (node:internal/modules/esm/module_job:263:25)\\\"]}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:10:38.064Z\",\"message\":\"2026-11-06T05:10:38.064Z\\treq-2\\tINIT_REPORT Init Duration: 244.90 ms\\tPhase: init\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:12:38.064Z\",\"message\":\"2026-11-06T05:12:38.064Z\\treq-4\\t2026-11-06T06:43:11.102Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"SyntaxError\\\",\\\"errorMessage\\\":\\\"The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"stack\\\":[\\\"file:///var/task/index.js:8\\\",\\\"  truncateForEmbedding,\\\",\\\"  ^^^^^^^^^^^^^^^^^^^^\\\",\\\"SyntaxError: The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"    at ModuleJob._instantiate (node:internal/modules/esm/module_job:180:21)\\\",\\\"    at async ModuleJob.run (node:internal/modules/esm/module_job:263:25)\\\"]}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:13:38.064Z\",\"message\":\"2026-11-06T05:13:38.064Z\\treq-5\\tINIT_REPORT Init Duration: 239.71 ms\\tPhase: invoke\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:15:38.064Z\",\"message\":\"2026-11-06T05:15:38.064Z\\treq-7\\tREPORT RequestId: f90f2aca-5c64-4289-90a2-9417bcb63a37\\tDuration: 251.06 ms\\tBilled Duration: 252 ms\\tMemory Size: 1024 MB\\tMax Memory Used: 63 MB\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:17:38.064Z\",\"message\":\"2026-11-06T05:17:38.064Z\\treq-9\\t2026-11-06T06:47:38.690Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"SyntaxError\\\",\\\"errorMessage\\\":\\\"The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"stack\\\":[\\\"file:///var/task/index.js:8\\\",\\\"  truncateForEmbedding,\\\",\\\"  ^^^^^^^^^^^^^^^^^^^^\\\",\\\"SyntaxError: The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"    at ModuleJob._instantiate (node:internal/modules/esm/module_job:180:21)\\\",\\\"    at async ModuleJob.run (node:internal/modules/esm/module_job:263:25)\\\"]}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.064Z\",\"message\":\"2026-11-06T05:18:38.064Z\\treq-10\\tINIT_REPORT Init Duration: 244.91 ms\\tPhase: invoke\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:20:38.064Z\",\"message\":\"2026-11-06T05:20:38.064Z\\treq-12\\tREPORT RequestId: 9c838d2e-45b2-4d10-94d4-2f4ef36764f6\\tDuration: 253.06 ms\\tBilled Duration: 254 ms\\tMemory Size: 1024 MB\\tMax Memory Used: 63 MB\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "PartRegistrationFunction 임베딩 텍스트 길이 자르기",
+    "topK": 3
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"PartRegistrationFunction\",\"invocations\":9,\"errors\":9,\"avgDuration\":250,\"errorRate\":100,\"lastError\":{\"message\":\"2026-11-06T06:43:10.554Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"SyntaxError\\\",\\\"errorMessage\\\":\\\"The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"stack\\\":[\\\"file:///var/task/index.js:8\\\",\\\"  truncateForEmbedding,\\\",\\\"  ^^^^^^^^^^^^^^^^^^^^\\\",\\\"SyntaxError: The requested module '/opt/nodejs/utils/search-document.js' does not provide an export named 'truncateForEmbedding'\\\",\\\"    at ModuleJob._instantiate (node:internal/modules/esm/module_job:180:21)\\\",\\\"    at async ModuleJob.run (node:internal/modules/esm/module_job:263:25)\\\"]}\",\"timestamp\":\"2026-11-06T05:21:38.064Z\"}}",
+   "replayed": true
+  }
+ ],
+ "L22": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "VectorSearchFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"VectorSearchFunction\",\"invocations\":410,\"errors\":0,\"avgDuration\":1900,\"errorRate\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "VectorSearchFunction",
+    "hours": 24
+   },
+   "result": "[{\"errorType\":\"SyntaxError\",\"count\":14,\"lastOccurred\":\"2026-11-06T05:21:38.064Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "VectorSearchFunction",
+    "filter": "ERROR",
+    "minutes": 1440
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:00:38.064Z\",\"message\":\"2026-11-06T05:00:38.064Z\\treq-1\\t2026-11-06T02:02:15.330Z\\tb73ce398-c39f-406a-b761-d2277d853a92\\tERROR\\tBatch explanation generation failed: SyntaxError: Expected ',' or ']' after array element in JSON at position 32 (line 1 column 33)\\n    at JSON.parse (<anonymous>)\\n    at parseExplanations (file:///opt/nodejs/utils/search-llm.js:118:31)\\n    at generateExplanations (file:///opt/nodejs/utils/search-llm.js:136:16)\\n    at async explainHandler (file:///var/task/index.js:449:41)\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:01:38.064Z\",\"message\":\"2026-11-06T05:01:38.064Z\\treq-2\\t2026-11-06T02:02:15.330Z\\tb73ce398-c39f-406a-b761-d2277d853a92\\tERROR\\tRaw response: [\\\"용량 64kWh로 조건 일치\\\",\\\"EV6 표기만 있어 \\\"차종\\\" 조건 확인 필요\\\",\\\"전압 800V로 조건 일치\\\",\\\"SOH 91%로 조건 일치\\\",\\\"제조사 정보 일치, 용량 조건 확인 필요\\\",\\\"니로 EV 호환 표기 있음\\\",\\\"용량 17.6kWh로 조건 미달\\\"]\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:16:38.064Z\",\"message\":\"2026-11-06T05:16:38.064Z\\treq-17\\t2026-11-06T03:44:01.208Z\\t82aa4b0a-f34c-4313-a562-076992e50aa3\\tERROR\\tBatch explanation generation failed: SyntaxError: Expected ',' or ']' after array element in JSON at position 32 (line 1 column 33)\\n    at JSON.parse (<anonymous>)\\n    at parseExplanations (file:///opt/nodejs/utils/search-llm.js:118:31)\\n    at generateExplanations (file:///opt/nodejs/utils/search-llm.js:136:16)\\n    at async explainHandler (file:///var/task/index.js:449:41)\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:17:38.064Z\",\"message\":\"2026-11-06T05:17:38.064Z\\treq-18\\t2026-11-06T03:44:01.208Z\\t82aa4b0a-f34c-4313-a562-076992e50aa3\\tERROR\\tRaw response: [\\\"용량 64kWh로 조건 일치\\\",\\\"EV6 표기만 있어 \\\"차종\\\" 조건 확인 필요\\\",\\\"전압 800V로 조건 일치\\\",\\\"SOH 91%로 조건 일치\\\",\\\"제조사 정보 일치, 용량 조건 확인 필요\\\",\\\"니로 EV 호환 표기 있음\\\",\\\"용량 17.6kWh로 조건 미달\\\"]\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "Bedrock 불안정 LLM fallback 유사도 매칭",
+    "topK": 5
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L23": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "all",
+    "days": 1
+   },
+   "result": "[{\"functionName\":\"VectorSearchFunction\",\"invocations\":380,\"errors\":0,\"avgDuration\":610,\"errorRate\":0},{\"functionName\":\"PartRegistrationFunction\",\"invocations\":12,\"errors\":0,\"avgDuration\":1720,\"errorRate\":0},{\"functionName\":\"ComplianceCheckFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"GetPartsFunction\",\"invocations\":520,\"errors\":0,\"avgDuration\":80,\"errorRate\":0},{\"functionName\":\"WatchPartFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"ProposalFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"SyntheticDataFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"BatteryHealthAssessmentFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"MaterialPropertySearchFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"ContactInquiryFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"SlackNotificationFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"SlackAgentFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "VectorSearchFunction",
+    "hours": 24
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "hours": 24
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L24": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "SyntheticDataFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"SyntheticDataFunction\",\"invocations\":4,\"errors\":0,\"avgDuration\":63800,\"errorRate\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_config",
+   "input": {
+    "functionName": "SyntheticDataFunction"
+   },
+   "result": "{\"functionName\":\"SyntheticDataFunction\",\"found\":true,\"runtime\":\"nodejs24.x\",\"handler\":\"index.handler\",\"timeoutSec\":120,\"memoryMB\":1024,\"ephemeralStorageMB\":512,\"architecture\":\"x86_64\",\"lastModified\":\"2026-11-06T00:52:56.000+0000\",\"state\":\"Active\",\"lastUpdateStatus\":\"Successful\",\"environment\":{\"DOCUMENTS_BUCKET_NAME\":\"eecar-documents-425454508084\",\"KNOWLEDGE_BASE_ID\":\"\",\"SNS_TOPIC_ARN\":\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications\",\"PARTS_TABLE_NAME\":\"eecar-parts-table\",\"S3_VECTORS_INDEX\":\"parts-vectors\",\"S3_VECTORS_BUCKET\":\"eecar-vectors-index-12234628\",\"USE_S3_VECTORS\":\"true\",\"VECTORS_BUCKET_NAME\":\"eecar-vectors-425454508084\",\"USE_KNOWLEDGE_BASE\":\"false\",\"QUERY_EXPANSION_ENABLED\":\"false\",\"BEDROCK_MODEL_ID\":\"global.anthropic.claude-haiku-4-5-20251001-v1:0\"},\"layers\":[{\"name\":\"eecar-utils-layer\",\"version\":27,\"createdDate\":\"2026-11-06T00:52:52.734+0000\",\"latestVersion\":27,\"latestCreatedDate\":\"2026-11-06T00:52:52.734+0000\",\"isLatest\":true}],\"roleName\":\"eecar-stack-SyntheticDataFunctionRole-0DD1VHMs7Ayk\"}",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "SyntheticDataFunction",
+    "filter": "ALL",
+    "minutes": 60
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T04:44:38.064Z\",\"message\":\"2026-11-06T04:44:38.064Z\\treq-0\\tSTART RequestId: 3692e633-c258-493a-9a98-c641e947569b Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:45:38.064Z\",\"message\":\"2026-11-06T04:45:38.064Z\\treq-1\\t2026-11-06T02:40:11.006Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerating 30 synthetic parts for category: battery\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:46:38.064Z\",\"message\":\"2026-11-06T04:46:38.064Z\\treq-2\\t2026-11-06T02:40:13.220Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: e07be607-efa6-4346-91cf-0872d108e7e2\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:47:38.064Z\",\"message\":\"2026-11-06T04:47:38.064Z\\treq-3\\t2026-11-06T02:40:13.220Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 1/30: e07be607-efa6-4346-91cf-0872d108e7e2 (2214ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:48:38.064Z\",\"message\":\"2026-11-06T04:48:38.064Z\\treq-4\\t2026-11-06T02:40:15.396Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 8099309b-872e-4614-98c4-d10d18e02312\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:49:38.064Z\",\"message\":\"2026-11-06T04:49:38.064Z\\treq-5\\t2026-11-06T02:40:15.396Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 2/30: 8099309b-872e-4614-98c4-d10d18e02312 (4390ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:50:38.064Z\",\"message\":\"2026-11-06T04:50:38.064Z\\treq-6\\t2026-11-06T02:40:17.708Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: ad074d03-96e7-4768-9034-c715d8516e32\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:51:38.064Z\",\"message\":\"2026-11-06T04:51:38.064Z\\treq-7\\t2026-11-06T02:40:17.708Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 3/30: ad074d03-96e7-4768-9034-c715d8516e32 (6702ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:52:38.064Z\",\"message\":\"2026-11-06T04:52:38.064Z\\treq-8\\t2026-11-06T02:40:19.817Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 1b057e18-d701-473d-869d-a38113f8c8a7\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:53:38.064Z\",\"message\":\"2026-11-06T04:53:38.064Z\\treq-9\\t2026-11-06T02:40:19.817Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 4/30: 1b057e18-d701-473d-869d-a38113f8c8a7 (8811ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:54:38.064Z\",\"message\":\"2026-11-06T04:54:38.064Z\\treq-10\\t2026-11-06T02:40:22.036Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: d606c677-a397-4dbf-ae3d-e926fd3506dd\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:55:38.064Z\",\"message\":\"2026-11-06T04:55:38.064Z\\treq-11\\t2026-11-06T02:40:22.036Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 5/30: d606c677-a397-4dbf-ae3d-e926fd3506dd (11030ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:56:38.064Z\",\"message\":\"2026-11-06T04:56:38.064Z\\treq-12\\t2026-11-06T02:40:24.383Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 393897f9-66c2-4def-9515-0deb91811589\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:57:38.064Z\",\"message\":\"2026-11-06T04:57:38.064Z\\treq-13\\t2026-11-06T02:40:24.383Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 6/30: 393897f9-66c2-4def-9515-0deb91811589 (13377ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:58:38.064Z\",\"message\":\"2026-11-06T04:58:38.064Z\\treq-14\\t2026-11-06T02:40:26.608Z\\t3692e633-c258-493a-9a98-c641e947569b\\tWARN\\tClaude description generation failed, using fallback: ThrottlingException: Too many tokens, please wait before trying again.\\n    at de_ThrottlingExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1146:21)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 429,\\n    requestId: '2F04171210F98AD134E0',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  }\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T04:59:38.064Z\",\"message\":\"2026-11-06T04:59:38.064Z\\treq-15\\t2026-11-06T02:40:26.608Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 7fe7185a-5f2f-4a2d-a200-323bead5b0e8\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:00:38.064Z\",\"message\":\"2026-11-06T05:00:38.064Z\\treq-16\\t2026-11-06T02:40:26.608Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 7/30: 7fe7185a-5f2f-4a2d-a200-323bead5b0e8 (15602ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:01:38.064Z\",\"message\":\"2026-11-06T05:01:38.064Z\\treq-17\\t2026-11-06T02:40:28.847Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 9c91196b-7369-4d32-8520-748279b1167b\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:02:38.064Z\",\"message\":\"2026-11-06T05:02:38.064Z\\treq-18\\t2026-11-06T02:40:28.847Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 8/30: 9c91196b-7369-4d32-8520-748279b1167b (17841ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:03:38.064Z\",\"message\":\"2026-11-06T05:03:38.064Z\\treq-19\\t2026-11-06T02:40:31.025Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 5810e919-7d17-4f46-a921-f6e1d4f12542\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:04:38.064Z\",\"message\":\"2026-11-06T05:04:38.064Z\\treq-20\\t2026-11-06T02:40:31.025Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 9/30: 5810e919-7d17-4f46-a921-f6e1d4f12542 (20019ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:05:38.064Z\",\"message\":\"2026-11-06T05:05:38.064Z\\treq-21\\t2026-11-06T02:40:33.316Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: aed33657-e3aa-494f-98cb-73f0148cdf18\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:06:38.064Z\",\"message\":\"2026-11-06T05:06:38.064Z\\treq-22\\t2026-11-06T02:40:33.316Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 10/30: aed33657-e3aa-494f-98cb-73f0148cdf18 (22310ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:07:38.064Z\",\"message\":\"2026-11-06T05:07:38.064Z\\treq-23\\t2026-11-06T02:40:35.503Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 96c0d10f-8ba0-4d13-af4c-7e367b9d9c97\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:08:38.064Z\",\"message\":\"2026-11-06T05:08:38.064Z\\treq-24\\t2026-11-06T02:40:35.503Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 11/30: 96c0d10f-8ba0-4d13-af4c-7e367b9d9c97 (24497ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:09:38.064Z\",\"message\":\"2026-11-06T05:09:38.064Z\\treq-25\\t2026-11-06T02:40:37.694Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 93827490-f71d-4220-96b0-dfe873b21968\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:10:38.064Z\",\"message\":\"2026-11-06T05:10:38.064Z\\treq-26\\t2026-11-06T02:40:37.694Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 12/30: 93827490-f71d-4220-96b0-dfe873b21968 (26688ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:11:38.064Z\",\"message\":\"2026-11-06T05:11:38.064Z\\treq-27\\t2026-11-06T02:40:39.896Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 1c538c21-9c06-4673-b599-6b65b51c1d29\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:12:38.064Z\",\"message\":\"2026-11-06T05:12:38.064Z\\treq-28\\t2026-11-06T02:40:39.896Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 13/30: 1c538c21-9c06-4673-b599-6b65b51c1d29 (28890ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:13:38.064Z\",\"message\":\"2026-11-06T05:13:38.064Z\\treq-29\\t2026-11-06T02:40:42.108Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 5381b3c7-2b04-4a3b-b110-4f686098f8e0\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:14:38.064Z\",\"message\":\"2026-11-06T05:14:38.064Z\\treq-30\\t2026-11-06T02:40:42.108Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 14/30: 5381b3c7-2b04-4a3b-b110-4f686098f8e0 (31102ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:15:38.064Z\",\"message\":\"2026-11-06T05:15:38.064Z\\treq-31\\t2026-11-06T02:41:14.851Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: fe3affb5-f272-4d9a-a46d-40ca3559ac26\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:16:38.064Z\",\"message\":\"2026-11-06T05:16:38.064Z\\treq-32\\t2026-11-06T02:41:14.851Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 29/30: fe3affb5-f272-4d9a-a46d-40ca3559ac26 (63845ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:17:38.064Z\",\"message\":\"2026-11-06T05:17:38.064Z\\treq-33\\t2026-11-06T02:41:16.993Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: dfe9f876-751b-4487-9830-3ab5be8d1b6b\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:18:38.064Z\",\"message\":\"2026-11-06T05:18:38.064Z\\treq-34\\t2026-11-06T02:41:16.993Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 30/30: dfe9f876-751b-4487-9830-3ab5be8d1b6b (65987ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:19:38.064Z\",\"message\":\"2026-11-06T05:19:38.064Z\\treq-35\\tEND RequestId: 3692e633-c258-493a-9a98-c641e947569b\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:20:38.064Z\",\"message\":\"2026-11-06T05:20:38.064Z\\treq-36\\tREPORT RequestId: 3692e633-c258-493a-9a98-c641e947569b\\tDuration: 66140.31 ms\\tBilled Duration: 66141 ms\\tMemory Size: 1024 MB\\tMax Memory Used: 171 MB\",\"level\":\"INFO\"}]",
+   "replayed": true
+  }
+ ],
+ "L25": [
+  {
+   "tool": "get_function_config",
+   "input": {
+    "functionName": "VectorSearchFunction"
+   },
+   "result": "{\"functionName\":\"VectorSearchFunction\",\"found\":true,\"runtime\":\"nodejs24.x\",\"handler\":\"index.handler\",\"timeoutSec\":60,\"memoryMB\":1024,\"ephemeralStorageMB\":512,\"architecture\":\"x86_64\",\"lastModified\":\"2026-11-06T00:53:03.000+0000\",\"state\":\"Active\",\"lastUpdateStatus\":\"Successful\",\"environment\":{\"DOCUMENTS_BUCKET_NAME\":\"eecar-documents-425454508084\",\"KNOWLEDGE_BASE_ID\":\"\",\"SNS_TOPIC_ARN\":\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications\",\"PARTS_TABLE_NAME\":\"eecar-parts-table\",\"S3_VECTORS_INDEX\":\"parts-vectors\",\"S3_VECTORS_BUCKET\":\"eecar-vectors-index-12234628\",\"USE_S3_VECTORS\":\"true\",\"VECTORS_BUCKET_NAME\":\"eecar-vectors-425454508084\",\"USE_KNOWLEDGE_BASE\":\"false\",\"QUERY_EXPANSION_ENABLED\":\"false\",\"BEDROCK_MODEL_ID\":\"global.anthropic.claude-haiku-4-5-20251001-v1:0\"},\"layers\":[{\"name\":\"eecar-utils-layer\",\"version\":27,\"createdDate\":\"2026-11-06T00:52:52.734+0000\",\"latestVersion\":27,\"latestCreatedDate\":\"2026-11-06T00:52:52.734+0000\",\"isLatest\":true}],\"roleName\":\"eecar-stack-VectorSearchFunctionRole-8ndl79eaAkbw\"}",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "VectorSearchFunction",
+    "days": 7
+   },
+   "result": "{\"functionName\":\"VectorSearchFunction\",\"invocations\":365,\"errors\":0,\"avgDuration\":590,\"errorRate\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "VectorSearchFunction",
+    "hours": 168
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L26": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "ComplianceCheckFunction",
+    "days": 7
+   },
+   "result": "{\"functionName\":\"ComplianceCheckFunction\",\"invocations\":41,\"errors\":0,\"avgDuration\":640,\"errorRate\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "ComplianceCheckFunction",
+    "hours": 168
+   },
+   "result": "[{\"errorType\":\"AccessDeniedException\",\"count\":41,\"lastOccurred\":\"2026-11-06T05:21:38.064Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "ComplianceCheckFunction",
+    "filter": "ERROR",
+    "minutes": 10080
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:05:38.064Z\",\"message\":\"2026-11-06T05:05:38.064Z\\treq-2\\t2026-11-06T01:12:41.006Z\\t7ef605fc-8dba-4425-9696-5fbd4c8fbe1f\\tERROR\\tFailed to check compliance with AI: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ComplianceCheckFunctionRole-xbXyccpNGbWj/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0 because no identity-based policy allows the bedrock:InvokeModel action\\n    at de_AccessDeniedExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1062:21)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22)\\n    at async callClaude (file:///opt/nodejs/utils/bedrock.js:50:17) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 403,\\n    requestId: '13682AC418603AA09663',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  }\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:11:38.064Z\",\"message\":\"2026-11-06T05:11:38.064Z\\treq-8\\t2026-11-06T02:33:09.472Z\\ta8f15eda-80c5-4adb-8e71-943adc8015cf\\tERROR\\tFailed to check compliance with AI: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ComplianceCheckFunctionRole-xbXyccpNGbWj/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0 because no identity-based policy allows the bedrock:InvokeModel action\\n    at de_AccessDeniedExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1062:21)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22)\\n    at async callClaude (file:///opt/nodejs/utils/bedrock.js:50:17) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 403,\\n    requestId: 'B16A457A3302D7C1F456',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  }\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:17:38.064Z\",\"message\":\"2026-11-06T05:17:38.064Z\\treq-14\\t2026-11-06T03:51:23.361Z\\t37a749d8-08e4-4495-a8da-1e5352d03cae\\tERROR\\tFailed to check compliance with AI: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-ComplianceCheckFunctionRole-xbXyccpNGbWj/eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd is not authorized to perform: bedrock:InvokeModel on resource: arn:aws:bedrock:::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0 because no identity-based policy allows the bedrock:InvokeModel action\\n    at de_AccessDeniedExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1062:21)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22)\\n    at async callClaude (file:///opt/nodejs/utils/bedrock.js:50:17) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 403,\\n    requestId: 'AC2646028F5B8B9BBF7A',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  }\\n}\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "analyze_error",
+   "input": {
+    "errorMessage": "AccessDeniedException in ComplianceCheckFunction - all 41 invocations failing",
+    "functionName": "ComplianceCheckFunction"
+   },
+   "result": "{\"errorType\":\"AccessDeniedException\",\"functionName\":\"ComplianceCheckFunction\",\"cause\":\"s3:GetObject, dynamodb:Query 등)\",\"solutions\":[\"s3:GetObject, dynamodb:Query 등)\",\"- 최소 권한 원칙(Least Privilege) 적용\",\"**CloudWatch Logs 상세 확인**\",\"- Lambda 함수의 CloudWatch Logs에서 정확한 거부된 작업 확인\",\"- 어떤 리소스/액션이 거부되었는지 파악\",\"**리소스 정책 검토**\",\"- 접근하는 S3 버킷, DynamoDB 테이블 등의 리소스 정책 확인\",\"- 필요시 리소스 정책에 Lambda 실행 역할 추가\",\"**VPC 설정 확인** (해당하는 경우)\",\"- Lambda가 VPC 내에 있다면 NAT Gateway, VPC Endpoint 설정 확인\",\"- 보안 그룹 인바운드/아웃바운드 규칙 검토\",\"*",
+   "replayed": false
+  }
+ ],
+ "L27": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "SyntheticDataFunction",
+    "filter": "ALL",
+    "minutes": 30
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T04:44:38.064Z\",\"message\":\"2026-11-06T04:44:38.064Z\\treq-0\\tSTART RequestId: 3692e633-c258-493a-9a98-c641e947569b Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:45:38.064Z\",\"message\":\"2026-11-06T04:45:38.064Z\\treq-1\\t2026-11-06T02:40:11.006Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerating 30 synthetic parts for category: battery\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:46:38.064Z\",\"message\":\"2026-11-06T04:46:38.064Z\\treq-2\\t2026-11-06T02:40:13.220Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: e07be607-efa6-4346-91cf-0872d108e7e2\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:47:38.064Z\",\"message\":\"2026-11-06T04:47:38.064Z\\treq-3\\t2026-11-06T02:40:13.220Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 1/30: e07be607-efa6-4346-91cf-0872d108e7e2 (2214ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:48:38.064Z\",\"message\":\"2026-11-06T04:48:38.064Z\\treq-4\\t2026-11-06T02:40:15.396Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 8099309b-872e-4614-98c4-d10d18e02312\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:49:38.064Z\",\"message\":\"2026-11-06T04:49:38.064Z\\treq-5\\t2026-11-06T02:40:15.396Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 2/30: 8099309b-872e-4614-98c4-d10d18e02312 (4390ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:50:38.064Z\",\"message\":\"2026-11-06T04:50:38.064Z\\treq-6\\t2026-11-06T02:40:17.708Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: ad074d03-96e7-4768-9034-c715d8516e32\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:51:38.064Z\",\"message\":\"2026-11-06T04:51:38.064Z\\treq-7\\t2026-11-06T02:40:17.708Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 3/30: ad074d03-96e7-4768-9034-c715d8516e32 (6702ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:52:38.064Z\",\"message\":\"2026-11-06T04:52:38.064Z\\treq-8\\t2026-11-06T02:40:19.817Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 1b057e18-d701-473d-869d-a38113f8c8a7\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:53:38.064Z\",\"message\":\"2026-11-06T04:53:38.064Z\\treq-9\\t2026-11-06T02:40:19.817Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 4/30: 1b057e18-d701-473d-869d-a38113f8c8a7 (8811ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:54:38.064Z\",\"message\":\"2026-11-06T04:54:38.064Z\\treq-10\\t2026-11-06T02:40:22.036Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: d606c677-a397-4dbf-ae3d-e926fd3506dd\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:55:38.064Z\",\"message\":\"2026-11-06T04:55:38.064Z\\treq-11\\t2026-11-06T02:40:22.036Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 5/30: d606c677-a397-4dbf-ae3d-e926fd3506dd (11030ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:56:38.064Z\",\"message\":\"2026-11-06T04:56:38.064Z\\treq-12\\t2026-11-06T02:40:24.383Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 393897f9-66c2-4def-9515-0deb91811589\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:57:38.064Z\",\"message\":\"2026-11-06T04:57:38.064Z\\treq-13\\t2026-11-06T02:40:24.383Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 6/30: 393897f9-66c2-4def-9515-0deb91811589 (13377ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T04:58:38.064Z\",\"message\":\"2026-11-06T04:58:38.064Z\\treq-14\\t2026-11-06T02:40:26.608Z\\t3692e633-c258-493a-9a98-c641e947569b\\tWARN\\tClaude description generation failed, using fallback: ThrottlingException: Too many tokens, please wait before trying again.\\n    at de_ThrottlingExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1146:21)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 429,\\n    requestId: '2F04171210F98AD134E0',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  }\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T04:59:38.064Z\",\"message\":\"2026-11-06T04:59:38.064Z\\treq-15\\t2026-11-06T02:40:26.608Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 7fe7185a-5f2f-4a2d-a200-323bead5b0e8\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:00:38.064Z\",\"message\":\"2026-11-06T05:00:38.064Z\\treq-16\\t2026-11-06T02:40:26.608Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 7/30: 7fe7185a-5f2f-4a2d-a200-323bead5b0e8 (15602ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:01:38.064Z\",\"message\":\"2026-11-06T05:01:38.064Z\\treq-17\\t2026-11-06T02:40:28.847Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 9c91196b-7369-4d32-8520-748279b1167b\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:02:38.064Z\",\"message\":\"2026-11-06T05:02:38.064Z\\treq-18\\t2026-11-06T02:40:28.847Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 8/30: 9c91196b-7369-4d32-8520-748279b1167b (17841ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:03:38.064Z\",\"message\":\"2026-11-06T05:03:38.064Z\\treq-19\\t2026-11-06T02:40:31.025Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 5810e919-7d17-4f46-a921-f6e1d4f12542\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:04:38.064Z\",\"message\":\"2026-11-06T05:04:38.064Z\\treq-20\\t2026-11-06T02:40:31.025Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 9/30: 5810e919-7d17-4f46-a921-f6e1d4f12542 (20019ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:05:38.064Z\",\"message\":\"2026-11-06T05:05:38.064Z\\treq-21\\t2026-11-06T02:40:33.316Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: aed33657-e3aa-494f-98cb-73f0148cdf18\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:06:38.064Z\",\"message\":\"2026-11-06T05:06:38.064Z\\treq-22\\t2026-11-06T02:40:33.316Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 10/30: aed33657-e3aa-494f-98cb-73f0148cdf18 (22310ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:07:38.064Z\",\"message\":\"2026-11-06T05:07:38.064Z\\treq-23\\t2026-11-06T02:40:35.503Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 96c0d10f-8ba0-4d13-af4c-7e367b9d9c97\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:08:38.064Z\",\"message\":\"2026-11-06T05:08:38.064Z\\treq-24\\t2026-11-06T02:40:35.503Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 11/30: 96c0d10f-8ba0-4d13-af4c-7e367b9d9c97 (24497ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:09:38.064Z\",\"message\":\"2026-11-06T05:09:38.064Z\\treq-25\\t2026-11-06T02:40:37.694Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 93827490-f71d-4220-96b0-dfe873b21968\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:10:38.064Z\",\"message\":\"2026-11-06T05:10:38.064Z\\treq-26\\t2026-11-06T02:40:37.694Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 12/30: 93827490-f71d-4220-96b0-dfe873b21968 (26688ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:11:38.064Z\",\"message\":\"2026-11-06T05:11:38.064Z\\treq-27\\t2026-11-06T02:40:39.896Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 1c538c21-9c06-4673-b599-6b65b51c1d29\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:12:38.064Z\",\"message\":\"2026-11-06T05:12:38.064Z\\treq-28\\t2026-11-06T02:40:39.896Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 13/30: 1c538c21-9c06-4673-b599-6b65b51c1d29 (28890ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:13:38.064Z\",\"message\":\"2026-11-06T05:13:38.064Z\\treq-29\\t2026-11-06T02:40:42.108Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 5381b3c7-2b04-4a3b-b110-4f686098f8e0\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:14:38.064Z\",\"message\":\"2026-11-06T05:14:38.064Z\\treq-30\\t2026-11-06T02:40:42.108Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 14/30: 5381b3c7-2b04-4a3b-b110-4f686098f8e0 (31102ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:15:38.064Z\",\"message\":\"2026-11-06T05:15:38.064Z\\treq-31\\t2026-11-06T02:41:14.851Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: fe3affb5-f272-4d9a-a46d-40ca3559ac26\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:16:38.064Z\",\"message\":\"2026-11-06T05:16:38.064Z\\treq-32\\t2026-11-06T02:41:14.851Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 29/30: fe3affb5-f272-4d9a-a46d-40ca3559ac26 (63845ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:17:38.064Z\",\"message\":\"2026-11-06T05:17:38.064Z\\treq-33\\t2026-11-06T02:41:16.993Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: dfe9f876-751b-4487-9830-3ab5be8d1b6b\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:18:38.064Z\",\"message\":\"2026-11-06T05:18:38.064Z\\treq-34\\t2026-11-06T02:41:16.993Z\\t3692e633-c258-493a-9a98-c641e947569b\\tINFO\\tGenerated part 30/30: dfe9f876-751b-4487-9830-3ab5be8d1b6b (65987ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:19:38.064Z\",\"message\":\"2026-11-06T05:19:38.064Z\\treq-35\\tEND RequestId: 3692e633-c258-493a-9a98-c641e947569b\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:20:38.064Z\",\"message\":\"2026-11-06T05:20:38.064Z\\treq-36\\tREPORT RequestId: 3692e633-c258-493a-9a98-c641e947569b\\tDuration: 66140.31 ms\\tBilled Duration: 66141 ms\\tMemory Size: 1024 MB\\tMax Memory Used: 171 MB\",\"level\":\"INFO\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "504 Gateway Timeout API Gateway 응답 지연",
+    "topK": 5
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L28": [
+  {
+   "tool": "get_function_config",
+   "input": {
+    "functionName": "SyntheticDataFunction"
+   },
+   "result": "{\"functionName\":\"SyntheticDataFunction\",\"found\":true,\"runtime\":\"nodejs24.x\",\"handler\":\"index.handler\",\"timeoutSec\":120,\"memoryMB\":1024,\"ephemeralStorageMB\":512,\"architecture\":\"x86_64\",\"lastModified\":\"2026-11-06T01:47:12.000+0000\",\"state\":\"Active\",\"lastUpdateStatus\":\"Successful\",\"environment\":{\"DOCUMENTS_BUCKET_NAME\":\"eecar-documents-425454508084\",\"KNOWLEDGE_BASE_ID\":\"\",\"SNS_TOPIC_ARN\":\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications\",\"PARTS_TABLE_NAME\":\"eecar-parts-table\",\"S3_VECTORS_INDEX\":\"parts-vectors\",\"S3_VECTORS_BUCKET\":\"eecar-vectors-index-12234628\",\"USE_S3_VECTORS\":\"true\",\"VECTORS_BUCKET_NAME\":\"eecar-vectors-425454508084\",\"USE_KNOWLEDGE_BASE\":\"false\",\"QUERY_EXPANSION_ENABLED\":\"false\",\"BEDROCK_MODEL_ID\":\"anthropic.claude-sonnet-4-5-20250929-v1:0\"},\"layers\":[{\"name\":\"eecar-utils-layer\",\"version\":27,\"createdDate\":\"2026-11-06T00:52:52.734+0000\",\"latestVersion\":27,\"latestCreatedDate\":\"2026-11-06T00:52:52.734+0000\",\"isLatest\":true}],\"roleName\":\"eecar-stack-SyntheticDataFunctionRole-0DD1VHMs7Ayk\"}",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "SyntheticDataFunction",
+    "filter": "ALL",
+    "minutes": 480
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:06:38.064Z\",\"message\":\"2026-11-06T05:06:38.064Z\\treq-0\\tSTART RequestId: ceccd19e-e311-4a73-814b-7c8ff491ffed Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:07:38.064Z\",\"message\":\"2026-11-06T05:07:38.064Z\\treq-1\\t2026-11-06T02:09:30.441Z\\tceccd19e-e311-4a73-814b-7c8ff491ffed\\tINFO\\tGenerating 20 synthetic parts for category: motor\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:08:38.064Z\",\"message\":\"2026-11-06T05:08:38.064Z\\treq-2\\t2026-11-06T02:09:30.593Z\\tceccd19e-e311-4a73-814b-7c8ff491ffed\\tWARN\\tClaude description generation failed, using fallback: ValidationException: Invocation of model ID anthropic.claude-sonnet-4-5-20250929-v1:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.\\n    at de_ValidationExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1163:21)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: 'B711075C6F7A56470D69',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  }\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:09:38.064Z\",\"message\":\"2026-11-06T05:09:38.064Z\\treq-3\\t2026-11-06T02:09:30.893Z\\tceccd19e-e311-4a73-814b-7c8ff491ffed\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 7e9243f5-caa8-48fa-8cd4-9cc900db4865\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:10:38.064Z\",\"message\":\"2026-11-06T05:10:38.064Z\\treq-4\\t2026-11-06T02:09:30.893Z\\tceccd19e-e311-4a73-814b-7c8ff491ffed\\tINFO\\tGenerated part 1/20: 7e9243f5-caa8-48fa-8cd4-9cc900db4865 (452ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:11:38.064Z\",\"message\":\"2026-11-06T05:11:38.064Z\\treq-5\\t2026-11-06T02:09:31.012Z\\tceccd19e-e311-4a73-814b-7c8ff491ffed\\tWARN\\tClaude description generation failed, using fallback: ValidationException: Invocation of model ID anthropic.claude-sonnet-4-5-20250929-v1:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.\\n    at de_ValidationExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1163:21)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '629AB2F4F9ADF45B58C7',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  }\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:12:38.064Z\",\"message\":\"2026-11-06T05:12:38.064Z\\treq-6\\t2026-11-06T02:09:31.312Z\\tceccd19e-e311-4a73-814b-7c8ff491ffed\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: b6090fa8-a7a0-4676-b9a7-62a58d6fddf7\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:13:38.064Z\",\"message\":\"2026-11-06T05:13:38.064Z\\treq-7\\t2026-11-06T02:09:31.312Z\\tceccd19e-e311-4a73-814b-7c8ff491ffed\\tINFO\\tGenerated part 2/20: b6090fa8-a7a0-4676-b9a7-62a58d6fddf7 (871ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:14:38.064Z\",\"message\":\"2026-11-06T05:14:38.064Z\\treq-8\\t2026-11-06T02:09:31.450Z\\tceccd19e-e311-4a73-814b-7c8ff491ffed\\tWARN\\tClaude description generation failed, using fallback: ValidationException: Invocation of model ID anthropic.claude-sonnet-4-5-20250929-v1:0 with on-demand throughput isn’t supported. Retry your request with the ID or ARN of an inference profile that contains this model.\\n    at de_ValidationExceptionRes (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:1163:21)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-bedrock-runtime/dist-cjs/index.js:978:19)\\n    at async invokeClaude (file:///opt/nodejs/utils/bedrock.js:28:22) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: 'EAE07CEA8984742ED868',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  }\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:15:38.064Z\",\"message\":\"2026-11-06T05:15:38.064Z\\treq-9\\t2026-11-06T02:09:31.750Z\\tceccd19e-e311-4a73-814b-7c8ff491ffed\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 77c47269-359a-41f2-81ee-4b255d763a34\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:16:38.064Z\",\"message\":\"2026-11-06T05:16:38.064Z\\treq-10\\t2026-11-06T02:09:31.750Z\\tceccd19e-e311-4a73-814b-7c8ff491ffed\\tINFO\\tGenerated part 3/20: 77c47269-359a-41f2-81ee-4b255d763a34 (1309ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:17:38.064Z\",\"message\":\"2026-11-06T05:17:38.064Z\\treq-11\\t2026-11-06T02:09:38.752Z\\tceccd19e-e311-4a73-814b-7c8ff491ffed\\tINFO\\tSuccessfully uploaded vector to S3 Vectors: 1c4400eb-8506-475f-91df-97cd12683340\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:18:38.064Z\",\"message\":\"2026-11-06T05:18:38.064Z\\treq-12\\t2026-11-06T02:09:38.752Z\\tceccd19e-e311-4a73-814b-7c8ff491ffed\\tINFO\\tGenerated part 20/20: 1c4400eb-8506-475f-91df-97cd12683340 (8311ms)\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:19:38.064Z\",\"message\":\"2026-11-06T05:19:38.064Z\\treq-13\\tEND RequestId: ceccd19e-e311-4a73-814b-7c8ff491ffed\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:20:38.064Z\",\"message\":\"2026-11-06T05:20:38.064Z\\treq-14\\tREPORT RequestId: ceccd19e-e311-4a73-814b-7c8ff491ffed\\tDuration: 8402.77 ms\\tBilled Duration: 8403 ms\\tMemory Size: 1024 MB\\tMax Memory Used: 166 MB\",\"level\":\"INFO\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "SyntheticDataFunction description 품질 템플릿 생성",
+    "topK": 3
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L29": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "all",
+    "days": 1
+   },
+   "result": "[{\"functionName\":\"VectorSearchFunction\",\"invocations\":380,\"errors\":0,\"avgDuration\":610,\"errorRate\":0},{\"functionName\":\"PartRegistrationFunction\",\"invocations\":12,\"errors\":0,\"avgDuration\":1720,\"errorRate\":0},{\"functionName\":\"ComplianceCheckFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"GetPartsFunction\",\"invocations\":520,\"errors\":0,\"avgDuration\":80,\"errorRate\":0},{\"functionName\":\"WatchPartFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"ProposalFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"SyntheticDataFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"BatteryHealthAssessmentFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"MaterialPropertySearchFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"ContactInquiryFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"SlackNotificationFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"SlackAgentFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250}]",
+   "replayed": true
+  }
+ ],
+ "L30": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "GetPartsFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"GetPartsFunction\",\"invocations\":210,\"errors\":143,\"avgDuration\":96,\"errorRate\":68.0952380952381,\"lastError\":{\"message\":\"2026-11-06T01:58:03.227Z\\t3644a684-f98e-48fe-a23c-713b77189a77\\tERROR\\tError in get-parts: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-GetPartsFunctionRole-jrlvazVqsSho/eecar-stack-GetPartsFunction-Hy7cV2pLm9Qe is not authorized to perform: dynamodb:Query on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/GSI2 because no identity-based policy allows the dynamodb:Query action\\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\\n    at async queryAllMetadataWithPagination (file:///opt/nodejs/utils/dynamodb.js:184:20)\\n    at async listParts (file:///var/task/index.js:71:18) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '9F9AF029585BA014E07C',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  __type: 'com.amazon.coral.service#AccessDeniedException'\\n}\",\"timestamp\":\"2026-11-06T05:21:38.064Z\"}}",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "GetPartsFunction",
+    "minutes": 120,
+    "filter": "ERROR"
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:07:38.064Z\",\"message\":\"2026-11-06T05:07:38.064Z\\treq-1\\t2026-11-06T01:58:03.227Z\\t3644a684-f98e-48fe-a23c-713b77189a77\\tERROR\\tError in get-parts: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-GetPartsFunctionRole-jrlvazVqsSho/eecar-stack-GetPartsFunction-Hy7cV2pLm9Qe is not authorized to perform: dynamodb:Query on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/GSI2 because no identity-based policy allows the dynamodb:Query action\\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\\n    at async queryAllMetadataWithPagination (file:///opt/nodejs/utils/dynamodb.js:184:20)\\n    at async listParts (file:///var/task/index.js:71:18) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '9F9AF029585BA014E07C',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  __type: 'com.amazon.coral.service#AccessDeniedException'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:14:38.064Z\",\"message\":\"2026-11-06T05:14:38.064Z\\treq-8\\t2026-11-06T01:58:21.404Z\\t854d6fae-5ee4-4911-a77c-739ee1734486\\tERROR\\tError in get-parts: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-GetPartsFunctionRole-jrlvazVqsSho/eecar-stack-GetPartsFunction-Hy7cV2pLm9Qe is not authorized to perform: dynamodb:Query on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/GSI1 because no identity-based policy allows the dynamodb:Query action\\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\\n    at async queryGSI1WithPagination (file:///opt/nodejs/utils/dynamodb.js:157:20)\\n    at async listParts (file:///var/task/index.js:71:18) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '1E7B95C5614637FDCDE7',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  __type: 'com.amazon.coral.service#AccessDeniedException'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.064Z\",\"message\":\"2026-11-06T05:18:38.064Z\\treq-12\\t2026-11-06T02:03:44.618Z\\te2c0be24-560d-48c5-a599-c2a9c9d0bbd2\\tERROR\\tError in get-parts: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-GetPartsFunctionRole-jrlvazVqsSho/eecar-stack-GetPartsFunction-Hy7cV2pLm9Qe is not authorized to perform: dynamodb:Query on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/GSI2 because no identity-based policy allows the dynamodb:Query action\\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\\n    at async queryAllMetadataWithPagination (file:///opt/nodejs/utils/dynamodb.js:184:20)\\n    at async listParts (file:///var/task/index.js:71:18) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: 'A165FBD61C277745F187',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  __type: 'com.amazon.coral.service#AccessDeniedException'\\n}\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_config",
+   "input": {
+    "functionName": "GetPartsFunction"
+   },
+   "result": "{\"functionName\":\"GetPartsFunction\",\"found\":true,\"runtime\":\"nodejs24.x\",\"handler\":\"index.handler\",\"timeoutSec\":30,\"memoryMB\":512,\"ephemeralStorageMB\":512,\"architecture\":\"x86_64\",\"lastModified\":\"2026-11-06T00:52:56.000+0000\",\"state\":\"Active\",\"lastUpdateStatus\":\"Successful\",\"environment\":{\"DOCUMENTS_BUCKET_NAME\":\"eecar-documents-425454508084\",\"KNOWLEDGE_BASE_ID\":\"\",\"SNS_TOPIC_ARN\":\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications\",\"PARTS_TABLE_NAME\":\"eecar-parts-table\",\"S3_VECTORS_INDEX\":\"parts-vectors\",\"S3_VECTORS_BUCKET\":\"eecar-vectors-index-12234628\",\"USE_S3_VECTORS\":\"true\",\"VECTORS_BUCKET_NAME\":\"eecar-vectors-425454508084\",\"USE_KNOWLEDGE_BASE\":\"false\",\"QUERY_EXPANSION_ENABLED\":\"false\",\"BEDROCK_MODEL_ID\":\"global.anthropic.claude-haiku-4-5-20251001-v1:0\"},\"layers\":[{\"name\":\"eecar-utils-layer\",\"version\":27,\"createdDate\":\"2026-11-06T00:52:52.734+0000\",\"latestVersion\":27,\"latestCreatedDate\":\"2026-11-06T00:52:52.734+0000\",\"isLatest\":true}],\"roleName\":\"eecar-stack-GetPartsFunctionRole-jrlvazVqsSho\"}",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_permissions",
+   "input": {
+    "functionName": "GetPartsFunction"
+   },
+   "result": "{\"functionName\":\"GetPartsFunction\",\"found\":true,\"roleName\":\"eecar-stack-GetPartsFunctionRole-jrlvazVqsSho\",\"statements\":[{\"policy\":\"GetPartsFunctionRolePolicy0\",\"effect\":\"Allow\",\"actions\":[\"dynamodb:GetItem\",\"dynamodb:Scan\",\"dynamodb:Query\",\"dynamodb:BatchGetItem\",\"dynamodb:DescribeTable\"],\"resources\":[\"arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table\"]},{\"policy\":\"AWSXrayWriteOnlyAccess\",\"effect\":\"Allow\",\"actions\":[\"xray:PutTraceSegments\",\"xray:PutTelemetryRecords\",\"xray:GetSamplingRules\",\"xray:GetSamplingTargets\",\"xray:GetSamplingStatisticSummaries\"],\"resources\":[\"*\"]},{\"policy\":\"AWSLambdaBasicExecutionRole\",\"effect\":\"Allow\",\"actions\":[\"logs:CreateLogGroup\",\"logs:CreateLogStream\",\"logs:PutLogEvents\"],\"resources\":[\"*\"]}]}",
+   "replayed": true
+  }
+ ],
+ "L31": [
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "WatchPartFunction 에러 실패",
+    "topK": 5
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "WatchPartFunction",
+    "filter": "ERROR",
+    "minutes": 120
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:08:38.065Z\",\"message\":\"2026-11-06T05:08:38.065Z\\treq-2\\t2026-11-06T01:42:10.304Z\\t8f03ad02-c6ca-4600-92c0-0a972a9bcce6\\tERROR\\tError in watch-part: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-WatchPartFunctionRole-PaWFHWYXP402/eecar-stack-WatchPartFunction-Lk82JdUe0aQz is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:27:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: 'F38E1BCAB2B7A9B4EA5F',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  __type: 'com.amazon.coral.service#AccessDeniedException'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:13:38.065Z\",\"message\":\"2026-11-06T05:13:38.065Z\\treq-7\\t2026-11-06T02:05:51.792Z\\tf803dfeb-3583-4509-9a58-a7478f28bd75\\tERROR\\tError in watch-part: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-WatchPartFunctionRole-PaWFHWYXP402/eecar-stack-WatchPartFunction-Lk82JdUe0aQz is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:27:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '27C14D3D220F5752FA49',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  __type: 'com.amazon.coral.service#AccessDeniedException'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.065Z\",\"message\":\"2026-11-06T05:18:38.065Z\\treq-12\\t2026-11-06T03:18:27.219Z\\t7f5144f9-62ef-4e75-a0f7-661e032166db\\tERROR\\tError in watch-part: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-WatchPartFunctionRole-PaWFHWYXP402/eecar-stack-WatchPartFunction-Lk82JdUe0aQz is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:27:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '141D6D6BCE4007BD0E50',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  __type: 'com.amazon.coral.service#AccessDeniedException'\\n}\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "WatchPartFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"WatchPartFunction\",\"invocations\":17,\"errors\":17,\"avgDuration\":210,\"errorRate\":100,\"lastError\":{\"message\":\"2026-11-06T01:42:10.304Z\\t8f03ad02-c6ca-4600-92c0-0a972a9bcce6\\tERROR\\tError in watch-part: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-WatchPartFunctionRole-PaWFHWYXP402/eecar-stack-WatchPartFunction-Lk82JdUe0aQz is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:27:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: 'F38E1BCAB2B7A9B4EA5F',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  __type: 'com.amazon.coral.service#AccessDeniedException'\\n}\",\"timestamp\":\"2026-11-06T05:21:38.065Z\"}}",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_permissions",
+   "input": {
+    "functionName": "WatchPartFunction"
+   },
+   "result": "{\"functionName\":\"WatchPartFunction\",\"found\":true,\"roleName\":\"eecar-stack-WatchPartFunctionRole-PaWFHWYXP402\",\"statements\":[{\"policy\":\"WatchPartFunctionRolePolicy0\",\"effect\":\"Allow\",\"actions\":[\"dynamodb:GetItem\",\"dynamodb:Scan\",\"dynamodb:Query\",\"dynamodb:BatchGetItem\",\"dynamodb:DescribeTable\"],\"resources\":[\"arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table\",\"arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table/index/*\"]},{\"policy\":\"WatchPartFunctionRolePolicy1\",\"effect\":\"Allow\",\"actions\":[\"sns:Publish\"],\"resources\":[\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications\"]},{\"policy\":\"AWSXrayWriteOnlyAccess\",\"effect\":\"Allow\",\"actions\":[\"xray:PutTraceSegments\",\"xray:PutTelemetryRecords\",\"xray:GetSamplingRules\",\"xray:GetSamplingTargets\",\"xray:GetSamplingStatisticSummaries\"],\"resources\":[\"*\"]},{\"policy\":\"AWSLambdaBasicExecutionRole\",\"effect\":\"Allow\",\"actions\":[\"logs:CreateLogGroup\",\"logs:CreateLogStream\",\"logs:PutLogEvents\"],\"resources\":[\"*\"]}]}",
+   "replayed": true
+  }
+ ],
+ "L32": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "all",
+    "days": 1
+   },
+   "result": "[{\"functionName\":\"VectorSearchFunction\",\"invocations\":182,\"errors\":0,\"avgDuration\":710,\"errorRate\":0},{\"functionName\":\"PartRegistrationFunction\",\"invocations\":9,\"errors\":0,\"avgDuration\":1650,\"errorRate\":0},{\"functionName\":\"ComplianceCheckFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"GetPartsFunction\",\"invocations\":240,\"errors\":0,\"avgDuration\":85,\"errorRate\":0},{\"functionName\":\"WatchPartFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"ProposalFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"SyntheticDataFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"BatteryHealthAssessmentFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"MaterialPropertySearchFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"ContactInquiryFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"SlackNotificationFunction\",\"invocations\":100,\"errors\":0,\"errorRate\":0,\"avgDuration\":250},{\"functionName\":\"SlackAgentFunction\",\"invocations\":6,\"errors\":0,\"avgDuration\":2100,\"errorRate\":0}]",
+   "replayed": true
+  }
+ ],
+ "L33": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "WatchPartFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"WatchPartFunction\",\"invocations\":17,\"errors\":17,\"avgDuration\":210,\"errorRate\":100,\"lastError\":{\"message\":\"2026-11-06T01:42:10.304Z\\t8f03ad02-c6ca-4600-92c0-0a972a9bcce6\\tERROR\\tError in watch-part: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-WatchPartFunctionRole-PaWFHWYXP402/eecar-stack-WatchPartFunction-Lk82JdUe0aQz is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:27:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: 'F38E1BCAB2B7A9B4EA5F',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  __type: 'com.amazon.coral.service#AccessDeniedException'\\n}\",\"timestamp\":\"2026-11-06T05:21:38.065Z\"}}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "WatchPartFunction",
+    "hours": 12
+   },
+   "result": "[{\"errorType\":\"AccessDeniedException\",\"count\":17,\"lastOccurred\":\"2026-11-06T05:21:38.065Z\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "WatchPartFunction",
+    "filter": "ERROR",
+    "minutes": 720
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:08:38.065Z\",\"message\":\"2026-11-06T05:08:38.065Z\\treq-2\\t2026-11-06T01:42:10.304Z\\t8f03ad02-c6ca-4600-92c0-0a972a9bcce6\\tERROR\\tError in watch-part: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-WatchPartFunctionRole-PaWFHWYXP402/eecar-stack-WatchPartFunction-Lk82JdUe0aQz is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:27:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: 'F38E1BCAB2B7A9B4EA5F',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  __type: 'com.amazon.coral.service#AccessDeniedException'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:13:38.065Z\",\"message\":\"2026-11-06T05:13:38.065Z\\treq-7\\t2026-11-06T02:05:51.792Z\\tf803dfeb-3583-4509-9a58-a7478f28bd75\\tERROR\\tError in watch-part: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-WatchPartFunctionRole-PaWFHWYXP402/eecar-stack-WatchPartFunction-Lk82JdUe0aQz is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:27:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '27C14D3D220F5752FA49',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  __type: 'com.amazon.coral.service#AccessDeniedException'\\n}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.065Z\",\"message\":\"2026-11-06T05:18:38.065Z\\treq-12\\t2026-11-06T03:18:27.219Z\\t7f5144f9-62ef-4e75-a0f7-661e032166db\\tERROR\\tError in watch-part: AccessDeniedException: User: arn:aws:sts::425454508084:assumed-role/eecar-stack-WatchPartFunctionRole-PaWFHWYXP402/eecar-stack-WatchPartFunction-Lk82JdUe0aQz is not authorized to perform: dynamodb:PutItem on resource: arn:aws:dynamodb:ap-northeast-2:425454508084:table/eecar-parts-table because no identity-based policy allows the dynamodb:PutItem action\\n    at throwDefaultError (/var/runtime/node_modules/@aws-sdk/node_modules/@smithy/smithy-client/dist-cjs/index.js:388:20)\\n    at de_CommandError (/var/runtime/node_modules/@aws-sdk/client-dynamodb/dist-cjs/index.js:2316:14)\\n    at async putItem (file:///opt/nodejs/utils/dynamodb.js:27:5)\\n    at async Runtime.handler (file:///var/task/index.js:30:5) {\\n  '$fault': 'client',\\n  '$metadata': {\\n    httpStatusCode: 400,\\n    requestId: '141D6D6BCE4007BD0E50',\\n    extendedRequestId: undefined,\\n    cfId: undefined,\\n    attempts: 1,\\n    totalRetryDelay: 0\\n  },\\n  __type: 'com.amazon.coral.service#AccessDeniedException'\\n}\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  }
+ ],
+ "L34": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "WatchPartFunction",
+    "filter": "ALL",
+    "minutes": 120
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:07:38.065Z\",\"message\":\"2026-11-06T05:07:38.065Z\\treq-0\\tINIT_START Runtime Version: nodejs:24.v14\\tRuntime Version ARN: arn:aws:lambda:ap-northeast-2::runtime:9c3e7a1f0b2d4e6a8c5b7d9f1e3a5c7b9d1f3e5a7c9b1d3f5e7a9c1b3d5f7e9a\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:08:38.065Z\",\"message\":\"2026-11-06T05:08:38.065Z\\treq-1\\t(node:2) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\\n(Use `node --trace-deprecation ...` to show where the warning was created)\",\"level\":\"WARN\"},{\"timestamp\":\"2026-11-06T05:09:38.065Z\",\"message\":\"2026-11-06T05:09:38.065Z\\treq-2\\tSTART RequestId: 71149d8d-7300-49ca-ae3b-0ad93b6b93ae Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:10:38.065Z\",\"message\":\"2026-11-06T05:10:38.065Z\\treq-3\\t2026-11-06T00:12:31.880Z\\t71149d8d-7300-49ca-ae3b-0ad93b6b93ae\\tINFO\\tCreating watch: d6b39cf9-2df1-4dc6-b700-e15538516101\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:11:38.065Z\",\"message\":\"2026-11-06T05:11:38.065Z\\treq-4\\tEND RequestId: 71149d8d-7300-49ca-ae3b-0ad93b6b93ae\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:12:38.065Z\",\"message\":\"2026-11-06T05:12:38.065Z\\treq-5\\tREPORT RequestId: 71149d8d-7300-49ca-ae3b-0ad93b6b93ae\\tDuration: 1312.55 ms\\tBilled Duration: 2417 ms\\tMemory Size: 512 MB\\tMax Memory Used: 101 MB\\tInit Duration: 1104.32 ms\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:13:38.065Z\",\"message\":\"2026-11-06T05:13:38.065Z\\treq-6\\tSTART RequestId: dc73f88b-3f5a-4b42-bdbb-655dfc25917d Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:14:38.065Z\",\"message\":\"2026-11-06T05:14:38.065Z\\treq-7\\t2026-11-06T00:14:02.441Z\\tdc73f88b-3f5a-4b42-bdbb-655dfc25917d\\tINFO\\tCreating watch: a49d7de0-4057-4e79-870b-06898e6a4110\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:15:38.065Z\",\"message\":\"2026-11-06T05:15:38.065Z\\treq-8\\tEND RequestId: dc73f88b-3f5a-4b42-bdbb-655dfc25917d\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:16:38.065Z\",\"message\":\"2026-11-06T05:16:38.065Z\\treq-9\\tREPORT RequestId: dc73f88b-3f5a-4b42-bdbb-655dfc25917d\\tDuration: 46.20 ms\\tBilled Duration: 47 ms\\tMemory Size: 512 MB\\tMax Memory Used: 103 MB\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:17:38.065Z\",\"message\":\"2026-11-06T05:17:38.065Z\\treq-10\\tSTART RequestId: bba3f466-0046-4341-9791-112b0a9e3344 Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:18:38.065Z\",\"message\":\"2026-11-06T05:18:38.065Z\\treq-11\\t2026-11-06T00:31:47.019Z\\tbba3f466-0046-4341-9791-112b0a9e3344\\tINFO\\tCreating watch: a47af993-6332-4c2b-936d-c9761b3eb443\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:19:38.065Z\",\"message\":\"2026-11-06T05:19:38.065Z\\treq-12\\tEND RequestId: bba3f466-0046-4341-9791-112b0a9e3344\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:20:38.065Z\",\"message\":\"2026-11-06T05:20:38.065Z\\treq-13\\tREPORT RequestId: bba3f466-0046-4341-9791-112b0a9e3344\\tDuration: 39.88 ms\\tBilled Duration: 40 ms\\tMemory Size: 512 MB\\tMax Memory Used: 103 MB\",\"level\":\"INFO\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "WatchPartFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"WatchPartFunction\",\"invocations\":14,\"errors\":0,\"avgDuration\":410,\"errorRate\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "punycode DeprecationWarning Lambda 성능",
+    "topK": 3
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L35": [
+  {
+   "tool": "get_function_config",
+   "input": {
+    "functionName": "VectorSearchFunction"
+   },
+   "result": "{\"functionName\":\"VectorSearchFunction\",\"found\":true,\"runtime\":\"nodejs24.x\",\"handler\":\"index.handler\",\"timeoutSec\":60,\"memoryMB\":1024,\"ephemeralStorageMB\":512,\"architecture\":\"x86_64\",\"lastModified\":\"2026-11-06T00:53:03.000+0000\",\"state\":\"Active\",\"lastUpdateStatus\":\"Successful\",\"environment\":{\"DOCUMENTS_BUCKET_NAME\":\"eecar-documents-425454508084\",\"KNOWLEDGE_BASE_ID\":\"\",\"SNS_TOPIC_ARN\":\"arn:aws:sns:ap-northeast-2:425454508084:eecar-notifications\",\"PARTS_TABLE_NAME\":\"eecar-parts-table\",\"S3_VECTORS_INDEX\":\"parts-vectors\",\"S3_VECTORS_BUCKET\":\"eecar-vectors-index-12234628\",\"USE_S3_VECTORS\":\"true\",\"VECTORS_BUCKET_NAME\":\"eecar-vectors-425454508084\",\"USE_KNOWLEDGE_BASE\":\"false\",\"QUERY_EXPANSION_ENABLED\":\"false\",\"BEDROCK_MODEL_ID\":\"global.anthropic.claude-haiku-4-5-20251001-v1:0\"},\"layers\":[{\"name\":\"eecar-utils-layer\",\"version\":27,\"createdDate\":\"2026-11-06T00:52:52.734+0000\",\"latestVersion\":27,\"latestCreatedDate\":\"2026-11-06T00:52:52.734+0000\",\"isLatest\":true}],\"roleName\":\"eecar-stack-VectorSearchFunctionRole-8ndl79eaAkbw\"}",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "VectorSearchFunction",
+    "days": 7
+   },
+   "result": "{\"functionName\":\"VectorSearchFunction\",\"invocations\":365,\"errors\":0,\"avgDuration\":590,\"errorRate\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "VectorSearchFunction",
+    "hours": 168
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L36": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "SlackNotificationFunction",
+    "minutes": 120,
+    "filter": "ERROR"
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T04:47:38.065Z\",\"message\":\"2026-11-06T04:47:38.065Z\\treq-2\\t2026-11-06T05:00:14.208Z\\t6da9003b-743b-45f4-80cc-d295cc484e57\\tINFO\\tFound 4 error events\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T04:49:38.065Z\",\"message\":\"2026-11-06T04:49:38.065Z\\treq-4\\t2026-11-06T05:00:14.388Z\\t6da9003b-743b-45f4-80cc-d295cc484e57\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T04:50:38.065Z\",\"message\":\"2026-11-06T04:50:38.065Z\\treq-5\\t2026-11-06T05:00:14.478Z\\t6da9003b-743b-45f4-80cc-d295cc484e57\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T04:57:38.065Z\",\"message\":\"2026-11-06T04:57:38.065Z\\treq-12\\t2026-11-06T05:00:15.010Z\\t9b04d152-845e-40a3-b839-4003c96da594\\tINFO\\tFound 3 error events\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T04:58:38.065Z\",\"message\":\"2026-11-06T04:58:38.065Z\\treq-13\\t2026-11-06T05:00:15.100Z\\t9b04d152-845e-40a3-b839-4003c96da594\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T04:59:38.065Z\",\"message\":\"2026-11-06T04:59:38.065Z\\treq-14\\t2026-11-06T05:00:15.190Z\\t9b04d152-845e-40a3-b839-4003c96da594\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:00:38.065Z\",\"message\":\"2026-11-06T05:00:38.065Z\\treq-15\\t2026-11-06T05:00:15.280Z\\t9b04d152-845e-40a3-b839-4003c96da594\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:06:38.065Z\",\"message\":\"2026-11-06T05:06:38.065Z\\treq-21\\t2026-11-06T05:00:15.802Z\\tbe83ab3e-cd0d-4773-ab2d-c1b0a17836a1\\tINFO\\tFound 2 error events\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:07:38.065Z\",\"message\":\"2026-11-06T05:07:38.065Z\\treq-22\\t2026-11-06T05:00:15.892Z\\tbe83ab3e-cd0d-4773-ab2d-c1b0a17836a1\\tINFO\\tSent WARNING alert for eecar-stack-ComplianceCheckFunction-P2tMmz9JguDd: Exception\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:08:38.065Z\",\"message\":\"2026-11-06T05:08:38.065Z\\treq-23\\t2026-11-06T05:00:15.982Z\\tbe83ab3e-cd0d-4773-ab2d-c1b0a17836a1\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:14:38.065Z\",\"message\":\"2026-11-06T05:14:38.065Z\\treq-29\\t2026-11-06T05:00:16.611Z\\te1654211-10ba-4309-9a1c-0393373c5b43\\tINFO\\tFound 3 error events\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:15:38.065Z\",\"message\":\"2026-11-06T05:15:38.065Z\\treq-30\\t2026-11-06T05:00:16.701Z\\te1654211-10ba-4309-9a1c-0393373c5b43\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:16:38.065Z\",\"message\":\"2026-11-06T05:16:38.065Z\\treq-31\\t2026-11-06T05:00:16.791Z\\te1654211-10ba-4309-9a1c-0393373c5b43\\tERROR\\tFailed to send Slack notification: 429 Too Many Requests\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:17:38.065Z\",\"message\":\"2026-11-06T05:17:38.065Z\\treq-32\\t2026-11-06T05:00:16.881Z\\te1654211-10ba-4309-9a1c-0393373c5b43\\tINFO\\tSent CRITICAL alert for eecar-stack-VectorSearchFunction-yXyHE1D702wX: Exception\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "SlackNotificationFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"SlackNotificationFunction\",\"invocations\":64,\"errors\":0,\"avgDuration\":640,\"errorRate\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "SlackNotificationFunction 알림 전송 실패 throttling",
+    "topK": 5
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L37": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "PaymentWebhookFunction",
+    "filter": "ERROR",
+    "minutes": 30
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "PaymentWebhookFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"PaymentWebhookFunction\",\"found\":false,\"note\":\"'PaymentWebhookFunction' 함수를 스택에서 찾지 못했습니다. 함수 이름을 확인하세요.\",\"invocations\":0,\"errors\":0,\"errorRate\":0,\"avgDuration\":0}",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "PaymentWebhookFunction",
+    "hours": 24
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ],
+ "L38": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "MaterialPropertySearchFunction",
+    "filter": "ERROR",
+    "minutes": 60
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "MaterialPropertySearchFunction",
+    "hours": 24
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "MaterialPropertySearchFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"MaterialPropertySearchFunction\",\"invocations\":37,\"errors\":0,\"avgDuration\":760,\"errorRate\":0}",
+   "replayed": true
+  }
+ ],
+ "L39": [
+  {
+   "tool": "get_function_status",
+   "input": {
+    "functionName": "ProposalFunction",
+    "days": 1
+   },
+   "result": "{\"functionName\":\"ProposalFunction\",\"invocations\":22,\"errors\":22,\"avgDuration\":205,\"errorRate\":100,\"lastError\":{\"message\":\"2026-11-06T05:51:02.330Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"Error\\\",\\\"errorMessage\\\":\\\"Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\\nDid you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"code\\\":\\\"ERR_MODULE_NOT_FOUND\\\",\\\"url\\\":\\\"file:///opt/nodejs/utils/dynamodb\\\",\\\"stack\\\":[\\\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\",\\\"Did you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\\\",\\\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\\\",\\\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\\\"]}\",\"timestamp\":\"2026-11-06T05:21:38.065Z\"}}",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "ProposalFunction",
+    "filter": "ERROR",
+    "minutes": 120
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T05:09:38.065Z\",\"message\":\"2026-11-06T05:09:38.065Z\\treq-1\\t2026-11-06T05:51:02.330Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"Error\\\",\\\"errorMessage\\\":\\\"Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\\nDid you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"code\\\":\\\"ERR_MODULE_NOT_FOUND\\\",\\\"url\\\":\\\"file:///opt/nodejs/utils/dynamodb\\\",\\\"stack\\\":[\\\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\",\\\"Did you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\\\",\\\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\\\",\\\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\\\"]}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:10:38.065Z\",\"message\":\"2026-11-06T05:10:38.065Z\\treq-2\\tINIT_REPORT Init Duration: 198.67 ms\\tPhase: init\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:12:38.065Z\",\"message\":\"2026-11-06T05:12:38.065Z\\treq-4\\t2026-11-06T05:51:02.871Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"Error\\\",\\\"errorMessage\\\":\\\"Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\\nDid you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"code\\\":\\\"ERR_MODULE_NOT_FOUND\\\",\\\"url\\\":\\\"file:///opt/nodejs/utils/dynamodb\\\",\\\"stack\\\":[\\\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\",\\\"Did you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\\\",\\\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\\\",\\\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\\\"]}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:13:38.065Z\",\"message\":\"2026-11-06T05:13:38.065Z\\treq-5\\tINIT_REPORT Init Duration: 201.13 ms\\tPhase: invoke\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:15:38.065Z\",\"message\":\"2026-11-06T05:15:38.065Z\\treq-7\\tREPORT RequestId: da4fb5c6-e93e-44d3-9f85-27599fa62642\\tDuration: 214.50 ms\\tBilled Duration: 215 ms\\tMemory Size: 512 MB\\tMax Memory Used: 57 MB\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:17:38.065Z\",\"message\":\"2026-11-06T05:17:38.065Z\\treq-9\\t2026-11-06T06:02:39.115Z\\tundefined\\tERROR\\tUncaught Exception \\t{\\\"errorType\\\":\\\"Error\\\",\\\"errorMessage\\\":\\\"Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\\nDid you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"code\\\":\\\"ERR_MODULE_NOT_FOUND\\\",\\\"url\\\":\\\"file:///opt/nodejs/utils/dynamodb\\\",\\\"stack\\\":[\\\"Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/opt/nodejs/utils/dynamodb' imported from /var/task/index.js\\\",\\\"Did you mean to import \\\\\\\"/opt/nodejs/utils/dynamodb.js\\\\\\\"?\\\",\\\"    at finalizeResolution (node:internal/modules/esm/resolve:275:11)\\\",\\\"    at moduleResolve (node:internal/modules/esm/resolve:860:10)\\\",\\\"    at defaultResolve (node:internal/modules/esm/resolve:984:11)\\\"]}\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:18:38.065Z\",\"message\":\"2026-11-06T05:18:38.065Z\\treq-10\\tINIT_REPORT Init Duration: 205.53 ms\\tPhase: invoke\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"},{\"timestamp\":\"2026-11-06T05:20:38.065Z\",\"message\":\"2026-11-06T05:20:38.065Z\\treq-12\\tREPORT RequestId: 4c56ff4c-e4aa-4957-baa5-dff913df997a\\tDuration: 217.80 ms\\tBilled Duration: 218 ms\\tMemory Size: 512 MB\\tMax Memory Used: 57 MB\\tStatus: error\\tError Type: Runtime.Unknown\",\"level\":\"ERROR\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "get_error_summary",
+   "input": {
+    "functionName": "ProposalFunction",
+    "hours": 6
+   },
+   "result": "[{\"errorType\":\"ERR_MODULE_NOT_FOUND\",\"count\":22,\"lastOccurred\":\"2026-11-06T05:21:38.065Z\"}]",
+   "replayed": true
+  }
+ ],
+ "L40": [
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "PartRegistrationFunction",
+    "filter": "ERROR",
+    "minutes": 1440
+   },
+   "result": "[]",
+   "replayed": true
+  },
+  {
+   "tool": "get_logs",
+   "input": {
+    "functionName": "VectorSearchFunction",
+    "filter": "ALL",
+    "minutes": 1440
+   },
+   "result": "[{\"timestamp\":\"2026-11-06T04:59:38.065Z\",\"message\":\"2026-11-06T04:59:38.065Z\\treq-0\\tSTART RequestId: 26eb4fcb-1164-4608-b7f9-57749a0f1e73 Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:00:38.065Z\",\"message\":\"2026-11-06T05:00:38.065Z\\treq-1\\t2026-11-06T02:40:15.522Z\\t26eb4fcb-1164-4608-b7f9-57749a0f1e73\\tINFO\\tProcessing search query: 코나 배터리\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:01:38.065Z\",\"message\":\"2026-11-06T05:01:38.065Z\\treq-2\\t2026-11-06T02:40:15.522Z\\t26eb4fcb-1164-4608-b7f9-57749a0f1e73\\tINFO\\tCache hit!\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:02:38.065Z\",\"message\":\"2026-11-06T05:02:38.065Z\\treq-3\\t{\\\"_aws\\\":{\\\"Timestamp\\\":1793932815522,\\\"CloudWatchMetrics\\\":[{\\\"Namespace\\\":\\\"EECAR/Search\\\",\\\"Dimensions\\\":[[\\\"Operation\\\"]],\\\"Metrics\\\":[{\\\"Name\\\":\\\"SearchRequests\\\",\\\"Unit\\\":\\\"Count\\\"},{\\\"Name\\\":\\\"CacheHit\\\",\\\"Unit\\\":\\\"Count\\\"},{\\\"Name\\\":\\\"ZeroResult\\\",\\\"Unit\\\":\\\"Count\\\"},{\\\"Name\\\":\\\"TotalMs\\\",\\\"Unit\\\":\\\"Milliseconds\\\"}]}]},\\\"Operation\\\":\\\"Search\\\",\\\"SearchRequests\\\":1,\\\"CacheHit\\\":1,\\\"ZeroResult\\\":0,\\\"TotalMs\\\":38}\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:03:38.065Z\",\"message\":\"2026-11-06T05:03:38.065Z\\treq-4\\tEND RequestId: 26eb4fcb-1164-4608-b7f9-57749a0f1e73\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:04:38.065Z\",\"message\":\"2026-11-06T05:04:38.065Z\\treq-5\\tREPORT RequestId: 26eb4fcb-1164-4608-b7f9-57749a0f1e73\\tDuration: 44.18 ms\\tBilled Duration: 45 ms\\tMemory Size: 1024 MB\\tMax Memory Used: 209 MB\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:05:38.065Z\",\"message\":\"2026-11-06T05:05:38.065Z\\treq-6\\tSTART RequestId: bfcecaaa-7ef0-4a1f-aaf8-2eeed09ade80 Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:06:38.065Z\",\"message\":\"2026-11-06T05:06:38.065Z\\treq-7\\t2026-11-06T02:41:03.318Z\\tbfcecaaa-7ef0-4a1f-aaf8-2eeed09ade80\\tINFO\\tProcessing search query: 코나 배터리 팩\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:07:38.065Z\",\"message\":\"2026-11-06T05:07:38.065Z\\treq-8\\t2026-11-06T02:41:03.630Z\\tbfcecaaa-7ef0-4a1f-aaf8-2eeed09ade80\\tINFO\\tvector 100, bm25 100 (index 191) -> ranked 152, constraints {\\\"categories\\\":[\\\"battery\\\"],\\\"numeric\\\":[],\\\"conditions\\\":[],\\\"vehicles\\\":[\\\"코나\\\"]}\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:08:38.065Z\",\"message\":\"2026-11-06T05:08:38.065Z\\treq-9\\t{\\\"_aws\\\":{\\\"Timestamp\\\":1793932863318,\\\"CloudWatchMetrics\\\":[{\\\"Namespace\\\":\\\"EECAR/Search\\\",\\\"Dimensions\\\":[[\\\"Operation\\\"]],\\\"Metrics\\\":[{\\\"Name\\\":\\\"SearchRequests\\\",\\\"Unit\\\":\\\"Count\\\"},{\\\"Name\\\":\\\"CacheHit\\\",\\\"Unit\\\":\\\"Count\\\"},{\\\"Name\\\":\\\"ZeroResult\\\",\\\"Unit\\\":\\\"Count\\\"},{\\\"Name\\\":\\\"EmbeddingMs\\\",\\\"Unit\\\":\\\"Milliseconds\\\"},{\\\"Name\\\":\\\"VectorSearchMs\\\",\\\"Unit\\\":\\\"Milliseconds\\\"},{\\\"Name\\\":\\\"IndexLoadMs\\\",\\\"Unit\\\":\\\"Milliseconds\\\"},{\\\"Name\\\":\\\"FusionMs\\\",\\\"Unit\\\":\\\"Milliseconds\\\"},{\\\"Name\\\":\\\"TotalMs\\\",\\\"Unit\\\":\\\"Milliseconds\\\"}]}]},\\\"Operation\\\":\\\"Search\\\",\\\"SearchRequests\\\":1,\\\"CacheHit\\\":0,\\\"ZeroResult\\\":0,\\\"EmbeddingMs\\\":138,\\\"VectorSearchMs\\\":92,\\\"IndexLoadMs\\\":2,\\\"FusionMs\\\":9,\\\"TotalMs\\\":270}\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:09:38.065Z\",\"message\":\"2026-11-06T05:09:38.065Z\\treq-10\\tEND RequestId: bfcecaaa-7ef0-4a1f-aaf8-2eeed09ade80\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:10:38.065Z\",\"message\":\"2026-11-06T05:10:38.065Z\\treq-11\\tREPORT RequestId: bfcecaaa-7ef0-4a1f-aaf8-2eeed09ade80\\tDuration: 276.31 ms\\tBilled Duration: 277 ms\\tMemory Size: 1024 MB\\tMax Memory Used: 214 MB\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:11:38.065Z\",\"message\":\"2026-11-06T05:11:38.065Z\\treq-12\\tSTART RequestId: c3648373-2d8d-4bfb-b78b-273367efadcb Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:12:38.065Z\",\"message\":\"2026-11-06T05:12:38.065Z\\treq-13\\t{\\\"_aws\\\":{\\\"Timestamp\\\":1793932863990,\\\"CloudWatchMetrics\\\":[{\\\"Namespace\\\":\\\"EECAR/Search\\\",\\\"Dimensions\\\":[[\\\"Feature\\\"],[]],\\\"Metrics\\\":[{\\\"Name\\\":\\\"LLMCalls\\\",\\\"Unit\\\":\\\"Count\\\"},{\\\"Name\\\":\\\"LLMFallback\\\",\\\"Unit\\\":\\\"Count\\\"},{\\\"Name\\\":\\\"LLMLatency\\\",\\\"Unit\\\":\\\"Milliseconds\\\"}]}]},\\\"Feature\\\":\\\"Explanation\\\",\\\"LLMCalls\\\":1,\\\"LLMFallback\\\":0,\\\"LLMLatency\\\":1950}\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:13:38.065Z\",\"message\":\"2026-11-06T05:13:38.065Z\\treq-14\\tEND RequestId: c3648373-2d8d-4bfb-b78b-273367efadcb\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:14:38.065Z\",\"message\":\"2026-11-06T05:14:38.065Z\\treq-15\\tREPORT RequestId: c3648373-2d8d-4bfb-b78b-273367efadcb\\tDuration: 2083.42 ms\\tBilled Duration: 2084 ms\\tMemory Size: 1024 MB\\tMax Memory Used: 221 MB\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:15:38.065Z\",\"message\":\"2026-11-06T05:15:38.065Z\\treq-16\\tSTART RequestId: 7a900bb7-4d40-4cb6-8a8f-a53ce0725dd4 Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:16:38.065Z\",\"message\":\"2026-11-06T05:16:38.065Z\\treq-17\\t2026-11-06T03:55:41.006Z\\t7a900bb7-4d40-4cb6-8a8f-a53ce0725dd4\\tINFO\\tProcessing search query: 코나 배터리\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:17:38.065Z\",\"message\":\"2026-11-06T05:17:38.065Z\\treq-18\\t2026-11-06T03:55:41.006Z\\t7a900bb7-4d40-4cb6-8a8f-a53ce0725dd4\\tINFO\\tCache hit!\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:18:38.065Z\",\"message\":\"2026-11-06T05:18:38.065Z\\treq-19\\t{\\\"_aws\\\":{\\\"Timestamp\\\":1793937341006,\\\"CloudWatchMetrics\\\":[{\\\"Namespace\\\":\\\"EECAR/Search\\\",\\\"Dimensions\\\":[[\\\"Operation\\\"]],\\\"Metrics\\\":[{\\\"Name\\\":\\\"SearchRequests\\\",\\\"Unit\\\":\\\"Count\\\"},{\\\"Name\\\":\\\"CacheHit\\\",\\\"Unit\\\":\\\"Count\\\"},{\\\"Name\\\":\\\"ZeroResult\\\",\\\"Unit\\\":\\\"Count\\\"},{\\\"Name\\\":\\\"TotalMs\\\",\\\"Unit\\\":\\\"Milliseconds\\\"}]}]},\\\"Operation\\\":\\\"Search\\\",\\\"SearchRequests\\\":1,\\\"CacheHit\\\":1,\\\"ZeroResult\\\":0,\\\"TotalMs\\\":38}\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:19:38.065Z\",\"message\":\"2026-11-06T05:19:38.065Z\\treq-20\\tEND RequestId: 7a900bb7-4d40-4cb6-8a8f-a53ce0725dd4\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-06T05:20:38.065Z\",\"message\":\"2026-11-06T05:20:38.065Z\\treq-21\\tREPORT RequestId: 7a900bb7-4d40-4cb6-8a8f-a53ce0725dd4\\tDuration: 44.18 ms\\tBilled Duration: 45 ms\\tMemory Size: 1024 MB\\tMax Memory Used: 209 MB\",\"level\":\"INFO\"}]",
+   "replayed": true
+  },
+  {
+   "tool": "recall_memory",
+   "input": {
+    "query": "검색 결과 정확도 띄어쓰기 부분 일치 벡터 임베딩",
+    "topK": 5
+   },
+   "result": "[]",
+   "replayed": true
+  }
+ ]
+}

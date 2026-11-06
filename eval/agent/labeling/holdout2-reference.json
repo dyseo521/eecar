@@ -1,0 +1,402 @@
+[
+ {
+  "id": "L01",
+  "cause": "no",
+  "fix": "no",
+  "wrong": "present",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "문의 기능은 설계상 DB에 저장하지 않고 SNS 메일로만 보내는데, DynamoDB 권한 부재를 고장 원인으로 단정했다. 존재하지 않는 contact-inquiries 테이블과 INQUIRIES_TABLE_NAME에 권한을 추가하라는 불필요한 조치를 사실처럼 제시했고 메일함 확인 안내가 없다.",
+  "critiqueB": "문의는 설계상 DB에 저장하지 않고 SNS 이메일로만 보내는데, DynamoDB 권한 누락을 원인으로 단정했다. 존재하지 않는 contact-inquiries 테이블에 권한을 추가하라는 불필요한 조치를 제시했고 이메일 수신함 확인 안내는 없다."
+ },
+ {
+  "id": "L02",
+  "cause": "partial",
+  "fix": "partial",
+  "wrong": "present",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "InvalidParameter: Subject는 짚었지만 근본 원인을 특수문자·줄바꿈으로 단정했고 100자는 제약 목록 중 하나로만 언급했다. 수정 코드는 문자 정제 위주이며 substring(0,100)은 SNS의 '100자 미만' 조건을 여전히 어기고 한글도 모두 지운다.",
+  "critiqueB": "SNS Subject 오류는 맞게 짚었으나 근본 원인을 특수문자·줄바꿈으로 단정했고 길이는 제약 중 하나로만 언급했다('100자 미만'이 아니라 '최대 100자'로 서술). 수정 코드는 substring(0,100)이라 100자가 그대로 남고 비ASCII를 모두 지워 한글 제목이 빈 문자열이 되므로 그대로는 동작하지 않는다."
+ },
+ {
+  "id": "L03",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "로그의 TypeError에서 일괄 적재로 suitableApplications가 문자열로 들어간 것을 원인으로 정확히 짚었다. 데이터 교정과 문자열도 처리하는 방어 코드를 모두 제시해 해결된다.",
+  "critiqueB": "suitableApplications가 문자열로 적재되어 .slice().join이 실패한다는 원인을 정확히 짚었다. 데이터 정정과 문자열 처리 방어 코드 모두 정답 조치와 일치한다."
+ },
+ {
+  "id": "L04",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "원인 단락은 없지만 suitableApplications 문자열 저장을 전제로 배열 변환과 Array.isArray 방어 코드를 제시해 원인과 해결이 모두 맞다. 예시 스크립트의 테이블명 'BatteryData'는 실제와 다르지만 템플릿 코드 수준이다.",
+  "critiqueB": "원인 문장을 따로 쓰지 않았지만 suitableApplications 문자열을 배열로 바꾸라는 조치와 검증 메시지로 원인을 분명히 했다. 데이터 정정과 코드 방어 모두 유효하다(예시 스크립트의 테이블명 BatteryData는 자리표시자)."
+ },
+ {
+  "id": "L05",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "present",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "Titan 8,192토큰 초과와 실패 전 저장으로 인한 중복은 맞게 짚었고 설명 길이 제한은 해결책에 부합한다(6,000자≈1,500토큰 환산은 한국어에 맞지 않을 수 있음). 그러나 3개 중복을 'Lambda 비동기 호출 2회 재시도' 때문이라고 단정한 것은 틀렸다(API Gateway 동기 호출이며 판매자 재시도가 원인).",
+  "critiqueB": "Titan 입력 한도(8,192 대 21,467토큰) 초과와 실패 전에 저장되어 중복이 남는 구조를 맞게 짚었고 길이 제한 조치도 유효하다. 다만 중복 3건을 'Lambda 비동기 호출의 2회 재시도' 때문이라고 단정했는데, API Gateway 동기 호출이라 사실과 다르다."
+ },
+ {
+  "id": "L06",
+  "cause": "partial",
+  "fix": "no",
+  "wrong": "none",
+  "source": "adjudicated",
+  "note": "중복 제거 문제라는 방향은 맞고 권한 누락이라는 핵심이 빠짐(B)",
+  "critiqueA": "SlackNotificationFunction의 DynamoDB 권한이 빠져 중복 제거가 fail open된 것을 확인하지 않고 규칙 변경·로직 제거 등 틀린 후보만 나열했다. '중복 제거 로직 복구'나 CloudWatch 필터 추가로는 권한 문제가 해결되지 않는다.",
+  "critiqueB": "SlackNotificationFunction의 중복 제거가 문제라는 방향은 맞지만 알림 함수 로그·권한을 보지 않아 DynamoDB 권한 누락(fail open)을 찾지 못했고, 코드 제거·이벤트 규칙 변경 같은 후보만 나열했다. 제시한 조치(중복 제거 로직 복구, CloudWatch 필터)로는 권한 문제가 풀리지 않는다."
+ },
+ {
+  "id": "L07",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "ERR_MODULE_NOT_FOUND 로그로 import 경로의 .js 확장자 누락을 정확히 짚고 .js를 붙이는 수정을 제시했다. Jest moduleNameMapper가 테스트에서 이를 가린 점은 설명하지 않았다.",
+  "critiqueB": "ESM import에서 .js 확장자가 빠졌다는 원인과 .js를 붙이는 수정을 정확히 제시했다. Jest moduleNameMapper가 테스트에서 이를 가린 점은 설명하지 않았고, npm run deploy는 실제로 없는 스크립트다."
+ },
+ {
+  "id": "L08",
+  "cause": "partial",
+  "fix": "partial",
+  "wrong": "none",
+  "source": "adjudicated",
+  "note": "길이는 해결되지만 정규식이 한글 제목을 지워 그대로는 부족(B)",
+  "critiqueA": "Subject 무효를 짚었으나 빈 값·특수문자·길이 초과를 후보로 나열했을 뿐 긴 제목이 원인임을 특정하지 못했다. 97자+'...' 절단(이후 정규식이 점까지 제거)으로 긴 제목 실패는 해결되지만 한글을 모두 지우는 부작용이 있다.",
+  "critiqueB": "빈 값·특수문자·100자 초과를 후보로 나열해 길이 원인은 여러 후보 중 하나에 그친다. 97자+'...'로 자르는 방향은 맞지만 [^\\w\\s\\-()] 치환이 한글을 모두 지워 한글 제목이 공백만 남고, 실제 코드의 '[EECAR] 일반 문의 - ' 접두어도 고려하지 않아 그대로는 부족하다."
+ },
+ {
+  "id": "L09",
+  "cause": "partial",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "SNS Publish 권한 거부라는 방향은 맞지만 권한을 조회하지 않아 정책 리소스 오타(eecar-notification)라는 핵심을 놓치고 '권한 없음'으로만 설명했다. 올바른 토픽 ARN에 sns:Publish를 추가하면 문제는 해결된다.",
+  "critiqueB": "SNS:Publish 권한 거부를 원인으로 짚었지만 권한을 조회하지 않아 정책 리소스 오타(eecar-notification)라는 핵심은 놓쳤다. 올바른 토픽 ARN에 sns:Publish를 허용하라는 조치는 문제를 해결한다."
+ },
+ {
+  "id": "L10",
+  "cause": "partial",
+  "fix": "yes",
+  "wrong": "present",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "export 누락·이름 불일치를 주원인으로 보고 레이어 미배포는 부가 가능성으로만 언급했다. build:all 후 레이어·함수를 함께 배포하라는 해결책은 맞지만 build:all이 배포까지 한다는 설명은 사실이 아니다.",
+  "critiqueB": "레이어 미배포는 '가능성도 있다'는 보조 후보로만 두고 export 누락을 먼저 의심했다. 레이어와 함수를 함께 빌드·배포하라는 조치는 맞지만, npm run build:all이 '배포'까지 한다는 설명은 틀렸다(빌드만 한다)."
+ },
+ {
+  "id": "L11",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "PaymentWebhookFunction이 스택에 없다고 정확히 답하고 실제 함수 목록을 보여 주며 정확한 이름을 요청했다.",
+  "critiqueB": "PaymentWebhookFunction이 스택에 없음을 확인하고 정확한 함수명을 요청했다. 제시한 함수 목록도 실제 템플릿과 일치한다."
+ },
+ {
+  "id": "L12",
+  "cause": "yes",
+  "fix": "partial",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "첫 요청 지연은 콜드 스타트이고 punycode 경고는 무관하다고 정확히 진단했다. 다만 조치가 필요 없다고 하지 않고 콜드 스타트 최적화·메모리 증설 등 불필요한 조치를 우선순위로 권했다.",
+  "critiqueB": "punycode 경고는 무관하고 첫 요청 지연은 콜드 스타트라고 정확히 답했다. 그러나 '조치 불필요' 대신 콜드 스타트 최적화·경고 제거·메모리 증설을 우선순위 조치로 권해 불필요한 작업을 유도한다(aws-sdk v2 require 예시도 이 프로젝트에 맞지 않음)."
+ },
+ {
+  "id": "L13",
+  "cause": "no",
+  "fix": "no",
+  "wrong": "present",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "설계상 DB에 저장하지 않는 정상 동작을 DynamoDB 권한 누락 장애로 단정했다. 존재하지 않는 contact-inquiries 테이블 권한 추가를 권해 불필요한 조치이며 수신 메일함 확인 안내가 없다.",
+  "critiqueB": "설계상 DB에 저장하지 않는 기능인데 'DynamoDB 접근 권한 없음'을 문제로 단정하고 contact-inquiries 테이블 권한 추가를 제시했다. 저장 로직이 있는지 확인하라는 말은 있지만 이메일 수신함 안내는 없다."
+ },
+ {
+  "id": "L14",
+  "cause": "partial",
+  "fix": "yes",
+  "wrong": "present",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "Task timed out, 3초 제한, 저장 후 재시도로 인한 중복은 맞지만 원인을 근거 없이 'Bedrock 임베딩 지연'으로 단정하고 제한 시간이 줄어든 점은 짚지 못했다. 제한 시간을 10초로 늘리면 해결되나, 현재 메모리를 128MB로 지어내 512MB로 '증가'시키라 했고(실제 1024MB) 함수가 계속 실행 중이었다는 설명도 틀렸다.",
+  "critiqueB": "3초 근처 타임아웃은 짚었지만 설정이 줄어든 것이 아니라 Bedrock 임베딩이 느려진 것을 원인으로 단정했다. 타임아웃을 10초로 늘리는 조치는 유효하나, 근거 없는 '현재 메모리 128MB'(실제 1024MB)와 '함수는 실제로 실행 중이었다'는 서술은 사실과 다르다."
+ },
+ {
+  "id": "L15",
+  "cause": "partial",
+  "fix": "partial",
+  "wrong": "none",
+  "source": "adjudicated",
+  "note": "오타를 세 후보 중 하나로만 들고 실제 함수 정상 여부는 확인하지 않음(A)",
+  "critiqueA": "MaterialSearchFunction이 스택에 없다는 점과 MaterialPropertySearchFunction을 제시한 것은 좋지만 오타를 여러 후보 중 하나로 두었다. 실제 함수를 조회해 에러가 없다고 알려 주지 않았다.",
+  "critiqueB": "MaterialSearchFunction이 없음을 확인하고 MaterialPropertySearchFunction을 제시해 오타를 짚었다. 다만 실제 함수를 조회하지 않아 '에러가 없다'는 답은 하지 못했다."
+ },
+ {
+  "id": "L16",
+  "cause": "partial",
+  "fix": "yes",
+  "wrong": "present",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "타임아웃(추정 3초)과 재시도 중복은 맞지만 근거 없이 임베딩 지연을 원인으로 단정하고 제한 시간 축소를 짚지 못했다. 제한 시간 10초 상향으로 해결되나 '백그라운드에서 계속 처리 중'이라는 설명은 틀렸다(시간 초과 시 실행은 중단되고 그 전에 저장된 METADATA가 남는 것).",
+  "critiqueB": "Task timed out과 추정 3초 타임아웃을 짚고 타임아웃 증가를 제시해 조치는 유효하다. 그러나 설정 축소가 아니라 '임베딩 생성이 느려짐'을 원인으로 단정했고, 시간 초과 뒤에도 '백그라운드에서 계속 처리 중'이라는 설명도 틀렸다(저장 후 종료됨)."
+ },
+ {
+  "id": "L17",
+  "cause": "partial",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "AccessDenied로 검사가 실패한다는 방향은 맞지만 정책이 서울 리전으로 좁혀져 global 프로필의 리전 없는 foundation-model ARN이 빠졌다는 핵심 대신 권한이 '제거'된 것으로 설명했다. 제시한 arn:aws:bedrock:*::foundation-model/*은 와일드카드가 리전 없는 ARN도 포함하므로 해결된다.",
+  "critiqueB": "Bedrock InvokeModel AccessDenied로 검사가 실패한다는 점은 맞다. 하지만 정책이 서울 리전으로 좁혀져 global 프로필의 리전 없는 foundation-model ARN이 빠졌다는 핵심과, fail open으로 '위반 없음'이 되는 이유는 설명하지 않았다. 제시한 arn:aws:bedrock:*::foundation-model/* 추가로는 해결된다."
+ },
+ {
+  "id": "L18",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "정책 리소스가 eecar-notification(단수)으로 오타가 난 것을 정확히 짚고 eecar-notifications로 고치도록 안내했다.",
+  "critiqueB": "권한 정책을 조회해 리소스 오타(eecar-notification 대 eecar-notifications)를 정확히 찾았다. 정책 리소스를 올바른 토픽 ARN으로 고치라는 조치도 정답과 일치한다."
+ },
+ {
+  "id": "L19",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "모든 함수가 에러 0%로 정상이라고 증거대로 보고하고 추가 조치가 필요 없다고 답했다.",
+  "critiqueB": "배포 후 모든 함수가 에러 0건으로 정상이라고 근거 수치와 함께 정확히 보고했고 불필요한 조치를 권하지 않았다."
+ },
+ {
+  "id": "L20",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "에러가 몰릴 때 Slack 웹훅 429 속도 제한으로 일부 알림이 빠졌다고 정확히 짚었다. 지수 백오프 재시도와 배치·쓰로틀링을 제시해 해결된다(Retry-After 언급은 없음).",
+  "critiqueB": "Slack 웹훅 429 속도 제한으로 일부 알림이 빠졌다고 정확히 짚었다. 지수 백오프 재시도와 배치·쓰로틀링 제안은 정답 조치와 일치한다(Retry-After 언급은 없음)."
+ },
+ {
+  "id": "L21",
+  "cause": "no",
+  "fix": "no",
+  "wrong": "none",
+  "source": "adjudicated",
+  "note": "사용자가 추가했다는 export가 소스에 없다고 단정, 레이어 재빌드 언급 없음(A)",
+  "critiqueA": "에러 문구를 그대로 옮겨 search-document.js가 export하지 않는다고 했을 뿐 레이어를 다시 빌드하지 않았다는 원인은 전혀 언급하지 않았다. 이미 있는 export를 소스에 추가하고 재배포하라는 안내로는 오래된 레이어가 그대로라 해결되지 않는다.",
+  "critiqueB": "레이어 모듈에 export가 없다는 런타임 현상만 짚고, utils를 고친 뒤 레이어를 다시 빌드·배포하지 않았다는 핵심 원인은 언급하지 않았다. 소스에 export를 추가하고 배포하라는 조치는 레이어 재빌드 단계가 빠져 그대로는 해결되지 않는다."
+ },
+ {
+  "id": "L22",
+  "cause": "yes",
+  "fix": "partial",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "Bedrock이 아니라 따옴표가 깨진 JSON의 파싱 실패라고 정확히 진단했다. 그러나 '즉시' 조치로 제시한 정규식은 정상 JSON의 구조 따옴표까지 이스케이프해 모든 파싱을 깨뜨리며, 프롬프트 수정만 올바른 방향이다.",
+  "critiqueB": "Bedrock은 정상이고 모델이 따옴표 처리가 깨진 JSON을 돌려줘 폴백된다는 원인을 정확히 짚었다. 그러나 '즉시' 조치로 제시한 정규식은 정상 JSON의 구조 따옴표까지 이스케이프해 모든 파싱을 깨뜨리므로(직접 실행해 확인) 그대로 적용하면 악화되고, 프롬프트 개선만 유효하다."
+ },
+ {
+  "id": "L23",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "모든 함수가 정상임을 보고하고 어느 기능·증상·시각인지 구체적으로 물었다. 24시간 수치를 '어제 저녁 활동'으로 표현한 것은 사소한 부정확함이다.",
+  "critiqueB": "모든 함수가 정상임을 보고하고 어느 기능·증상·시각인지 구체적으로 물어 정답 조치와 일치한다."
+ },
+ {
+  "id": "L24",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "present",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "API Gateway 29초 제한과 Lambda 66초 실행으로 504가 나도 데이터는 생성된다는 점을 정확히 짚고, 작업 ID를 반환하는 비동기 처리를 1순위로 제시했다. 다만 API Gateway 제한 시간을 120초로 늘리라는 임시안은 엣지 최적화 API에서 불가능한 조치다.",
+  "critiqueB": "API Gateway 29초 통합 제한과 Lambda 66초 실행을 정확히 짚고 비동기(jobId 반환) 처리를 1순위로 제시했다. 다만 edge-optimized REST API의 29초 제한을 120초로 늘린다는 '임시 해결'은 불가능한 조치다."
+ },
+ {
+  "id": "L25",
+  "cause": "yes",
+  "fix": "partial",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "USE_KNOWLEDGE_BASE=false이고 S3 Vectors를 쓰므로 빈 값이 정상이라고 정확히 결론 냈다. 그런데도 KB ID를 채워 두라고 권하고 꺼 둔 쿼리 확장을 켜 보라고 해 불필요한 조치가 섞였다.",
+  "critiqueB": "USE_KNOWLEDGE_BASE=false이고 S3 Vectors를 쓰므로 빈 값이 문제없다고 정확히 결론 냈다. 그러나 권장사항에서 아직 없는 KB의 ID를 미리 채워두라고 해 '값을 채울 필요 없다'는 정답과 어긋난다."
+ },
+ {
+  "id": "L26",
+  "cause": "partial",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "Bedrock InvokeModel 권한 거부라는 방향은 맞지만 서울 리전으로 좁혀진 정책과 global 프로필 라우팅이라는 핵심 대신 권한을 '잃었다'고만 설명했다. 리전 와일드카드 foundation-model ARN을 추가하는 조치로 해결되나 S3·DynamoDB 광범위 권한 같은 불필요한 추가가 섞여 있다.",
+  "critiqueB": "Bedrock AccessDenied를 원인으로 짚었지만 리전 축소로 global 프로필의 다른 리전 ARN이 빠졌다는 핵심과 fail open 구조는 설명하지 않았다. arn:aws:bedrock:*::foundation-model/... 인라인 정책 추가로는 해결되며, 정책명·스택 파일명은 자리표시자다."
+ },
+ {
+  "id": "L27",
+  "cause": "yes",
+  "fix": "partial",
+  "wrong": "present",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "API Gateway 29초 제한과 Lambda 66초 실행이라는 원인은 정확하다. 그러나 '권장'으로 제시한 TimeoutInMillis 60초 상향은 엣지 최적화 API에서 불가능하고, 올바른 해법인 비동기 처리는 장기 UX 개선으로만 밀려 있다.",
+  "critiqueB": "29초 API Gateway 제한과 66초 실행이라는 원인은 정확하다. 그러나 1순위 조치인 통합 타임아웃 60초 상향은 edge-optimized REST API에서 불가능하고, 정답인 비동기 처리는 '장기' 옵션으로 밀려 있다."
+ },
+ {
+  "id": "L28",
+  "cause": "yes",
+  "fix": "partial",
+  "wrong": "present",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "추론 프로필 없는 Sonnet 4.5 ID로 on-demand 호출이 거부되어 템플릿으로 폴백된다는 원인은 정확하다. 그러나 예시 ARN(계정 ID·global./apac. 접두사 없음)은 잘못된 형식이고, 원래 Globals 값 복구 대신 퇴역한 Claude 3.5 모델을 '이 계정에서 지원'한다며 근거 없이 권했다.",
+  "critiqueB": "Sonnet 4.5 기본 모델 ID의 on-demand 호출 거부와 템플릿 폴백이라는 원인은 정확하다. 그러나 예시 ARN(계정 ID와 global./apac. 접두어 없음)과 Haiku 3.5·Sonnet 3.5 기본 ID 대안은 모두 그대로 실패하고, '이 계정에서 지원하는 모델'은 근거 없는 단정이며 Globals 값으로 되돌리는 안도 없다."
+ },
+ {
+  "id": "L29",
+  "cause": "yes",
+  "fix": "partial",
+  "wrong": "none",
+  "source": "adjudicated",
+  "note": "정상 판단은 맞지만 무엇이 이상했는지 묻지 않음. 같은 시나리오 L23과 기준을 맞춤(B)",
+  "critiqueA": "어제 모든 함수가 정상이었다고 보고하고 특정 함수·시간대를 알려 달라고 요청했다. 증상·화면을 직접 묻지는 않았지만 막연한 질문에 맞게 구체화를 요청했다.",
+  "critiqueB": "모든 함수가 정상이라는 결론은 맞다. 그러나 무엇이 이상했는지(기능·화면·증상·시각) 묻지 않고 특정 함수의 로그 조회를 제안하는 데 그쳐, 막연한 질문에 대한 안내로는 부족하다."
+ },
+ {
+  "id": "L30",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "GetPartsFunction 정책에 테이블 ARN만 있고 GSI 인덱스 ARN이 없어 Query가 거부된다고 정확히 짚고, GSI1·GSI2 인덱스 ARN 추가와 템플릿 수정을 안내했다.",
+  "critiqueB": "GetPartsFunction 정책에 테이블 ARN만 있고 GSI 인덱스 ARN이 없어 Query가 거부된다는 원인을 정확히 짚었다. 인덱스 ARN 추가와 템플릿 반영 조치도 정답과 일치한다."
+ },
+ {
+  "id": "L31",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "권한을 조회해 정책이 읽기 전용으로 바뀌어 PutItem이 빠졌음을 정확히 짚고 PutItem 추가와 템플릿 확인을 안내했다.",
+  "critiqueB": "권한을 조회해 정책이 읽기 전용이 되어 PutItem이 빠졌음을 정확히 짚었다. PutItem 추가와 템플릿 확인 조치는 정답과 일치한다."
+ },
+ {
+  "id": "L32",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "모든 함수가 에러 0건으로 정상이라고 증거대로 보고하고 추가 조치를 권하지 않았다.",
+  "critiqueB": "배포 후 모든 함수가 에러 0건으로 정상임을 정확히 보고했고(합계 1,237건도 맞음) 불필요한 조치를 권하지 않았다."
+ },
+ {
+  "id": "L33",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "AccessDenied 로그로 WatchPartFunction 역할에 PutItem 권한이 없다는 원인을 정확히 짚었다. PutItem 권한을 확인·추가하라는 조치로 해결된다.",
+  "critiqueB": "WatchPartFunction 역할에 dynamodb:PutItem 권한이 없어 100% 실패한다는 원인을 정확히 짚었다. PutItem을 포함한 정책 복구 조치도 유효하다."
+ },
+ {
+  "id": "L34",
+  "cause": "no",
+  "fix": "no",
+  "wrong": "present",
+  "source": "adjudicated",
+  "note": "무관한 punycode 경고를 첫 요청 지연의 원인으로 단정(A)",
+  "critiqueA": "Init Duration으로 콜드 스타트는 보았으나 punycode 경고가 첫 요청 성능을 직접 떨어뜨린다고 틀리게 단정했다. Node 24→22/20 다운그레이드와 engines 필드 수정은 효과가 없거나 해로운 조치다.",
+  "critiqueB": "콜드 스타트 패턴은 표로 보였지만 'punycode 경고가 첫 요청 성능을 직접 저하시킨다'고 정답과 반대로 단정했다. Node.js 24에서 22/20으로 내리라는 조치(engines 필드는 Lambda 런타임을 바꾸지도 못함)는 불필요하고 해롭다."
+ },
+ {
+  "id": "L35",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "USE_KNOWLEDGE_BASE=false라 KNOWLEDGE_BASE_ID가 쓰이지 않으므로 지금은 문제가 아니라고 정확히 답했다. KB를 쓰려 할 때만 값을 넣으라는 조건부 안내라 불필요한 조치를 권하지 않았다.",
+  "critiqueB": "KNOWLEDGE_BASE_ID는 쓰이지 않는 설정이라 문제가 아니라고 정확히 결론 냈다. KB 사용은 원할 때의 조건부 안내로만 두어 불필요한 조치를 권하지 않았다."
+ },
+ {
+  "id": "L36",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "로그의 연속 429로 Slack 웹훅 속도 제한을 정확히 짚고 지수 백오프·분산 전송·SQS를 제시했다.",
+  "critiqueB": "Slack 웹훅 429 속도 제한으로 알림이 누락됐다고 정확히 짚었다. 지수 백오프·분산 전송·SQS 제안은 정답 조치와 일치한다."
+ },
+ {
+  "id": "L37",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "none",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "PaymentWebhookFunction이 스택에 없다고 답하고 정확한 함수명이나 에러 메시지를 요청했다. 다른 함수일 가능성은 가능성으로만 언급했다.",
+  "critiqueB": "결제 함수가 스택에 없음을 확인하고 정확한 함수명이나 에러 메시지를 요청해 정답과 일치한다. 다른 함수일 가능성은 추측으로만 덧붙였다."
+ },
+ {
+  "id": "L38",
+  "cause": "partial",
+  "fix": "partial",
+  "wrong": "none",
+  "source": "adjudicated",
+  "note": "정상 보고는 맞지만 오타를 짚지 않고 근거 없는 후보를 나열(A)",
+  "critiqueA": "실제 MaterialPropertySearchFunction을 조회해 에러가 없다고 보고한 점은 맞지만, 사용자가 말한 함수명이 오타라는 점과 정확한 이름은 안내하지 않았다. 대신 조용한 실패·권한 문제 등 추측성 후보를 나열했다.",
+  "critiqueB": "실제 MaterialPropertySearchFunction을 조회해 에러가 없음을 알리고 구체적인 증상을 물었다. 그러나 사용자가 말한 이름이 오타라는 점과 정확한 함수명을 안내하지 않았다."
+ },
+ {
+  "id": "L39",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "present",
+  "source": "adjudicated",
+  "note": "원인과 import 수정은 맞지만 1순위 롤백 명령의 S3 버킷·키를 지어냄(A)",
+  "critiqueA": "ERR_MODULE_NOT_FOUND로 ESM .js 확장자 문제를 짚었고 올바른 import 형태(.js 포함)를 제시했다. 다만 1순위로 제시한 롤백 명령의 S3 버킷·키(eecar-lambda-builds, ProposalFunction-previous.zip)는 지어낸 값이고, 롤백은 완화책일 뿐이다.",
+  "critiqueB": "ESM 확장자 문제라고 짚었지만 '빌드 시 .js 생성 실패'와 'import 확장자 누락'을 함께 후보로 두어 원인을 확정하지 못했다. 롤백과 .js를 붙인 import 예시가 있어 조치로는 해결된다."
+ },
+ {
+  "id": "L40",
+  "cause": "yes",
+  "fix": "yes",
+  "wrong": "present",
+  "source": "agreed",
+  "note": "",
+  "critiqueA": "'코나 배터리'가 7일 결과 캐시에 적중해 오래된 결과를 돌려준다는 원인과 MATCH# 캐시 삭제 조치는 맞다. 다만 캐시가 등록 직후 S3 Vectors 색인 미완료 때 만들어졌다고 근거 없이 단정했고, 부품명 해시로 캐시를 지우는 예시 코드는 질의 해시 기반 키와 맞지 않는다.",
+  "critiqueB": "7일 검색 캐시가 오래된 결과를 돌려준다는 원인과 MATCH# 캐시 삭제·등록 시 무효화 조치는 정답과 일치한다. 다만 '등록 직후 인덱싱이 끝나기 전에 캐시됐다'는 근거 없는 경위를 단정했다(정답은 등록 전 결과)."
+ }
+]
