@@ -1399,3 +1399,12 @@ E-35의 4.5 결과를 보기 전에 이 기록을 커밋한다.
   - **버스트는 Lambda 한도까지 막아 주지 못했다.** 동시 30건의 500은 Lambda 스로틀이다(같은 시간대 `Throttles` 29 = API `5XXError` 29, 함수 `Errors` 0). 계정 동시 실행 한도 10이 먼저 찬다.
   - 재검토 조건: 실제 사용자 요청에서 500이 관측되면 계정 동시 실행 한도 상향을 검토한다.
 
+### A-48 정보 접근 도구 3종을 운영에 추가한다 · 2026-11-09 · 측정 + 판단
+
+- **근거**: E-41에서 사전 기준 네 가지를 충족했다. 측정 모델은 Haiku 5.5이고 운영 모델은 Haiku 4.5이므로, 운영 조합의 정확도는 재지 않았다(판단). 모두 읽기 전용이다.
+- **변경**: 운영 도구 목록에 `search_code`, `get_request_breakdown`, `get_resource_policy`를 추가하고 언제 쓰는지 프롬프트에 한 문장을 넣었다.
+- **코드 조회**: 빌드 시 `backend/src`와 `template.yaml`을 `source-snapshot`으로 패키지에 넣는다(약 540KB). 비밀값이 없고 배포된 코드와 일치한다. `prompts` 폴더는 제외한다.
+- **접근 로그**: API Gateway 스테이지에 JSON 접근 로그를 켠다. 요청 ID, IP, 상태, 메서드, 경로, User-Agent만 남긴다. IP가 있으므로 보존 기간은 14일로 둔다(판단). 재검토 조건: 분석에 14일이 부족하거나 개인정보 요구가 생기면 조정한다.
+- **권한**: Slack 에이전트 역할에 `s3:GetBucketPolicy`, `s3:GetEncryptionConfiguration`(`eecar-*` 버킷), `kms:DescribeKey`, `kms:GetKeyPolicy`를 추가한다. 쓰기 권한은 없다.
+- **계정 설정**: API Gateway 로그 전송에는 계정 단위 CloudWatch 역할이 필요해 `eecar-apigateway-cloudwatch` 역할을 만들어 등록했다. 스택 밖의 설정이다. 배포 역할의 로그 그룹 권한 범위 때문에 로그 그룹 이름은 `/aws/lambda/eecar-stack-api-access`로 둔다.
+

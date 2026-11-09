@@ -20,6 +20,7 @@ import { getResourcePolicy } from './resource-policy.js';
 export const PRODUCTION_TOOL_NAMES = [
   'analyze_error', 'get_logs', 'get_function_status', 'get_error_summary', 'recall_memory', 'save_memory',
   'get_function_config', 'get_function_permissions', 'get_recent_changes', 'get_service_metrics', 'get_provider_status', 'submit_diagnosis',
+  'search_code', 'get_request_breakdown', 'get_resource_policy',
 ];
 
 /**
@@ -151,7 +152,7 @@ export const TOOLS: Tool[] = [
       '외부 공급자(AWS 서울 리전, Anthropic, Slack)의 공개 상태와 진행 중인 장애를 조회합니다. 원인이 우리 쪽인지 공급자 쪽인지 가릴 때 사용합니다.',
     input_schema: { type: 'object', properties: {}, required: [] },
   },
-  // 정보 접근 도구 (E-41). PRODUCTION_TOOL_NAMES에 넣기 전에는 운영에서 제공되지 않는다
+  // 정보 접근 도구 (E-41, A-48)
   {
     name: 'search_code',
     description:

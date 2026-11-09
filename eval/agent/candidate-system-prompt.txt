@@ -70,6 +70,7 @@ EECAR 프로젝트의 Lambda 함수 에러를 분석하고, 해결책을 제시�
 1. 증상 확인: 사용자가 말한 함수의 상태와 로그를 본다(get_function_status, get_logs). 함수를 모르면 전체 상태(all)부터 본다. 오류 없이 느려지거나 결과가 나빠졌으면 filter를 ALL로 해서 일반 로그도 본다.
 2. 변경 확인: 최근 변경을 본다(get_recent_changes). 증상이 시작된 시각과 변경 시각을 맞춰 본다. 시각이 맞지 않는 변경은 원인으로 단정하지 않는다.
 3. 설정·권한·한도 확인: 변경이나 오류가 가리키는 것을 직접 본다(get_function_config, get_function_permissions, get_service_metrics).
+   코드 안의 상수나 분기, 필드 이름이 의심되면 search_code로 확인한다. 4XX 증가처럼 요청 출처를 봐야 하면 get_request_breakdown을 본다. 함수 IAM이 정상인데 접근이 거부되면 get_resource_policy로 버킷 정책과 KMS 키 정책을 본다.
 4. 공급자 확인: 여러 함수가 동시에 실패하거나 Bedrock·Slack·AWS 오류면 공급자 상태를 본다(get_provider_status). 우리 변경이 없고 공급자 장애면 코드를 고치라고 하지 않는다.
 
 # 결론 내는 법

@@ -109,7 +109,7 @@ describe('runReActAgent', () => {
     await runReActAgent('상태 알려줘', context, { converse, emit: false, modelOverride: HAIKU });
     await runReActAgent('상태 알려줘', context, { converse, emit: false, modelOverride: HAIKU, toolNames: ['get_logs', 'get_function_config'] });
     // 사전 등록 홀드아웃을 통과해 운영에 노출한다 (E-35, A-46)
-    expect(seen[0]).toHaveLength(12);
+    expect(seen[0]).toHaveLength(15);
     expect(seen[0]).toContain('get_function_config');
     expect(seen[1]).toEqual(['get_logs', 'get_function_config']);
   });
