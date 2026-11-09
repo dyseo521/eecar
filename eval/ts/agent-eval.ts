@@ -20,6 +20,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { runPool } from './run-pool.js';
+import { SUBMIT_DIAGNOSIS_TOOL } from '../../backend/src/functions/slack-agent/tools/diagnosis.js';
 
 interface Fixture {
   status?: { invocations: number; errors: number; avgDuration: number };
@@ -138,6 +139,26 @@ const KNOWN_FUNCTIONS = [
   'ProposalFunction', 'SyntheticDataFunction', 'BatteryHealthAssessmentFunction', 'MaterialPropertySearchFunction',
   'ContactInquiryFunction', 'SlackNotificationFunction', 'SlackAgentFunction',
 ];
+
+/** Haiku 5.5 하네스 변형 (E-37). 설정 파일 하나가 프롬프트, 제출 방식, 도구 정의, effort를 정한다 */
+function harnessDeps(file: string, configTools: string[]) {
+  const h = JSON.parse(readFileSync(file, 'utf-8'));
+  if (h.effort) process.env.EVAL_EFFORT = h.effort;
+  const base = SUBMIT_DIAGNOSIS_TOOL.input_schema as any;
+  const schema = h.verdictDescription
+    ? { ...base, properties: { ...base.properties, verdict: { ...base.properties.verdict, description: h.verdictDescription } } }
+    : base;
+  const removed: string[] = h.removeTools ?? [];
+  return {
+    systemPrompt: readFileSync(h.prompt, 'utf-8').split('\r\n').join('\n'),
+    toolNames: [...configTools, 'get_recent_changes', 'get_service_metrics', 'get_provider_status', 'submit_diagnosis'].filter(t => !removed.includes(t)),
+    requireDiagnosis: true,
+    cachePrompt: true,
+    finalizeMode: h.finalizeMode ?? 'forced',
+    ...(h.finalizePrompt ? { finalizePrompt: h.finalizePrompt } : {}),
+    toolOverrides: { submit_diagnosis: { ...(h.submitDescription ? { description: h.submitDescription } : {}), input_schema: schema, strict: !!h.strict } },
+  };
+}
 
 function arg(name: string): string | undefined {
   const i = process.argv.indexOf(`--${name}`);
@@ -342,6 +363,8 @@ async function main(): Promise<void> {
         ? { systemPrompt: promptFile('eval/agent/config-runbook-system-prompt.txt'), toolNames: CONFIG_TOOLS }
         : variant === 'tools-only'
           ? { systemPrompt: shippedPrompt(), toolNames: CONFIG_TOOLS }
+          : variant === 'h55'
+            ? harnessDeps(arg('harness')!, CONFIG_TOOLS)
           : variant === 'candidate'
             ? { systemPrompt: promptFile(arg('prompt') ?? 'eval/agent/candidate-system-prompt.txt'), toolNames: [...CONFIG_TOOLS, 'get_recent_changes', 'get_service_metrics', 'get_provider_status', 'submit_diagnosis'], requireDiagnosis: !process.argv.includes('--free-text'), cachePrompt: true }
             : {};
@@ -371,7 +394,7 @@ async function main(): Promise<void> {
           executeTool: makeTools(scenario, calls, analyzeError, variant === 'baseline'), emit: false, modelOverride: model,
           ...baselineDeps,
           // 운영 v1.9.1에는 현재 시각이 없다. 후보에만 넣는다
-          ...(variant === 'candidate' ? { currentTime: scenarioClock(scenario) } : {}),
+          ...(variant === 'candidate' || variant === 'h55' ? { currentTime: scenarioClock(scenario) } : {}),
         });
       const g = grade(scenario, outcome.response, calls);
       results.push({ id: scenario.id, run: r, source: scenario.source ?? 'v3', code: scenario.code, title: scenario.title, ...g, calls, response: outcome.response, ...(outcome.diagnosis ? { diagnosis: outcome.diagnosis } : {}), metrics: outcome.metrics, steps: outcome.steps });

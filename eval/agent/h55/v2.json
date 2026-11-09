@@ -1,0 +1,7 @@
+{
+ "prompt": "eval/agent/h55/system-v1.txt",
+ "verdictDescription": "root_cause: 변경, 로그, 설정, 지표가 하나의 메커니즘을 가리키면 쓴다. 코드를 직접 못 봤거나 확인 못 한 항목이 남아도 된다. 남은 것은 not_verified에 적는다. / hypothesis: 서로 다른 설명이 둘 이상 남아 있고 도구로 가를 수 없을 때만 쓴다. / insufficient_evidence: 후보를 세울 신호 자체가 없을 때 쓴다. 시각이 겹치는 변경만으로 후보를 세우지 않는다. / no_fault: 사용자 영향이 없을 때 쓴다(정상, 의도된 동작, 사용자에게 닿지 않은 오류, 감시 경로 문제, 배포 직후의 짧은 과도 현상). 사용자 영향이 있던 장애는 복구됐어도 root_cause다.",
+ "submitDescription": "조사를 마치면 이 도구로 진단을 제출합니다. 호출하면 그대로 사용자에게 전달되고 대화가 끝납니다.",
+ "finalizePrompt": "조사가 끝났으면 submit_diagnosis로 제출하세요.",
+ "finalizeMode": "auto-first"
+}
