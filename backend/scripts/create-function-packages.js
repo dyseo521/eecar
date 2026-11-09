@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, readdirSync } from 'fs';
+import { copyFileSync, cpSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -22,3 +22,10 @@ for (const funcName of functionDirs) {
   writeFileSync(packagePath, JSON.stringify(packageJson, null, 2));
   console.log(`Created package.json for ${funcName}`);
 }
+
+// 자동이가 운영 중인 코드를 조회할 수 있게 소스를 패키지에 함께 넣는다 (DECISION_LOG E-41)
+const snapshotDir = join(functionsDir, 'slack-agent', 'source-snapshot');
+mkdirSync(join(snapshotDir, 'infrastructure'), { recursive: true });
+cpSync(join(__dirname, '../src'), join(snapshotDir, 'backend/src'), { recursive: true, filter: source => !source.includes('prompts') });
+copyFileSync(join(__dirname, '../../infrastructure/template.yaml'), join(snapshotDir, 'infrastructure/template.yaml'));
+console.log('Created source snapshot for slack-agent');
