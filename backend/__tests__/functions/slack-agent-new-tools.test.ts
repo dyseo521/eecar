@@ -33,6 +33,26 @@ describe('searchCode', () => {
     expect(searchCode({ path: '/etc/passwd' }, files)).toMatchObject({ found: false });
   });
 
+  const repo = {
+    'backend/src/utils/search-llm.ts': 'export const EXPLANATION_MAX_TOKENS = 1800;\nconst other = 1;',
+    'backend/src/functions/vector-search/index.ts': 'export const handler = async () => {};',
+  };
+
+  it('matches each word of a natural query and ignores separators', () => {
+    const r = searchCode({ query: 'explanation maxTokens description' }, repo) as any;
+    expect(r.matches[0]).toMatchObject({ path: 'backend/src/utils/search-llm.ts', line: 1, score: 2 });
+    expect(r.matchedAllTerms).toBe(false);
+  });
+
+  it('maps a logical function name to its folder', () => {
+    expect(searchCode({ path: 'backend/src/functions/VectorSearchFunction/index.ts' }, repo)).toMatchObject({ found: true, path: 'backend/src/functions/vector-search/index.ts' });
+  });
+
+  it('suggests files when a path is missing and explains the layout when nothing matches', () => {
+    expect(searchCode({ path: 'utils/search-llm-old.ts' }, repo)).toMatchObject({ found: false, suggestions: ['backend/src/utils/search-llm.ts'] });
+    expect(searchCode({ query: '설명 생성' }, repo)).toHaveProperty('layout');
+  });
+
   it('asks for input when both are empty', () => {
     expect(searchCode({}, files)).toHaveProperty('error');
   });

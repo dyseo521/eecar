@@ -1406,5 +1406,7 @@ E-35의 4.5 결과를 보기 전에 이 기록을 커밋한다.
 - **코드 조회**: 빌드 시 `backend/src`와 `template.yaml`을 `source-snapshot`으로 패키지에 넣는다(약 540KB). 비밀값이 없고 배포된 코드와 일치한다. `prompts` 폴더는 제외한다.
 - **접근 로그**: API Gateway 스테이지에 JSON 접근 로그를 켠다. 요청 ID, IP, 상태, 메서드, 경로, User-Agent만 남긴다. IP가 있으므로 보존 기간은 14일로 둔다(판단). 재검토 조건: 분석에 14일이 부족하거나 개인정보 요구가 생기면 조정한다.
 - **권한**: Slack 에이전트 역할에 `s3:GetBucketPolicy`, `s3:GetEncryptionConfiguration`(`eecar-*` 버킷), `kms:DescribeKey`, `kms:GetKeyPolicy`를 추가한다. 쓰기 권한은 없다.
+- **배포 전후 확인 (v1.13.0, 2026-11-10)**: 도구 12개 -> 15개. 접근 로그가 꺼짐 -> 켜짐으로 바뀌어 잘못된 경로의 403이 경로, User-Agent와 함께 집계됐다. 읽기 권한은 허용, 쓰기 권한은 거부로 시뮬레이션했다.
+- **배포 후 발견한 결함**: Slack에서 "최대 토큰 수"를 물으니 `search_code`가 8번 모두 실패했다. 스냅샷 54개 파일은 패키지에 있었다. 도구가 검색어 전체를 한 문자열로 비교해 `maxTokens explanation description` 같은 입력이 일치하지 않았고, `VectorSearchFunction` 폴더를 찾았는데 실제 이름은 `vector-search`였다. 평가의 코드 데이터는 파일이 적어 이 문제를 드러내지 못했다. 단어별 일치와 점수 정렬, 구분 기호 무시, 함수 이름 변환, 경로 제안을 넣었다.
 - **계정 설정**: API Gateway 로그 전송에는 계정 단위 CloudWatch 역할이 필요해 `eecar-apigateway-cloudwatch` 역할을 만들어 등록했다. 스택 밖의 설정이다. 배포 역할의 로그 그룹 권한 범위 때문에 로그 그룹 이름은 `/aws/lambda/eecar-stack-api-access`로 둔다.
 
