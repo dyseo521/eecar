@@ -79,7 +79,10 @@ async function main(): Promise<void> {
   await runPool(targets.map(r => async () => {
     const scenario = scenarios.get(r.id);
     const evidence = await evidenceOf(scenario, r.steps);
-    const message = handoffMessage(scenario.message, evidence, r.diagnosis.not_verified ?? []);
+    // V2는 strict 없이 실행해 not_verified가 문자열로 저장된 실행이 있다
+    const notVerified = r.diagnosis.not_verified;
+    const unverified: string[] = Array.isArray(notVerified) ? notVerified : typeof notVerified === 'string' && notVerified.trim() ? [notVerified] : [];
+    const message = handoffMessage(scenario.message, evidence, unverified);
     const calls: any[] = [];
     let outcome: any;
     try {

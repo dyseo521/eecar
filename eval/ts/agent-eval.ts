@@ -146,9 +146,11 @@ export function harnessDeps(file: string, configTools: string[]) {
   const h = JSON.parse(readFileSync(file, 'utf-8'));
   if (h.effort) process.env.EVAL_EFFORT = h.effort;
   const base = SUBMIT_DIAGNOSIS_TOOL.input_schema as any;
-  const schema = h.verdictDescription
+  const described = h.verdictDescription
     ? { ...base, properties: { ...base.properties, verdict: { ...base.properties.verdict, description: h.verdictDescription } } }
     : base;
+  // strict 모드의 Sonnet 5.5는 필수가 아닌 필드를 생략한다. 답변에 필요한 필드는 필수로 지정한다 (E-39)
+  const schema = h.requiredFields ? { ...described, required: h.requiredFields } : described;
   const removed: string[] = h.removeTools ?? [];
   return {
     systemPrompt: readFileSync(h.prompt, 'utf-8').split('\r\n').join('\n'),

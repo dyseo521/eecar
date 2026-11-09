@@ -5,5 +5,16 @@
  "finalizePrompt": "조사가 끝났으면 submit_diagnosis로 제출하세요.",
  "finalizeMode": "auto-only",
  "strict": true,
- "effort": "medium"
+ "effort": "medium",
+ "requiredFields": [
+  "verdict",
+  "summary",
+  "cause",
+  "evidence",
+  "fix_action",
+  "fix_type",
+  "fix_verify",
+  "fix_rollback",
+  "not_verified"
+ ]
 }
