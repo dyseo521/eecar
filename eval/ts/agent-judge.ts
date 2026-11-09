@@ -173,7 +173,7 @@ async function fullEvidence(scenario: any, steps: any[] | undefined): Promise<st
       result = res.success ? JSON.stringify(res.data) : `Error: ${res.error}`;
     }
     // 묶음 도구는 여러 조회의 결과라 같은 잘림 기준을 쓰면 근거가 사라진다 (E-40)
-    rows.push(`- ${st.action}${target ? `(${target})` : ''}: ${result.slice(0, st.action === 'get_incident_context' ? EVIDENCE_LIMIT * 5 : EVIDENCE_LIMIT)}`);
+    rows.push(`- ${st.action}${target ? `(${target})` : ''}: ${result.slice(0, st.action === 'get_incident_context' || st.action === 'search_code' ? EVIDENCE_LIMIT * 5 : EVIDENCE_LIMIT)}`);
   }
   return rows.length ? rows.join('\n') : '(조회 없음)';
 }
