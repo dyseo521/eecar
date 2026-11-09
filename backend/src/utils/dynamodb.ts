@@ -125,6 +125,27 @@ export async function incrementAttribute(pk: string, sk: string, attribute: stri
 }
 
 /**
+ * 상한이 있는 카운터를 원자적으로 1 올린다. 항목이 없으면 만든다.
+ * 이미 상한에 도달했으면 false를 돌려준다.
+ */
+export async function incrementWithinLimit(pk: string, sk: string, limit: number, ttl: number): Promise<boolean> {
+  try {
+    await ddbDocClient.send(new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: pk, SK: sk },
+      UpdateExpression: 'ADD #count :one SET #ttl = :ttl',
+      ConditionExpression: 'attribute_not_exists(#count) OR #count < :limit',
+      ExpressionAttributeNames: { '#count': 'count', '#ttl': 'TTL' },
+      ExpressionAttributeValues: { ':one': 1, ':ttl': ttl, ':limit': limit },
+    }));
+    return true;
+  } catch (error: any) {
+    if (error.name === 'ConditionalCheckFailedException') return false;
+    throw error;
+  }
+}
+
+/**
  * Batch get items
  */
 const BATCH_GET_MAX_KEYS = 100; // DynamoDB BatchGetItem hard limit

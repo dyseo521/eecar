@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import crypto from 'crypto';
 import { generateEmbedding, findTopKSimilar, callClaude } from '/opt/nodejs/utils/bedrock.js';
 import { getVector, listVectorKeys } from '/opt/nodejs/utils/s3.js';
-import { getItem, putItem, batchGetItems, DynamoDBItem, incrementAttribute } from '/opt/nodejs/utils/dynamodb.js';
+import { getItem, putItem, batchGetItems, DynamoDBItem, incrementAttribute, incrementWithinLimit } from '/opt/nodejs/utils/dynamodb.js';
 import { successResponse, errorResponse, parseJsonBody } from '/opt/nodejs/utils/response.js';
 import { CANDIDATES_PER_RETRIEVER } from '/opt/nodejs/utils/search.js';
 import { getSearchIndex, partIdOf } from '/opt/nodejs/utils/search-index.js';
@@ -14,12 +14,35 @@ import {
   expandSearchQuery,
   generateExplanations,
   FALLBACK_REASON,
+  ExplanationItem,
+  ExplanationResult,
   TextGenerator,
 } from '/opt/nodejs/utils/search-llm.js';
 import { emitMetrics } from '/opt/nodejs/utils/emf.js';
+import { isAuthorizedCanary } from './canary-auth.js';
 
 const generateWithClaude: TextGenerator = (prompt, maxTokens) =>
   callClaude([{ role: 'user', content: prompt }], undefined, maxTokens);
+
+// 호출 제한은 순간 부하만 막으므로 하루 LLM 비용은 여기서 막는다 (DECISION_LOG A-47)
+const DAILY_EXPLANATION_LIMIT = 200;
+const BUDGET_TTL_SECONDS = 3 * 24 * 60 * 60;
+
+async function generateWithinBudget(query: string, items: ExplanationItem[]): Promise<ExplanationResult> {
+  let allowed = true;
+  try {
+    const day = new Date().toISOString().slice(0, 10);
+    allowed = await incrementWithinLimit(`LLMBUDGET#${day}`, 'EXPLANATION', DAILY_EXPLANATION_LIMIT, Math.floor(Date.now() / 1000) + BUDGET_TTL_SECONDS);
+  } catch (error) {
+    // 카운터 장애로 검색 기능까지 막지 않는다
+    console.warn('[llm-budget] 카운터 갱신 실패:', (error as Error).name);
+  }
+  if (!allowed) {
+    console.warn('[llm-budget] 오늘의 설명 상한에 도달해 폴백으로 응답');
+    return { explanations: new Array(items.length).fill(FALLBACK_REASON), ok: false, fallback: true };
+  }
+  return generateExplanations(query, items, generateWithClaude);
+}
 
 // 쿼리 확장은 측정상 품질 이득이 없어 기본값을 끈다 (DECISION_LOG E-18, E-19)
 const QUERY_EXPANSION_ENABLED = process.env.QUERY_EXPANSION_ENABLED === 'true';
@@ -285,7 +308,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     // explain=false: LLM 설명 없이 바로 응답하고, 설명은 /api/search/explain으로 따로 받는다 (C-08, A-30)
     // canary=true: 합성 검사 요청. 캐시를 읽지도 쓰지도 않고 진단 정보를 함께 돌려준다 (A-39)
     const { query, filters, topK = 10, explain = true } = body;
-    const canary = body.canary === true;
+    const canary = body.canary === true && await isAuthorizedCanary(event);
 
     if (!query) {
       return errorResponse('Query is required', undefined, 400, event);
@@ -499,7 +522,7 @@ async function enrichWithAISequential(
     };
   });
   const started = Date.now();
-  const { explanations, fallback } = await generateExplanations(query, items, generateWithClaude);
+  const { explanations, fallback } = await generateWithinBudget(query, items);
   recordLlmCall('Explanation', Date.now() - started, fallback);
   return buildResults(present, parts, explanations);
 }
@@ -550,7 +573,7 @@ async function explainHandler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     const parsed = parseJsonBody(event);
     if (!parsed.ok) return parsed.response;
     const { query, partIds } = parsed.body;
-    const canary = parsed.body.canary === true;
+    const canary = parsed.body.canary === true && await isAuthorizedCanary(event);
     if (!query || !Array.isArray(partIds) || partIds.length === 0 || partIds.some(id => typeof id !== 'string')) {
       return errorResponse('query and partIds are required', undefined, 400, event);
     }
@@ -583,7 +606,7 @@ async function explainHandler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
         matched: check.matched, mismatched: check.mismatched };
     });
     const started = Date.now();
-    const { explanations, fallback } = await generateExplanations(query, prompts, generateWithClaude);
+    const { explanations, fallback } = await generateWithinBudget(query, prompts);
     recordLlmCall('Explanation', Date.now() - started, fallback);
     const byId = Object.fromEntries(present.map((id, i) => [id, explanations[i] || FALLBACK_REASON]));
 

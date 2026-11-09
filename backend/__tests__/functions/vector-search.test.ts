@@ -10,15 +10,19 @@ import type { APIGatewayProxyEvent } from 'aws-lambda';
 import { mockClient } from 'aws-sdk-client-mock';
 import { BatchGetCommand, DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { Readable } from 'stream';
 import { sdkStreamMixin } from '@aws-sdk/util-stream-node';
 import { explainCacheKey, handler, matchesFilters, searchCacheKey } from '../../src/functions/vector-search/index.js';
 import { resetSearchIndexCache } from '../../src/utils/search-index.js';
+import { resetCanaryTokenCache } from '../../src/functions/vector-search/canary-auth.js';
 
 const docMock = mockClient(DynamoDBDocumentClient);
 const s3Mock = mockClient(S3Client);
 const bedrockMock = mockClient(BedrockRuntimeClient);
+const ssmMock = mockClient(SSMClient);
+const CANARY_HEADERS = { 'X-Eecar-Canary-Token': 'canary-test-token' };
 
 const body = (data: unknown) => sdkStreamMixin(Readable.from([Buffer.from(JSON.stringify(data))]));
 
@@ -34,8 +38,8 @@ const indexed = [
 ];
 const vectors: Record<string, number[]> = { a: [1, 0], b: [0.2, 0.98], c: [0.9, 0.1], d: [0.95, 0.05] };
 
-function event(payload: unknown, path = '/api/search'): APIGatewayProxyEvent {
-  return { body: JSON.stringify(payload), headers: {}, path, resource: path } as unknown as APIGatewayProxyEvent;
+function event(payload: unknown, path = '/api/search', headers: Record<string, string> = {}): APIGatewayProxyEvent {
+  return { body: JSON.stringify(payload), headers, path, resource: path } as unknown as APIGatewayProxyEvent;
 }
 
 const results = (res: { body: string }) => {
@@ -48,6 +52,9 @@ describe('vector-search handler', () => {
     docMock.reset();
     s3Mock.reset();
     bedrockMock.reset();
+    ssmMock.reset();
+    ssmMock.on(GetParameterCommand).resolves({ Parameter: { Value: 'canary-test-token' } });
+    resetCanaryTokenCache();
     resetSearchIndexCache();
     jest.spyOn(console, 'log').mockImplementation(() => {});
     jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -133,7 +140,7 @@ describe('vector-search handler', () => {
   it('serves canary searches without touching the cache and reports retriever diagnostics', async () => {
     const writes: string[] = [];
     (process.stdout.write as unknown as jest.Mock).mockImplementation(((chunk: string) => { writes.push(String(chunk)); return true; }) as any);
-    const res = await handler(event({ query: '배터리', topK: 3, explain: false, canary: true }));
+    const res = await handler(event({ query: '배터리', topK: 3, explain: false, canary: true }, '/api/search', CANARY_HEADERS));
     const parsed = JSON.parse(res.body);
     expect(parsed.diagnostics).toMatchObject({ vectorCandidates: 4, indexSize: 3 });
     expect(parsed.diagnostics.bm25Candidates).toBeGreaterThan(0);
@@ -154,10 +161,56 @@ describe('vector-search handler', () => {
 
   it('bypasses the explanation cache for canaries and reports fallback', async () => {
     docMock.on(GetCommand).resolves({ Item: { explanations: { a: '캐시된 설명' }, TTL: Math.floor(Date.now() / 1000) + 60 } });
-    const res = await handler(event({ query: '배터리', partIds: ['a'], canary: true }, '/api/search/explain'));
+    const res = await handler(event({ query: '배터리', partIds: ['a'], canary: true }, '/api/search/explain', CANARY_HEADERS));
     const parsed = JSON.parse(res.body);
     expect(parsed).toMatchObject({ cached: false, fallback: true });
     expect(docMock.commandCalls(PutCommand).filter(c => c.args[0].input.Item?.SK === 'EXPLAIN')).toHaveLength(0);
+  });
+
+  it.each([
+    ['no token', {}],
+    ['a wrong token', { 'X-Eecar-Canary-Token': 'wrong' }],
+  ])('treats canary=true with %s as a normal search', async (_name, headers) => {
+    const res = await handler(event({ query: '배터리', topK: 3, explain: false, canary: true }, '/api/search', headers as Record<string, string>));
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body).diagnostics).toBeUndefined();
+    expect(docMock.commandCalls(GetCommand).filter(c => String(c.args[0].input.Key?.PK).startsWith('MATCH#')).length).toBeGreaterThan(0);
+  });
+
+  it('does not read the token parameter when no token is presented', async () => {
+    await handler(event({ query: '배터리', topK: 3, explain: false, canary: true }));
+    expect(ssmMock.commandCalls(GetParameterCommand)).toHaveLength(0);
+  });
+
+  it('accepts the canary token header in any case', async () => {
+    const res = await handler(event({ query: '배터리', topK: 3, explain: false, canary: true }, '/api/search', { 'x-eecar-canary-token': 'canary-test-token' }));
+    expect(JSON.parse(res.body).diagnostics).toBeDefined();
+  });
+
+  it('treats a canary as a normal search when the token cannot be read', async () => {
+    ssmMock.on(GetParameterCommand).rejects(Object.assign(new Error('denied'), { name: 'AccessDeniedException' }));
+    const res = await handler(event({ query: '배터리', topK: 3, explain: false, canary: true }, '/api/search', CANARY_HEADERS));
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body).diagnostics).toBeUndefined();
+  });
+
+  it('serves cached explanations to canary requests without a valid token', async () => {
+    docMock.on(GetCommand).resolves({ Item: { explanations: { a: '캐시된 설명' }, TTL: Math.floor(Date.now() / 1000) + 60 } });
+    const res = await handler(event({ query: '배터리', partIds: ['a'], canary: true }, '/api/search/explain'));
+    expect(JSON.parse(res.body)).toEqual({ explanations: { a: '캐시된 설명' }, cached: true });
+  });
+
+  it('stops calling the LLM once the daily explanation limit is reached', async () => {
+    docMock.on(UpdateCommand).rejects(Object.assign(new Error('limit'), { name: 'ConditionalCheckFailedException' }));
+    const res = await handler(event({ query: '배터리', partIds: ['a'], canary: true }, '/api/search/explain', CANARY_HEADERS));
+    expect(JSON.parse(res.body)).toMatchObject({ cached: false, fallback: true });
+    expect(bedrockMock.commandCalls(InvokeModelCommand)).toHaveLength(0);
+  });
+
+  it('still calls the LLM when the daily counter fails', async () => {
+    docMock.on(UpdateCommand).rejects(Object.assign(new Error('slow down'), { name: 'ThrottlingException' }));
+    await handler(event({ query: '배터리', partIds: ['a'], canary: true }, '/api/search/explain', CANARY_HEADERS));
+    expect(bedrockMock.commandCalls(InvokeModelCommand).length).toBeGreaterThan(0);
   });
 
   it('never logs the raw search query, which could spoof alerts and reach the agent as log text', async () => {

@@ -141,6 +141,16 @@ GSI1PK: CACHE
 GSI1SK: HIT_COUNT#1 (생성 시 고정. 적중 수는 hitCount를 원자적으로 올린다, A-41)
 ```
 
+검색 결과 설명의 하루 LLM 호출 수 (DECISION_LOG A-47):
+
+```
+PK: LLMBUDGET#{YYYY-MM-DD}
+SK: EXPLANATION
+Attributes:
+  - count: number (원자적으로 증가, 상한 도달 시 폴백)
+  - TTL: number (3일 후 자동 삭제)
+```
+
 ---
 
 ### 4. Watch List (알림 등록)
