@@ -37,7 +37,7 @@ const client = new Anthropic({ apiKey: readKey(), maxRetries: 6, defaultHeaders:
 const SPEND_FILE = process.env.EVAL_SPEND_FILE ?? join(homedir(), '.eecar-anthropic-spend.jsonl');
 const CAP = Number(process.env.EVAL_USD_CAP ?? 50);
 // 달러/백만 토큰. 단가를 모르는 모델은 상한을 지키기 위해 높게 잡는다
-const PRICE = [[/haiku-5-5/, 0.1, 0.5], [/haiku-4-5/, 1, 5], [/sonnet-4-6/, 3, 15]];
+const PRICE = [[/haiku-5-5/, 0.1, 0.5], [/haiku-4-5/, 1, 5], [/sonnet-4-6/, 3, 15], [/sonnet-5-5/, 2, 10]];
 const UNKNOWN_PRICE = [3, 15];
 const MODEL_MAP = Object.fromEntries((process.env.EVAL_MODEL_MAP ?? '').split(',').filter(Boolean).map(p => p.split('=')));
 

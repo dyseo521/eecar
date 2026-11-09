@@ -142,7 +142,7 @@ const KNOWN_FUNCTIONS = [
 ];
 
 /** Haiku 5.5 하네스 변형 (E-37). 설정 파일 하나가 프롬프트, 제출 방식, 도구 정의, effort를 정한다 */
-function harnessDeps(file: string, configTools: string[]) {
+export function harnessDeps(file: string, configTools: string[]) {
   const h = JSON.parse(readFileSync(file, 'utf-8'));
   if (h.effort) process.env.EVAL_EFFORT = h.effort;
   const base = SUBMIT_DIAGNOSIS_TOOL.input_schema as any;

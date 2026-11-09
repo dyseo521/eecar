@@ -88,7 +88,7 @@ export interface AgentDeps {
   /** 제출 지시문을 바꾼다 (평가에서 Haiku 5.5 하네스 비교) */
   finalizePrompt?: string;
   /** auto-first면 결론 시점에 먼저 강제 없이 제출을 받는다. 강제하면 Haiku 5.5는 사고 없이 바로 호출한다 (E-37) */
-  finalizeMode?: 'forced' | 'auto-first';
+  finalizeMode?: 'forced' | 'auto-first' | 'auto-only';
   /** 도구 정의를 평가에서 바꾼다. strict면 입력 스키마를 API가 보장한다 */
   toolOverrides?: Record<string, { description?: string; input_schema?: Record<string, unknown>; strict?: boolean }>;
   /** 시스템 프롬프트에 넣을 현재 시각(ISO). 평가에서는 시나리오 시계를 쓴다 */
@@ -243,9 +243,11 @@ export async function runReActAgent(
         messages,
         toolConfig: {
           tools,
-          ...(deps.requireDiagnosis && ((finalizing && (deps.finalizeMode !== 'auto-first' || finalizeRetried)) || turnCount === MAX_TURNS)
-            ? { toolChoice: { tool: { name: 'submit_diagnosis' } } }
-            : investigating ? { toolChoice: { any: {} } } : {}),
+          // auto-only: Sonnet 5.5처럼 강제 tool_choice를 400으로 거부하는 모델용 (E-39)
+          ...(deps.finalizeMode === 'auto-only' ? {}
+            : deps.requireDiagnosis && ((finalizing && (deps.finalizeMode !== 'auto-first' || finalizeRetried)) || turnCount === MAX_TURNS)
+              ? { toolChoice: { tool: { name: 'submit_diagnosis' } } }
+              : investigating ? { toolChoice: { any: {} } } : {}),
         },
         inferenceConfig: {
           maxTokens: 2048,
@@ -367,7 +369,7 @@ export async function runReActAgent(
         continue;
       }
       // auto-first에서 제출 없이 또 텍스트로 끝내면 그때 강제한다
-      if (textResponse && deps.requireDiagnosis && finalizing && deps.finalizeMode === 'auto-first' && !finalizeRetried) {
+      if (textResponse && deps.requireDiagnosis && finalizing && (deps.finalizeMode === 'auto-first' || deps.finalizeMode === 'auto-only') && !finalizeRetried) {
         finalizeRetried = true;
         messages.push({ role: 'user', content: [{ text: deps.finalizePrompt ?? DIAGNOSIS_FINALIZE_PROMPT }] });
         continue;
