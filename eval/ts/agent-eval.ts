@@ -331,6 +331,25 @@ export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, 
         return { success: true, data: worldServiceMetrics(scenario, String(input.service ?? ''), fn) };
       case 'get_provider_status':
         return { success: true, data: worldProviderStatus(scenario) };
+      case 'get_incident_context': {
+        // 운영 도구와 같은 구성으로 기존 조회를 묶는다 (E-40). 호출 기록은 묶음 도구 한 번으로 남긴다
+        const inner = makeTools(scenario, [], analyzeError, legacyTools, options);
+        const read = async (tool: string, args: Record<string, unknown>) => {
+          const r = await inner(tool, args);
+          return r.success ? r.data : { error: r.error };
+        };
+        const services = Object.fromEntries(await Promise.all(['apigateway', 'bedrock', 'dynamodb', 'canary'].map(async s => [s, await read('get_service_metrics', { service: s })])));
+        const scope = fn
+          ? {
+            status: await read('get_function_status', { functionName: fn }),
+            errorLogs: ((await read('get_logs', { functionName: fn, filter: 'ERROR' })) as unknown[]).slice(-30),
+            errorSummary: await read('get_error_summary', { functionName: fn }),
+            config: await read('get_function_config', { functionName: fn }),
+            lambda: await read('get_service_metrics', { service: 'lambda', functionName: fn }),
+          }
+          : { status: await read('get_function_status', { functionName: 'all' }) };
+        return { success: true, data: { functionName: fn || 'all', windowHours: 24, recentChanges: await read('get_recent_changes', fn ? { functionName: fn } : {}), ...services, ...scope } };
+      }
       case 'get_impact_summary':
         return { success: true, data: worldImpactSummary(scenario) };
       case 'get_function_config':
