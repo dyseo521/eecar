@@ -54,16 +54,11 @@ export const SUBMIT_DIAGNOSIS_TOOL: Tool = {
       fault_type: { type: 'string', description: '장애 유형', enum: [...FAULT_TYPES] },
       evidence: { type: 'array', items: { type: 'string' }, description: '도구 결과에서 그대로 옮긴 근거 (로그 문구, 변경 이력, 설정값). 도구 결과에 없는 값은 쓰지 않는다' },
       contributing: { type: 'array', items: { type: 'string' }, description: '기여 요인 (알림 누락, 재시도 없음 등)' },
-      fix: {
-        type: 'object',
-        description: '조치. 장애가 아니면 type을 none으로 두고 필요한 안내만 쓴다',
-        properties: {
-          action: { type: 'string', description: '바로 실행할 조치. 도구로 확인한 실제 이름과 값을 쓰고, 확인하지 못한 값은 지어내지 않는다' },
-          type: { type: 'string', description: 'fix: 원인을 제거 / mitigation: 증상만 줄임 / none: 조치 불필요', enum: ['fix', 'mitigation', 'none'] },
-          verify: { type: 'string', description: '해결을 확인하는 방법' },
-          rollback: { type: 'string', description: '조치를 되돌리는 방법' },
-        },
-      },
+      // 평평한 문자열로 받는다. 중첩 객체로 받으면 Haiku가 15% 정도 깨진 문자열로 보내 조치가 답변에서 사라졌다 (E-34)
+      fix_action: { type: 'string', description: '조치. 도구로 확인한 실제 이름과 값을 쓰고, 확인하지 못한 값은 지어내지 않는다. 원인을 확인하지 못했으면 비우거나, 확인된 뒤에 할 일만 쓴다' },
+      fix_type: { type: 'string', description: 'fix: 원인을 제거 / mitigation: 증상만 줄임 / none: 조치 불필요', enum: ['fix', 'mitigation', 'none'] },
+      fix_verify: { type: 'string', description: '해결을 확인하는 방법' },
+      fix_rollback: { type: 'string', description: '조치를 되돌리는 방법' },
       not_verified: { type: 'array', items: { type: 'string' }, description: '확인하지 못한 것과 더 필요한 정보' },
     },
     required: ['verdict', 'summary'],
@@ -79,7 +74,7 @@ export const DIAGNOSIS_FINALIZE_PROMPT = `조사 결과를 submit_diagnosis로 �
 - hypothesis: 유력한 설명이 있지만 확인하지 못했을 때 씁니다. 무엇을 보면 확인되는지 적습니다.
 - insufficient_evidence: 유력한 설명조차 없을 때만 씁니다. 코드를 볼 수 없다는 이유만으로 고르지 않습니다.
 - no_fault: 장애가 아닐 때만 씁니다(정상, 의도된 동작, 배포 직후의 짧은 과도 현상). 사용자에게 영향이 있었던 장애는 복구됐어도 root_cause로 쓰고 복구됐다고 적습니다. 반복되는 오류는 몇 분 조용해도 회복이 아닙니다.
-- 원인을 확인하지 못했으면 fix.action에는 코드·설정 변경이 아니라 다음에 확인할 것을 씁니다.
+- 원인을 확인하지 못했으면 not_verified에 다음에 확인할 것을 씁니다. 롤백이나 코드·설정 변경을 바로 권하지 않습니다. 변경은 확인된 뒤에 할 일로만 fix_action에 씁니다.
 - evidence와 cause에는 도구 결과에 있는 값만 씁니다.`;
 
 /** 도구를 한 번도 부르지 않고 끝내려 할 때의 지시. 조사 없이 "근거 부족"으로 끝낸 사례가 있었다 */
@@ -98,6 +93,26 @@ const VERDICT_LABEL: Record<string, string> = {
 
 const FIX_LABEL: Record<string, string> = { fix: '조치', mitigation: '완화 조치', none: '조치' };
 
+const PARAMETER_TAG = /<parameter name="(\w+)">([\s\S]*?)(?=<parameter name=|<\/parameter>|$)/g;
+
+/**
+ * 제출을 진단으로 바꾼다. 평평한 필드를 쓰되, 이전 형식(fix 객체)과 모델이 깨뜨린 문자열도 복구한다.
+ * 깨진 문자열 예: <parameter name="type">fix\n<parameter name="action">...
+ */
+export function normalizeDiagnosis(raw: Record<string, unknown>): Diagnosis {
+  const { fix_action, fix_type, fix_verify, fix_rollback, fix, ...rest } = raw;
+  let nested: Record<string, unknown> = {};
+  if (fix && typeof fix === 'object') nested = fix as Record<string, unknown>;
+  else if (typeof fix === 'string' && fix.trim()) {
+    const parsed = Object.fromEntries([...fix.matchAll(PARAMETER_TAG)].map(m => [m[1], m[2].trim()]));
+    nested = Object.keys(parsed).length ? parsed : { action: fix.trim() };
+  }
+  const value = (flat: unknown, key: string) => (typeof flat === 'string' && flat.trim() ? flat : nested[key]) as string | undefined;
+  const action = value(fix_action, 'action');
+  const merged = { action, type: value(fix_type, 'type'), verify: value(fix_verify, 'verify'), rollback: value(fix_rollback, 'rollback') };
+  return { ...(rest as unknown as Diagnosis), ...(action ? { fix: merged as Diagnosis['fix'] } : {}) };
+}
+
 const list = (items: unknown): string[] => (Array.isArray(items) ? items.map(String).filter(Boolean) : items ? [String(items)] : []);
 
 /** 제출된 진단을 Slack 메시지로 만든다 */
@@ -110,12 +125,16 @@ export function renderDiagnosis(d: Diagnosis): string {
   if (evidence.length) lines.push('', '*근거*', ...evidence.map(e => `• ${e}`));
   const contributing = list(d.contributing);
   if (contributing.length) lines.push('', '*기여 요인*', ...contributing.map(c => `• ${c}`));
+  const notVerified = list(d.not_verified);
+  // 원인을 확인하지 못했으면 확인할 것을 먼저 보여 주고, 조치는 확인된 뒤의 일로 표시한다. 가설만 보고 바로 롤백하지 않게 한다 (E-34)
+  const unconfirmed = d.verdict === 'hypothesis' || d.verdict === 'insufficient_evidence';
+  if (unconfirmed && notVerified.length) lines.push('', '*먼저 확인할 것*', ...notVerified.map(n => `• ${n}`));
   if (d.fix?.action) {
-    lines.push('', `*${FIX_LABEL[d.fix.type ?? 'fix'] ?? '조치'}*: ${d.fix.action}`);
+    const label = unconfirmed ? '확인되면 검토할 조치' : FIX_LABEL[d.fix.type ?? 'fix'] ?? '조치';
+    lines.push('', `*${label}*: ${d.fix.action}`);
     if (d.fix.verify) lines.push(`확인: ${d.fix.verify}`);
     if (d.fix.rollback) lines.push(`되돌리기: ${d.fix.rollback}`);
   }
-  const notVerified = list(d.not_verified);
-  if (notVerified.length) lines.push('', '*확인하지 못한 것*', ...notVerified.map(n => `• ${n}`));
+  if (!unconfirmed && notVerified.length) lines.push('', '*확인하지 못한 것*', ...notVerified.map(n => `• ${n}`));
   return lines.join('\n');
 }

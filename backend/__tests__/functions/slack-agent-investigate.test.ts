@@ -16,7 +16,7 @@ import {
   parseAwsFeed,
   type ChangeEvent,
 } from '../../src/functions/slack-agent/tools/investigate.js';
-import { renderDiagnosis } from '../../src/functions/slack-agent/tools/diagnosis.js';
+import { renderDiagnosis, normalizeDiagnosis } from '../../src/functions/slack-agent/tools/diagnosis.js';
 import { runReActAgent } from '../../src/functions/slack-agent/orchestrator.js';
 
 const trailMock = mockClient(CloudTrailClient);
@@ -174,7 +174,44 @@ describe('renderDiagnosis', () => {
 
   it('marks healthy conclusions and mitigation fixes', () => {
     expect(renderDiagnosis({ verdict: 'no_fault', summary: '정상입니다.', component: 'none', fault_type: 'no_fault' })).toContain('장애 아님');
-    expect(renderDiagnosis({ verdict: 'hypothesis', summary: 's', fix: { action: 'a', type: 'mitigation' } })).toContain('완화 조치');
+    expect(renderDiagnosis({ verdict: 'root_cause', summary: 's', fix: { action: 'a', type: 'mitigation' } })).toContain('완화 조치');
+  });
+});
+
+describe('normalizeDiagnosis', () => {
+  it('reads the flat fix fields', () => {
+    const d = normalizeDiagnosis({ verdict: 'root_cause', summary: 's', fix_action: '되돌린다', fix_type: 'fix', fix_verify: '지표 확인', fix_rollback: '다시 적용' });
+    expect(d.fix).toEqual({ action: '되돌린다', type: 'fix', verify: '지표 확인', rollback: '다시 적용' });
+  });
+
+  it('keeps the previous nested form working', () => {
+    expect(normalizeDiagnosis({ verdict: 'root_cause', summary: 's', fix: { action: '되돌린다', type: 'mitigation' } }).fix).toMatchObject({ action: '되돌린다', type: 'mitigation' });
+  });
+
+  it('recovers a fix the model garbled into a tagged string', () => {
+    const fix = '\n<parameter name="type">fix\n<parameter name="action">레이어를 v27로 되돌린다\n<parameter name="verify">오류율이 0인지 본다';
+    expect(normalizeDiagnosis({ verdict: 'root_cause', summary: 's', fix }).fix).toMatchObject({ type: 'fix', action: '레이어를 v27로 되돌린다', verify: '오류율이 0인지 본다' });
+  });
+
+  it('treats a plain string as the action and leaves an empty fix out', () => {
+    expect(normalizeDiagnosis({ verdict: 'root_cause', summary: 's', fix: '캐시를 비운다' }).fix).toMatchObject({ action: '캐시를 비운다' });
+    expect(normalizeDiagnosis({ verdict: 'no_fault', summary: 's', fix_type: 'none' }).fix).toBeUndefined();
+  });
+});
+
+describe('renderDiagnosis for an unconfirmed cause', () => {
+  const base = { summary: '요약', not_verified: ['호출 주체 확인'], fix: { action: '이전 버전으로 롤백', type: 'fix' as const } };
+
+  it('shows what to check first and marks the change as conditional', () => {
+    const text = renderDiagnosis({ ...base, verdict: 'hypothesis' });
+    expect(text.indexOf('먼저 확인할 것')).toBeLessThan(text.indexOf('확인되면 검토할 조치'));
+    expect(text).toContain('호출 주체 확인');
+  });
+
+  it('keeps a confirmed cause action first', () => {
+    const text = renderDiagnosis({ ...base, verdict: 'root_cause' });
+    expect(text).toContain('*조치*: 이전 버전으로 롤백');
+    expect(text.indexOf('*조치*')).toBeLessThan(text.indexOf('확인하지 못한 것'));
   });
 });
 
