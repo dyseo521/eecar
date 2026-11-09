@@ -20,6 +20,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { runPool } from './run-pool.js';
+import { reduceLogs } from '../../backend/src/functions/slack-agent/tools/log-reduce.js';
 import { SUBMIT_DIAGNOSIS_TOOL } from '../../backend/src/functions/slack-agent/tools/diagnosis.js';
 
 interface Fixture {
@@ -224,7 +225,7 @@ interface Call { name: string; functionName?: string }
 /** 운영 get_function_status가 돌려주는 필드만. 스로틀·p99·동시 실행은 get_service_metrics로 본다 */
 const baseStatus = (s: { invocations: number; errors: number; avgDuration: number }) => ({ invocations: s.invocations, errors: s.errors, avgDuration: s.avgDuration });
 
-export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, legacyTools = false) {
+export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, legacyTools = false, options: { reduceLogs?: boolean } = {}) {
   normalizeScenario(scenario);
   return async (name: string, input: Record<string, unknown>) => {
     calls.push({ name, ...(input.functionName ? { functionName: String(input.functionName) } : {}) });
@@ -236,6 +237,10 @@ export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, 
         const lines = found?.fixture.logs ?? [];
         const entries = logEntries(lines).filter(e =>
           filter === 'ALL' ? true : filter === 'ERROR' ? e.level === 'ERROR' : filter === 'WARN' ? e.level === 'WARN' : e.level === 'INFO');
+        if (options.reduceLogs) {
+          const reduced = reduceLogs(entries);
+          return { success: true, data: [...reduced.entries, { timestamp: '', message: reduced.summary, level: 'INFO' as const }] };
+        }
         return { success: true, data: entries };
       }
       case 'get_function_status': {
@@ -398,7 +403,7 @@ async function main(): Promise<void> {
   const tasks = pending.map(({ scenario, r }) => async () => {
       const calls: Call[] = [];
       const outcome = await runReActAgent(scenario.message, { userId: 'eval', channelId: 'eval' }, {
-          executeTool: makeTools(scenario, calls, analyzeError, variant === 'baseline'), emit: false, modelOverride: model,
+          executeTool: makeTools(scenario, calls, analyzeError, variant === 'baseline', { reduceLogs: variant === 'h55' && JSON.parse(readFileSync(arg('harness')!, 'utf-8')).reduceLogs === true }), emit: false, modelOverride: model,
           ...baselineDeps,
           // 운영 v1.9.1에는 현재 시각이 없다. 후보에만 넣는다
           ...(variant === 'candidate' || variant === 'h55' ? { currentTime: scenarioClock(scenario) } : {}),
