@@ -401,6 +401,7 @@ Resources:
           SLACK_BOT_TOKEN_SSM_PARAM: /eecar/slack/bot-token
           AGENT_MODEL_ID: global.anthropic.claude-haiku-4-5-20251001-v1:0
           AGENT_COMPLEX_MODEL_ID: global.anthropic.claude-sonnet-4-6
+          STACK_NAME: !Ref AWS::StackName
           SLACK_SIGNING_SECRET_SSM_PARAM: /eecar/slack/signing-secret
           BEDROCK_KB_ID_SSM_PARAM: /eecar/bedrock/kb-id
           S3_VECTORS_BUCKET: eecar-vectors-index-12234628
@@ -436,6 +437,35 @@ Resources:
                 - cloudwatch:GetMetricStatistics
                 - cloudwatch:ListMetrics
               Resource: '*'
+        # 장애 조사: 변경 이력과 함수 설정·권한 조회. 모두 읽기 전용이다. 쓰기 권한은 주지 않는다 (A-46)
+        - Statement:
+            - Effect: Allow
+              Action:
+                - cloudtrail:LookupEvents
+                - lambda:GetLayerVersion
+                - lambda:ListLayerVersions
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - cloudformation:DescribeStackEvents
+              Resource: !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*'
+            - Effect: Allow
+              Action:
+                - lambda:GetFunctionConfiguration
+              Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-*'
+            - Effect: Allow
+              Action:
+                - iam:ListRolePolicies
+                - iam:GetRolePolicy
+                - iam:ListAttachedRolePolicies
+              Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${AWS::StackName}-*'
+            - Effect: Allow
+              Action:
+                - iam:GetPolicy
+                - iam:GetPolicyVersion
+              Resource:
+                - 'arn:aws:iam::aws:policy/*'
+                - !Sub 'arn:aws:iam::${AWS::AccountId}:policy/*'
         # Lambda: 함수 목록 조회 (SAM suffix 해결용)
         - Statement:
             - Effect: Allow

@@ -11,10 +11,13 @@ import { getProviderStatus, getRecentChanges, getServiceMetrics } from './invest
 import { SUBMIT_DIAGNOSIS_TOOL } from './diagnosis.js';
 
 /**
- * 운영에서 모델에 보여주는 도구. 설정·권한 조회 도구(get_function_config, get_function_permissions)는
- * 홀드아웃 v2에서 사전 등록 기준을 넘지 못해 운영에는 노출하지 않고 평가에서만 켠다 (E-32, A-38)
+ * 운영에서 모델에 보여주는 도구. 사전 등록 홀드아웃을 통과한 구성이다 (E-35, A-46).
+ * 조회 도구는 모두 읽기 전용이다. 조치는 제안까지만 하고 실행하지 않는다.
  */
-export const PRODUCTION_TOOL_NAMES = ['analyze_error', 'get_logs', 'get_function_status', 'get_error_summary', 'recall_memory', 'save_memory'];
+export const PRODUCTION_TOOL_NAMES = [
+  'analyze_error', 'get_logs', 'get_function_status', 'get_error_summary', 'recall_memory', 'save_memory',
+  'get_function_config', 'get_function_permissions', 'get_recent_changes', 'get_service_metrics', 'get_provider_status', 'submit_diagnosis',
+];
 
 /**
  * 도구 정의 전체 (평가용 실험 도구 포함)
