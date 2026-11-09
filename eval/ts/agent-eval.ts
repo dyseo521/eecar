@@ -388,7 +388,14 @@ async function main(): Promise<void> {
   const originalError = console.error;
   const results: any[] = [];
   const order = new Map(scenarios.map((s, i) => [s.id, i]));
-  const tasks = scenarios.flatMap(scenario => Array.from({ length: runs }, (_, r) => async () => {
+  // --retry-errors: 오류로 끝난 실행만 다시 돌리고 나머지는 재사용한다
+  const retryFile = arg('retry-errors');
+  const kept: any[] = retryFile ? JSON.parse(readFileSync(retryFile, 'utf-8')).results.filter((r: any) => r.metrics.stopReason !== 'error') : [];
+  results.push(...kept);
+  const done = new Set(kept.map(r => `${r.id}#${r.run}`));
+  const agentErrors = new Map<string, number>();
+  const pending = scenarios.flatMap(scenario => Array.from({ length: runs }, (_, r) => ({ scenario, r }))).filter(p => !done.has(`${p.scenario.id}#${p.r}`));
+  const tasks = pending.map(({ scenario, r }) => async () => {
       const calls: Call[] = [];
       const outcome = await runReActAgent(scenario.message, { userId: 'eval', channelId: 'eval' }, {
           executeTool: makeTools(scenario, calls, analyzeError, variant === 'baseline'), emit: false, modelOverride: model,
@@ -399,11 +406,17 @@ async function main(): Promise<void> {
       const g = grade(scenario, outcome.response, calls);
       results.push({ id: scenario.id, run: r, source: scenario.source ?? 'v3', code: scenario.code, title: scenario.title, ...g, calls, response: outcome.response, ...(outcome.diagnosis ? { diagnosis: outcome.diagnosis } : {}), metrics: outcome.metrics, steps: outcome.steps });
       originalLog(`${g.pass ? 'pass' : 'FAIL'} ${scenario.id}#${r} cause=${g.cause} fix=${g.fix} noWrong=${g.noWrongClaim} tools=${g.tools} evidence=${g.evidence} turns=${outcome.metrics.turns} $${outcome.metrics.estimatedCostUsd.toFixed(4)}`);
-  }));
+  });
 
-  // 병렬 실행 동안 에이전트 로그를 끈다. 진행 줄은 원래 console로 찍는다
+  // 병렬 실행 동안 에이전트 로그를 끈다. 진행 줄은 원래 console로 찍고, 오류는 유형별로 센다
   console.log = () => {};
-  console.error = () => {};
+  console.error = (...args: unknown[]) => {
+    const error = args.find(a => a instanceof Error) as Error | undefined;
+    if (error) {
+      const kind = `${error.name}: ${error.message.slice(0, 80)}`;
+      agentErrors.set(kind, (agentErrors.get(kind) ?? 0) + 1);
+    }
+  };
   try {
     await runPool(tasks, Number(arg('concurrency') ?? 1));
   } finally {
@@ -411,6 +424,7 @@ async function main(): Promise<void> {
     console.error = originalError;
   }
   results.sort((a, b) => order.get(a.id)! - order.get(b.id)! || a.run - b.run);
+  if (agentErrors.size) originalLog('오류 유형:', JSON.stringify([...agentErrors.entries()]));
 
   writeReport(scenarios, results, runs, model, tag, scenarioFile, variant);
 }

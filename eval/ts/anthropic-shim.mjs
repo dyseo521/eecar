@@ -54,7 +54,14 @@ const maxTokensFor = (model, requested) => (acceptsTemperature(model) ? requeste
 
 function spent() {
   if (!existsSync(SPEND_FILE)) return 0;
-  return readFileSync(SPEND_FILE, 'utf-8').split('\n').filter(Boolean).reduce((sum, l) => sum + JSON.parse(l).usd, 0);
+  // 동시에 도는 실행이 쓰는 중인 마지막 줄은 깨져 있을 수 있다. 읽기 실패로 평가를 멈추지 않는다
+  return readFileSync(SPEND_FILE, 'utf-8').split('\n').filter(Boolean).reduce((sum, l) => {
+    try {
+      return sum + JSON.parse(l).usd;
+    } catch {
+      return sum;
+    }
+  }, 0);
 }
 
 function record(model, usage) {
