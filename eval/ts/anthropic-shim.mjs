@@ -115,9 +115,10 @@ async function converse(input) {
     ...(system.length ? { system } : {}),
     messages: input.messages.map(m => ({ role: m.role, content: m.content.map(toContent) })),
     ...(input.toolConfig?.tools?.length ? {
-      tools: input.toolConfig.tools.map(t => ({ name: t.toolSpec.name, description: t.toolSpec.description, input_schema: t.toolSpec.inputSchema.json })),
+      tools: input.toolConfig.tools.map(t => ({ name: t.toolSpec.name, description: t.toolSpec.description, input_schema: t.toolSpec.inputSchema.json, ...(t.toolSpec.strict ? { strict: true } : {}) })),
     } : {}),
     ...(toolChoice ? { tool_choice: toolChoice } : {}),
+    ...(process.env.EVAL_EFFORT && !acceptsTemperature(model) ? { output_config: { effort: process.env.EVAL_EFFORT } } : {}),
   });
   const content = response.content.flatMap(b => {
     if (b.type === 'text') return [{ text: b.text }];

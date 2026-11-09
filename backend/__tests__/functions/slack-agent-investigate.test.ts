@@ -209,6 +209,39 @@ describe('production rollout (A-46)', () => {
     return { result: await runReActAgent(message, { userId: 'U', channelId: 'C' }, { converse, executeTool, emit: false, modelOverride: HAIKU, ...deps }), converse };
   };
 
+  it('asks for the submission without forcing it first when finalize mode is auto-first', async () => {
+    const choices: unknown[] = [];
+    const replies = [
+      reply([{ toolUse: { toolUseId: 't1', name: 'get_logs', input: {} } }]),
+      reply([{ text: '확인했습니다.' }]),
+      reply([{ text: '아직 정리 중입니다.' }]),
+      reply([submit]),
+    ];
+    const converse = jest.fn(async (input: ConverseCommandInput) => {
+      choices.push(input.toolConfig?.toolChoice);
+      return replies.shift()!;
+    });
+    const executeTool = jest.fn(async () => ({ success: true, data: {} }));
+    const result = await runReActAgent('검색이 이상해요', { userId: 'U', channelId: 'C' }, {
+      converse, executeTool, emit: false, modelOverride: HAIKU, requireDiagnosis: true, finalizeMode: 'auto-first', finalizePrompt: '제출하세요',
+    });
+    expect(choices).toEqual([undefined, undefined, undefined, { tool: { name: 'submit_diagnosis' } }]);
+    expect(result.diagnosis).toMatchObject({ verdict: 'no_fault' });
+  });
+
+  it('applies tool overrides and strict mode only when asked', async () => {
+    const specs: any[] = [];
+    const converse = jest.fn(async (input: ConverseCommandInput) => {
+      specs.push((input.toolConfig?.tools ?? []).find(t => t.toolSpec?.name === 'submit_diagnosis')?.toolSpec);
+      return reply([{ text: '정상입니다.' }]);
+    });
+    await runReActAgent('안녕', { userId: 'U', channelId: 'C' }, { converse, emit: false, modelOverride: HAIKU, toolOverrides: { submit_diagnosis: { description: '바꾼 설명', strict: true } } });
+    await runReActAgent('안녕', { userId: 'U', channelId: 'C' }, { converse, emit: false, modelOverride: HAIKU });
+    expect(specs[0]).toMatchObject({ description: '바꾼 설명', strict: true, inputSchema: { json: { additionalProperties: false } } });
+    expect(specs[1].strict).toBeUndefined();
+    expect(specs[1].inputSchema.json.additionalProperties).toBeUndefined();
+  });
+
   it('answers small talk directly in production', async () => {
     const { result, converse } = await run('안녕', [reply([{ text: '안녕하세요!' }])], { requireDiagnosis: true, allowConversation: true });
     expect(result.response).toBe('안녕하세요!');

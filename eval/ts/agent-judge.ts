@@ -204,7 +204,7 @@ async function main(): Promise<void> {
       tasks.push(async () => {
       const evidence = await fullEvidence(scenario, r.steps);
       const head = `## 사용자 질문\n${scenario.message}\n\n## 정답 요지\n- 원인: ${truth.cause}\n- 올바른 조치(한 가지 예): ${truth.fix}\n\n`;
-      const c = await callTool(CAUSE_RUBRIC, `${head}## 도우미가 원래 아는 정보 (시스템 프롬프트)\n${promptFor(variant)}${variant === 'candidate' ? currentTimeSection(scenarioClock(scenario)) : ''}\n\n## 도우미가 조회한 자료\n${evidence}\n\n## 진단 도우미의 답변\n${r.response}`, CAUSE_TOOL);
+      const c = await callTool(CAUSE_RUBRIC, `${head}## 도우미가 원래 아는 정보 (시스템 프롬프트)\n${promptFor(variant)}${variant === 'candidate' || variant === 'h55' ? currentTimeSection(scenarioClock(scenario)) : ''}\n\n## 도우미가 조회한 자료\n${evidence}\n\n## 진단 도우미의 답변\n${r.response}`, CAUSE_TOOL);
       const fixRubric = scenario?.truth?.verdict === 'insufficient_evidence' ? FIX_RUBRIC + INSUFFICIENT_FIX_RULE : FIX_RUBRIC;
       const f = await callTool(fixRubric, `${head}## 진단 도우미의 답변\n${r.response}`, FIX_TOOL);
       inTok += c.inTok + f.inTok; outTok += c.outTok + f.outTok;

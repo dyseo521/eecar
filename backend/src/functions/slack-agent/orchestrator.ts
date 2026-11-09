@@ -85,6 +85,12 @@ export interface AgentDeps {
   requireDiagnosis?: boolean;
   /** 인사나 기억 조회처럼 일반 대화인 요청은 진단 제출을 강제하지 않는다. 평가는 검증한 구성을 재현하도록 끈다 (A-46) */
   allowConversation?: boolean;
+  /** 제출 지시문을 바꾼다 (평가에서 Haiku 5.5 하네스 비교) */
+  finalizePrompt?: string;
+  /** auto-first면 결론 시점에 먼저 강제 없이 제출을 받는다. 강제하면 Haiku 5.5는 사고 없이 바로 호출한다 (E-37) */
+  finalizeMode?: 'forced' | 'auto-first';
+  /** 도구 정의를 평가에서 바꾼다. strict면 입력 스키마를 API가 보장한다 */
+  toolOverrides?: Record<string, { description?: string; input_schema?: Record<string, unknown>; strict?: boolean }>;
   /** 시스템 프롬프트에 넣을 현재 시각(ISO). 평가에서는 시나리오 시계를 쓴다 */
   currentTime?: string;
   /** 도구 정의와 시스템 프롬프트를 캐시한다 (A-44). Haiku 4.5의 최소 크기 4,096토큰을 넘을 때만 효과가 있다 */
@@ -201,19 +207,23 @@ export async function runReActAgent(
   let lastAnalysis = '';
   let diagnosis: Diagnosis | undefined;
   let finalizing = false;
+  let finalizeRetried = false;
   let investigating = false;
 
   // Bedrock Converse API용 도구 정의
   const offered = deps.toolNames ?? PRODUCTION_TOOL_NAMES;
-  const tools = TOOLS.filter(tool => offered.includes(tool.name)).map((tool) => ({
-    toolSpec: {
-      name: tool.name,
-      description: tool.description,
-      inputSchema: {
-        json: tool.input_schema as Record<string, unknown>,
+  const tools = TOOLS.filter(tool => offered.includes(tool.name)).map((tool) => {
+    const override = deps.toolOverrides?.[tool.name];
+    const schema = (override?.input_schema ?? tool.input_schema) as Record<string, unknown>;
+    return {
+      toolSpec: {
+        name: tool.name,
+        description: override?.description ?? tool.description,
+        inputSchema: { json: override?.strict ? { ...schema, additionalProperties: false } : schema },
+        ...(override?.strict ? { strict: true } : {}),
       },
-    },
-  })) as BedrockTool[];
+    };
+  }) as BedrockTool[];
 
   while (turnCount < MAX_TURNS) {
     turnCount++;
@@ -233,7 +243,7 @@ export async function runReActAgent(
         messages,
         toolConfig: {
           tools,
-          ...(deps.requireDiagnosis && (finalizing || turnCount === MAX_TURNS)
+          ...(deps.requireDiagnosis && ((finalizing && (deps.finalizeMode !== 'auto-first' || finalizeRetried)) || turnCount === MAX_TURNS)
             ? { toolChoice: { tool: { name: 'submit_diagnosis' } } }
             : investigating ? { toolChoice: { any: {} } } : {}),
         },
@@ -353,7 +363,13 @@ export async function runReActAgent(
           continue;
         }
         finalizing = true;
-        messages.push({ role: 'user', content: [{ text: DIAGNOSIS_FINALIZE_PROMPT }] });
+        messages.push({ role: 'user', content: [{ text: deps.finalizePrompt ?? DIAGNOSIS_FINALIZE_PROMPT }] });
+        continue;
+      }
+      // auto-first에서 제출 없이 또 텍스트로 끝내면 그때 강제한다
+      if (textResponse && deps.requireDiagnosis && finalizing && deps.finalizeMode === 'auto-first' && !finalizeRetried) {
+        finalizeRetried = true;
+        messages.push({ role: 'user', content: [{ text: deps.finalizePrompt ?? DIAGNOSIS_FINALIZE_PROMPT }] });
         continue;
       }
 
