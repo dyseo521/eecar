@@ -1,8 +1,9 @@
 /**
  * 운영 검색 합성 검사 (DECISION_LOG A-39). 의존성 없이 Node 20+에서 실행한다.
  *
- *   node eval/prod/search-canary.mjs [--api https://.../prod] [--spec 다른-검사.json]
+ *   EECAR_CANARY_TOKEN=... node eval/prod/search-canary.mjs [--api https://.../prod] [--spec 다른-검사.json]
  *
+ * - 토큰: canary=true는 X-Eecar-Canary-Token이 맞을 때만 적용된다 (A-47). 없으면 일반 요청으로 처리돼 진단값이 오지 않는다.
  * - 검색: canary=true로 캐시를 거치지 않고 실제 파이프라인을 실행한다. 결과 카테고리·조건 위반과
  *   검색기별 후보 수(벡터·BM25), 색인 크기를 확인한다.
  * - 설명: LLM 설명이 폴백 없이 생성되는지 확인한다 (C-09: 폴백이 200 응답 뒤에 숨었다).
@@ -16,12 +17,17 @@ const API = (argApi >= 0 ? process.argv[argApi + 1] : process.env.EECAR_API_URL)
 const argSpec = process.argv.indexOf('--spec');
 // --spec: 다른 검사 정의로 실행 (일부러 실패하는 검사로 검출을 확인할 때)
 const spec = JSON.parse(readFileSync(argSpec >= 0 ? process.argv[argSpec + 1] : new URL('./canary.json', import.meta.url), 'utf-8'));
+const TOKEN = process.env.EECAR_CANARY_TOKEN;
+if (!TOKEN) {
+  console.error('EECAR_CANARY_TOKEN이 없습니다. 토큰이 없으면 진단값을 받지 못해 모든 검사가 실패합니다.');
+  process.exit(1);
+}
 
 async function post(path, payload) {
   const started = performance.now();
   const res = await fetch(`${API}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    headers: { 'Content-Type': 'application/json; charset=utf-8', 'X-Eecar-Canary-Token': TOKEN },
     body: JSON.stringify(payload),
   });
   const ms = Math.round(performance.now() - started);

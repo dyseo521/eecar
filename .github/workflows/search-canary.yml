@@ -30,6 +30,7 @@ jobs:
         id: canary
         env:
           EECAR_API_URL: https://6o4futufni.execute-api.ap-northeast-2.amazonaws.com/prod
+          EECAR_CANARY_TOKEN: ${{ secrets.EECAR_CANARY_TOKEN }}
         run: node eval/prod/search-canary.mjs
 
       - name: Notify Slack on failure

@@ -51,6 +51,20 @@ Resources:
       StageName: prod
       Description: EECAR API Gateway
       TracingEnabled: true  # X-Ray distributed tracing enabled
+      # 호출 제한 (DECISION_LOG A-47). 모든 클라이언트가 공유하는 값이라 순간 부하만 막는다.
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          ThrottlingRateLimit: 10
+          ThrottlingBurstLimit: 20
+        - ResourcePath: '/~1api~1search'
+          HttpMethod: POST
+          ThrottlingRateLimit: 2
+          ThrottlingBurstLimit: 5
+        - ResourcePath: '/~1api~1search~1explain'
+          HttpMethod: POST
+          ThrottlingRateLimit: 1
+          ThrottlingBurstLimit: 3
 
   # Lambda Functions
   VectorSearchFunction:
@@ -95,6 +109,11 @@ Resources:
                 - bedrock:Retrieve
                 - bedrock:RetrieveAndGenerate
               Resource: !Sub 'arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:knowledge-base/*'
+            # 합성 검사 토큰 (DECISION_LOG A-47)
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/eecar/canary-token'
       Events:
         Search:
           Type: Api
