@@ -95,12 +95,44 @@ const FIX_LABEL: Record<string, string> = { fix: '조치', mitigation: '완화 �
 
 const PARAMETER_TAG = /<parameter name="(\w+)">([\s\S]*?)(?=<parameter name=|<\/parameter>|$)/g;
 
+const TAG_START = '<parameter name="';
+const LIST_FIELDS = new Set(['evidence', 'contributing', 'not_verified']);
+const stripTail = (s: string) => s.replace(/(<\/\w+>|\\?["'],?|\s)+$/, '').trim();
+
+function leakedValue(name: string, value: string): unknown {
+  const clean = stripTail(value);
+  if (!LIST_FIELDS.has(name)) return clean;
+  try {
+    return JSON.parse(clean);
+  } catch {
+    return clean;
+  }
+}
+
+/**
+ * 문자열 값 뒤에 다음 항목이 태그째 이어 붙은 입력을 복구한다.
+ * 예: cause = '...입니다.",\n<parameter name="contributing">[]"'
+ * 그대로 두면 답변에 태그가 보이고 뒤따르는 항목이 사라진다. dev 60회 중 6회였다 (E-34)
+ */
+function recoverLeakedParameters(raw: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...raw };
+  for (const [key, value] of Object.entries(raw)) {
+    if (key === 'fix' || typeof value !== 'string' || !value.includes(TAG_START)) continue;
+    const at = value.indexOf(TAG_START);
+    out[key] = stripTail(value.slice(0, at));
+    for (const m of value.slice(at).matchAll(PARAMETER_TAG)) {
+      if (out[m[1]] === undefined) out[m[1]] = leakedValue(m[1], m[2]);
+    }
+  }
+  return out;
+}
+
 /**
  * 제출을 진단으로 바꾼다. 평평한 필드를 쓰되, 이전 형식(fix 객체)과 모델이 깨뜨린 문자열도 복구한다.
  * 깨진 문자열 예: <parameter name="type">fix\n<parameter name="action">...
  */
-export function normalizeDiagnosis(raw: Record<string, unknown>): Diagnosis {
-  const { fix_action, fix_type, fix_verify, fix_rollback, fix, ...rest } = raw;
+export function normalizeDiagnosis(input: Record<string, unknown>): Diagnosis {
+  const { fix_action, fix_type, fix_verify, fix_rollback, fix, ...rest } = recoverLeakedParameters(input);
   let nested: Record<string, unknown> = {};
   if (fix && typeof fix === 'object') nested = fix as Record<string, unknown>;
   else if (typeof fix === 'string' && fix.trim()) {

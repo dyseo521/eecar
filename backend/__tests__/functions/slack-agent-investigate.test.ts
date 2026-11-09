@@ -193,6 +193,24 @@ describe('normalizeDiagnosis', () => {
     expect(normalizeDiagnosis({ verdict: 'root_cause', summary: 's', fix }).fix).toMatchObject({ type: 'fix', action: '레이어를 v27로 되돌린다', verify: '오류율이 0인지 본다' });
   });
 
+  it('recovers fields that leaked into the end of another value', () => {
+    const d = normalizeDiagnosis({
+      verdict: 'root_cause',
+      summary: 's',
+      cause: '코드와 레이어의 버전이 맞지 않습니다.",\n<parameter name="evidence">["로그 A", "설정 B"]"\n<parameter name="fix_action">레이어를 맞춘다</cause>',
+    });
+    expect(d.cause).toBe('코드와 레이어의 버전이 맞지 않습니다.');
+    expect(d.evidence).toEqual(['로그 A', '설정 B']);
+    expect(d.fix).toMatchObject({ action: '레이어를 맞춘다' });
+    expect(renderDiagnosis(d)).not.toContain('<parameter');
+  });
+
+  it('does not let a leaked value overwrite a field the model filled in', () => {
+    const d = normalizeDiagnosis({ verdict: 'root_cause', summary: 's', evidence: ['진짜 근거'], cause: '원인</cause>\n<parameter name="evidence">["덮어쓰기"]' });
+    expect(d.evidence).toEqual(['진짜 근거']);
+    expect(d.cause).toBe('원인');
+  });
+
   it('treats a plain string as the action and leaves an empty fix out', () => {
     expect(normalizeDiagnosis({ verdict: 'root_cause', summary: 's', fix: '캐시를 비운다' }).fix).toMatchObject({ action: '캐시를 비운다' });
     expect(normalizeDiagnosis({ verdict: 'no_fault', summary: 's', fix_type: 'none' }).fix).toBeUndefined();
