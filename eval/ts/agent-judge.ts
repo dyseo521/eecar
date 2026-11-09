@@ -17,6 +17,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { BedrockRuntimeClient, ConverseCommand } from '@aws-sdk/client-bedrock-runtime';
 import { makeTools, scenarioClock } from './agent-eval.js';
+import { runPool } from './run-pool.js';
 import { currentTimeSection } from '../../backend/src/functions/slack-agent/tools/diagnosis.js';
 
 const args = process.argv.slice(2);
@@ -173,6 +174,7 @@ async function main(): Promise<void> {
   const done = new Set(out.map(j => `${j.variant}/${j.scenario}/${j.run}`));
   let inTok = 0, outTok = 0;
   const save = () => writeFileSync(outFile, JSON.stringify({ meta: { date, judgeVersion: JUDGE_VERSION, model: MODEL, reports: REPORTS, items: one('items') ?? null, inputTokens: inTok, outputTokens: outTok }, judgments: out }, null, 1));
+  const tasks: Array<() => Promise<void>> = [];
   for (const file of REPORTS) {
     const report = JSON.parse(readFileSync(file, 'utf-8'));
     const variant = (file.match(/holdout2-([a-z]+)\.json$/)?.[1]) ?? report.meta?.variant ?? report.meta?.tag ?? 'unknown';
@@ -188,6 +190,7 @@ async function main(): Promise<void> {
         ? { cause: truthCause(scenario.truth), fix: [scenario.truth.fix, ...(scenario.truth.acceptableFixes ?? []).map((f: string) => `또는 ${f}`), ...(scenario.truth.forbiddenFixes?.length ? [`(하면 안 되는 조치: ${scenario.truth.forbiddenFixes.join(', ')})`] : [])].join(' ') }
         : TRUTH[r.id];
       if (!truth) continue;
+      tasks.push(async () => {
       const evidence = await fullEvidence(scenario, r.steps);
       const head = `## 사용자 질문\n${scenario.message}\n\n## 정답 요지\n- 원인: ${truth.cause}\n- 올바른 조치(한 가지 예): ${truth.fix}\n\n`;
       const c = await callTool(CAUSE_RUBRIC, `${head}## 도우미가 원래 아는 정보 (시스템 프롬프트)\n${promptFor(variant)}${variant === 'candidate' ? currentTimeSection(scenarioClock(scenario)) : ''}\n\n## 도우미가 조회한 자료\n${evidence}\n\n## 진단 도우미의 답변\n${r.response}`, CAUSE_TOOL);
@@ -200,8 +203,11 @@ async function main(): Promise<void> {
       out.push({ item: item?.id, variant, scenario: r.id, run: r.run, ...j, pass, phrasePass: r.pass });
       save();
       console.log(`${item?.id ?? ''} ${variant} ${r.id}#${r.run} cause=${j.cause} fix=${j.fix} wrong=${j.wrong} pass=${pass} (phrase ${r.pass})`);
+      });
     }
   }
+  // API로 돌릴 때는 분당 한도가 넉넉해 병렬로 실행한다. 한 건마다 저장하므로 중단해도 --resume으로 잇는다
+  await runPool(tasks, Number(one('concurrency') ?? 1));
   save();
   console.log(`\n${out.length}건 → ${outFile} (입력 ${inTok}, 출력 ${outTok} 토큰)`);
 }
