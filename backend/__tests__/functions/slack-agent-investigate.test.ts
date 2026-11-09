@@ -229,6 +229,26 @@ describe('production rollout (A-46)', () => {
     expect(result.diagnosis).toMatchObject({ verdict: 'no_fault' });
   });
 
+  it('never sends a forced tool choice in auto-only mode, for models that reject it', async () => {
+    const choices: unknown[] = [];
+    const replies = [
+      reply([{ text: '살펴보겠습니다.' }]),
+      reply([{ toolUse: { toolUseId: 't1', name: 'get_logs', input: {} } }]),
+      reply([{ text: '확인했습니다.' }]),
+      reply([submit]),
+    ];
+    const converse = jest.fn(async (input: ConverseCommandInput) => {
+      choices.push(input.toolConfig?.toolChoice);
+      return replies.shift()!;
+    });
+    const executeTool = jest.fn(async () => ({ success: true, data: {} }));
+    const result = await runReActAgent('검색이 이상해요', { userId: 'U', channelId: 'C' }, {
+      converse, executeTool, emit: false, modelOverride: HAIKU, requireDiagnosis: true, finalizeMode: 'auto-only', finalizePrompt: '제출하세요',
+    });
+    expect(choices).toEqual([undefined, undefined, undefined, undefined]);
+    expect(result.diagnosis).toMatchObject({ verdict: 'no_fault' });
+  });
+
   it('applies tool overrides and strict mode only when asked', async () => {
     const specs: any[] = [];
     const converse = jest.fn(async (input: ConverseCommandInput) => {
