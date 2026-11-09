@@ -62,9 +62,10 @@ async function score(file: string): Promise<void> {
       if (verdict === 'no_fault') { c.noFaultOk++; c.verdictOk++; }
       if (verdict === 'root_cause') c.noFaultOverclaim++;
     }
-    if (d?.evidence?.length) {
+    const evidence: unknown[] = Array.isArray(d?.evidence) ? d.evidence : d?.evidence ? [d.evidence] : [];
+    if (evidence.length) {
       const text = await toolText(scenarios.get(r.id), r.steps);
-      const cited = (d.evidence as unknown[]).map(String).join(' ').match(TIME) ?? [];
+      const cited = evidence.map(String).join(' ').match(TIME) ?? [];
       if (cited.some(t => !text.includes(t))) c.unsupportedTime++;
     }
   }
