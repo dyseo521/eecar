@@ -6,7 +6,7 @@ set -euo pipefail
 export AWS_REGION=ap-northeast-2
 export EVAL_MODEL_MAP='claude-haiku-4-5-20251001=claude-haiku-5-5'
 export EVAL_SPEND_FILE="$(cygpath -m "$HOME")/.eecar-anthropic-spend-h55-nofault.jsonl"
-export EVAL_USD_CAP=3
+export EVAL_USD_CAP="${EVAL_USD_CAP:-3}"
 RUN="node --import tsx --import ./eval/ts/opt-alias.mjs --import ./eval/ts/anthropic-shim.mjs"
 SCENARIOS=eval/agent/scenarios_v3_holdout.json
 latest() { ls -t eval/reports/*-"$1".json 2>/dev/null | head -1 || true; }
