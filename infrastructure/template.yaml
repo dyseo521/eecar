@@ -617,6 +617,16 @@ Resources:
   # GetParts, WatchPart, Proposal, SyntheticData, BatteryHealth, MaterialProperty, ContactInquiry
 
   # Lambda Invoke Permissions for CloudWatch Logs (Must be created before Subscription Filters)
+  # CloudWatch 경보가 알림 함수를 직접 호출한다. 배포 역할의 SNS 권한이 기존 토픽 하나로 제한되어 새 토픽을 만들 수 없다 (A-45)
+  SlackNotificationInvokePermissionAlarms:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SlackNotificationFunction
+      Action: lambda:InvokeFunction
+      Principal: lambda.alarms.cloudwatch.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+      SourceArn: !Sub 'arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${AWS::StackName}-search-*'
+
   SlackNotificationInvokePermissionVectorSearch:
     Type: AWS::Lambda::Permission
     Properties:
@@ -818,9 +828,9 @@ Resources:
       ComparisonOperator: GreaterThanOrEqualToThreshold
       TreatMissingData: notBreaching
       AlarmActions:
-        - !Ref NotificationTopic
+        - !GetAtt SlackNotificationFunction.Arn
       OKActions:
-        - !Ref NotificationTopic
+        - !GetAtt SlackNotificationFunction.Arn
 
   # 합성 검사(canary)의 벡터 후보가 0이거나 검사가 멈추면 경보 (DECISION_LOG A-39)
   # 검사는 GitHub Actions가 매시 실행한다. 일정 실행은 몇십 분 늦어질 수 있어 3시간 연속일 때만 경보한다
@@ -836,16 +846,17 @@ Resources:
           Value: Canary
       Statistic: Minimum
       Period: 3600
-      EvaluationPeriods: 3
-      DatapointsToAlarm: 3
+      # GitHub 일정 실행의 실측 간격은 중앙값 5.7시간, 최대 7.9시간이라 3시간 기준은 오탐이 계속 났다 (A-45)
+      EvaluationPeriods: 12
+      DatapointsToAlarm: 12
       Threshold: 1
       ComparisonOperator: LessThanThreshold
       TreatMissingData: breaching
-      # 경보가 아무에게도 가지 않으면 검사가 멈춘 것을 알 수 없다 (DECISION_LOG A-43)
+      # 경보는 메일이 아니라 Slack으로 보낸다 (A-45). 검색이 실제로 실패하면 워크플로가 실행 때마다 바로 Slack에 알린다
       AlarmActions:
-        - !Ref NotificationTopic
+        - !GetAtt SlackNotificationFunction.Arn
       OKActions:
-        - !Ref NotificationTopic
+        - !GetAtt SlackNotificationFunction.Arn
 
   EECARDashboard:
     Type: AWS::CloudWatch::Dashboard

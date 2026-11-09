@@ -24,6 +24,32 @@ function generateCloudWatchDashboardUrl(): string {
   return `https://console.aws.amazon.com/cloudwatch/home?region=${AWS_REGION}#dashboards:name=${DASHBOARD_NAME}`;
 }
 
+/** CloudWatch 경보가 Lambda를 직접 호출할 때의 이벤트 (필요한 필드만, DECISION_LOG A-45) */
+export interface CloudWatchAlarmEvent {
+  source?: string;
+  alarmData: {
+    alarmName: string;
+    state: { value: string; reason?: string; timestamp?: string };
+    previousState?: { value?: string };
+    configuration?: { description?: string };
+  };
+}
+
+/** 경보와 복구만 알린다. 데이터 부족 상태로 오가는 변화는 알리지 않는다 */
+export function formatAlarmMessage(event: CloudWatchAlarmEvent): { text: string } | null {
+  const { alarmName, state, previousState, configuration } = event.alarmData;
+  if (state.value === 'ALARM') {
+    const lines = [`:rotating_light: *CloudWatch 경보: ${alarmName}*`];
+    if (configuration?.description) lines.push(configuration.description);
+    if (state.reason) lines.push(`사유: ${state.reason.slice(0, 300)}`);
+    return { text: lines.join('\n') };
+  }
+  if (state.value === 'OK' && previousState?.value === 'ALARM') {
+    return { text: `:white_check_mark: *복구됨: ${alarmName}*` };
+  }
+  return null;
+}
+
 /**
  * Slack Block Kit 형식으로 메시지 포맷팅
  * - 레거시 attachments 대신 blocks 사용
