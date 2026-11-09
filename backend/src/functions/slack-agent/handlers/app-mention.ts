@@ -7,6 +7,9 @@ import { SlackEvent, SlackBlock, AgentStep } from '../types.js';
 import { getBotToken } from '../slack-verifier.js';
 import { runReActAgent } from '../orchestrator.js';
 
+// Slack section 블록의 text 한도. 넘으면 메시지 전체가 거부되어 사용자가 아무것도 받지 못한다
+const SLACK_SECTION_LIMIT = 3000;
+
 /**
  * @자동이 멘션 처리
  */
@@ -47,6 +50,12 @@ export async function handleAppMention(event: SlackEvent): Promise<void> {
       userId: user,
       channelId: channel,
       threadTs: thread_ts || ts,
+    }, {
+      // 사전 등록 홀드아웃을 통과한 구성 (E-35, A-46)
+      requireDiagnosis: true,
+      allowConversation: true,
+      cachePrompt: true,
+      currentTime: new Date().toISOString(),
     });
 
     // 결과를 Slack으로 전송
@@ -73,7 +82,7 @@ async function postMessage(
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: message,
+        text: message.length > SLACK_SECTION_LIMIT ? `${message.slice(0, SLACK_SECTION_LIMIT - 40)}\n… (길이 제한으로 생략)` : message,
       },
     },
   ];

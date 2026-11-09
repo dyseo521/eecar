@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs';
+import { JADONG_SYSTEM_PROMPT } from '../../src/functions/slack-agent/prompts/system.js';
 /**
  * 자동이 조사 도구(변경 이력, 의존 서비스 지표, 공급자 상태)와 구조화 진단 제출 (A-40)
  */
@@ -17,7 +19,7 @@ import {
   type ChangeEvent,
 } from '../../src/functions/slack-agent/tools/investigate.js';
 import { renderDiagnosis, normalizeDiagnosis } from '../../src/functions/slack-agent/tools/diagnosis.js';
-import { runReActAgent } from '../../src/functions/slack-agent/orchestrator.js';
+import { runReActAgent, isConversational } from '../../src/functions/slack-agent/orchestrator.js';
 
 const trailMock = mockClient(CloudTrailClient);
 const cfnMock = mockClient(CloudFormationClient);
@@ -175,6 +177,68 @@ describe('renderDiagnosis', () => {
   it('marks healthy conclusions and mitigation fixes', () => {
     expect(renderDiagnosis({ verdict: 'no_fault', summary: '정상입니다.', component: 'none', fault_type: 'no_fault' })).toContain('장애 아님');
     expect(renderDiagnosis({ verdict: 'root_cause', summary: 's', fix: { action: 'a', type: 'mitigation' } })).toContain('완화 조치');
+  });
+});
+
+describe('production rollout (A-46)', () => {
+  const HAIKU = 'global.anthropic.claude-haiku-4-5-20251001-v1:0';
+  const usage = { inputTokens: 100, outputTokens: 10, totalTokens: 110 };
+  const reply = (content: unknown[]) => ({ output: { message: { role: 'assistant', content } }, usage }) as unknown as ConverseCommandOutput;
+  const submit = { toolUse: { toolUseId: 'end', name: 'submit_diagnosis', input: { verdict: 'no_fault', summary: '정상입니다.' } } };
+
+  it('uses the prompt that passed the holdout', () => {
+    const candidate = readFileSync(new URL('../../../eval/agent/candidate-system-prompt.txt', import.meta.url), 'utf-8').replace(/\r\n/g, '\n').trimEnd();
+    expect(JADONG_SYSTEM_PROMPT.trimEnd()).toBe(candidate);
+  });
+
+  it.each([
+    ['안녕', [], true],
+    ['도움말 보여줘', [], true],
+    ['Throttling 어떻게 해결했어?', ['recall_memory'], true],
+    ['검색이 이상해요', [], false],
+    ['안녕하세요, 어제부터 검색 결과가 전부 비어 있는데 원인을 찾아 주세요', [], false],
+    ['VectorSearch 봐줘', ['get_logs'], false],
+    ['기억해 둔 거랑 비교해줘', ['recall_memory', 'get_logs'], false],
+  ])('classifies %j with tools %j as conversational=%j', (message, tools, expected) => {
+    expect(isConversational(message, tools)).toBe(expected);
+  });
+
+  const run = async (message: string, replies: ConverseCommandOutput[], deps: Record<string, unknown>) => {
+    const converse = jest.fn(async (_: ConverseCommandInput) => replies.shift()!);
+    const executeTool = jest.fn(async () => ({ success: true, data: {} }));
+    return { result: await runReActAgent(message, { userId: 'U', channelId: 'C' }, { converse, executeTool, emit: false, modelOverride: HAIKU, ...deps }), converse };
+  };
+
+  it('answers small talk directly in production', async () => {
+    const { result, converse } = await run('안녕', [reply([{ text: '안녕하세요!' }])], { requireDiagnosis: true, allowConversation: true });
+    expect(result.response).toBe('안녕하세요!');
+    expect(result.diagnosis).toBeUndefined();
+    expect(converse).toHaveBeenCalledTimes(1);
+  });
+
+  it('still requires a diagnosis once the agent has investigated', async () => {
+    const { result } = await run('검색이 이상해요', [
+      reply([{ toolUse: { toolUseId: 't1', name: 'get_logs', input: {} } }]),
+      reply([{ text: '확인했습니다.' }]),
+      reply([submit]),
+    ], { requireDiagnosis: true, allowConversation: true });
+    expect(result.diagnosis).toMatchObject({ verdict: 'no_fault' });
+  });
+
+  it('keeps forcing a diagnosis when conversation is not allowed, as the evaluation measured', async () => {
+    const { result } = await run('안녕', [
+      reply([{ text: '안녕하세요!' }]),
+      reply([{ toolUse: { toolUseId: 't1', name: 'get_logs', input: {} } }]),
+      reply([{ text: '확인했습니다.' }]),
+      reply([submit]),
+    ], { requireDiagnosis: true });
+    expect(result.diagnosis).toMatchObject({ verdict: 'no_fault' });
+  });
+
+  it('never returns an empty answer', async () => {
+    const { result } = await run('검색이 이상해요', [reply([])], { requireDiagnosis: true, allowConversation: true });
+    expect(result.response).toContain('답변을 만들지 못했습니다');
+    expect(result.metrics.stopReason).toBe('empty');
   });
 });
 
@@ -372,13 +436,13 @@ describe('orchestrator with submit_diagnosis', () => {
     expect(metrics.estimatedCostUsd).toBeCloseTo((4500 * 1 + 100 * 5) / 1_000_000, 8);
   });
 
-  it('does not offer the investigation tools in production', async () => {
+  it('offers the investigation tools in production (A-46)', async () => {
     const seen: string[][] = [];
     const converse = jest.fn(async (input: ConverseCommandInput) => {
       seen.push((input.toolConfig?.tools ?? []).map(t => t.toolSpec?.name ?? ''));
       return { output: { message: { role: 'assistant', content: [{ text: '정상입니다.' }] } }, usage } as unknown as ConverseCommandOutput;
     });
     await runReActAgent('상태', { userId: 'U', channelId: 'C' }, { converse, emit: false, modelOverride: HAIKU });
-    for (const name of ['get_recent_changes', 'get_service_metrics', 'get_provider_status', 'submit_diagnosis']) expect(seen[0]).not.toContain(name);
+    for (const name of ['get_recent_changes', 'get_service_metrics', 'get_provider_status', 'get_function_config', 'get_function_permissions', 'submit_diagnosis']) expect(seen[0]).toContain(name);
   });
 });

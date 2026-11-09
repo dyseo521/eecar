@@ -83,6 +83,8 @@ export interface AgentDeps {
    * 매 턴 도구 호출을 강제하면 평균 턴과 비용이 2배가 됐고 판정 결과는 나아지지 않았다.
    */
   requireDiagnosis?: boolean;
+  /** 인사나 기억 조회처럼 일반 대화인 요청은 진단 제출을 강제하지 않는다. 평가는 검증한 구성을 재현하도록 끈다 (A-46) */
+  allowConversation?: boolean;
   /** 시스템 프롬프트에 넣을 현재 시각(ISO). 평가에서는 시나리오 시계를 쓴다 */
   currentTime?: string;
   /** 도구 정의와 시스템 프롬프트를 캐시한다 (A-44). Haiku 4.5의 최소 크기 4,096토큰을 넘을 때만 효과가 있다 */
@@ -106,6 +108,21 @@ const SHORT_FINAL_CHARS = 200;
  * 모델이 분석을 쓴 뒤 도구(예: recall_memory)를 한 번 더 부르고 짧은 마무리만 쓰면, 사용자에게 분석이 빠진 답이 갔다.
  * 마지막 답이 짧고 앞 턴에 분석이 있으면 둘을 이어 붙인다.
  */
+const MEMORY_TOOLS = new Set(['recall_memory', 'save_memory']);
+const SMALL_TALK = /^(안녕|하이|ㅎㅇ|hello|hi\b|hey\b|고마워|감사|수고|도움말|help\b|누구(야|세요)|뭐\s*할\s*수)/i;
+const SMALL_TALK_MAX_CHARS = 30;
+const EMPTY_RESPONSE_MESSAGE = '답변을 만들지 못했습니다. 잠시 후 다시 시도해 주세요.';
+
+/**
+ * 진단이 아니라 일반 대화인 요청인가. 기억 도구만 썼거나, 도구 없이 끝난 짧은 인사·도움말이면 그렇다.
+ * 넓게 잡으면 진단을 건너뛰게 되므로 좁게 둔다. 애매하면 진단으로 처리한다 (A-46)
+ */
+export function isConversational(message: string, toolsUsed: string[]): boolean {
+  if (toolsUsed.length > 0) return toolsUsed.every(t => MEMORY_TOOLS.has(t));
+  const text = message.trim();
+  return text.length <= SMALL_TALK_MAX_CHARS && SMALL_TALK.test(text);
+}
+
 export function mergeFinalResponse(lastAnalysis: string, finalText: string): string {
   if (!lastAnalysis || finalText.length >= SHORT_FINAL_CHARS || finalText.includes(lastAnalysis)) return finalText;
   return `${lastAnalysis}\n\n${finalText}`;
@@ -328,7 +345,8 @@ export async function runReActAgent(
       }
 
       // 구조화 진단이 필요하면 텍스트로 끝내지 않고 제출을 받는다 (앞의 분석은 대화에 남아 있다)
-      if (textResponse && deps.requireDiagnosis && !finalizing) {
+      const conversational = deps.allowConversation && isConversational(userMessage, metrics.tools.map(t => t.name));
+      if (textResponse && deps.requireDiagnosis && !finalizing && !conversational) {
         if (metrics.toolCalls === 0 && !investigating) {
           investigating = true;
           messages.push({ role: 'user', content: [{ text: DIAGNOSIS_INVESTIGATE_PROMPT }] });
@@ -365,6 +383,9 @@ export async function runReActAgent(
     finalResponse =
       '분석이 복잡하여 완료하지 못했습니다. 더 구체적인 질문을 해주시면 도움이 됩니다.';
   }
+
+  // 빈 답을 Slack에 보내면 사용자는 아무것도 받지 못한다. 홀드아웃 120회 중 1회 있었다 (A-46)
+  if (!finalResponse) finalResponse = EMPTY_RESPONSE_MESSAGE;
 
   metrics.latencyMs = Date.now() - started;
   console.log(JSON.stringify({
