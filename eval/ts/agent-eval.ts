@@ -21,6 +21,7 @@ import { join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { runPool } from './run-pool.js';
 import { reduceLogs } from '../../backend/src/functions/slack-agent/tools/log-reduce.js';
+import { searchCode } from '../../backend/src/functions/slack-agent/tools/code-search.js';
 import { SUBMIT_DIAGNOSIS_TOOL } from '../../backend/src/functions/slack-agent/tools/diagnosis.js';
 
 interface Fixture {
@@ -70,6 +71,10 @@ interface Scenario {
     changes?: Array<{ time: string; type: string; target: string; actor?: string; summary?: string; details?: unknown }>;
     metrics?: { bedrock?: Record<string, Record<string, number>>; dynamodb?: Record<string, number>; apiGateway?: Record<string, number>; canary?: Record<string, unknown> };
     externalStatus?: Array<{ provider: string; time?: string; severity?: string; title?: string; body?: string }>;
+    /** E-41 정보 접근 도구용. code는 경로별 파일 내용 */
+    code?: Record<string, string>;
+    accessLogs?: Record<string, unknown>;
+    resourcePolicies?: Record<string, Record<string, unknown>>;
   };
   truth?: { verdict: string; component?: string; faultType?: string; cause: string; fix: string; acceptableFixes?: string[]; forbiddenFixes?: string[]; contributing?: string[] };
 }
@@ -331,6 +336,18 @@ export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, 
         return { success: true, data: worldServiceMetrics(scenario, String(input.service ?? ''), fn) };
       case 'get_provider_status':
         return { success: true, data: worldProviderStatus(scenario) };
+      case 'search_code':
+        return { success: true, data: searchCode({ query: input.query as string | undefined, path: input.path as string | undefined, startLine: input.startLine as number | undefined }, scenario.world?.code ?? {}) };
+      case 'get_request_breakdown': {
+        const logs = scenario.world?.accessLogs;
+        const count = scenario.world?.metrics?.apiGateway?.count ?? 500;
+        return { success: true, data: logs ?? { windowHours: 24, total: count, byStatus: { 200: count }, topPaths: [['/api/search', Math.round(count / 2)], ['/api/parts', Math.round(count / 2)]], topIps: [], topUserAgents: [] } };
+      }
+      case 'get_resource_policy': {
+        const resource = String(input.resource ?? '');
+        const found = scenario.world?.resourcePolicies?.[resource];
+        return { success: true, data: found ? { resource, found: true, ...found } : { resource, found: false, note: 'NoSuchResource' } };
+      }
       case 'get_incident_context': {
         // 운영 도구와 같은 구성으로 기존 조회를 묶는다 (E-40). 호출 기록은 묶음 도구 한 번으로 남긴다
         const inner = makeTools(scenario, [], analyzeError, legacyTools, options);
