@@ -2,7 +2,8 @@
  * 구조화 진단의 결정적 지표 (DECISION_LOG E-34). 모델을 호출하지 않는다.
  *
  * 판정 모델(eval/ts/agent-judge.ts)이 1차 지표이고, 이 스크립트는 보조 지표다.
- * - 판정 일치: 근거 부족 사례는 hypothesis도 인정한다. 시나리오 작성자 노트대로 숨은 원인을 유력 후보로 드는 것은 괜찮고 단정만 오답이다.
+ * - 판정 일치: 근거 부족 사례는 hypothesis도 인정한다. 관대한 지표라 조심스러운 답이면 만점이 나온다.
+ *   내용까지 맞았는지는 판정 모델이 본다. 18/18이 판정 모델로는 4/18이었던 일이 있어 제출 분포를 함께 보인다 (E-34).
  * - 장애 놓침: 실제 장애를 no_fault로 답한 비율. 가장 위험한 오류라 따로 본다.
  * - 과잉 단정: 근거 부족·정상 사례를 root_cause로 답한 비율.
  * - 구성요소·장애 유형: 원인이 확인되는 사례만 본다. 근거 부족 사례의 정답은 도구로 볼 수 없는 숨은 값이다.
@@ -34,7 +35,7 @@ const pct = (a: number, b: number) => (b ? `${a}/${b} (${((a / b) * 100).toFixed
 async function score(file: string): Promise<void> {
   const report = JSON.parse(readFileSync(file, 'utf-8')) as { meta: { scenarioFile: string; variant?: string; tag?: string }; results: Row[] };
   const scenarios = new Map((JSON.parse(readFileSync(report.meta.scenarioFile, 'utf-8')).scenarios as any[]).map(s => [s.id, s]));
-  const c = { runs: 0, submitted: 0, fault: 0, missed: 0, verdictOk: 0, noFault: 0, noFaultOk: 0, unsure: 0, unsureOk: 0, unsureOverclaim: 0, noFaultOverclaim: 0, faultOk: 0, compOk: 0, typeOk: 0, unsupportedTime: 0, turns: 0, cost: 0 };
+  const c = { runs: 0, submitted: 0, fault: 0, missed: 0, verdictOk: 0, noFault: 0, noFaultOk: 0, unsure: 0, unsureOk: 0, unsureOverclaim: 0, unsureExact: 0, unsureHypothesis: 0, noFaultOverclaim: 0, faultOk: 0, compOk: 0, typeOk: 0, unsupportedTime: 0, turns: 0, cost: 0 };
   for (const r of report.results) {
     const truth = scenarios.get(r.id)?.truth;
     if (!truth) continue;
@@ -54,6 +55,8 @@ async function score(file: string): Promise<void> {
       c.unsure++;
       if (verdict === 'insufficient_evidence' || verdict === 'hypothesis') { c.unsureOk++; c.verdictOk++; }
       if (verdict === 'root_cause') c.unsureOverclaim++;
+      if (verdict === 'insufficient_evidence') c.unsureExact++;
+      if (verdict === 'hypothesis') c.unsureHypothesis++;
     } else {
       c.noFault++;
       if (verdict === 'no_fault') { c.noFaultOk++; c.verdictOk++; }
@@ -69,6 +72,7 @@ async function score(file: string): Promise<void> {
   console.log(`- 제출: ${pct(c.submitted, c.runs)}, 평균 턴 ${(c.turns / c.runs).toFixed(2)}, 실행당 $${(c.cost / c.runs).toFixed(4)}`);
   if (!c.submitted) { console.log('- 구조화 제출이 없어 판정 지표를 계산하지 않는다'); return; }
   console.log(`- 판정 일치: ${pct(c.verdictOk, c.runs)} (원인 확인 ${pct(c.faultOk, c.fault)}, 근거 부족 ${pct(c.unsureOk, c.unsure)}, 정상·오경보 ${pct(c.noFaultOk, c.noFault)})`);
+  console.log(`- 근거 부족 사례의 제출: insufficient_evidence ${c.unsureExact}, hypothesis ${c.unsureHypothesis}, root_cause ${c.unsureOverclaim} (hypothesis는 내용을 판정 모델로 확인한다)`);
   console.log(`- 장애 놓침(실제 장애를 no_fault로): ${pct(c.missed, c.fault)}`);
   console.log(`- 과잉 단정(root_cause로): 근거 부족 ${pct(c.unsureOverclaim, c.unsure)}, 정상·오경보 ${pct(c.noFaultOverclaim, c.noFault)}`);
   console.log(`- 원인 확인 사례의 구성요소 일치 ${pct(c.compOk, c.fault)}, 장애 유형 일치 ${pct(c.typeOk, c.fault)}`);

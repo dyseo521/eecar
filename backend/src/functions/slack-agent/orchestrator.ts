@@ -18,7 +18,7 @@ import {
 import { AgentStep, ToolResult } from './types.js';
 import { JADONG_SYSTEM_PROMPT } from './prompts/system.js';
 import { PRODUCTION_TOOL_NAMES, TOOLS, executeTool } from './tools/index.js';
-import { Diagnosis, renderDiagnosis, DIAGNOSIS_FINALIZE_PROMPT, DIAGNOSIS_INVESTIGATE_PROMPT, currentTimeSection } from './tools/diagnosis.js';
+import { Diagnosis, normalizeDiagnosis, renderDiagnosis, DIAGNOSIS_FINALIZE_PROMPT, DIAGNOSIS_INVESTIGATE_PROMPT, currentTimeSection } from './tools/diagnosis.js';
 import { emitMetrics } from '/opt/nodejs/utils/emf.js';
 
 const bedrockClient = new BedrockRuntimeClient({ region: 'ap-northeast-2' });
@@ -256,7 +256,7 @@ export async function runReActAgent(
         // 구조화 진단 제출: 다른 도구 호출과 함께 와도 제출을 최종 답으로 삼고 끝낸다 (A-40)
         const submitted = toolUses.find(t => t.name === 'submit_diagnosis');
         if (submitted) {
-          diagnosis = submitted.input as unknown as Diagnosis;
+          diagnosis = normalizeDiagnosis(submitted.input as Record<string, unknown>);
           finalResponse = renderDiagnosis(diagnosis);
           metrics.stopReason = 'final';
           steps.push({ thought: '진단 제출', action: 'submit_diagnosis', actionInput: submitted.input as Record<string, unknown> });

@@ -29,7 +29,7 @@ const TRUTH = JSON.parse(readFileSync(one('truth') ?? 'eval/agent/truth_holdout_
 const MODEL = one('model') ?? 'global.anthropic.claude-sonnet-4-6';
 const TAG = one('tag') ?? 'judge';
 const ITEMS = one('items') ? (JSON.parse(readFileSync(one('items')!, 'utf-8')) as Array<{ id: string; variant: string; scenario: string; run: number }>) : null;
-const JUDGE_VERSION = 'v2.2';
+const JUDGE_VERSION = 'v2.3';
 const EVIDENCE_LIMIT = 4000;
 
 const client = new BedrockRuntimeClient({ region: 'ap-northeast-2' });
@@ -79,6 +79,17 @@ function promptFor(variant: string): string {
   const file = one('agent-prompt') ?? (variant === 'config' ? 'eval/agent/config-runbook-system-prompt.txt' : variant === 'candidate' ? 'eval/agent/candidate-system-prompt.txt' : 'eval/agent/shipped-v1.9.1-system-prompt.txt');
   return readFileSync(file, 'utf-8').split('\r\n').join('\n');
 }
+
+/**
+ * v2.3: 근거 부족 사례의 정답은 "더 확인하자"라서 "장애가 해소되는가"에 yes가 나올 수 없었다.
+ * 올바르게 조심한 답도 조치 no·partial로 떨어졌다. 이 범주에만 q_resolves의 뜻을 바꾼다 (E-34).
+ */
+const INSUFFICIENT_FIX_RULE = `
+
+이 사례는 원인을 도구로 확인할 수 없는 사례다. 여기서 q_resolves는 "장애가 해소되는가"가 아니라 다음을 뜻한다.
+- yes: 답변이 근거를 얻는 데 타당한 다음 확인(무엇을 보거나 무엇을 물을지)을 핵심으로 제시하고, 확인되지 않은 원인을 전제로 롤백·배포·코드·설정 변경을 바로 권하지 않는다.
+- no: 확인되지 않은 원인을 전제로 변경을 핵심 조치로 권하거나, 다음 확인이 없다.
+- "확인되면 검토할 조치"처럼 확인 뒤의 일로 덧붙인 변경은 핵심 조치가 아니다.`;
 
 const CAUSE_TOOL = {
   toolSpec: {
@@ -194,7 +205,8 @@ async function main(): Promise<void> {
       const evidence = await fullEvidence(scenario, r.steps);
       const head = `## 사용자 질문\n${scenario.message}\n\n## 정답 요지\n- 원인: ${truth.cause}\n- 올바른 조치(한 가지 예): ${truth.fix}\n\n`;
       const c = await callTool(CAUSE_RUBRIC, `${head}## 도우미가 원래 아는 정보 (시스템 프롬프트)\n${promptFor(variant)}${variant === 'candidate' ? currentTimeSection(scenarioClock(scenario)) : ''}\n\n## 도우미가 조회한 자료\n${evidence}\n\n## 진단 도우미의 답변\n${r.response}`, CAUSE_TOOL);
-      const f = await callTool(FIX_RUBRIC, `${head}## 진단 도우미의 답변\n${r.response}`, FIX_TOOL);
+      const fixRubric = scenario?.truth?.verdict === 'insufficient_evidence' ? FIX_RUBRIC + INSUFFICIENT_FIX_RULE : FIX_RUBRIC;
+      const f = await callTool(fixRubric, `${head}## 진단 도우미의 답변\n${r.response}`, FIX_TOOL);
       inTok += c.inTok + f.inTok; outTok += c.outTok + f.outTok;
       const fix = fixLabel(f.input);
       const { reason: _fr, ...checklist } = f.input;
