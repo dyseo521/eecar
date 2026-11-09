@@ -3,7 +3,7 @@ import { gunzipSync } from 'zlib';
 import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
 import { parseLogEvent } from './parser.js';
 import { classifySeverity } from './severity.js';
-import { formatSlackMessage } from './slack-formatter.js';
+import { CloudWatchAlarmEvent, formatAlarmMessage, formatSlackMessage } from './slack-formatter.js';
 import { acquireAlertSlot, releaseAlertSlot } from './deduplicator.js';
 
 const ssmClient = new SSMClient({ region: 'ap-northeast-2' });
@@ -28,7 +28,28 @@ async function getSlackWebhookUrl(): Promise<string> {
   return webhookUrl;
 }
 
-export const handler = async (event: CloudWatchLogsEvent) => {
+/** CloudWatch 경보의 직접 호출을 Slack으로 보낸다. 비동기 호출이라 예외를 던지면 Lambda가 재시도한다 */
+async function handleAlarm(event: CloudWatchAlarmEvent) {
+  const message = formatAlarmMessage(event);
+  if (!message) return { statusCode: 200, body: 'Alarm state not notified' };
+
+  const webhookUrl = await getSlackWebhookUrl();
+  if (!webhookUrl) throw new Error('Slack Webhook URL not found in Parameter Store');
+
+  const response = await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(message),
+  });
+  if (!response.ok) throw new Error(`Failed to send alarm to Slack: ${response.status} ${response.statusText}`);
+
+  console.log(`Sent alarm notification: ${event.alarmData.alarmName} ${event.alarmData.state.value}`);
+  return { statusCode: 200, body: 'Alarm notified' };
+}
+
+export const handler = async (event: CloudWatchLogsEvent | CloudWatchAlarmEvent) => {
+  if ('alarmData' in event) return handleAlarm(event);
+
   try {
     // 1. Base64 + Gzip 압축 해제
     const payload = Buffer.from(event.awslogs.data, 'base64');
