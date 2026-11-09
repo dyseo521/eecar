@@ -9,6 +9,7 @@ import { recallMemory, saveMemory } from './memory.js';
 import { getFunctionConfig, getFunctionPermissions } from './config.js';
 import { getProviderStatus, getRecentChanges, getServiceMetrics } from './investigate.js';
 import { SUBMIT_DIAGNOSIS_TOOL } from './diagnosis.js';
+import { getIncidentContext } from './incident-context.js';
 
 /**
  * 운영에서 모델에 보여주는 도구. 사전 등록 홀드아웃을 통과한 구성이다 (E-35, A-46).
@@ -148,6 +149,20 @@ export const TOOLS: Tool[] = [
       '외부 공급자(AWS 서울 리전, Anthropic, Slack)의 공개 상태와 진행 중인 장애를 조회합니다. 원인이 우리 쪽인지 공급자 쪽인지 가릴 때 사용합니다.',
     input_schema: { type: 'object', properties: {}, required: [] },
   },
+  // 평가 중인 묶음 조회 도구 (E-40). PRODUCTION_TOOL_NAMES에 넣기 전에는 운영에서 제공되지 않는다
+  {
+    name: 'get_incident_context',
+    description:
+      '장애 조사를 시작할 때 먼저 호출합니다. 함수 상태, 최근 ERROR 로그, 에러 요약, 최근 변경, 함수 설정, Lambda 한도 지표와 API Gateway, Bedrock, DynamoDB, 합성 검사 지표를 한 번에 돌려줍니다. functionName을 생략하면 전체 함수 상태와 스택 변경, 서비스 지표를 돌려줍니다.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        functionName: { type: 'string', description: 'Lambda 함수 이름. 모르면 생략' },
+        hours: { type: 'number', description: '조회 기간 (시간, 기본 24시간)' },
+      },
+      required: [],
+    },
+  },
   // 평가용 실험 도구 (E-38). PRODUCTION_TOOL_NAMES에 없어 운영에서는 제공되지 않는다
   {
     name: 'get_impact_summary',
@@ -270,6 +285,9 @@ export async function executeTool(
           return { success: true, data: status };
         }
       }
+
+      case 'get_incident_context':
+        return { success: true, data: await getIncidentContext(input.functionName ? String(input.functionName) : undefined, Number(input.hours) || 24) };
 
       case 'get_recent_changes':
         return { success: true, data: await getRecentChanges(input.functionName ? String(input.functionName) : undefined, Number(input.hours) || 168) };
