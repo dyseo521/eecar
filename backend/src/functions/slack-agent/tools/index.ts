@@ -148,6 +148,13 @@ export const TOOLS: Tool[] = [
       '외부 공급자(AWS 서울 리전, Anthropic, Slack)의 공개 상태와 진행 중인 장애를 조회합니다. 원인이 우리 쪽인지 공급자 쪽인지 가릴 때 사용합니다.',
     input_schema: { type: 'object', properties: {}, required: [] },
   },
+  // 평가용 실험 도구 (E-38). PRODUCTION_TOOL_NAMES에 없어 운영에서는 제공되지 않는다
+  {
+    name: 'get_impact_summary',
+    description:
+      '장애가 맞는지 판단할 때 쓰는 요약입니다. 최근 24시간 API 요청·5XX·4XX, 함수별 오류, 마지막 오류 시각과 경과 시간, Bedrock·DynamoDB 오류, 합성 검사 결과, CloudWatch 경보 정의(TreatMissingData 포함)를 돌려줍니다. 계산값만 돌려주며 장애 여부는 판단하지 않습니다.',
+    input_schema: { type: 'object', properties: {}, required: [] },
+  },
   SUBMIT_DIAGNOSIS_TOOL,
   {
     name: 'get_error_summary',

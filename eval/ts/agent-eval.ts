@@ -152,7 +152,7 @@ function harnessDeps(file: string, configTools: string[]) {
   const removed: string[] = h.removeTools ?? [];
   return {
     systemPrompt: readFileSync(h.prompt, 'utf-8').split('\r\n').join('\n'),
-    toolNames: [...configTools, 'get_recent_changes', 'get_service_metrics', 'get_provider_status', 'submit_diagnosis'].filter(t => !removed.includes(t)),
+    toolNames: [...configTools, 'get_recent_changes', 'get_service_metrics', 'get_provider_status', ...(h.addTools ?? []), 'submit_diagnosis'].filter(t => !removed.includes(t)),
     requireDiagnosis: true,
     cachePrompt: true,
     finalizeMode: h.finalizeMode ?? 'forced',
@@ -214,6 +214,48 @@ export function scenarioClock(scenario: Scenario): string {
     ...(scenario.world?.changes ?? []).map(c => c.time),
   ].map(t => (t ? Date.parse(t) : NaN)).filter(t => !Number.isNaN(t));
   return new Date(times.length ? Math.max(...times) + 60_000 : FIXED_CLOCK).toISOString();
+}
+
+/** infrastructure/template.yaml의 경보 정의. 모든 시나리오에 같은 값을 돌려준다 */
+const ALARM_DEFINITIONS = [
+  { name: 'eecar-stack-search-llm-fallback', metric: 'EECAR/Search LLMFallback', condition: '합계 >= 1', treatMissingData: 'notBreaching' },
+  { name: 'eecar-stack-search-canary-vector', metric: 'EECAR/Search VectorCandidates', condition: '최솟값 < 1', treatMissingData: 'breaching' },
+];
+
+/** 영향 요약 (E-38). 시나리오의 기존 데이터에서 계산만 하므로 정답을 새로 알려 주지 않는다 */
+function worldImpactSummary(scenario: Scenario): Record<string, unknown> {
+  const nowIso = scenarioClock(scenario);
+  const now = Date.parse(nowIso);
+  const minutesAgo = (t: number) => Math.max(0, Math.round((now - t) / 60_000));
+  const functions = KNOWN_FUNCTIONS.flatMap(name => {
+    const s = findFixture(scenario, name)?.fixture.status;
+    return s?.errors ? [{ functionName: name, errors: s.errors, invocations: s.invocations }] : [];
+  });
+  const errorTimes = Object.values(scenario.functions)
+    .flatMap(f => (f.logs ?? []).filter(l => LEVEL(l) === 'ERROR').map(l => ISO_PREFIX.exec(l)?.[0]))
+    .map(t => (t ? Date.parse(t) : NaN))
+    .filter(t => !Number.isNaN(t));
+  const lastError = errorTimes.length ? Math.max(...errorTimes) : undefined;
+  const api = worldServiceMetrics(scenario, 'apigateway', '') as Record<string, number>;
+  const models = worldServiceMetrics(scenario, 'bedrock', '').models as Array<Record<string, number>>;
+  const dynamodb = worldServiceMetrics(scenario, 'dynamodb', '') as Record<string, number>;
+  const canary = worldServiceMetrics(scenario, 'canary', '') as Record<string, unknown>;
+  const lastRun = typeof canary.lastRunAt === 'string' ? Date.parse(canary.lastRunAt) : NaN;
+  return {
+    now: nowIso,
+    windowHours: 24,
+    api: { requests: api.count, errors5xx: api['5xx'], errors4xx: api['4xx'] },
+    lambdaErrors: { total: functions.reduce((n, f) => n + f.errors, 0), functions },
+    lastError: lastError === undefined ? null : { at: new Date(lastError).toISOString(), minutesAgo: minutesAgo(lastError) },
+    dependencies: {
+      bedrockServerErrors: models.reduce((n, m) => n + (m.serverErrors ?? 0), 0),
+      bedrockThrottles: models.reduce((n, m) => n + (m.throttles ?? 0), 0),
+      dynamodbThrottledRequests: dynamodb.throttledRequests ?? 0,
+      dynamodbSystemErrors: dynamodb.systemErrors ?? 0,
+    },
+    canary: { ...canary, ...(Number.isNaN(lastRun) ? {} : { minutesSinceLastRun: minutesAgo(lastRun) }) },
+    alarms: ALARM_DEFINITIONS,
+  };
 }
 
 function healthy(name: string) {
@@ -287,6 +329,8 @@ export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, 
         return { success: true, data: worldServiceMetrics(scenario, String(input.service ?? ''), fn) };
       case 'get_provider_status':
         return { success: true, data: worldProviderStatus(scenario) };
+      case 'get_impact_summary':
+        return { success: true, data: worldImpactSummary(scenario) };
       case 'get_function_config':
       case 'get_function_permissions': {
         const known = isKnown(fn);
