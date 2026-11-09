@@ -11,6 +11,9 @@
  * - 키: 저장소 루트 .env에서 읽어 클라이언트에만 넘긴다. 환경 변수, 로그, 명령줄에 두지 않는다.
  * - 지출 상한: 호출마다 사용량을 홈 디렉터리의 JSONL에 남기고(내용 없이 토큰 수만), EVAL_USD_CAP(기본 50)을 넘으면 멈춘다.
  * - EVAL_MODEL_MAP="원본=대상,..."으로 모델을 바꿔 시험한다. 예: claude-haiku-4-5-20251001=claude-haiku-5-5
+ * - EVAL_SPEND_FILE로 지출 장부를 나눈다. 동시에 도는 실행이 서로의 상한을 쓰지 않게 한다.
+ * - Haiku 5.5 이후 모델은 공식 이전 안내에 맞춘다: temperature를 보내지 않고, 사고 블록을 도구 결과와 함께 그대로 돌려주며,
+ *   max_tokens를 넉넉히 준다(사고가 한도에 포함되고 같은 글이 토큰으로 약 30% 더 많다).
  */
 import { createRequire } from 'module';
 import { appendFileSync, existsSync, readFileSync } from 'fs';
@@ -31,10 +34,10 @@ function readKey() {
 
 const client = new Anthropic({ apiKey: readKey(), maxRetries: 6, defaultHeaders: { 'anthropic-version': '2023-06-01' } });
 
-const SPEND_FILE = join(homedir(), '.eecar-anthropic-spend.jsonl');
+const SPEND_FILE = process.env.EVAL_SPEND_FILE ?? join(homedir(), '.eecar-anthropic-spend.jsonl');
 const CAP = Number(process.env.EVAL_USD_CAP ?? 50);
 // 달러/백만 토큰. 단가를 모르는 모델은 상한을 지키기 위해 높게 잡는다
-const PRICE = [[/haiku-4-5/, 1, 5], [/sonnet-4-6/, 3, 15]];
+const PRICE = [[/haiku-5-5/, 0.1, 0.5], [/haiku-4-5/, 1, 5], [/sonnet-4-6/, 3, 15]];
 const UNKNOWN_PRICE = [3, 15];
 const MODEL_MAP = Object.fromEntries((process.env.EVAL_MODEL_MAP ?? '').split(',').filter(Boolean).map(p => p.split('=')));
 
@@ -44,8 +47,10 @@ function apiModel(modelId) {
   return MODEL_MAP[id] ?? id;
 }
 
-/** 5세대 이후 모델은 temperature를 받지 않는다 */
+/** 5세대 이후 모델은 temperature를 받지 않고, 사고가 기본으로 켜져 있어 max_tokens에 여유가 필요하다 */
 const acceptsTemperature = model => !/-5(-\d+)?$/.test(model);
+const THINKING_MIN_MAX_TOKENS = 8192;
+const maxTokensFor = (model, requested) => (acceptsTemperature(model) ? requested : Math.max(requested, THINKING_MIN_MAX_TOKENS));
 
 function spent() {
   if (!existsSync(SPEND_FILE)) return 0;
@@ -69,6 +74,11 @@ async function call(params) {
 
 function toContent(block) {
   if (block.text !== undefined) return { type: 'text', text: block.text };
+  // 사고 블록은 내용이 비어 있어도 그대로 돌려줘야 한다 (공식 이전 안내)
+  if (block.reasoningContent?.reasoningText) {
+    return { type: 'thinking', thinking: block.reasoningContent.reasoningText.text ?? '', signature: block.reasoningContent.reasoningText.signature };
+  }
+  if (block.reasoningContent?.redactedContent !== undefined) return { type: 'redacted_thinking', data: block.reasoningContent.redactedContent };
   if (block.toolUse) return { type: 'tool_use', id: block.toolUse.toolUseId, name: block.toolUse.name, input: block.toolUse.input };
   if (block.toolResult) {
     return { type: 'tool_result', tool_use_id: block.toolResult.toolUseId, content: block.toolResult.content.map(c => ({ type: 'text', text: c.text })) };
@@ -100,7 +110,7 @@ async function converse(input) {
   const system = toSystem(input.system);
   const response = await call({
     model,
-    max_tokens: input.inferenceConfig?.maxTokens ?? 1024,
+    max_tokens: maxTokensFor(model, input.inferenceConfig?.maxTokens ?? 1024),
     ...(temperature !== undefined && acceptsTemperature(model) ? { temperature } : {}),
     ...(system.length ? { system } : {}),
     messages: input.messages.map(m => ({ role: m.role, content: m.content.map(toContent) })),
@@ -112,6 +122,8 @@ async function converse(input) {
   const content = response.content.flatMap(b => {
     if (b.type === 'text') return [{ text: b.text }];
     if (b.type === 'tool_use') return [{ toolUse: { toolUseId: b.id, name: b.name, input: b.input } }];
+    if (b.type === 'thinking') return [{ reasoningContent: { reasoningText: { text: b.thinking, signature: b.signature } } }];
+    if (b.type === 'redacted_thinking') return [{ reasoningContent: { redactedContent: b.data } }];
     return [];
   });
   const u = response.usage;
@@ -133,7 +145,10 @@ async function invokeModel(input) {
   const body = JSON.parse(typeof input.body === 'string' ? input.body : new TextDecoder().decode(input.body));
   const { anthropic_version: _version, ...rest } = body;
   const model = apiModel(input.modelId);
-  if (!acceptsTemperature(model)) delete rest.temperature;
+  if (!acceptsTemperature(model)) {
+    delete rest.temperature;
+    rest.max_tokens = maxTokensFor(model, rest.max_tokens ?? 1024);
+  }
   const response = await call({ ...rest, model });
   return { body: new TextEncoder().encode(JSON.stringify(response)) };
 }
