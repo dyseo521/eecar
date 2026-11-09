@@ -1211,11 +1211,11 @@
     },
     "externalStatus": [
      {
-      "service": "Amazon Bedrock",
-      "region": "ap-northeast-2",
-      "status": "resolved",
-      "title": "일부 모델 호출 지연",
-      "time": "2026-11-19T11:20:00Z"
+      "provider": "aws",
+      "time": "2026-11-19T11:20:00Z",
+      "severity": "resolved",
+      "title": "[ap-northeast-2] Amazon Bedrock: 일부 모델 호출 지연",
+      "body": ""
      }
     ],
     "code": {
@@ -2889,12 +2889,11 @@
     },
     "externalStatus": [
      {
-      "service": "Amazon Bedrock",
-      "region": "ap-northeast-2",
-      "status": "resolved",
-      "title": "Titan Embeddings 일시 오류율 증가",
+      "provider": "aws",
       "time": "2026-11-20T03:12:00Z",
-      "resolvedAt": "2026-11-20T03:14:00Z"
+      "severity": "resolved",
+      "title": "[ap-northeast-2] Amazon Bedrock: Titan Embeddings 일시 오류율 증가",
+      "body": "resolvedAt: 2026-11-20T03:14:00Z"
      }
     ],
     "code": {
