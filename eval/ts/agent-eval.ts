@@ -19,6 +19,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, resolve } from 'path';
 import { fileURLToPath } from 'url';
+import { runPool } from './run-pool.js';
 
 interface Fixture {
   status?: { invocations: number; errors: number; avgDuration: number };
@@ -362,29 +363,31 @@ async function main(): Promise<void> {
 
   const originalLog = console.log;
   const originalError = console.error;
-  const results = [];
-  for (const scenario of scenarios) {
-    for (let r = 0; r < runs; r++) {
+  const results: any[] = [];
+  const order = new Map(scenarios.map((s, i) => [s.id, i]));
+  const tasks = scenarios.flatMap(scenario => Array.from({ length: runs }, (_, r) => async () => {
       const calls: Call[] = [];
-      console.log = () => {};
-      console.error = () => {};
-      let outcome;
-      try {
-        outcome = await runReActAgent(scenario.message, { userId: 'eval', channelId: 'eval' }, {
+      const outcome = await runReActAgent(scenario.message, { userId: 'eval', channelId: 'eval' }, {
           executeTool: makeTools(scenario, calls, analyzeError, variant === 'baseline'), emit: false, modelOverride: model,
           ...baselineDeps,
           // 운영 v1.9.1에는 현재 시각이 없다. 후보에만 넣는다
           ...(variant === 'candidate' ? { currentTime: scenarioClock(scenario) } : {}),
         });
-      } finally {
-        console.log = originalLog;
-        console.error = originalError;
-      }
       const g = grade(scenario, outcome.response, calls);
       results.push({ id: scenario.id, run: r, source: scenario.source ?? 'v3', code: scenario.code, title: scenario.title, ...g, calls, response: outcome.response, ...(outcome.diagnosis ? { diagnosis: outcome.diagnosis } : {}), metrics: outcome.metrics, steps: outcome.steps });
       originalLog(`${g.pass ? 'pass' : 'FAIL'} ${scenario.id}#${r} cause=${g.cause} fix=${g.fix} noWrong=${g.noWrongClaim} tools=${g.tools} evidence=${g.evidence} turns=${outcome.metrics.turns} $${outcome.metrics.estimatedCostUsd.toFixed(4)}`);
-    }
+  }));
+
+  // 병렬 실행 동안 에이전트 로그를 끈다. 진행 줄은 원래 console로 찍는다
+  console.log = () => {};
+  console.error = () => {};
+  try {
+    await runPool(tasks, Number(arg('concurrency') ?? 1));
+  } finally {
+    console.log = originalLog;
+    console.error = originalError;
   }
+  results.sort((a, b) => order.get(a.id)! - order.get(b.id)! || a.run - b.run);
 
   writeReport(scenarios, results, runs, model, tag, scenarioFile, variant);
 }
