@@ -51,7 +51,6 @@ export function reduceLogs<T extends ReducibleLogEntry>(entries: T[]): { entries
   const before = entries.reduce((n, e) => n + e.message.length, 0);
   const out: T[] = [];
   const seen = new Map<string, { entry: T; count: number; first: string; last: string }>();
-  let dropped = 0;
 
   for (const entry of entries) {
     if (isProblem(entry)) {
@@ -59,7 +58,6 @@ export function reduceLogs<T extends ReducibleLogEntry>(entries: T[]): { entries
       continue;
     }
     if (START_END.test(entry.message)) {
-      dropped++;
       continue;
     }
     const message = compressReport(entry.message) ?? compressEmf(entry.message) ?? entry.message;
@@ -73,7 +71,6 @@ export function reduceLogs<T extends ReducibleLogEntry>(entries: T[]): { entries
     if (prior) {
       prior.count++;
       prior.last = entry.timestamp;
-      dropped++;
       continue;
     }
     const copy = { ...entry };
