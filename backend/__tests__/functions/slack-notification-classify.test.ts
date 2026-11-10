@@ -48,6 +48,22 @@ describe('parseLogEvent', () => {
     expect(type(`ValidationException: Invalid parameter: Subject${stack}`)).toBe('ValidationError');
   });
 
+  it('gives the same hash to the same message logged by different requests', () => {
+    // 회귀 테스트: 'Error: '가 없는 줄은 시각과 요청 ID까지 메시지로 삼아 해시가 매번 달라졌고, 중복 제거가 되지 않았다 (A-49)
+    const line = (time: string, requestId: string) => `${time}\t${requestId}\tERROR\tRaw response: \n`;
+    const first = parseLogEvent({ timestamp: 1, message: line('2026-11-09T12:30:05.874Z', '8e23b68a-9677-41b0-a69c-89c2fe09ee06') }, VECTOR_SEARCH_LOG_GROUP);
+    const second = parseLogEvent({ timestamp: 2, message: line('2026-11-09T12:30:09.320Z', '2ff71f58-da29-4bbd-85e2-97540558bb43') }, VECTOR_SEARCH_LOG_GROUP);
+
+    expect(first.errorMessage).toBe('Raw response:');
+    expect(first.requestId).toBe('8e23b68a-9677-41b0-a69c-89c2fe09ee06');
+    expect(second.errorHash).toBe(first.errorHash);
+  });
+
+  it('keeps different messages apart', () => {
+    const hash = (text: string) => parseLogEvent({ timestamp: 1, message: `2026-11-09T12:30:05.874Z\tabc-123\tERROR\t${text}` }, VECTOR_SEARCH_LOG_GROUP).errorHash;
+    expect(hash('No JSON array found in response: a')).not.toBe(hash('Failed to load index'));
+  });
+
   it('extracts request id, error type and message from a Node.js runtime ERROR line', () => {
     const parsed = parseLogEvent(
       {
