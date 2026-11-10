@@ -199,6 +199,11 @@ describe('production rollout (A-46)', () => {
     ['안녕하세요, 어제부터 검색 결과가 전부 비어 있는데 원인을 찾아 주세요', [], false],
     ['VectorSearch 봐줘', ['get_logs'], false],
     ['기억해 둔 거랑 비교해줘', ['recall_memory', 'get_logs'], false],
+    // 코드, 설정처럼 고정된 값만 조회한 요청은 장애 조사가 아니다 (A-50)
+    ['설명 생성 최대 토큰 수가 코드에 얼마로 설정돼 있어?', ['search_code', 'search_code'], true],
+    ['VectorSearch 타임아웃 몇 초야?', ['get_function_config'], true],
+    ['검색 설명이 잘려서 나와요', ['search_code', 'get_logs'], false],
+    ['VectorSearch 상태 알려줘', ['get_function_status'], false],
   ])('classifies %j with tools %j as conversational=%j', (message, tools, expected) => {
     expect(isConversational(message, tools)).toBe(expected);
   });
@@ -267,6 +272,17 @@ describe('production rollout (A-46)', () => {
     expect(result.response).toBe('안녕하세요!');
     expect(result.diagnosis).toBeUndefined();
     expect(converse).toHaveBeenCalledTimes(1);
+  });
+
+  it('answers a code lookup question in plain text instead of a diagnosis', async () => {
+    // 회귀 테스트: 코드만 조회한 질문에도 진단 제출을 강제해 "장애 아님"으로 답했다 (A-50)
+    const { result, converse } = await run('설명 생성 최대 토큰 수가 코드에 얼마로 설정돼 있어?', [
+      reply([{ toolUse: { toolUseId: 't1', name: 'search_code', input: { query: 'EXPLANATION_MAX_TOKENS' } } }]),
+      reply([{ text: 'backend/src/utils/search-llm.ts에 1800으로 설정되어 있습니다.' }]),
+    ], { requireDiagnosis: true, allowConversation: true });
+    expect(result.response).toBe('backend/src/utils/search-llm.ts에 1800으로 설정되어 있습니다.');
+    expect(result.diagnosis).toBeUndefined();
+    expect(converse).toHaveBeenCalledTimes(2);
   });
 
   it('still requires a diagnosis once the agent has investigated', async () => {

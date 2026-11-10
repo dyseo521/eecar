@@ -111,24 +111,28 @@ const ANALYSIS_MIN_CHARS = 200;
 const SHORT_FINAL_CHARS = 200;
 
 /**
- * 모델이 분석을 쓴 뒤 도구(예: recall_memory)를 한 번 더 부르고 짧은 마무리만 쓰면, 사용자에게 분석이 빠진 답이 갔다.
- * 마지막 답이 짧고 앞 턴에 분석이 있으면 둘을 이어 붙인다.
+ * 기억, 코드, 설정처럼 고정된 값을 조회하는 도구. 로그, 지표, 변경 이력 같은 운영 상태는 보지 않는다.
+ * 이 도구만 쓰고 끝난 요청은 장애 조사가 아니라 조회 질문으로 본다 (A-50)
  */
-const MEMORY_TOOLS = new Set(['recall_memory', 'save_memory']);
+const LOOKUP_TOOLS = new Set(['recall_memory', 'save_memory', 'search_code', 'get_function_config', 'get_function_permissions', 'get_resource_policy']);
 const SMALL_TALK = /^(안녕|하이|ㅎㅇ|hello|hi\b|hey\b|고마워|감사|수고|도움말|help\b|누구(야|세요)|뭐\s*할\s*수)/i;
 const SMALL_TALK_MAX_CHARS = 30;
 const EMPTY_RESPONSE_MESSAGE = '답변을 만들지 못했습니다. 잠시 후 다시 시도해 주세요.';
 
 /**
- * 진단이 아니라 일반 대화인 요청인가. 기억 도구만 썼거나, 도구 없이 끝난 짧은 인사·도움말이면 그렇다.
- * 넓게 잡으면 진단을 건너뛰게 되므로 좁게 둔다. 애매하면 진단으로 처리한다 (A-46)
+ * 진단이 아니라 일반 대화인 요청인가. 조회 도구만 썼거나, 도구 없이 끝난 짧은 인사·도움말이면 그렇다.
+ * 넓게 잡으면 진단을 건너뛰게 되므로 좁게 둔다. 운영 상태를 보는 도구를 하나라도 썼으면 진단으로 처리한다 (A-46, A-50)
  */
 export function isConversational(message: string, toolsUsed: string[]): boolean {
-  if (toolsUsed.length > 0) return toolsUsed.every(t => MEMORY_TOOLS.has(t));
+  if (toolsUsed.length > 0) return toolsUsed.every(t => LOOKUP_TOOLS.has(t));
   const text = message.trim();
   return text.length <= SMALL_TALK_MAX_CHARS && SMALL_TALK.test(text);
 }
 
+/**
+ * 모델이 분석을 쓴 뒤 도구(예: recall_memory)를 한 번 더 부르고 짧은 마무리만 쓰면, 사용자에게 분석이 빠진 답이 갔다.
+ * 마지막 답이 짧고 앞 턴에 분석이 있으면 둘을 이어 붙인다.
+ */
 export function mergeFinalResponse(lastAnalysis: string, finalText: string): string {
   if (!lastAnalysis || finalText.length >= SHORT_FINAL_CHARS || finalText.includes(lastAnalysis)) return finalText;
   return `${lastAnalysis}\n\n${finalText}`;
