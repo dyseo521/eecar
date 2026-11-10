@@ -144,6 +144,9 @@ function extractErrorType(message: string): string {
   return 'Unknown';
 }
 
+/** Lambda Node.js 런타임이 로그 앞에 붙이는 "시각\t요청 ID\t수준\t" */
+const RUNTIME_PREFIX = /^\d{4}-\d{2}-\d{2}T[\d:.]+Z\t[\w-]+\t(?:ERROR|WARN|INFO|DEBUG|TRACE|FATAL)\t/;
+
 function extractErrorMessage(message: string): string {
   // "Error: " 또는 "Exception: " 이후 첫 줄 추출
   const errorMatch = message.match(/(?:Error|Exception): (.+?)(?:\n|$)/);
@@ -157,8 +160,8 @@ function extractErrorMessage(message: string): string {
     return timeoutMatch ? `Lambda timed out after ${timeoutMatch[1]} seconds` : 'Lambda execution timed out';
   }
 
-  // 첫 200자 반환
-  return message.slice(0, 200).trim();
+  // 첫 200자 반환. 시각과 요청 ID를 떼지 않으면 같은 에러도 해시가 매번 달라져 중복 제거가 되지 않는다 (A-49)
+  return message.replace(RUNTIME_PREFIX, '').slice(0, 200).trim();
 }
 
 function extractStackTrace(message: string): string | undefined {

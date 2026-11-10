@@ -159,8 +159,10 @@ export async function generateExplanations(
     response = await generate(buildExplanationPrompt(query, items), EXPLANATION_MAX_TOKENS);
     return parseExplanations(response, items.length);
   } catch (error) {
-    console.error('Batch explanation generation failed:', error);
-    console.error('Raw response:', response.substring(0, 200));
+    // 폴백 한 번이 에러 로그 한 건이 되게 한다. 에러 로그 한 건마다 Slack 알림이 나간다 (A-49).
+    // 호출이 실패하면 응답이 없으므로, 응답 원문은 파싱에 실패했을 때만 같은 로그에 붙인다.
+    const raw = response ? ['Raw response:', response.substring(0, 200)] : [];
+    console.error('Batch explanation generation failed:', error, ...raw);
     return { explanations: new Array(items.length).fill(FALLBACK_REASON), ok: false, fallback: true };
   }
 }

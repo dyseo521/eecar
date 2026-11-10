@@ -132,6 +132,22 @@ describe('explanations', () => {
     expect(result.explanations).toEqual([FALLBACK_REASON, FALLBACK_REASON]);
   });
 
+  it('logs one error per fallback so that one failure raises one alert', async () => {
+    // 회귀 테스트: 호출이 실패하면 빈 "Raw response:" 줄이 하나 더 남아 알림이 두 건씩 나갔다 (A-49)
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    await generateExplanations('q', items, async () => {
+      throw new Error('throttled');
+    });
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(error.mock.calls[0]).not.toContain('Raw response:');
+
+    error.mockClear();
+    await generateExplanations('q', items, async () => '[not json]');
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(error.mock.calls[0]).toEqual(expect.arrayContaining(['Raw response:', '[not json]']));
+    error.mockRestore();
+  });
+
   it('passes the explanation token budget to the generator', async () => {
     const generate = jest.fn(async (_prompt: string, _max: number) => '["a", "b"]');
     await generateExplanations('q', items, generate);
