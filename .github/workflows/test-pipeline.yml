@@ -124,7 +124,8 @@ jobs:
     name: E2E Tests
     needs: [backend-unit, frontend-unit]
     if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
+    # ubuntu-latest가 26.04로 바뀌어 Playwright 1.56이 chromium 설치를 거부한다 (DECISION_LOG A-51)
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
