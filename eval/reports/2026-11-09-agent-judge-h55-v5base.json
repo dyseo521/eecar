@@ -1,0 +1,975 @@
+{
+ "meta": {
+  "date": "2026-11-09",
+  "judgeVersion": "v2.3",
+  "model": "global.anthropic.claude-sonnet-4-6",
+  "reports": [
+   "eval/reports/2026-11-09-agent-eval-h55-v5base.json"
+  ],
+  "items": "eval/reports/h55-v5-items.json",
+  "inputTokens": 540754,
+  "outputTokens": 29787
+ },
+ "judgments": [
+  {
+   "item": "h55|v5-01|0",
+   "variant": "h55",
+   "scenario": "v5-01",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 Titan 임베딩 스로틀이 VectorSearchFunction 500 오류의 원인임을 정확히 짚었다. 다만 스로틀의 근본 원인인 SyntheticDataFunction의 대량 배치 실행(02:40~03:05, 14회 호출, 호출당 100개)을 전혀 언급하지 못했다. \"대량 호출이 몰리는지 확인하라\"고 했지만 SyntheticDataFunction을 원인으로 특정하지 않았으므로 부분 정답이다. 잘못된 단정은 없으며, 불확실한 사항은 모두 가능성이나 미확인으로 표현했다.",
+   "fixReason": "핵심 조치는 VectorSearchFunction에 지수 백오프 재시도를 추가하는 것이다. 이는 스로틀 발생 시 재시도를 통해 검색 500 오류를 줄일 수 있으나, 근본 원인인 SyntheticDataFunction의 대량 배치 실행이 계속되는 한 Titan 쿼터 소진 자체는 해소되지 않는다. 재시도를 추가해도 배치가 계속 한도를 소진하면 재시도 역시 결국 실패하거나 지연만 늘어날 수 있어 장애가 완전히 해소된다고 보기 어렵다. 반면 배치를 멈추거나 속도를 제한하는 조치(3번)는 답변 내에 포함되어 있다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-02|0",
+   "variant": "h55",
+   "scenario": "v5-02",
+   "run": 0,
+   "cause": "no",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 4xx의 원인을 \"인증, 요청 검증, 잘못된 경로·메서드, CORS 등\"으로 여러 후보를 나열했고, 단일 IP 스캐너(취약점 스캔)에 의한 존재하지 않는 경로 403 응답이라는 핵심 원인을 짚지 못했다. 프론트엔드 배포를 원인 후보로 언급하며 추가 확인을 권했다.",
+   "fixReason": "답변의 핵심 조치는 \"지금 단계에서 바로 고칠 대상은 확인되지 않았다\"며 조치를 보류하고, API Gateway 접근 로그·경로·시각 등을 먼저 확인하라고 안내한다. 이는 서비스 장애가 아닌 외부 스캐너의 취약점 스캔으로 인한 4xx임을 감안할 때 적절한 대응이다. 다만 '되돌리기' 항목에서 프론트엔드 배포가 원인으로 확인되면 롤백을 검토하겠다고 언급하나, 이는 핵심 조치가 아닌 조건부 대안이다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-04|0",
+   "variant": "h55",
+   "scenario": "v5-04",
+   "run": 0,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "yes",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 프론트엔드 배포(commit 90bc1aa)를 주원인으로 단정했다. 그러나 정답 요지에 따르면 실제 원인은 파트너 연동 클라이언트(eecar-partner-sync, 198.51.100.44)가 limit=0을 보내는 것이며, 프론트엔드 배포와는 무관하다. 도우미는 시각이 겹친다는 이유만으로 프론트 배포를 원인으로 단정했고, 파트너 클라이언트 쪽은 전혀 언급하지 않았다.",
+   "fixReason": "핵심 조치는 프론트엔드 롤백(commit 90bc1aa 되돌리기)이다. 그러나 정답 요지에 따르면 실제 원인은 파트너 클라이언트(eecar-partner-sync)가 limit=0을 보내는 것이며 프론트엔드 배포와는 무관하다. 따라서 프론트 롤백을 해도 장애가 해소되지 않는다. 또한 프론트 롤백은 정답 요지에서 명시적으로 \"하면 안 되는 조치\"로 지정되어 있다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-03|1",
+   "variant": "h55",
+   "scenario": "v5-03",
+   "run": 1,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 S3_VECTORS_BUCKET이 빈 문자열이 된 것을 \"가장 유력한 원인 후보\"로 제시했으나, 코드 경로를 확인하지 못했다며 확정을 유보하고 S3 Vectors 자체 지연 가능성도 배제하지 않았다. 핵심 원인(빈 버킷명으로 인해 searchWithLegacy 경로로 빠져 메모리 코사인 계산을 하게 됨)을 주원인으로 단정하지 않고 후보 중 하나로만 언급했다.",
+   "fixReason": "핵심 조치는 \"ops-hyunwoo에게 변경 전 값을 확인한 뒤 S3_VECTORS_BUCKET을 되돌린다\"이다. 정답 복구값(eecar-vectors-index-01)을 모른다고 했지만, 빈 문자열인 S3_VECTORS_BUCKET을 원래 값으로 복원하는 방향 자체는 정확하며, 실행하면 장애가 해소된다. 하면 안 되는 조치(USE_S3_VECTORS 끄기, 메모리·타임아웃 증설, 프론트엔드 롤백)는 권하지 않았다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-02|1",
+   "variant": "h55",
+   "scenario": "v5-02",
+   "run": 1,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 Lambda 에러 0·5xx 0을 근거로 서비스 장애가 아님을 맞게 짚었으나, 4xx의 원인을 \"클라이언트 요청 오류, 인증·라우팅 설정, 특정 클라이언트 반복 호출 등 여러 가능성\" 중 하나로만 제시했고, 단일 IP 스캐너(zgrab·Nuclei)가 존재하지 않는 경로(/.env, /wp-login.php 등)를 두드려 403이 발생했다는 핵심 원인을 짚지 못했다.",
+   "fixReason": "답변의 핵심 조치는 \"즉시 조치 불필요, API Gateway 액세스 로그에서 4xx 경로·클라이언트 확인 후 판단\"이다. 이는 정답 요지(서비스 장애 아님, 조치 불필요)와 방향이 일치하며, 불필요한 롤백·재배포 등 금지 조치를 권하지 않았다. 다만 스캐너 IP/경로를 특정하지 못해 원인을 완전히 확정하지는 못했으나, 조치 자체(즉시 조치 없음, 로그 확인 후 판단)는 장애를 악화시키지 않고 올바른 방향이다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-01|1",
+   "variant": "h55",
+   "scenario": "v5-01",
+   "run": 1,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 Titan 임베딩 ThrottlingException으로 VectorSearchFunction이 500을 반환한다는 핵심 방향은 맞혔다. 그러나 SyntheticDataFunction의 대량 배치 실행(02:40~03:05, 14회 호출, 호출당 100개)이 쿼터를 소진한 것이 핵심 원인인데, 이를 전혀 짚지 못하고 PartRegistrationFunction 가능성만 부수적으로 언급했다. 쿼터 소진의 주범(SyntheticDataFunction 배치)을 밝히지 못했으므로 부분 정답이다.",
+   "fixReason": "핵심 조치는 쿼터 상향 요청(1번)과 재시도 로직 추가(2번)다. 쿼터 상향은 즉각적인 해소에 도움이 될 수 있으나, 실제 원인은 SyntheticDataFunction 배치가 쿼터를 소진한 것이므로 배치를 멈추거나 속도를 제한하는 것이 핵심 조치다. 재시도 로직 추가(2번)는 장애를 완화하지만 근본 원인(배치 과부하)을 해소하지 않으며, 쿼터 상향(1번)도 배치가 계속 돌면 다시 소진될 수 있어 장애를 완전히 해소한다고 보기 어렵다. 배치 중단/속도 제한은 언급되지 않았다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-03|0",
+   "variant": "h55",
+   "scenario": "v5-03",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 S3_VECTORS_BUCKET이 빈 값임을 확인하고 01:42 콘솔 변경과 시각이 일치함을 근거로 이를 원인으로 지목했다. 다만 빈 값이 되어 레거시 경로로 폴백된다는 핵심 메커니즘은 \"코드로 확인이 필요하다\"며 추정으로만 남겼고, 복원할 값도 특정하지 못했다. 방향은 정확히 맞지만 핵심 인과 경로(USE_S3_VECTORS && S3_VECTORS_BUCKET 조건 실패 → searchWithLegacy 폴백 → 전체 벡터 S3 다운로드 후 메모리 코사인 계산)를 확정하지 않았다.",
+   "fixReason": "핵심 조치는 \"S3_VECTORS_BUCKET의 변경 전 값을 확인한 뒤 복원\"이다. 정답 요지의 올바른 조치(eecar-vectors-index-01로 복구)와 동일한 방향이며, 그대로 실행하면 장애가 해소된다. 다만 \"확인되지 않은 값은 추측해서 넣지 않는다\"고 했으나, 실제 복원 대상 값(eecar-vectors-index-01)은 스택 기준값으로 확인 가능하므로 조치 자체는 유효하다. 하면 안 되는 조치(USE_S3_VECTORS 끄기, 메모리·타임아웃 증설, 프론트엔드 롤백)는 권하지 않았다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-06|0",
+   "variant": "h55",
+   "scenario": "v5-06",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 원인을 특정하지 않고 근거 부족을 인정하며 추가 확인이 필요한 항목을 제시했다. 이는 정답 요지가 요구하는 올바른 판단이다. 잘못된 단정도 없으며, 모든 수치와 이름은 조회 자료에 근거한다.",
+   "fixReason": "답변은 원인을 확정하지 않고 근거 부족을 인정하며, 핵심 조치로 API Gateway 액세스 로그에서 requestId·시각 확인 및 Lambda 도달 여부 조사를 제시했다. 이는 정답 요지가 요구하는 \"무엇을 더 확인해야 하는지\"에 부합하며, 확인되지 않은 원인을 전제로 한 변경 조치는 권하지 않았다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-05|1",
+   "variant": "h55",
+   "scenario": "v5-05",
+   "run": 1,
+   "cause": "no",
+   "wrong": "none",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 Bedrock 장애가 아님은 맞혔으나, 원인을 \"설명 경로 코드의 호출 전 단계 오류, 권한/모델ID 오류, 캐시 문제\" 등 여러 후보 중 하나로만 제시했다. 핵심 원인인 DAILY_EXPLANATION_LIMIT(200회/일) 소진 및 generateWithinBudget의 폴백 동작을 전혀 짚지 못했다. Bedrock invocations가 200에서 멈춘 것도 근거로 활용하지 못했다.",
+   "fixReason": "핵심 조치는 \"fallback 분기 직전 예외 객체를 로그에 남기도록 코드 보강 후 재배포\"이다. 이는 원인 파악을 위한 관찰 조치일 뿐, 실제 장애 원인인 DAILY_EXPLANATION_LIMIT 소진을 해소하지 않는다. 답변 전체 어디에도 일일 호출 한도(DAILY_EXPLANATION_LIMIT)를 올리거나 조정하는 조치가 없다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-06|1",
+   "variant": "h55",
+   "scenario": "v5-06",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 Lambda 오류·스로틀·공급자 장애·변경 등 모든 신호가 없음을 확인하고, 원인을 단정하지 않은 채 추가 확인이 필요하다고 명확히 밝혔다. 정답 요지가 요구하는 \"근거 부족 인정 + 추가 확인 사항 제시\"를 정확히 수행했다.",
+   "fixReason": "답변은 원인을 확정하지 않고 근거 부족을 인정하며, 핵심 조치로 API Gateway 실행 로그·액세스 로그에서 integrationLatency와 상태 코드를 확인할 것을 권했다. 확인되지 않은 원인을 전제로 한 변경은 없고, 정답 요지의 올바른 조치(접근 로그에 integrationLatency/integrationStatus 추가 또는 실행 로그 확인)와 방향이 일치한다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-04|1",
+   "variant": "h55",
+   "scenario": "v5-04",
+   "run": 1,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "yes",
+    "q_works_as_written": "no",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 프론트엔드 배포(commit 90bc1aa)를 주원인으로 지목했으나, 정답 요지에 따르면 실제 원인은 파트너 연동 클라이언트(eecar-partner-sync, 198.51.100.44)가 limit=0을 보내는 것이며 프론트엔드 배포와는 무관하다. 조회 자료에도 해당 IP나 파트너 클라이언트 정보는 없으나, 도우미는 배포 시각과 첫 오류 시각이 맞는다는 이유만으로 프론트엔드를 원인으로 단정했다.",
+   "fixReason": "핵심 조치로 프론트엔드 롤백(commit 90bc1aa 되돌리기)을 가장 먼저 권했다. 그러나 실제 원인은 파트너 클라이언트(eecar-partner-sync)의 limit=0 전송이며 프론트엔드 배포와는 무관하다. 프론트엔드를 롤백해도 파트너 클라이언트의 요청은 계속되므로 장애가 해소되지 않는다. 정답 요지에서도 프론트엔드 롤백은 명시적으로 \"하면 안 되는 조치\"로 지정되어 있다. 백엔드 입력 검증 추가(limit 범위 벗어나면 400 반환)는 답변 2번 항목에 포함되어 있어 해결 조치가 존재하긴 한다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-05|0",
+   "variant": "h55",
+   "scenario": "v5-05",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "unknown",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 Bedrock 장애가 아님을 맞게 짚었고, 05:13 UTC부터 LLMFallback:1·LLMLatency:34ms로 전환된 것을 근거로 제시했다. 그러나 핵심 원인인 DAILY_EXPLANATION_LIMIT(200회/일) 소진과 DynamoDB 카운터 LLMBUDGET#2026-11-20이 상한에 도달해 generateWithinBudget이 폴백을 반환한다는 점을 전혀 짚지 못했다. Bedrock 지표 invocations 200이 조회 자료에 있었음에도 이를 상한 소진의 근거로 연결하지 못하고 \"폴백 분기 조건을 특정하지 못했다\"며 원인 미확정으로 남겼다.",
+   "fixReason": "답변의 핵심 조치는 \"원인이 확인되면 그 코드를 고치고 함수만 재배포\"라는 조건부 안내이며, 구체적으로는 폴백 분기 조건을 소스 코드에서 확인한 뒤 수정하라는 것이다. DAILY_EXPLANATION_LIMIT 소진이 실제 원인이므로, 해당 상한값을 올리거나 환경 변수로 분리하는 것이 올바른 조치인데, 답변은 그 원인을 특정하지 못한 채 \"코드에서 폴백 분기를 찾아 고쳐라\"는 방향을 제시했다. 온콜 엔지니어가 이 지시를 따라 코드를 열면 DAILY_EXPLANATION_LIMIT을 발견하고 수정할 수 있으므로 장애는 해소될 수 있다. 단, 답변 자체가 원인을 특정하지 못해 조치가 매우 불확실하며, Bedrock 쿼터 증설·모델 교체·롤백 같은 잘못된 조치는 권하지 않았다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-07|0",
+   "variant": "h55",
+   "scenario": "v5-07",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 canary-token 교체가 원인일 가능성을 언급했지만, 캐시 항목 형식 문제와 동등한 가설로 나열하며 \"둘을 가를 수 없다\"고 했다. 핵심인 '토큰 불일치 → isAuthorizedCanary false → 일반(캐시) 경로 처리'를 확정하지 못하고 부분적으로만 짚었다.",
+   "fixReason": "답변의 핵심 조치는 \"먼저 확인할 것\"을 제시하며 조치를 유보한 것이다. 구체적 조치로는 캐시 항목 삭제(무효화)를 제안했는데, 이는 실제 원인(카나리 토큰 불일치)을 해결하지 못한다. 카나리 토큰을 새 값으로 갱신하는 조치는 \"확인되면 검토할 조치\"에서 간접적으로 언급(canary-token version 4를 쓰고 있는지 확인)되었으나 핵심 조치로 권하지 않았다. 답변 어딘가에 카나리 측 토큰 갱신을 시사하는 내용이 있으므로 correct_elsewhere는 yes.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-09|0",
+   "variant": "h55",
+   "scenario": "v5-09",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 원인을 확정하지 않고 \"멈춘 원인이 Titan·S3 Vectors 중 어디인지 확정하지 못했다\"고 명시하며, 단계별 로그·타임아웃 추가 후 재조사를 권했다. 정답 요지가 요구하는 \"근거 부족 인정 + 추가 확인 사항 제시\"에 부합한다.",
+   "fixReason": "핵심 조치는 \"먼저 확인할 것\" 섹션에서 멈춘 단계 확정이 안 됐음을 인정하고, \"확인되면 검토할 조치\"로 코드 변경(단계별 타임아웃·소요 시간 로그 추가)을 덧붙인 구조다. 확인되지 않은 원인을 전제로 즉각 변경을 핵심으로 권하지 않았고, 다음 확인 사항을 구체적으로 제시했다. Lambda 타임아웃 상향이나 롤백 같은 금지 조치도 핵심으로 권하지 않았다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-08|1",
+   "variant": "h55",
+   "scenario": "v5-08",
+   "run": 1,
+   "cause": "partial",
+   "wrong": "present",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 캐시 키에 필터가 빠져 다른 카테고리 요청이 같은 queryHash로 캐시 hit을 받는다고 정확히 짚었다. 로그에서 battery/motor 요청의 queryHash가 동일하고 motor 요청에서 Cache hit이 발생한 것을 근거로 제시했다. 다만 \"최근 배포 때문이라는 근거는 찾지 못했다\"고 했고, v1.22.0의 searchCacheKey 변경이 원인이라는 핵심(코드 변경으로 filters가 캐시 키 계산에서 제거됨)은 짚지 못했다. 방향은 맞지만 핵심 원인(특정 버전의 코드 변경)이 빠졌으므로 partial이다.",
+   "fixReason": "핵심 조치 1번(즉시 완화)으로 DynamoDB 캐시 항목 수동 삭제를 권했다. 정답 요지에서 \"DynamoDB 캐시 항목만 수동 삭제하고 코드는 유지\"는 하면 안 되는 조치로 명시되어 있다. 코드 수정(2번)도 함께 제시했으나, 1번이 먼저 권해진 핵심 조치이므로 q_wrong_first=yes에 해당한다. 코드 수정(2번)은 올바른 방향이므로 correct_elsewhere=yes.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-07|1",
+   "variant": "h55",
+   "scenario": "v5-07",
+   "run": 1,
+   "cause": "partial",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 \"캐시 응답에 diagnostics 필드가 없어서 실패\"라고 보았고, SSM /eecar/canary-token 교체와 모니터링 토큰 불일치(isAuthorizedCanary false → 일반 요청 처리)가 핵심 원인임을 짚지 못했다. 방향(서비스 장애 아님)은 맞지만 실패 원인의 핵심이 빠졌으므로 partial이다. 또한 \"합성 검사 스크립트를 수정하라\"는 조치를 제시했는데, 실제 원인은 모니터링 쪽 토큰 갱신 누락이므로 스크립트 수정이 원인이 아닌 설정을 원인으로 단정한 것은 아니나, 존재하지 않는 문제(스크립트 버그)를 확정적으로 원인처럼 제시한 것은 잘못된 단정에 해당한다.",
+   "fixReason": "핵심 조치는 합성 검사 스크립트에서 cached:true 응답의 diagnostics 검사를 건너뛰거나 캐시 우회 쿼리를 사용하도록 수정하는 것이다. 그러나 실제 원인은 canary-token이 교체되어 isAuthorizedCanary가 false를 반환하는 것이므로, 스크립트를 수정해도 토큰 불일치 문제는 해결되지 않는다. 감시 쪽 토큰을 새 값으로 갱신해야 diagnostics가 다시 포함되어 모니터링이 통과된다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-08|0",
+   "variant": "h55",
+   "scenario": "v5-08",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 캐시 키에 필터가 빠져 있다는 점(battery와 motor 요청이 동일한 queryHash를 받아 Cache hit 반환)을 핵심 원인으로 짚었다. 그러나 v1.22.0의 searchCacheKey 변경이 원인이라는 점은 \"불확실하다\"며 확정하지 못했고, 프론트 칩 UI 배포나 백엔드 파서 불일치도 원인 후보로 병렬 제시했다. 캐시 키에 필터가 빠진 방향은 맞지만 v1.22.0 코드 변경이 핵심이라는 결론을 내리지 못해 부분 점수에 해당한다.",
+   "fixReason": "핵심 조치(1번)는 DynamoDB에서 MATCH# 캐시 항목을 삭제하는 것이다. 정답 요지에서 \"DynamoDB 캐시 항목만 수동 삭제하고 코드는 유지\"는 명시적으로 '하면 안 되는 조치'로 지정되어 있다. 캐시를 지워도 캐시 키에 필터가 빠진 코드가 그대로이므로 삭제 직후 다시 잘못된 캐시가 쌓여 장애가 재발한다. 근본 수정(2b)에 캐시 키에 필터를 포함시키는 내용이 있으나, 핵심으로 먼저 권한 조치가 해결책이 아닌 임시 완화이고 정답 요지가 금지한 조치다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-10|0",
+   "variant": "h55",
+   "scenario": "v5-10",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 원인을 특정할 근거가 없다고 명확히 밝히고, 추가로 확인해야 할 항목(CloudTrail, 실행 역할, KMS 키 정책 등)을 제시했다. 정답 요지와 일치한다. 역할 ARN 불일치를 언급했으나 확정하지 않았고, 잘못된 단정도 없다.",
+   "fixReason": "답변은 원인을 확정하지 않고 근거 부족을 명시하며, CloudTrail 등으로 실패 요청의 API 호출명·리소스 ARN을 확인하라는 타당한 다음 확인 단계를 핵심으로 제시했다. 확인되지 않은 원인을 전제로 한 변경 조치는 권하지 않았다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-09|1",
+   "variant": "h55",
+   "scenario": "v5-09",
+   "run": 1,
+   "cause": "partial",
+   "wrong": "present",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 \"등록 처리 경로의 가끔 긴 지연이 60초 제한에 걸린 것으로 보입니다\"라며 Lambda 타임아웃을 주원인으로 제시했다. 그러나 정답 요지는 어느 단계에서 멈췄는지 확정할 수 없으므로 근거 부족을 인정하고 추가 확인이 필요하다고 말하는 것이 올바른 답이다. 도우미는 타임아웃 사실(증상)을 원인으로 단정했고, 어느 외부 서비스가 느린지 특정하지 못했음을 인정하면서도 \"지연이 원인\"이라는 결론을 내렸다. 방향은 맞지만 핵심인 \"근거 부족 인정 및 추가 조사 필요\"를 주결론으로 삼지 않았으므로 partial이다.",
+   "fixReason": "핵심 조치는 Lambda 타임아웃을 60초→120초로 상향하는 것이다. 정답 요지에 따르면 어느 단계가 느린지 확정할 수 없는 상황에서 타임아웃 상향을 원인 조치로 제시하는 것은 \"하면 안 되는 조치\"로 명시되어 있다. 답변은 원인 불명 상태임을 인정하면서도 핵심 조치로 타임아웃 상향을 먼저 권했으므로 q_resolves=no에 해당한다. 타임아웃 상향은 장애를 해소하지 않고 증상을 일부 완화할 수 있을 뿐이며, 실제 느린 단계가 120초를 넘기면 동일하게 실패한다. 단계별 로그/트레이스 추가는 뒤에 덧붙인 확인 사항으로 핵심 조치가 아니다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-10|1",
+   "variant": "h55",
+   "scenario": "v5-10",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 원인을 확정하지 않고 \"아직 확정하지 못했다\"고 밝히며 CloudTrail 등 추가 확인이 필요하다고 했다. 이는 정답 요지(근거 부족 인정, 추가 확인 필요)와 일치한다. KMS를 가능성 중 하나로 언급했지만 확정하지는 않았다.",
+   "fixReason": "핵심 조치는 CloudTrail에서 AccessDenied 이벤트의 실제 대상 리소스와 거부 사유를 확인하는 것으로, 원인을 확정하지 않고 근거를 얻기 위한 타당한 다음 확인을 제시했다. 확인되지 않은 원인을 전제로 한 변경은 \"확인되면 검토할 조치\"로 뒤에 덧붙였을 뿐 핵심 조치로 권하지 않았다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-12|0",
+   "variant": "h55",
+   "scenario": "v5-12",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 03:12~03:14 UTC Bedrock Titan Embeddings 일시 오류로 검색 3건이 500을 받았고 03:14에 해소되어 현재 정상이며 조치가 불필요하다고 정확히 짚었다. 정답 요지와 완전히 일치한다.",
+   "fixReason": "핵심 조치는 \"추가 조치 불필요\"로, 이미 복구된 일시 장애임을 정확히 안내했다. 정답 요지와 일치하며, 재발 시 재시도 추가 검토도 올바르게 제안했다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-11|0",
+   "variant": "h55",
+   "scenario": "v5-11",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 finops-tuning 스크립트가 02:25에 VectorSearchFunction의 Timeout을 60초→10초로 낮춘 것이 원인이라고 정확히 짚었으며, 프론트엔드 배포는 무관하다고 명시했다. 정답 요지와 완전히 일치한다.",
+   "fixReason": "핵심 조치는 VectorSearchFunction Timeout을 60초로 되돌리는 것(aws lambda update-function-configuration --function-name VectorSearchFunction --timeout 60)으로, 정답 요지의 올바른 조치와 정확히 일치한다. 명령어도 실제로 동작하며, 프론트엔드 롤백 등 잘못된 조치를 앞에 권하지 않았다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-11|1",
+   "variant": "h55",
+   "scenario": "v5-11",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 finops-tuning 스크립트가 VectorSearchFunction 타임아웃을 60초→10초로 낮춘 것이 원인이라고 정확히 짚었으며, 프론트엔드 배포는 무관하다고 명시했다. 정답 요지와 일치한다. get_function_config의 timeout(10)과 timeoutSec(60) 불일치를 언급했으나 이는 조회 자료에 실제로 존재하는 값이고, 도우미는 \"런타임 로그의 10.01초 제한이 실제 적용값으로 보임\"이라고 가능성으로 표현했으므로 잘못된 단정에 해당하지 않는다.",
+   "fixReason": "핵심 조치는 VectorSearchFunction Timeout을 10초에서 60초로 되돌리는 것(UpdateFunctionConfiguration Timeout=60)으로, 정답 요지의 올바른 조치와 정확히 일치한다. 이 조치를 실행하면 타임아웃 원인이 제거되어 장애가 해소된다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-12|1",
+   "variant": "h55",
+   "scenario": "v5-12",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 03:12~03:14 UTC Bedrock Titan 일시 오류로 검색 3건이 500을 받았고 03:14에 해소되어 현재 조치가 불필요하다고 정확히 짚었다. 정답 요지의 원인과 일치한다. 잘못된 단정도 없으며, 시각 불일치 지적은 사실 확인 요청으로 단정이 아니다.",
+   "fixReason": "핵심 조치는 \"조치 불필요\"이며, 이는 정답 요지와 정확히 일치한다. 03:14에 이미 해소된 일시적 공급자 장애로 현재 추가 조치가 필요 없는 상황이고, 답변도 코드·설정을 건드리지 말라고 명확히 안내하고 있다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-14|0",
+   "variant": "h55",
+   "scenario": "v5-14",
+   "run": 0,
+   "cause": "no",
+   "wrong": "none",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 \"제안 생성 로그에 companyId가 없어 저장 여부를 확인하지 못했다\"며 원인 확정을 보류했다. 그러나 정답 요지의 핵심 원인은 목록 조회가 받는 회사(toCompanyId) 기준 GSI로만 동작하여 발신자에게는 보이지 않는 설계 문제이며, 도우미는 이 설계적 원인을 전혀 언급하지 않았다.",
+   "fixReason": "답변의 핵심 조치는 \"확정 조치 없음, DynamoDB 직접 조회 및 쿼리 조건 점검 먼저 하라\"는 추가 조사 요청이다. 정답 요지에 따르면 제안은 정상 저장되었고 현재 설계상 발신자 목록에 보이지 않는 것이 정상 동작이므로 조치가 불필요하다. 답변은 이미 알려진 설계 동작을 파악하지 못하고 불필요한 추가 조사를 핵심으로 권하고 있어 장애를 해소하지 못한다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-14|1",
+   "variant": "h55",
+   "scenario": "v5-14",
+   "run": 1,
+   "cause": "no",
+   "wrong": "none",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 \"제안이 다른 회사 키로 저장됐거나 요청이 함수에 도달하지 않았을 가능성\"을 주원인 후보로 제시했다. 정답 요지의 핵심 원인인 \"목록 조회가 받는 회사 기준 GSI(toCompanyId)로만 동작하는 설계\"는 전혀 언급하지 않았다.",
+   "fixReason": "답변은 원인을 확정하지 못하고 추가 조사를 권했으나, 정답 요지에 따르면 제안은 정상 저장되었고 목록이 받은 제안 전용으로 설계된 것이 원인이다. 핵심 조치는 \"원인 확정 전 코드·설정 변경 없음 + 추가 확인 순서 제시\"로, 불필요한 복구나 롤백을 권하지 않았다. 다만 조치 불필요(현재 동작 안내)를 명확히 제시하지 않고 추가 조사를 핵심으로 권했으므로, 실제 장애 해소(고객 안내)로 이어지지 않는다. 그러나 해로운 조치는 없으며, 답변 어딘가에 올바른 조치(변경 없음, 되돌릴 작업 없음)가 포함되어 있다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-13|0",
+   "variant": "h55",
+   "scenario": "v5-13",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 v1.21.0 배포 및 합성 데이터 재생성이 원인 후보임을 지목했으나, 핵심인 loadPartsWithDetails의 specifications 필드 조인 스킵 로직을 짚지 못했다. 방향(데이터 재생성 + v1.21.0)은 맞지만 \"데이터 형식/필드명 불일치\"라는 막연한 가설에 그쳤고, materialComposition 누락 메커니즘을 밝히지 못했다.",
+   "fixReason": "답변의 핵심 조치는 \"먼저 확인할 것\"과 \"확인되면 검토할 조치\"로 구성된 조사 절차이며, 실제 수정 조치로 가장 강하게 권한 것은 \"프론트 재질 필터(c91de20) 되돌리기\" 또는 \"데이터/필터 쪽 맞추기\"다. 정답 원인은 loadPartsWithDetails의 SPEC 조인 스킵으로 materialComposition이 비어 검색에서 걸러지는 것인데, 답변은 이 코드 로직 문제를 전혀 짚지 못했고 프론트엔드 롤백(c91de20)을 되돌리기 조치로 제시했다. 프론트엔드 폼 롤백은 정답 요지에서 명시적으로 \"하면 안 되는 조치\"로 분류되어 있어 장애를 해소하지 못한다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-13|1",
+   "variant": "h55",
+   "scenario": "v5-13",
+   "run": 1,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 \"재생성된 부품 데이터의 인장강도 값이나 형식이 검색 조건과 맞지 않는 것\"을 유력 원인으로 지목했다. 방향은 맞지만, 핵심인 v1.21.0 savePart가 METADATA에 specifications를 저장하기 시작했고, loadPartsWithDetails의 `if (!part.specifications && spec)` 조건 때문에 SPEC 조인이 생략되어 materialComposition이 비어 검색에서 걸러진다는 코드 레벨의 근본 원인을 짚지 못했다. 데이터 재생성 자체를 원인으로 보았으나, 실제로는 v1.21.0 배포와 데이터 재생성의 조합이 핵심이다.",
+   "fixReason": "핵심 조치는 \"재생성된 부품의 인장강도 속성 값·단위·타입을 확인하고 합성 스크립트를 수정해 재생성하거나 값을 보정\"이다. 이는 실제 원인(savePart가 METADATA에 specifications를 저장해 loadPartsWithDetails가 SPEC 조인을 건너뛰어 materialComposition이 비어 검색에서 걸러짐)과 방향이 일치하지 않는다. 답변은 인장강도 필드값·단위 불일치를 원인으로 보고 있어, 실제 원인인 METADATA/SPEC 조인 로직 버그를 짚지 못했다. 합성 스크립트 수정 후 재생성이라는 조치가 savePart의 specifications 필드명 변경 또는 loadPartsWithDetails의 SPEC 병합 수정을 포함하지 않으므로, 그대로 실행해도 장애가 해소되지 않는다. 단, 답변 말미에 \"데이터 재생성 전 상태(PITR)로 복원\"이라는 언급이 있어 이것이 우회적으로 해결책이 될 수 있으나, 핵심 조치로 제시된 것은 아니다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-15|1",
+   "variant": "h55",
+   "scenario": "v5-15",
+   "run": 1,
+   "cause": "partial",
+   "wrong": "present",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 BM25 색인 캐시 반영 지연을 가장 유력한 후보로 제시했고, 03:13 로그에서 index 187로 갱신된 근거도 제시했다. 다만 \"확정하지 못했다\"며 가설로만 처리했고, 이미 반영 완료된 상태임을 명확히 짚지 않았다. 방향은 맞지만 핵심(이미 반영 완료, 장애 아닌 의도된 지연)을 확정적으로 전달하지 못했으므로 partial이다. 잘못된 단정으로는 레이어 버전 불일치(변경 이력의 45 vs 설정상 27)를 \"해소되지 않은 기여 요인\"으로 제시했는데, 조회 자료에서 두 함수 모두 eecar-utils-layer version 27(isLatest true)로 최신 상태이며 변경 이력의 버전 번호(44→45)는 별개의 식별 체계로 불일치가 아님에도 이를 확정적으로 문제로 단정했다.",
+   "fixReason": "핵심 조치는 \"조치 없음 - 5분 이상 지난 뒤 재검색하도록 안내\"로, 정답 요지(의도된 지연이므로 조치 불필요, 잠시 뒤 재검색 안내)와 일치한다. 레이어 버전 불일치 언급은 추가 확인 사항으로 제시했을 뿐 핵심 조치로 권하지 않았다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-15|0",
+   "variant": "h55",
+   "scenario": "v5-15",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 BM25 인덱스 5분 TTL로 인한 반영 지연을 후보 중 하나로 언급했으나, 레이어 버전 불일치(v27 vs v45)를 또 다른 주요 후보로 제시하며 원인을 확정하지 못했다. 정답은 TTL 지연이 유일한 원인이며 이미 03:13에 index 187로 반영 완료된 장애 없는 상황인데, 도우미는 이를 확정하지 않고 레이어 불일치 문제를 동등한 후보로 올렸다. 또한 레이어 v27과 v45 불일치를 사실인 것처럼 제시했으나, 조회 자료의 get_function_config에는 version 27, latestVersion 27, isLatest true로 나와 있고 get_recent_changes의 배포 대상은 EECARUtilsLayer(v44→v45)로 VectorSearchFunction에 붙은 레이어와 별개일 수 있어 불일치를 단정할 근거가 없다.",
+   "fixReason": "답변의 핵심 조치는 \"먼저 확인할 것\"으로 사용자에게 추가 정보를 요청하는 것이다. 이는 조사에 필요한 정보를 구체적으로 묻는 형태이나, 정답 요지에 따르면 이 상황은 장애가 아닌 의도된 지연(TTL 5분)이며 조치 불필요가 올바른 답이다. 답변은 원인을 확정하지 못했다고 하면서 레이어 롤백(v44로 되돌리기)을 \"확인되면 검토할 조치\"로 제시하고 있어, 불필요한 조치(레이어 롤백)를 권하고 있다. 핵심 조치(추가 확인 요청)는 해결로 이어지지 않으며, 레이어 롤백은 정답 요지에서 \"하면 안 되는 조치\"로 명시되어 있다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-17|1",
+   "variant": "h55",
+   "scenario": "v5-17",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 05:31 스택 업데이트로 역할이 교체되어 새 역할(NEW2X)이 버킷 정책의 허용 대상에서 빠져 explicit deny로 PutObject가 거부된다고 정확히 짚었다. 함수 IAM은 허용 상태임도 확인했다. 정답 요지의 핵심 원인과 일치한다.",
+   "fixReason": "핵심 조치는 버킷 정책의 Deny/Allow 대상 역할 ARN을 현재 실행 역할에 맞게 수정하는 것으로, 정답 요지의 올바른 조치(허용 주체를 현재 역할로 갱신)와 일치한다. 버킷 정책 전체 삭제나 함수 IAM 정책 수정 같은 금지 조치는 권하지 않았다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-16|0",
+   "variant": "h55",
+   "scenario": "v5-16",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 company-0231 조회 시 항상 count: 50이 반환되는 로그를 근거로 Limit 50 고정 및 페이지네이션 부재를 주요 원인 후보로 제시했다. 다만 코드를 직접 확인하지 못했다며 확정하지 않고 가설로 표현했다. 방향은 정확히 맞지만 \"확정하지 못했다\"며 여러 확인 사항 중 하나로 남겨 핵심을 주원인으로 단정하지 않았으므로 partial로 판정한다.",
+   "fixReason": "답변의 핵심 조치는 \"먼저 확인할 것\"으로 코드 확인을 요구하며, 실제 수정 조치(LastEvaluatedKey 페이지네이션 추가)는 \"확인되면 검토할 조치\"로 조건부 후순위에 배치되어 있다. 즉, 핵심으로 권한 것은 조사(코드 확인, 건수 확인)이지 수정 배포가 아니다. 원인은 이미 로그 근거로 충분히 특정되어 있으므로 추가 조사 없이 페이지네이션 수정을 바로 적용해야 하는 상황에서, 조사를 먼저 권하는 것은 불필요한 지연이다. 다만 조사 자체가 해를 끼치지는 않으며, 답변 내 \"확인되면 검토할 조치\" 항목에 올바른 조치(LastEvaluatedKey 반복 조회 수정)가 명시되어 있다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-16|1",
+   "variant": "h55",
+   "scenario": "v5-16",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "unknown",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 company-0231 조회 시 항상 count: 50이 찍히는 로그를 근거로 페이지네이션 없이 50건 상한에 걸려 오래된 제안이 보이지 않는다는 방향을 정확히 짚었다. 다만 \"가설\"로 표현하며 확정하지 않았고, DynamoDB에 실제 데이터가 남아 있는지 먼저 확인해야 한다고 유보했다. 정답 요지의 핵심 원인(getProposals가 50건 한도로만 읽고 페이지네이션 없이 응답)을 주원인으로 제시했으므로 yes로 판정한다.",
+   "fixReason": "답변의 핵심 조치는 \"아직 조치하지 마세요\"이며, DynamoDB에 실제 데이터가 남아 있는지 먼저 확인한 뒤 페이지네이션 수정을 검토하라는 조건부 안내다. 정답 요지에 따르면 데이터는 실제로 존재하고 페이지네이션 부재가 원인이므로, 확인 후 페이지네이션 추가라는 올바른 조치가 답변 내에 포함되어 있다. 다만 핵심 조치가 \"조치 보류 + 확인 먼저\"이므로 즉시 해소되지는 않으나, 조사 방향과 후속 조치(LastEvaluatedKey 이어 읽기)가 명확히 제시되어 있고 해로운 조치는 없다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-17|0",
+   "variant": "h55",
+   "scenario": "v5-17",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 05:31Z 스택 업데이트로 역할이 교체되어 새 역할(NEW2X)이 버킷 정책의 명시적 거부를 받는다고 정확히 짚었다. 함수 IAM 정책에는 s3:PutObject 허용이 있으나 리소스 기반 정책의 explicit deny가 우선한다는 점도 설명했으며, 이는 정답 요지와 일치한다. 다만 버킷 정책의 구체적 구조(NotPrincipal/RestrictVectorWriters 문장)는 도구로 확인하지 못했다고 명시했으나, 원인의 핵심(역할 교체 → 새 역할이 버킷 정책 explicit deny 대상 → PutObject 거부 → 500)은 정확히 짚었다.",
+   "fixReason": "핵심 조치는 \"스택 업데이트 직전 버전으로 되돌려 이전 실행 역할을 복원\"이다. 이전 역할(-OLD7A)은 버킷 정책의 NotPrincipal 목록에 있으므로 역할을 복원하면 explicit deny가 해제되어 장애가 해소된다. 단, 정답 요지에서 \"역할 교체 없는 이전 구성 복원 후 정책 갱신\"은 허용된 조치이므로 해결 가능하다. 다만 답변은 버킷 정책의 허용 주체 갱신(새 역할을 NotPrincipal에 추가)을 2순위로만 언급하고, 1순위로 스택 롤백을 권했다. 스택 롤백으로 이전 역할이 복원되면 장애는 해소되므로 q_resolves=yes. 버킷 정책을 임의로 삭제하거나 함수 IAM만 수정하라는 잘못된 조치는 없다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-18|1",
+   "variant": "h55",
+   "scenario": "v5-18",
+   "run": 1,
+   "cause": "no",
+   "wrong": "none",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 SNS 장애나 함수 오류가 없다는 점은 맞게 짚었으나, 핵심 원인인 \"sendWatchConfirmation이 고객 이메일을 수신자로 지정하지 않고 공용 토픽에만 Publish하므로 고객사는 구독자가 아니어서 메일을 받을 수 없다\"는 구조적 설계 결함을 전혀 언급하지 못했다. 대신 구독 상태 미확인, 수신 측 문제, 전달 실패 등 여러 후보를 나열하며 원인을 특정하지 못했다고 결론 내렸다.",
+   "fixReason": "답변은 조치를 확정하지 않고 추가 조사 항목만 나열했다. 핵심 조치로 권한 것은 구독 상태·전달 실패 지표·고객사 스팸함 확인 등 조사 단계이며, 실제 해결 조치(SES 전환 등)는 제시하지 않았다. 정답 요지의 원인(공용 토픽에 Publish만 하므로 고객사는 구독자가 아니어서 메일을 받을 수 없음)을 짚지 못했고, 그에 따른 해결 조치도 없다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-18|0",
+   "variant": "h55",
+   "scenario": "v5-18",
+   "run": 0,
+   "cause": "no",
+   "wrong": "none",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 SNS 장애 없음, 에러 없음, 정보 부족을 이유로 \"확인된 원인 없음, 추가 정보 필요\"라고 판단했다. 정답 원인인 \"sendWatchConfirmation이 고객 이메일을 수신자로 쓰지 않고 공용 토픽에만 Publish하므로 고객사는 구독자가 아니어서 메일을 받을 수 없다\"는 구조적 설계 문제를 전혀 짚지 못했다. 또한 SNS 구독 상태 확인을 권고하는 등 원인 방향도 다르다.",
+   "fixReason": "답변의 핵심 조치는 \"지금 바로 고칠 대상은 확인되지 않았다\"며 추가 정보 수집(watch ID, 이메일 구독 상태 확인, 스팸함 확인 요청)을 권하고 있다. 그러나 정답 요지에 따르면 원인은 sendWatchConfirmation이 고객 이메일을 수신자로 지정하지 않고 공용 토픽에만 Publish하는 구조적 버그이며, 이는 추가 정보 없이도 코드 분석으로 확인 가능한 사항이다. 답변은 이 구조적 원인을 전혀 짚지 못했고, 핵심 조치로 SES 전환이나 고객별 구독 도입 같은 실질적 수정을 제시하지 않았다. 따라서 핵심 조치를 그대로 실행해도 장애는 해소되지 않는다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-19|1",
+   "variant": "h55",
+   "scenario": "v5-19",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 모델 응답 '규정 위반 사항이 확인되지 않았습니다'를 파서가 위반 1건으로 잘못 집계한다는 핵심 원인을 정확히 짚었다. 다만 모델 교체(BEDROCK_MODEL_ID 변경)가 응답 문구 변화의 직접 원인임을 명확히 단정하지 않고 '확인 필요'로 남겼으나, 파싱 오탐이라는 핵심은 맞게 짚었다.",
+   "fixReason": "핵심 조치는 parseViolations를 JSON 구조화 출력으로 수정하는 것으로, 이는 '확인되지 않았습니다' 문구가 위반으로 오탐되는 근본 원인을 직접 해결한다. 4번 임시 조치로 알림 경로 차단을 권했으나 이는 보조 조치이며, 규정 검사 비활성화나 SNS 구독 해제로 종결하는 것과는 다르게 수정 배포 후 복구를 명시했다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-20|0",
+   "variant": "h55",
+   "scenario": "v5-20",
+   "run": 0,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 11-17 스로틀 변경을 주원인 후보로 제시했으나, 정답 요지의 핵심 원인인 IP 203.0.113.77(python-requests)의 단일 클라이언트 과다 요청은 전혀 언급하지 못했다. 변경 방향은 관련이 있지만 실제 오늘 급증의 원인을 짚지 못했다.",
+   "fixReason": "핵심 조치는 /api/search 메서드 스로틀을 이전 값(rate 5, burst 10)으로 롤백하는 것이다. 정답 요지에서 이 롤백은 \"하면 안 되는 조치\"로 명시되어 있다. 실제 원인은 단일 클라이언트(IP 203.0.113.77)의 자동 요청이 공유 스로틀을 소진한 것이므로, 스로틀을 올려도 해당 클라이언트가 계속 요청을 독점하면 정상 사용자는 여전히 429를 받을 수 있다. 올바른 조치(WAF 차단, rate-based 규칙, 클라이언트별 사용 계획)는 답변 어디에도 제시되지 않았다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-20|1",
+   "variant": "h55",
+   "scenario": "v5-20",
+   "run": 1,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "yes",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 11/17 스로틀 설정 변경(rate 5→2, burst 10→5)을 주원인으로 지목했다. 그러나 정답 요지에 따르면 실제 원인은 IP 203.0.113.77(python-requests)의 단일 클라이언트가 /api/search 호출 대부분을 차지해 공유 스로틀을 소진한 것이며, 11/17 변경은 사흘 전 일로 오늘 급증의 원인이 아니다. 도우미는 이 단일 클라이언트 문제를 전혀 짚지 못했다.",
+   "fixReason": "핵심 조치는 11/17 CloudFormation 변경을 롤백(rate 5, burst 10으로 되돌리기)하는 것이다. 그러나 정답 요지에 따르면 실제 원인은 단일 클라이언트(IP 203.0.113.77)의 자동 요청이 공유 스로틀을 소진한 것이며, 11/17 설정 변경은 사흘 전 일이고 오늘 급증의 원인이 아니다. 스로틀 전체 상향(롤백)은 정답 요지에서 명시적으로 \"하면 안 되는 조치\"로 지정되어 있어 장애를 해소하지 못하고 오히려 문제 클라이언트의 남용을 방치하게 된다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-19|0",
+   "variant": "h55",
+   "scenario": "v5-19",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 모델 응답 문구가 파서에서 위반으로 잘못 집계된다는 방향을 맞게 짚었으나, 룰 파일 변경도 원인 후보로 병렬 제시하며 핵심(parseViolations가 '확인되지 않았습니다' 문구를 위반 없음으로 인식 못 함)을 확정하지 않고 \"코드 미확인\"으로 유보했다. 정답은 모델 교체로 인한 응답 문구 변화 + 파서 불일치가 원인이며 룰 파일은 무관한데, 도우미는 룰 파일을 여전히 원인 후보로 남겨 핵심이 부분적으로만 전달됐다.",
+   "fixReason": "핵심 조치는 BEDROCK_MODEL_ID를 이전 값으로 되돌리는 것이다. 이는 정답 요지에서도 임시 복구 조치로 인정되며, 이후 파서 보강을 3번째 단계로 제시하고 있다. 모델 원복만으로는 파서 문제가 근본 해결되지 않지만, 이전 모델은 '없음/없습니다' 형태로 응답하므로 오탐이 사라져 장애는 해소된다. 단, 정답 요지는 \"모델 원복 후 파서 보강\"을 올바른 조치로 인정하므로 원복 자체는 유효하다. 다만 답변은 원인을 완전히 확정하지 못한 상태에서 룰 파일 롤백도 2번째 단계로 권하고 있어 불필요한 조치가 포함되어 있으나, 핵심(첫 번째) 조치인 모델 원복은 장애를 해소한다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-22|0",
+   "variant": "h55",
+   "scenario": "v5-22",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "02:45 콘솔 변경으로 BEDROCK_MODEL_ID가 잘못된 값으로 바뀌어 ValidationException이 발생한다는 핵심 원인을 정확히 짚었고, errors=0인 이유(함수가 오류를 잡아 정상 종료)도 올바르게 설명했다.",
+   "fixReason": "핵심 조치는 BEDROCK_MODEL_ID를 하이픈 표기(global.anthropic.claude-haiku-4-5-20251001-v1:0)로 되돌리는 것으로, 이는 정답 요지의 올바른 조치와 정확히 일치한다. 명령·값도 구체적으로 제시되어 있고 그대로 실행하면 장애가 해소된다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-22|1",
+   "variant": "h55",
+   "scenario": "v5-22",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 02:45 콘솔 변경으로 BEDROCK_MODEL_ID가 오타(\"4.5\")로 바뀌어 ValidationException이 발생한다고 정확히 짚었다. 함수 오류율이 0으로 찍히는 이유도 올바르게 설명했다.",
+   "fixReason": "핵심 조치는 BEDROCK_MODEL_ID를 올바른 하이픈 형식(\"global.anthropic.claude-haiku-4-5-20251001-v1:0\")으로 수정하는 것으로, 정답 요지의 조치와 정확히 일치한다. 명령·값 모두 구체적으로 제시되어 있고 그대로 실행하면 장애가 해소된다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-21|1",
+   "variant": "h55",
+   "scenario": "v5-21",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 버킷 기본 암호화가 aws:kms로 바뀐 뒤 업로드된 룰 파일을 ComplianceCheckFunction 역할이 복호화하지 못해 AccessDenied가 발생한다고 주원인으로 짚었다. 정답 요지와 방향이 일치한다. 다만 키 정책이 ComplianceCheckFunction 역할을 허용하지 않는다는 핵심(키 정책 제한)은 \"키 정책도 함께 확인하세요\"라고 언급하는 데 그쳤고, 역할 IAM에 kms:Decrypt가 있어도 키 정책이 막는다는 점을 확정적으로 짚지 못했다. 그러나 주원인(KMS 암호화 변경 → AccessDenied → 폴백)은 명확히 제시했으므로 yes로 판정한다.",
+   "fixReason": "핵심 조치는 \"키가 44c9a2e1이 아니면 해당 키의 kms:Decrypt를 역할에 추가하거나 룰 파일을 44c9a2e1 키로 재업로드\"인데, 정답 요지에 따르면 문제는 키 정책이 ComplianceCheckFunction 역할을 허용하지 않는 것이다. 함수 IAM에 kms:Decrypt를 추가하는 것만으로는 키 정책이 막고 있어 해결되지 않으며(정답 요지에서 명시적으로 \"하면 안 되는 조치\"로 지목), 룰 파일을 44c9a2e1 키로 재업로드하는 것도 그 키의 정책이 역할을 허용하는지 확인되지 않아 해결 보장이 없다. 또한 조치 전에 \"키 ID를 먼저 확인하라\"는 조사 단계를 핵심 조치로 앞세워 실제 해결 조치가 조건부로만 제시되었다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-23|0",
+   "variant": "h55",
+   "scenario": "v5-23",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 sec-baseline이 ContactInquiryFunction 역할의 인라인 정책을 삭제해 sns:Publish 권한이 사라졌고, 이로 인해 AuthorizationErrorException이 발생해 500 오류가 난다고 주원인으로 정확히 짚었다. 정답 요지와 일치한다.",
+   "fixReason": "핵심 조치는 ContactInquiryFunction 역할에 sns:Publish 권한을 복원하는 것으로, 정답 요지의 올바른 조치와 일치한다. 보안 담당자 확인을 먼저 권했으나 이는 절차적 권고이며 실제 복구 조치(인라인 정책 복원 또는 sns:Publish 정책 추가)가 명확히 제시되어 있어 장애를 해소할 수 있다. 역할 이름 불일치 확인도 실행 전 점검 사항으로 적절하다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-23|1",
+   "variant": "h55",
+   "scenario": "v5-23",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 sec-baseline이 01:30 UTC에 ContactInquiryFunction 역할의 인라인 정책(ContactInquiryFunctionRolePolicy0)을 삭제해 SNS:Publish 권한이 사라졌고, 그로 인해 AuthorizationErrorException이 발생해 500 오류가 됐다고 정확히 짚었다. 정답 요지의 원인과 완전히 일치한다.",
+   "fixReason": "핵심 조치는 sec-baseline 담당자 확인 후 CloudFormation 스택 재배포로 ContactInquiryFunctionRolePolicy0(SNS:Publish 권한)을 복구하는 것이다. 이는 정답 요지의 올바른 조치(스택 재배포로 정책 복원)와 일치하며, 실행 시 장애가 해소된다. 담당자 확인을 먼저 권한 것은 절차적 안전장치로 불가능하거나 틀린 조치가 아니다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-24|0",
+   "variant": "h55",
+   "scenario": "v5-24",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 02:40 버킷 정책 갱신으로 인한 explicit deny가 SSE 헤더 없는 PutObject를 거부한다고 짚었다. 로그의 AccessDenied + resource-based policy explicit deny와 변경 이력을 근거로 제시했으며, 함수 IAM은 허용 상태임도 확인했다. 다만 DenyObjectsWithoutKms 조건(KMS SSE 헤더 누락)이라는 핵심 메커니즘은 명시하지 않고 \"버킷 정책의 Deny가 우선 적용\"이라는 수준에서 멈췄다. 방향은 정확하나 핵심 원인(KMS SSE 조건 불충족)이 빠져 있어 partial로 판정한다.",
+   "fixReason": "핵심 조치는 \"sec-baseline 담당자와 함께 Deny 문장을 확인하고, 의도되지 않았으면 제거, 의도된 것이면 예외 처리\"다. 정답 요지의 원인(DenyObjectsWithoutKms 조건 미충족)을 정확히 짚지는 못했지만, 버킷 정책의 Deny 문장을 제거하거나 예외를 추가하는 조치는 실제로 장애를 해소한다. 단, 조치 전에 담당자 확인을 먼저 하라고 권하는 것은 조사 절차이지 틀린 조치가 아니며, 버킷 정책 전체 삭제나 IAM 권한 추가 같은 금지 조치는 권하지 않았다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-21|0",
+   "variant": "h55",
+   "scenario": "v5-21",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "unknown",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 버킷 기본 암호화가 KMS로 바뀐 뒤 업로드된 파일을 ComplianceCheckFunction 역할이 복호화하지 못해 AccessDenied가 발생하고 기본 룰로 폴백한다는 핵심 원인을 정확히 짚었다. 다만 키 정책 제한(관리자·eecar-docs-publisher만 허용, 루트 위임 없음)까지는 확인하지 못하고 \"키 ARN이 다를 수 있다\"는 가설 수준으로 남겼으나, 주원인 방향은 일치한다. 잘못된 단정은 없으며 불확실한 부분은 가설·확인 필요로 표현했다.",
+   "fixReason": "핵심 조치는 \"버킷 기본 암호화에 쓰이는 KMS 키 ARN을 확인한 뒤, 그 키가 역할 정책의 키와 다르면 ComplianceCheckFunctionRole에 해당 키의 kms:Decrypt를 추가\"하는 것이다. 정답 요지의 원인(키 정책에서 ComplianceCheckFunction 역할이 배제됨)과 답변이 제시한 원인(역할 정책에 해당 키 ARN이 없음)은 레이어가 다르지만, 실제로 역할 정책에 올바른 키 ARN의 kms:Decrypt를 추가하면 복호화가 가능해져 장애가 해소될 수 있다. 단, 정답 요지는 키 정책 측 허용이 핵심이고 역할 정책 추가만으로는 키 정책이 역할을 막고 있으면 해결되지 않는다. 그러나 답변은 \"같은 키라면 다른 원인을 찾아야 한다\"고 조건을 달아 확인 후 조치를 권하고 있어, 실제 키가 다를 경우에만 역할 정책 추가를 권하는 구조다. 키 정책 측 문제(계정 루트 위임 없음, 역할 미포함)는 언급되지 않아 역할 정책만 추가해도 키 정책이 여전히 거부하면 해결되지 않는다. 따라서 핵심 조치가 장애를 완전히 해소한다고 보기 어렵다(unknown). 조치 자체는 해롭지 않고, 명령/코드 오류도 없으며, 틀린 조치를 앞에 권하지 않았다. 답변 어딘가에 올바른 조치(kms:Decrypt 추가)가 포함되어 있으나 키 정책 측 허용은 빠져 있다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-24|1",
+   "variant": "h55",
+   "scenario": "v5-24",
+   "run": 1,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 버킷 정책의 명시적 Deny가 s3:PutObject를 막는다는 핵심 원인을 정확히 짚었다. 다만 DenyObjectsWithoutKms 조건(KMS SSE 헤더 누락)이라는 구체적 원인까지는 확인하지 못하고 \"정확한 정책 문장은 아직 확인하지 못했다\"고 유보했으므로 방향은 맞지만 핵심이 빠진 부분 정답이다.",
+   "fixReason": "핵심 조치는 버킷 정책에서 parts/* 경로의 s3:PutObject를 막는 Deny 문장을 찾아 제거하거나 범위를 좁히는 것이다. 정답 원인은 DenyObjectsWithoutKms 조건(KMS SSE 헤더 없는 PutObject 거부)이므로, 해당 Deny 문장을 제거하거나 역할 ARN 예외를 추가하면 실제로 장애가 해소된다. 단, 올바른 근본 해결책(KMS SSE 헤더 추가 또는 조건 완화)과 달리 Deny 문장 자체를 제거하는 것은 보안 정책을 무력화할 수 있으나 장애 해소 자체는 된다. 답변이 Deny 문장 제거 또는 범위 축소를 권하고 있어 장애는 해소되며, KMS 헤더 추가 방법은 언급되지 않았지만 조치 자체는 유효하다.",
+   "pass": false,
+   "phrasePass": false
+  }
+ ]
+}

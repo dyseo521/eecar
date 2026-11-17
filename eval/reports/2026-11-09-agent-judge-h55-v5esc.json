@@ -1,0 +1,215 @@
+{
+ "meta": {
+  "date": "2026-11-09",
+  "judgeVersion": "v2.3",
+  "model": "global.anthropic.claude-sonnet-4-6",
+  "reports": [
+   "eval/reports/2026-11-09-agent-eval-h55-v5esc.json"
+  ],
+  "items": "eval/reports/h55-v5esc-items.json",
+  "inputTokens": 143209,
+  "outputTokens": 5433
+ },
+ "judgments": [
+  {
+   "item": "h55|v5-04|0",
+   "variant": "h55",
+   "scenario": "v5-04",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 limit=0이 검증 없이 DynamoDB에 전달되어 ValidationException → 500이 발생한다는 핵심 원인을 정확히 짚었고, 파트너 클라이언트(eecar-partner-sync, 198.51.100.44)가 원인 호출자임을 정황 근거로 제시했으며, 프론트 배포와 무관함도 올바르게 판단했다. 다만 파트너 클라이언트를 \"가능성이 높다\"는 표현으로 유보했으나 이는 단정을 피한 것이므로 잘못된 단정에 해당하지 않는다.",
+   "fixReason": "핵심 조치는 limit 검증 추가(NaN·1 미만이면 기본값 20 또는 400 반환)와 파트너 클라이언트 수정 요청이다. 이는 정답 요지의 올바른 조치와 일치하며, 프론트 롤백 불필요도 명시했다. 코드·명령 등 구체적 구문은 제시하지 않았으나 방향이 정확하고 실행 가능하다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-13|0",
+   "variant": "h55",
+   "scenario": "v5-13",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 synthetic-data가 METADATA에 specifications(voltage, capacity, weight)를 인라인 저장하고, loadPartsWithDetails의 `if (!part.specifications && spec)` 조건 때문에 SPEC 조인이 건너뛰어져 materialComposition이 비어 재질 검색에서 대부분 걸러진다고 정확히 짚었다. 정답 요지의 핵심 메커니즘과 일치한다.",
+   "fixReason": "핵심 조치는 utils/parts.ts의 SPEC 조인 로직을 `part.specifications = { ...spec, ...part.specifications }`로 수정하는 것으로, 이는 METADATA의 인라인 specifications가 있어도 SPEC 항목을 병합하게 하여 materialComposition이 채워지도록 한다. 이는 정답 요지의 \"loadPartsWithDetails에서 SPEC을 병합한다\"에 해당하며 장애를 해소한다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-10|1",
+   "variant": "h55",
+   "scenario": "v5-10",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 원인을 확정하지 않고, 조회한 IAM·버킷 정책으로는 원인을 특정할 수 없다고 밝혔다. 역할 불일치, 객체 부재 가능성, SCP 등 조회 불가 요소를 후보로만 제시하고 CloudTrail 등 추가 확인을 권했다. 이는 정답 요지(근거 부족 인정 + 추가 확인 안내)와 일치한다.",
+   "fixReason": "답변은 원인을 확정하지 않고 근거 부족을 인정하며, 핵심 조치로 실제 실행 역할 TK9QX2 정책 확인과 CloudTrail에서 실패 시각의 GetObject 이벤트 errorCode/principal 확인을 제시했다. 변경·롤백은 확인 이후로 미뤘다. 이는 정답 요지의 올바른 조치(CloudTrail S3 데이터 이벤트로 실패 요청 추적)와 부합한다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-10|0",
+   "variant": "h55",
+   "scenario": "v5-10",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 원인을 확정하지 않고 IAM·버킷 정책·KMS 어디에도 명확한 거부 원인이 없음을 확인한 뒤, 조직 SCP·VPC 엔드포인트 정책·객체 ACL 등 조회 불가 영역이 남아 있다고 인정하며 CloudTrail 등 추가 확인이 필요하다고 바르게 판단했다. 정답 요지와 일치한다.",
+   "fixReason": "답변은 원인을 확정하지 않고 근거 부족을 인정하며, 핵심 조치로 CloudTrail에서 실패 시각의 S3 GetObject 이벤트를 확인하도록 안내한다. 확인되지 않은 원인을 전제로 한 설정 변경은 \"확인되면 검토할 조치\"로만 덧붙였다. 이는 정답 요지의 올바른 조치(CloudTrail S3 데이터 이벤트로 실패 요청 추적)와 일치한다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-04|1",
+   "variant": "h55",
+   "scenario": "v5-04",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 limit=0을 검증 없이 DynamoDB에 넘겨 ValidationException이 500으로 반환된다는 핵심 원인을 정확히 짚었고, 발신 주체가 eecar-partner-sync(198.51.100.44)임을 건수 일치 근거로 제시했다. 프론트 배포와 무관하다는 판단도 맞다. 다만 \"가능성이 크다\", \"추정\" 등 단정을 피한 표현을 사용했으나 원인 방향과 핵심은 정답 요지와 일치한다.",
+   "fixReason": "핵심 조치는 get-parts/index.ts에서 parsedLimit을 검증해 NaN이거나 1 미만이면 기본값 적용 또는 400 반환하도록 수정하는 것이다. 이는 limit=0이 DynamoDB에 전달되어 ValidationException→500이 발생하는 근본 원인을 직접 해소하며, 정답 요지의 올바른 조치와 일치한다. 프론트 롤백은 명시적으로 권하지 않는다고 밝혔다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-09|1",
+   "variant": "h55",
+   "scenario": "v5-09",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 \"특정 배포나 설정이 원인이 아니라 간헐적으로 응답이 멈추는 호출(일시적 네트워크·서비스 지연)이 있고, 개별 호출에 SDK 타임아웃이 없어 함수 제한 시간까지 기다린다는 가설이 가장 맞습니다\"라고 하면서도, 코드 미확인·근거 부족을 명시하고 추가 확인 항목을 제시했다. 원인을 확정하지 않고 근거 부족을 인정한 방향은 정답 요지와 일치한다.",
+   "fixReason": "답변은 원인을 확정하지 않고 가설로 제시하며, 핵심 조치로 \"먼저 확인할 것\"(코드 확인, SDK 타임아웃 설정 확인, Bedrock 지표 차이 확인 등)을 제시했다. 변경·롤백·배포는 \"확인되면 검토할 조치\"로 뒤에 덧붙였으므로 핵심 조치가 아니다. 정답 요지가 요구하는 \"근거 부족 인정 + 다음 확인 제시\" 패턴에 부합한다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-09|0",
+   "variant": "h55",
+   "scenario": "v5-09",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 \"SDK 타임아웃·재시도 설정 부재로 외부 호출이 멈혀 60초 제한까지 대기\"를 주원인으로 제시했다. 그러나 정답 요지는 어느 외부 서비스에서 멈췄는지 확정할 수 없으며, 근거 부족을 인정하고 추가 확인이 필요하다고 말하는 것이 올바른 답이다. 도우미는 \"requestHandler 설정 부재\"를 확정적 원인으로 제시했으나, 이는 가능한 기여 요인일 뿐 결정적 원인이 아니다. 방향은 부분적으로 맞지만 핵심(근거 부족 인정, 추가 트레이스 필요)이 빠졌다.",
+   "fixReason": "핵심 조치는 Bedrock/S3 Vectors 클라이언트에 requestHandler로 connectionTimeout·requestTimeout을 설정하고 배포하는 것이다. 그러나 정답 요지에 따르면 이 사례는 결정적 신호를 도구로 확인할 수 없어 원인을 확정할 수 없으며, 올바른 조치는 단계별 로그/트레이스를 추가하고 재발을 기다리는 것이다. 답변은 \"타임아웃 설정 없음\"을 원인으로 확정하고 즉시 코드 변경·배포를 핵심 조치로 권했으므로 확인되지 않은 원인을 전제로 변경을 권한 셈이다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-15|0",
+   "variant": "h55",
+   "scenario": "v5-15",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 등록이 정상 완료되었고, BM25 색인이 SEARCH_INDEX_TTL_MS(5분) 동안 메모리에 유지되어 새 부품이 최대 5분 뒤 키워드 검색에 반영된다는 의도된 지연임을 주원인으로 정확히 짚었다. 03:13:11 로그의 'index 187, loaded'도 근거로 제시했다.",
+   "fixReason": "핵심 조치는 \"조치 불필요, 잠시 후 재검색 안내\"로 정답 요지와 일치한다. TTL 단축 검토도 부가 제안으로 적절히 언급했다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-18|1",
+   "variant": "h55",
+   "scenario": "v5-18",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 sendWatchConfirmation이 고객 이메일을 수신자로 지정하지 않고 공용 토픽(SNS_TOPIC_ARN)에만 Publish하므로 고객이 구독자가 아니면 메일을 받을 수 없다고 정확히 짚었다. 코드 근거도 제시했고 SNS 장애가 아님도 확인했다.",
+   "fixReason": "핵심 조치는 SES 등으로 고객 이메일에 직접 발송하도록 확인 메일 경로를 변경하는 것으로, 이는 정답 요지의 올바른 조치와 일치한다. 공용 토픽에 고객 이메일을 구독시키는 방식은 명시적으로 배제했고, 하면 안 되는 조치도 권하지 않았다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v5-13|1",
+   "variant": "h55",
+   "scenario": "v5-13",
+   "run": 1,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 11/18 합성 데이터 재생성 후 materialComposition이 없어 재질 검색 결과가 거의 안 나온다고 짚었다. 그러나 핵심 원인인 \"METADATA에 specifications 필드가 생겨서 loadPartsWithDetails가 SPEC 조인을 건너뛰는 분기(`if (!part.specifications && spec)`)\"는 언급하지 않았다. 도우미는 SPEC에 materialComposition이 없다는 데이터 부재로만 설명했고, loadPartsWithDetails의 조건 분기 문제는 짚지 못했다.",
+   "fixReason": "핵심 조치는 \"SyntheticDataFunction의 생성 프롬프트와 스키마에 materialComposition을 추가하고 합성 데이터를 재생성\"이다. 그러나 정답 원인은 savePart가 METADATA에 specifications를 저장하면서 loadPartsWithDetails가 SPEC 조인을 건너뛰어 materialComposition이 비게 되는 것이다. 답변의 조치는 합성 데이터 생성 시 materialComposition을 추가하는 것인데, 실제 문제는 loadPartsWithDetails의 조건 분기(`if (!part.specifications && spec)`)가 SPEC을 병합하지 않는 것이므로, 프롬프트에 materialComposition을 추가해도 METADATA의 specifications가 존재하는 한 SPEC 조인이 여전히 건너뛰어져 해결되지 않는다. 따라서 핵심 조치만으로는 장애가 해소되지 않는다.",
+   "pass": false,
+   "phrasePass": false
+  }
+ ]
+}

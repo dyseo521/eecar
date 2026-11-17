@@ -1,0 +1,2296 @@
+{
+  "meta": {
+    "date": "2026-11-06",
+    "judgeVersion": "v2.2",
+    "model": "global.anthropic.claude-sonnet-4-6",
+    "reports": [
+      "eval/reports/2026-11-06-agent-eval-v3dev-shipped.json",
+      "eval/reports/2026-11-06-agent-eval-v3dev-candidate.json"
+    ],
+    "items": null,
+    "inputTokens": 1036589,
+    "outputTokens": 72459
+  },
+  "judgments": [
+    {
+      "variant": "shipped",
+      "scenario": "v3-01",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 로그 조회 없이 인코딩 문제, 데이터 정제 누락, 다국어 데이터 등 여러 원인을 후보로 제시했다. 정답 요지는 근거 부족을 인정하고 추가 확인이 필요하다고 말하는 것이 맞음 기준이며, 도우미는 확정하지 않고 추가 정보를 요청했으므로 방향은 맞다. 그러나 EXPLAIN 캐시 확인, 모델 호출 로깅 등 핵심 진단 경로를 전혀 언급하지 않았고, 제시한 후보들(인코딩, 데이터 정제)은 실제 숨은 원인(공급자 추론 품질 문제)과 거리가 있어 부분 점수에 해당한다.",
+      "fixReason": "답변은 원인을 확정하지 않고 추가 정보(어느 함수, 스크린샷, 발생 시점)를 구체적으로 묻고 있다. 정답 요지에서 요구하는 \"근거 부족을 인정하고 무엇을 더 확인해야 하는지 말하는 것\"에 부합한다. 다만 인코딩 문제·데이터 정제 누락 등을 \"일반적인 원인\"으로 나열하며 사실상 후보를 제시하는 수준이고 확정하지는 않았으므로 허용 범위 내다. 핵심 조치는 추가 정보 수집 요청이며 이는 올바른 방향이다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-01",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 인코딩 문제, Bedrock 응답 처리, S3 메타데이터 인코딩 오류를 예상 원인으로 제시했다. 이는 근거 없이 특정 원인을 후보로 나열한 것이지만, 확정적으로 단정하지는 않았고 추가 정보를 요청하며 근거 부족을 간접적으로 인정했다. 그러나 정답 요지는 \"근거가 부족함을 인정하고 무엇을 더 확인해야 하는지 말하는 것\"이 맞음의 기준인데, 도우미는 로그 조회나 EXPLAIN 캐시 확인 등 핵심 진단 방향을 제시하지 못하고 일반적인 후보만 나열했으므로 부분 점수에 해당한다. 인코딩·S3 메타데이터 등을 원인 후보로 제시한 것은 확정이 아닌 가능성 표현이므로 잘못된 단정은 없다.",
+      "fixReason": "답변은 원인을 확정하지 않고 추가 정보를 요청하며, 인코딩 문제·Bedrock 응답 처리 등을 후보로 제시하는 데 그쳤다. 핵심 조치는 스크린샷 첨부 및 추가 정보(함수명, 검색어, 발생 빈도) 확인 요청으로, 정답 요지가 요구하는 \"근거 부족 인정 + 추가 확인 사항 제시\" 방향과 부합한다. 다만 인코딩·S3 메타데이터 등 특정 원인을 후보로 나열했으나 확정하지는 않았으므로 잘못된 단정은 아니다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-01",
+      "run": 2,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 인코딩 문제(UTF-8 처리 오류, 다국어 정규화 미흡, S3 메타데이터 인코딩 불일치)를 주원인으로 확정적으로 제시했다. 그러나 조회 자료에는 이를 뒷받침할 신호가 없으며, 정답 요지는 근거 부족을 인정하고 추가 확인이 필요하다고 말하는 것이 올바른 답임을 명시한다. 인코딩 문제는 숨은 원인 후보에도 포함되지 않는다.",
+      "fixReason": "핵심 조치로 UTF-8 인코딩 처리 오류를 원인으로 확정하고 UTF-8 정규화 코드 추가를 권했다. 정답 요지에 따르면 원인을 확정할 근거가 없으며, 올바른 조치는 EXPLAIN 캐시 확인·모델 호출 로깅 활성화·공급자 문의 등이다. 인코딩 문제로 단정해 코드를 수정해도 실제 원인(공급자 추론 품질 문제 + 캐시 오염)은 해소되지 않는다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-02",
+      "run": 0,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 VectorSearchFunction의 배치 설명 생성 로직 문제(무한 재시도 루프)를 주원인으로 확정했다. 그러나 조회 자료에서는 Lambda 함수들의 호출 수가 평소와 같아 스택 내부로 설명되지 않으며, CloudTrail·모델 호출 로그가 없어 호출 주체를 확정할 수 없다. 근거 없이 VectorSearchFunction의 코드 문제로 단정한 것은 잘못된 단정에 해당한다.",
+      "fixReason": "답변은 'VectorSearchFunction의 배치 설명 생성 로직이 무한 재시도 루프를 돌고 있다'고 원인을 확정하고, 해당 코드를 수정하는 것을 핵심 조치로 제시했다. 그러나 정답 요지에 따르면 이 사례는 결정적 신호가 없어 원인을 확정할 수 없으며, 올바른 조치는 CloudTrail InvokeModel 호출자·소스 IP 확인 및 모델 호출 로깅 활성화 등 사용 주체를 먼저 파악하는 것이다. 답변은 근거 없이 특정 함수와 코드 버그로 단정하고 코드 수정을 권했으므로, 이 조치를 실행해도 실제 원인(개발 PC에서 같은 자격 증명으로 평가 배치 실행)은 해소되지 않는다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-02",
+      "run": 1,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 VectorSearchFunction의 재시도 로그를 근거로 \"토큰 낭비 메커니즘 발견\"이라며 원인을 확정했다. 그러나 조회 자료에는 Lambda 함수 호출 수가 평소와 같고, 모델 호출 로그·CloudTrail 데이터 이벤트가 없어 스택 외부 호출 여부를 알 수 없다. 정답 요지는 근거 부족을 인정하고 추가 확인 방법을 제시하는 것이 올바른 답이라고 명시한다. 도우미는 재시도 로직을 주원인으로 단정했으므로 원인 판정은 no이다.",
+      "fixReason": "답변은 로그에서 재시도 패턴을 발견했다며 원인을 확정하고, 핵심 조치로 재시도 횟수를 줄이는 코드 수정을 제시했다. 그러나 정답 요지에 따르면 결정적 신호가 없어 원인을 확정할 수 없으며, 올바른 조치는 CloudTrail InvokeModel 호출자·소스 IP 확인 및 모델 호출 로깅 활성화로 사용 주체를 파악하는 것이다. 재시도 코드 수정은 토큰 6배 증가의 실제 원인(개발 PC에서 같은 자격 증명으로 평가 배치 실행)을 해소하지 못한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-02",
+      "run": 2,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "yes",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 VectorSearchFunction의 \"Batch explanation generation\" 로직이 원인이라고 확정했다. 그러나 조회 자료에는 Lambda 함수 호출 수가 평소와 같고, 호출 주체를 특정할 CloudTrail/모델 호출 로그가 없어 원인을 확정할 수 없는 상황이다. 정답은 근거 부족을 인정하고 추가 확인이 필요하다고 말하는 것인데, 도우미는 스택 내 함수를 주원인으로 단정했다.",
+      "fixReason": "답변은 \"VectorSearchFunction의 Batch explanation generation 로직\"을 원인으로 확정하고, 해당 코드 검토·프롬프트 최적화·배치 API 전환 등을 핵심 조치로 권하고 있다. 그러나 정답 요지에 따르면 결정적 신호가 없어 원인을 확정할 수 없는 상황이며, 올바른 조치는 CloudTrail InvokeModel 호출자·소스 IP 확인 및 모델 호출 로깅 활성화로 사용 주체를 먼저 파악하는 것이다. 답변은 근거 없이 특정 함수를 원인으로 단정하고 운영 함수 코드 변경(선택적 비활성화 포함)을 권했으므로, 실제 원인(개발 PC 배치 평가)을 해소하지 못하며 오히려 운영 함수를 불필요하게 건드리는 잘못된 조치다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-12",
+      "run": 0,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 \"베드록이 느린 게 맞습니다\"라고 단정했으나, 조회 자료에는 평소 LLMLatency 비교값, 라우팅 리전, 입력 토큰 변화 등 결정적 신호가 없어 원인을 확정할 수 없다. 정답 요지는 근거 부족을 인정하고 추가 확인 사항을 안내하는 것이 올바른 답이라고 명시한다.",
+      "fixReason": "답변은 \"베드록이 느린 게 맞습니다\"라고 단정하며 즉각 배치 처리, 캐싱, 모델 교체(Claude 3 Haiku) 등을 핵심 조치로 권했다. 정답 요지에 따르면 결정적 신호가 없어 원인을 확정할 수 없고, 모델 교체·max_tokens 축소 등은 하면 안 되는 조치로 명시되어 있다. 원인을 단정한 뒤 잘못된 조치(모델 교체 등)를 올바른 조치(LLMLatency 이전 기간 비교, X-Ray 확인, AWS Support 문의)보다 앞에 제시했다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-12",
+      "run": 1,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "LLMLatency 수치가 높다는 것은 확인했지만, 평소 값과의 비교 자료·라우팅 리전·입력 토큰 변화 등 결정적 근거 없이 \"베드록 API 자체가 느린 상태\", \"스로틀링 가능성\", \"할당량 근처\" 등을 원인으로 확정했다. 근거 부족을 인정하고 추가 확인이 필요하다고 말하는 대신 원인을 단정했으므로 틀림이다.",
+      "fixReason": "답변은 근거 없이 \"베드록 API 자체가 느린 상태\"로 원인을 확정하고, 핵심 조치로 지수 백오프·타임아웃 15초 증가를 권했다. 이는 이전 기간과의 비교나 라우팅 리전·입력 토큰 확인 없이 단정한 것으로, 해당 조치를 실행해도 공급자 일시 지연이 원인인 장애는 해소되지 않는다. 또한 스로틀링 가능성을 언급했으나 스로틀 지표 확인 없이 단정했고, 올바른 조치(LLMLatency 비교, X-Ray/모델 호출 로깅 확인, AWS Support 문의)는 \"확인 필요\" 항목에 일부 언급되어 있으나 핵심 조치가 아니다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-12",
+      "run": 2,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 \"원인을 찾았습니다\"라고 선언하며 Bedrock 서비스 지연을 주원인으로 확정했다. 그러나 조회 자료에는 평소 LLMLatency 비교값, 라우팅 리전, 입력 토큰 변화 등 결정적 신호가 없어 원인을 단정할 수 없는 상황이다. 또한 \"정상 범위(보통 2~3초)\"라는 수치는 조회 자료나 시스템 프롬프트 어디에도 없는 지어낸 값이다.",
+      "fixReason": "답변은 로그 수치를 제시하며 \"Bedrock 서비스 지연\"을 원인으로 확정하고, 즉시 조치로 \"AWS Bedrock 콘솔에서 서비스 상태 확인\"을 권했다. 그러나 정답 요지에 따르면 결정적 신호가 없어 원인을 확정할 수 없으며, 올바른 조치는 LLMLatency 비교·모델 호출 로깅·X-Ray 확인 등 추가 조사다. 답변은 근거 없이 원인을 단정하고 배치 처리·캐싱 같은 무관한 조치를 핵심으로 제시했으므로 장애를 해소하지 못한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-20",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "로그의 503 에러와 Slack 서버 장애를 주원인으로 정확히 짚었으며, 우리 쪽 설정·코드 변경과 무관하다고 바르게 판단했다. 조회 자료에 없는 Slack 상태 페이지 공지나 복구 시각은 언급하지 않았지만, 503 기반으로 Slack 측 장애임을 주원인으로 제시한 것은 정답 요지와 일치한다.",
+      "fixReason": "핵심 조치는 \"재시도 로직 강화(지수 백오프 3회 재시도 추가)\"로, 이는 즉각적인 장애 해소가 아닌 향후 개선 사항이다. 정답 요지에 따르면 Slack 측 장애이므로 우리 쪽 수정이 필요 없고, 조치 없이 복구를 확인하고 놓친 오류를 CloudWatch 로그에서 확인하는 것이 올바른 조치다. 재시도 로직 추가는 개선 사항으로 유효하나, 이미 복구된 장애를 해소하는 조치는 아니다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-20",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "로그의 503 에러를 Slack 측 문제로 짚었고, 방향은 맞다. 그러나 Slack 상태 페이지의 Incoming Webhook 장애 공지와 복구 시각을 근거로 삼지 않았고, \"우리 쪽 문제 + Slack API 문제 혼합\"이라고 표현해 우리 쪽에도 원인이 있는 것처럼 제시했다. 핵심인 \"설정·코드 변경과 무관한 외부 장애\"를 명확히 짚지 못했다.",
+      "fixReason": "핵심 조치는 재시도 로직(지수 백오프) 코드를 SlackNotificationFunction에 추가하는 것이다. 정답 요지에 따르면 이번 장애는 Slack 측 Incoming Webhook 장애로 우리 쪽 코드 변경이 필요 없으며, 재시도 로직 추가는 '개선' 사항일 뿐 현재 장애를 해소하는 조치가 아니다. 이미 Slack이 복구된 상황에서 코드 배포를 즉시 조치로 권하는 것은 불필요한 변경이다. 다만 코드 자체는 동작 가능하고 해롭지는 않으며, 답변 내에 \"Slack 서버 측 문제\"임을 언급하고 있어 장애 해소 사실은 포함되어 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-20",
+      "run": 2,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 \"우리 쪽 문제\"라고 단정하며 Webhook URL 만료·비활성화, 재시도 로직 부재 등 내부 코드·설정 문제를 주원인으로 제시했다. 정답은 Slack Incoming Webhook 장애(503)가 원인이며 우리 쪽 수정이 필요 없다는 것이다. 또한 Slack 상태 페이지를 확인해보라고 권유만 했을 뿐 Slack 장애를 주원인으로 짚지 않았다.",
+      "fixReason": "핵심 조치는 \"Slack Webhook URL 확인 및 환경 변수 검증\"이다. 그러나 정답 요지에 따르면 원인은 Slack 측 Incoming Webhook 장애(503)이며 우리 쪽 설정·코드 변경은 불필요하다. Webhook URL이나 환경 변수에는 문제가 없으므로 이 조치를 실행해도 장애가 해소되지 않는다. 또한 \"우리 쪽 문제\"라고 단정하며 불필요한 조치를 먼저 권하고 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-23",
+      "run": 0,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "조회 자료에서 결정적 신호가 없어 근거 부족을 인정하고 추가 확인을 제안해야 하는 상황인데, 도우미는 \"벡터 임베딩 미스매치\", \"S3 Vectors 동기화 지연\" 등 특정 원인을 확정적으로 주원인으로 제시했다. 또한 \"유사도 > 0.8\" 같은 존재하지 않는 설정값을 실제처럼 제시하고, 재색인 명령을 해결책으로 단정했다.",
+      "fixReason": "핵심 조치로 \"벡터 임베딩 미스매치\"와 \"S3 Vectors 동기화 지연\"을 확정적으로 제시하고, 재색인(reindex) 명령을 가장 강하게 권했다. 이는 정답 요지에서 \"하면 안 되는 조치\"로 명시된 재색인으로 해결된다는 단정에 해당한다. 실제 원인은 SPEC 필드 구조(material vs materialComposition) 불일치이므로 재색인으로는 해결되지 않는다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-23",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 벡터 임베딩 미스매치, 메타데이터 불완전, 임계값 설정, S3 인덱스 동기화 지연 등 여러 후보를 나열했다. 정답 요지는 결정적 신호가 없으므로 추가 확인이 필요하다고 말하는 것이 올바른 답인데, 도우미는 그 방향으로 접근했다. 그러나 S3 인덱스 동기화 지연을 유력 원인처럼 제시하고, 벡터 임베딩 미스매치·임계값 설정 등 근거 없는 원인들을 확정적 후보로 나열했다. 핵심인 \"근거 부족 인정 + 무엇을 더 확인해야 하는지\"보다 원인 단정 쪽에 무게가 실려 있어 부분 점수에 해당한다.",
+      "fixReason": "답변의 핵심 조치는 PartRegistrationFunction 로그 확인, VectorSearchFunction 코드 리뷰, S3 Vectors 데이터 검증 등이다. 이 중 \"PartRegistrationFunction 로그 확인\"은 부품 등록 여부를 보는 것으로 정답 방향(SPEC 항목의 필드 구조 확인)과 일부 겹치나, 핵심 조치로 가장 강하게 권한 것은 벡터 임베딩/유사도/S3 동기화 등 벡터 검색 관련 원인들이다. 이는 근거 없이 벡터 검색 문제로 원인을 확정하는 단정에 해당하며, 실제 원인(materialComposition 필드 누락)을 해결하지 못한다. 다만 \"PartRegistrationFunction 로그 확인\"이 포함되어 있어 SPEC 구조 확인으로 이어질 가능성이 있으므로 correct_elsewhere는 yes로 볼 수 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-23",
+      "run": 2,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 벡터 임베딩 미스매치, S3 인덱싱 지연, 검색 필터 문제 등 여러 후보를 나열했다. 정답 요지는 결정적 신호가 없으므로 추가 확인이 필요하다고 인정하는 것이 맞음 기준인데, 도우미는 \"버그라기보다는 데이터 문제일 가능성이 높습니다\"라고 방향을 단정하고 벡터 재인덱싱을 해결책으로 제시했다. 핵심 원인(materialComposition 필드 누락)을 짚지 못했고 근거 부족을 인정하지 않았으므로 partial 수준에도 미치지 못한다. 또한 \"S3 Vectors 인덱싱 지연\"을 원인으로 확정적으로 제시하고 \"벡터 재인덱싱\" 조치를 권고했는데, 조회 자료에는 이를 뒷받침하는 근거가 전혀 없어 잘못된 단정에 해당한다.",
+      "fixReason": "핵심 조치로 \"벡터 재인덱싱\"을 권했는데, 이는 정답 요지에서 명시적으로 \"하면 안 되는 조치(재색인으로 해결된다고 단정)\"에 해당한다. 또한 원인을 벡터 임베딩 미스매치·인덱싱 지연 등으로 확정하고 있어 근거 없는 단정이다. 올바른 조치인 SPEC 항목의 materialComposition 필드 구조 확인은 언급되지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-24",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "present",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "로그에서 ResourceNotFoundException(Legacy 모델, 15일 미사용)을 정확히 짚고, 폴백으로 인해 템플릿 문구가 반환된다는 핵심 원인을 올바르게 설명했다. 다만 SyntheticDataFunction 콘솔에 별도로 설정된 BEDROCK_MODEL_ID 환경 변수가 원인이라는 점(템플릿 전역 값과 다른 값이 콘솔에서 덮어쓰여 있다는 점)은 언급하지 않았으나, 원인의 방향(Legacy 모델 → ResourceNotFoundException → 폴백)은 정확히 맞다. 코드 예시에서 'claude-2'를 변경 전 모델 ID로 제시했으나 이는 실제 로그나 시스템 프롬프트에 없는 값을 확정적으로 제시한 것이다.",
+      "fixReason": "핵심 조치는 \"Bedrock 모델 업그레이드 - 최신 모델로 변경\"이다. 방향은 맞지만, 제시한 모델 ID(anthropic.claude-3-sonnet-20240229-v1:0)는 정답 요지의 올바른 모델(anthropic.claude-haiku-4-5-20251001-v1:0)과 다르고, 근본 원인인 콘솔에서 직접 설정된 BEDROCK_MODEL_ID 환경 변수를 제거하거나 재정의해야 한다는 핵심을 짚지 못했다. 그러나 SyntheticDataFunction의 모델 ID를 활성 모델로 바꾸는 것 자체는 장애를 해소한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-24",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "로그에서 ResourceNotFoundException(Legacy 모델, 15일 미사용)을 정확히 짚고, 이로 인해 fallback 템플릿 문구가 사용된다는 핵심 원인을 맞게 설명했다. 다만 SyntheticDataFunction 콘솔에 별도로 설정된 BEDROCK_MODEL_ID 환경변수가 원인이라는 핵심(템플릿 전역 모델이 아닌 함수별 오버라이드)은 언급하지 않았으므로 완전히 맞다고 보기는 어렵지만, 방향과 핵심 에러는 정확히 짚었다.",
+      "fixReason": "핵심 조치는 \"Bedrock 콘솔에서 Legacy 모델 Activate 버튼 클릭\"이다. 그러나 정답 요지에 따르면 Legacy 모델 접근 재신청(활성화)은 명시적으로 \"하면 안 되는 조치\"로 지정되어 있어 장애를 해소하지 못한다. 올바른 조치는 환경변수 BEDROCK_MODEL_ID를 제거하거나 활성 모델 ID로 교체하는 것인데, 이는 2번 항목에서 언급되긴 하나 구체적인 방법(콘솔 환경변수 삭제 또는 sam deploy 재적용)이 아닌 코드 파일 수정으로만 안내되어 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-24",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "로그에서 ResourceNotFoundException(Legacy 모델, 15일 미사용)을 정확히 짚었고, 이것이 폴백 고정 문구로 이어진다는 흐름도 맞다. 다만 핵심인 \"SyntheticDataFunction 콘솔에 직접 설정된 BEDROCK_MODEL_ID가 Claude 3 Haiku로 남아 있어 템플릿 전역 설정을 덮어쓴다\"는 환경변수 충돌 원인을 짚지 못했다.",
+      "fixReason": "핵심 조치는 bedrock.js의 모델 ID를 Claude 3.5 Sonnet 등 활성 모델로 변경하는 것이다. 그러나 실제 원인은 Lambda 콘솔에서 직접 설정한 환경변수 BEDROCK_MODEL_ID가 Legacy 모델로 남아 있는 것이므로, 코드 파일을 수정해도 콘솔 환경변수가 우선 적용되어 문제가 해결되지 않는다. 올바른 조치는 콘솔 환경변수를 제거하거나 sam deploy로 템플릿 값을 재적용하는 것이다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-26",
+      "run": 0,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 에러 로그가 없다는 이유로 브라우저/클라이언트 측 캐싱 문제를 주원인으로 단정했다. 실제 원인은 09:40 배포로 searchCacheKey에서 필터·topK가 제거되어 서버 측 RESULT 캐시가 필터 변경을 무시하고 이전 결과를 반환하는 것이다.",
+      "fixReason": "핵심 조치가 브라우저 캐시 완전 삭제인데, 이는 정답 요지에서 명시적으로 \"하면 안 되는 조치(브라우저 캐시 문제로 결론)\"에 해당한다. 실제 원인은 서버 측 searchCacheKey에서 필터·topK가 빠진 것이므로 브라우저 캐시를 지워도 서버가 동일한 캐시 결과를 반환해 장애가 해소되지 않는다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-26",
+      "run": 1,
+      "cause": "no",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 프론트엔드 캐싱, 파라미터 미전달, S3 Vectors 캐시 등을 후보로 나열했을 뿐, 정답인 searchCacheKey 정리로 인해 서버 측 캐시 키에서 필터·topK가 빠진 것을 주원인으로 짚지 못했다. 브라우저/로컬스토리지 문제를 첫 번째 의심 원인으로 제시한 것은 정답과 방향이 다르다.",
+      "fixReason": "답변의 핵심 조치는 브라우저 개발자도구·네트워크 탭·로컬 스토리지 확인 등 프론트엔드 측 진단을 먼저 권하고 있다. 실제 원인은 서버 측 searchCacheKey에서 필터·topK가 누락된 백엔드 캐시 버그이므로, 프론트엔드 진단을 핵심으로 권하는 것은 장애를 해소하지 못한다. 또한 \"브라우저 캐시 문제로 결론\"은 하면 안 되는 조치로 명시되어 있어 방향 자체가 틀렸다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-26",
+      "run": 2,
+      "cause": "no",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 원인을 전혀 짚지 못하고 추가 정보를 요청하는 데 그쳤다. 로그 조회도 하지 않아 캐시 키 문제를 언급하지 않았다.",
+      "fixReason": "답변의 핵심 조치는 추가 정보를 수집하기 위한 질문이다. 그런데 정답 요지에 따르면 이 장애는 09:40 배포로 인한 서버 측 캐시 키 버그이며, 브라우저/클라이언트 측 문제가 아님이 명확하다. 답변은 Lambda 함수 종류, 화면, 발생 시각 등을 묻고 있는데, 이 중 '언제부터 문제?'는 진단에 유효하나 나머지 질문들은 이미 충분히 특정된 증상(필터 변경 무관하게 이전 캐시 결과 반환)을 재확인하는 수준이다. 그러나 발생 시각 확인은 배포 시점과 연결하는 데 의미 있고, 전반적으로 조사에 필요한 정보를 묻는 것 자체는 불합리하지 않다. 다만 이 질문들만으로는 장애가 해소되지 않으며, 실제 해결 조치(캐시 키 수정 재배포 또는 롤백)는 전혀 제시되지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-27",
+      "run": 0,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 Bedrock 스로틀링을 주원인으로 확정했으나, 조회 자료에는 VectorSearchFunction 에러율 0%, Bedrock 관련 에러 로그 없음 등 이를 뒷받침할 결정적 근거가 없다. 정답 요지는 근거 부족을 인정하고 추가 확인이 필요하다고 말하는 것이 올바른 답이다.",
+      "fixReason": "답변은 Bedrock 스로틀링을 원인으로 확정하고 재시도 로직·배치 처리·캐싱 등 코드 변경을 핵심 조치로 권했다. 그러나 정답 요지에 따르면 현재 도구로는 원인을 확정할 수 없으며, 실제 원인은 프론트-백엔드 배포 불일치로 인한 400 오류다. Bedrock 스로틀링 대응 코드를 배포해도 400 거부 문제는 전혀 해소되지 않는다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-27",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 원인을 확정하지 않고 추가 정보(함수명, 시간 등)를 요청하며 근거 부족을 인정했다. 다만 \"Bedrock API 호출 한도 초과 여부\", \"Lambda 타임아웃 발생 여부\" 등을 진단 항목으로 제시하며 방향을 열어두었고, 어떤 원인도 확정하지 않았으므로 정답 요지의 기준(근거 부족 인정 + 추가 확인 요청)에 부합한다.",
+      "fixReason": "답변의 핵심 조치는 Lambda 함수명을 묻고 에러 로그·Bedrock 호출 상태·타임아웃 등을 확인하겠다는 것이다. 이는 원인 확정 없이 추가 정보를 수집하려는 방향으로 올바르다. 다만 진단 항목에 \"Bedrock API 호출 상태(토큰 한도 초과 여부)\"를 포함시켜 Bedrock 쪽을 유력 후보로 암시하고 있으나 확정하지는 않았다. 정답 요지가 요구하는 핵심 조치(브라우저 네트워크 탭 또는 API Gateway 액세스 로그로 /api/search/explain의 400 응답 본문 확인, 프론트 배포 이력 대조)는 언급되지 않았다. 함수명 질문 자체는 조사 방향이지만, 실제 장애 해소에 필요한 400 응답 본문 확인이나 프론트 배포 이력 대조는 포함되어 있지 않아 이 조치만으로는 장애가 해소되지 않는다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-27",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 원인을 확정하지 않고 추가 정보가 필요하다고 밝히며 어떤 함수·화면인지, 언제부터인지 등을 물었다. 정답 요지가 요구하는 \"근거 부족 인정 + 추가 확인 사항 제시\" 방향과 일치한다.",
+      "fixReason": "답변은 원인을 확정하지 않고 어느 함수/화면에서 호출되는지, 언제부터 발생했는지, 콘솔 로그가 있는지 등 추가 정보를 구체적으로 묻고 있다. 이는 정답 요지가 요구하는 \"근거 부족을 인정하고 무엇을 더 확인해야 하는지 말하는\" 조치에 부합한다. 다만 /api/search/explain 400 응답 본문 확인이나 프론트 배포 이력 대조 같은 핵심 확인 포인트는 언급되지 않아 조사 방향이 다소 빗나가 있지만, 잘못된 단정이나 해로운 조치는 없다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-30",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 SSM ParameterNotFound 에러를 주원인으로 정확히 짚었고, 파라미터 이름 불일치(환경변수·IAM 정책이 예전 이름을 가리키는 상황)도 확인 항목으로 언급했다. 다만 SSM 파라미터 이름이 변경된 구체적 경위(/eecar/slack/webhook-url 삭제 후 /eecar/prod/slack/webhook-url 생성)는 명시하지 못했고, 핵심 원인을 여러 후보 중 하나로 제시하는 형태로 답했다.",
+      "fixReason": "핵심 조치(4번 파라미터 재생성)에서 파라미터명을 `slack-webhook-url`로 제시했는데, 실제 필요한 이름은 `/eecar/slack/webhook-url`(구 이름 복원) 또는 환경변수·IAM 정책을 새 이름으로 함께 변경하는 것이다. 제시된 이름으로 파라미터를 만들어도 Lambda 환경변수가 가리키는 경로와 다르므로 장애가 해소되지 않는다. 또한 IAM 정책도 함께 수정해야 한다고 언급하지만, 핵심 조치인 파라미터 재생성 명령의 이름이 틀려 그대로 실행하면 해결되지 않는다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-30",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 SSM ParameterNotFound 에러를 정확히 짚었고, 파라미터 부재와 IAM 권한 문제를 원인으로 제시했다. 그러나 파라미터 이름이 변경(삭제 후 재생성)된 것이 핵심 원인임을 밝히지 못했고, 환경 변수(SLACK_WEBHOOK_SSM_PARAM)가 예전 이름을 가리키고 있다는 점도 언급하지 않았다. 방향은 맞지만 핵심(파라미터 이름 변경으로 인한 불일치)이 빠져 있다.",
+      "fixReason": "핵심 조치는 \"SSM Parameter Store에서 파라미터가 없으면 생성\"과 \"IAM 권한 확인\"이다. 파라미터 복원(/eecar/slack/webhook-url 재생성)과 IAM 정책 수정을 함께 안내하고 있어 실제 원인(파라미터 이름 변경으로 인한 ParameterNotFound)을 해소하는 방향이다. 다만 \"Slack Webhook URL 등록\"이라는 표현이 재발급을 암시할 수 있으나, 전체 맥락상 기존 URL을 파라미터로 등록하는 의미로 해석 가능하고, 환경 변수 수정은 언급하지 않아 IAM+파라미터 복원 조합으로 해결 가능하다. 코드 수정(index.js)을 3번째로 권한 것은 불필요하지만 핵심 조치보다 뒤에 위치한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-30",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 SSM ParameterNotFound 에러를 원인으로 짚고, 파라미터 존재 여부 확인 및 IAM 권한 확인을 제안했다. 그러나 파라미터 이름이 변경(/eecar/slack/webhook-url → /eecar/prod/slack/webhook-url)되어 함수의 환경 변수와 IAM 정책이 예전 이름을 가리키는 것이 핵심 원인인데, 이를 명시하지 않고 파라미터 부재와 권한 문제를 일반적인 후보로만 나열했다. 또한 잘못된 단정은 없으며, 가능성으로 제시한 수준이다.",
+      "fixReason": "핵심 조치(1번)는 SSM 파라미터 존재 여부 확인이고, 2번에서 IAM 권한 확인, 3번에서 환경 변수 확인을 함께 권하고 있다. 정답 요지의 조치(파라미터 복원 또는 환경변수+IAM 동시 변경)와 방향이 일치하며, 파라미터 복원 또는 환경변수·IAM 일괄 수정 모두 언급되어 있어 실행 시 장애가 해소된다. 다만 핵심 조치(1번)는 \"확인\"에 그쳐 실제 복원·수정 행동을 명시하지 않아 그대로 실행해도 해결된다고 보기 어렵다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-31",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 모든 함수의 에러율 0%, 응답 성능 정상, 배포 안정화를 확인하고 \"특별히 모니터링할 사항 없음\"으로 올바르게 요약했다. 정답 요지의 핵심(오류·스로틀 없음, 지연 정상, 이상 신호 없음)을 정확히 짚었다.",
+      "fixReason": "장애가 없는 정상 상태이므로 올바른 조치는 현재 상태를 요약해 알리는 것이다. 답변은 모든 함수가 정상임을 표로 정리하고 추가 조치 없이 관찰 유지를 권했으므로 적절하다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-31",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 모든 함수의 에러율 0%, 정상 응답시간을 확인하고 이상 징후 없음을 올바르게 요약했다. 정답 요지와 일치한다. 사실과 다른 내용을 확정적으로 단정한 부분도 없다.",
+      "fixReason": "답변은 모든 함수가 정상이라는 현황을 요약해 알리고 있으며, 불필요한 롤백·증설·없는 장애 원인 제시 없이 조치 없음을 핵심으로 권하고 있다. 이는 정답 요지(조치 없이 현재 상태를 요약해 알린다)와 일치한다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-31",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 모든 함수의 에러율 0%, 응답 시간 정상, 트래픽 정상임을 확인하고 \"특별히 주의할 사항이 없다\"고 올바르게 판단했다. 이는 정답 요지(이상 없음, 조치 불필요)와 일치한다. 사실과 다른 내용을 확정적으로 단정한 부분도 없다.",
+      "fixReason": "답변은 모든 함수의 에러율 0%, 응답시간 정상, 트래픽 정상임을 요약하며 조치 없이 현재 상태를 알리는 것이 핵심이다. 이는 정답 요지(조치 없이 현재 상태를 요약해 알린다)와 정확히 일치한다. 불필요한 롤백이나 증설 등 해로운 조치는 없다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-33",
+      "run": 0,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 \"USE_KNOWLEDGE_BASE 활성화가 맞습니다!\"라고 단정하며 이를 주원인으로 제시했다. 그러나 정답 요지에 따르면 실제 원인은 v1.10.1 배포 시 search-index 상수 정리로 BM25 색인 캐시 TTL이 사실상 0이 되어 매 요청마다 전체 METADATA를 GSI2로 재로드하는 것이다. USE_KNOWLEDGE_BASE는 KNOWLEDGE_BASE_ID가 비어 있어 효과가 없으므로 원인이 아니다. 또한 IndexLoadMs 이상 증가(수백 ms)와 'loaded' 로그는 캐시 미스 때문임을 로그가 보여주지만, 도우미는 이를 KB 쿼리 탓으로 잘못 귀결했다.",
+      "fixReason": "핵심 조치는 \"인덱스 캐싱 추가(코드 패치)\"이며, 원인을 USE_KNOWLEDGE_BASE 활성화로 단정하고 있다. 정답 요지에서 USE_KNOWLEDGE_BASE는 KNOWLEDGE_BASE_ID가 비어 있어 효과가 없으므로 원인이 아니라고 명시되어 있다. 실제 원인은 v1.10.1 배포로 인한 BM25 색인 캐시 TTL 상수 오류이며, 올바른 조치는 롤백 또는 TTL 상수 핫픽스다. 답변이 제시한 캐싱 코드 패치는 TTL 상수 버그를 직접 수정하지 않으므로 장애를 해소하지 못한다. 또한 DynamoDB 용량 증설, Lambda 메모리 증설 등 하면 안 되는 조치도 포함되어 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-33",
+      "run": 1,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 USE_KNOWLEDGE_BASE 활성화를 주원인으로 단정했으나, 정답은 v1.10.1 배포 시 search-index 상수 정리로 BM25 색인 캐시 TTL이 사실상 0이 되어 매 요청마다 전체 METADATA를 GSI2로 재로드하는 것이 원인이다. 또한 recall_memory 조회 결과 KNOWLEDGE_BASE_ID가 비어 있어 USE_KNOWLEDGE_BASE는 효과가 없음에도 이를 확정적 원인으로 단정했으므로 잘못된 단정이 있다.",
+      "fixReason": "핵심 조치는 \"Index 캐싱 활성화\" 코드 추가인데, 이는 실제 원인(BM25 색인 캐시 TTL 상수 버그로 인한 매 요청마다 전체 METADATA 재로드)을 USE_KNOWLEDGE_BASE 활성화로 잘못 단정한 데서 나온 조치다. 정답 요지에서 명시적으로 \"USE_KNOWLEDGE_BASE를 원인으로 단정\"은 하면 안 되는 조치로 지정되어 있으며, KNOWLEDGE_BASE_ID가 비어 있어 실제로 효과가 없다. 제안된 캐싱 코드는 실제 문제(SEARCH_INDEX_TTL_MS 상수 버그)를 해결하지 못한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-33",
+      "run": 2,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 IndexLoadMs 급증과 CacheHit:0을 올바르게 짚었으나, 원인을 USE_KNOWLEDGE_BASE 활성화로 단정했다. 실제 원인은 v1.10.1 배포에서 BM25 색인 캐시 TTL 상수가 잘못 정리되어 매 요청마다 전체 METADATA를 GSI2로 재로드하는 것이다. USE_KNOWLEDGE_BASE는 KNOWLEDGE_BASE_ID가 비어 있어 실질적 효과가 없으므로 이를 주원인으로 단정한 것은 틀렸다.",
+      "fixReason": "답변의 핵심 조치는 USE_KNOWLEDGE_BASE 비활성화이다. 그러나 정답 요지에 따르면 KNOWLEDGE_BASE_ID가 비어 있어 USE_KNOWLEDGE_BASE는 실제로 효과가 없으며, 이를 원인으로 단정하는 것은 명시적으로 '하면 안 되는 조치'로 지정되어 있다. 실제 원인은 v1.10.1 배포로 인한 BM25 색인 캐시 TTL 버그이므로, USE_KNOWLEDGE_BASE 비활성화로는 장애가 해소되지 않는다. 메모리 증설(1024MB→2048MB)과 DynamoDB 용량 최적화도 하면 안 되는 조치로 지정되어 있어 q_wrong_first도 해당된다. 다만 코드 제안에서 캐시 TTL 300초(5분) 설정을 언급하고 있어 정답 방향과 일부 겹치나, 이는 핵심 조치가 아닌 부가 제안이다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-35",
+      "run": 0,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "yes",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 ENOTFOUND DNS 해석 실패를 정확히 짚었으나, 이를 v1.10.1 배포 또는 VPC/네트워크 설정 변경의 결과로 주원인을 제시했다. 정답은 AWS DynamoDB 리전 엔드포인트 자체의 장애(AWS 인프라 문제)이며 배포와 무관하다는 것이 핵심인데, 도우미는 배포·VPC·IAM·환경변수 등 내부 변경을 주원인 후보로 나열했고 AWS 측 장애 가능성은 언급하지 않았다. 또한 VPC/네트워크 설정 변경을 확정적으로 의심하며 \"VPC 제거 후 테스트\" 등 잘못된 조치를 단정적으로 제안했다.",
+      "fixReason": "답변의 핵심 조치는 \"VPC/네트워크 설정 변경 확인 및 VPC 제거 후 테스트\"이며, 이는 AWS DynamoDB 리전 엔드포인트 DNS 해석 실패(AWS 측 장애)가 원인인 이 상황에서 해결책이 되지 않는다. VPC 설정 변경이나 제거는 AWS 측 장애를 해소하지 못하며, 오히려 네트워크 구성을 건드려 추가 문제를 유발할 수 있다. 올바른 조치(AWS 복구 대기, 고객 공지)는 답변 어디에도 없다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-35",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 ENOTFOUND 오류가 v1.10.1 배포로 인한 DynamoDB 엔드포인트 해석 실패라고 단정했다. 그러나 정답 요지에 따르면 원인은 AWS ap-northeast-2 리전의 DynamoDB 엔드포인트 DNS 해석 실패(AWS 측 장애)이며, 배포 변경 범위(proposal 응답 문구)와 무관하다. 도우미는 ENOTFOUND와 DynamoDB 엔드포인트 방향은 맞게 짚었으나, 이를 v1.10.1 코드/VPC/DNS 설정 변경 탓으로 돌려 AWS 외부 장애라는 핵심을 놓쳤다. 또한 v1.10.1이 원인이라고 확정적으로 단정한 것은 사실과 다르다.",
+      "fixReason": "핵심 조치는 VPC 엔드포인트·보안그룹·DNS 설정 확인이다. 그러나 실제 원인은 AWS 리전 자체의 DNS 해석 장애(AWS 인프라 문제)이므로, VPC/DNS 설정을 변경해도 장애가 해소되지 않는다. 올바른 조치는 AWS 복구를 기다리며 고객 공지를 하는 것이다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-35",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 ENOTFOUND(DNS 해석 실패)를 올바르게 짚었으나, 이를 v1.10.1 배포와 연관된 VPC/보안그룹/SDK 변경 등 배포 측 원인으로 주로 설명했다. 정답은 AWS DynamoDB 리전 엔드포인트 자체의 장애(AWS 인프라 문제)이며 배포와 무관하다는 점이 핵심인데, 도우미는 이를 짚지 못하고 배포 변경사항을 주원인 후보로 제시했다. 또한 VPC 설정 변경, NAT Gateway 부재, 보안 그룹 차단 등을 확정적 원인 후보로 단정했으나 조회 자료나 시스템 프롬프트에 이를 뒷받침하는 근거가 없다.",
+      "fixReason": "핵심 조치는 \"VPC 설정 확인, NAT Gateway 확인, 보안 그룹 확인\" 등 인프라 설정 변경 조사 및 수정이다. 그러나 실제 원인은 AWS DynamoDB 리전 엔드포인트 장애(ENOTFOUND)이므로 VPC/NAT/보안그룹을 수정해도 장애가 해소되지 않는다. 롤백 불필요 판단은 맞지만, 올바른 조치인 \"AWS 복구 대기 및 고객 공지\"는 제시하지 않고 엉뚱한 인프라 점검을 핵심으로 권했다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-36",
+      "run": 0,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 현재 IAM 역할에 bedrock:InvokeModel 권한이 없다는 것을 주원인으로 제시했다. 그러나 정답 요지에 따르면 실제 원인은 배포 직후 IAM 최종 일관성(eventual consistency) 지연으로 인한 일시적 거부이며, 현재 정책에는 권한이 그대로 존재한다. 도우미는 현재도 권한이 없는 것처럼 단정하고 권한 추가를 주요 해결책으로 제시했으므로 원인을 잘못 짚었다. 또한 현재 에러율이 0이고 복구된 상황임에도 권한이 지속적으로 없다고 확정적으로 말한 것은 사실과 다른 단정에 해당한다.",
+      "fixReason": "핵심 조치는 IAM 콘솔에서 bedrock:InvokeModel 권한을 추가하는 것이다. 그러나 정답 요지에 따르면 현재 정책에 권한이 이미 존재하며, 장애는 IAM 최종 일관성으로 인한 일시적 현상으로 이미 복구됐다. 권한을 추가하면 중복 정책이 생기거나 불필요한 변경이 되며, 장애 자체는 이미 해소된 상태이므로 이 조치가 장애를 해결하지 않는다. 또한 2순위로 AmazonBedrockFullAccess 관리형 정책 추가를 권하는데, 이는 과도한 권한 확대로 하면 안 되는 조치에 해당한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-36",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "yes",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 \"배포 직후 IAM 캐싱 지연\"을 첫 번째 후보로 제시했으나, \"Bedrock 모델 액세스 권한 미설정\"과 \"임시 서비스 이슈\"도 동등한 후보로 나열했다. 정답 요지의 핵심인 IAM 최종 일관성으로 인한 일시적 거부를 주원인으로 단정하지 않고 여러 가능성 중 하나로만 언급했다.",
+      "fixReason": "핵심 조치로 \"Lambda 실행 역할에 bedrock:InvokeModel(특정 모델 ARN) 및 bedrock:ListFoundationModels 권한 추가\"를 권했다. 정답 요지에 따르면 현재 정책에 권한이 이미 존재하며 IAM 최종 일관성으로 인한 일시적 현상이므로 권한 추가는 불필요하다. 또한 bedrock:ListFoundationModels는 장애와 무관한 불필요한 권한 확대에 해당한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-36",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 \"권한 정책이 불완전하여 언제든 다시 발생할 수 있다\"고 주원인을 제시했으나, 정답은 IAM 최종 일관성(eventual consistency)으로 인한 일시적 거부이며 현재 정책에는 권한이 그대로 있다는 것이다. 방향(IAM 권한 관련)은 일부 맞지만 핵심 원인(배포 후 일관성 지연)을 짚지 못했다.",
+      "fixReason": "핵심 조치는 IAM 역할에 bedrock:InvokeModel 및 inference-profile/* 리소스 권한을 추가하는 것이다. 그러나 정답 요지에 따르면 현재 정책에 권한이 이미 존재하며 IAM 최종 일관성으로 인한 일시적 오류였으므로, 권한 추가는 불필요한 조치다. 또한 권장 조치가 \"조치 없이 복구 확인\"이 아닌 권한 확대 방향으로 제시되어 장애를 해소하지 못한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-41",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "yes",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 임베딩 재생성 누락과 BM25 인덱스 미갱신을 주원인으로 짚었으나, 정답의 핵심인 SEARCH_DOCUMENT_VERSION 불일치로 인해 재색인이 dry run만 실행되어 METADATA의 searchText/searchAttributes가 v5로 남아 SPEC·배터리 상태 줄이 빠진 것을 전혀 언급하지 못했다. 방향(재색인 필요)은 부분적으로 맞지만 핵심 원인이 빠졌다.",
+      "fixReason": "핵심 조치는 \"S3 Vectors 인덱스 재구성(인덱스 삭제 후 재빌드)\"으로, 정답 요지에서 명시적으로 \"하면 안 되는 조치\"로 지목된 것이다. 실제 원인은 SEARCH_DOCUMENT_VERSION 불일치로 인한 재색인 미완료이므로, 올바른 조치는 --apply로 재색인 스크립트를 실행하거나 버전을 5로 되돌리는 것이다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-41",
+      "run": 1,
+      "cause": "no",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 표기 사전 추가로 인한 토크나이제이션 변경·임베딩 재생성 미완료·가중치 불균형 등을 주원인 후보로 나열했다. 정답 요지의 핵심인 SEARCH_DOCUMENT_VERSION 불일치로 인한 재색인 미완료(dry run만 실행되어 SPEC·배터리 상태 줄 누락)는 전혀 언급하지 않았다.",
+      "fixReason": "핵심 조치는 \"임베딩 재생성(PartRegistrationFunction 배치 실행 → S3 Vectors 업데이트)\"이다. 실제 원인은 SEARCH_DOCUMENT_VERSION 불일치로 인한 재색인 미완료(BM25 검색 문서의 SPEC·배터리 상태 줄 누락)이며, 올바른 조치는 reindex-search-documents.ts --apply 실행 또는 버전 롤백이다. 임베딩(벡터) 재생성은 BM25 기반 검색 문서 문제와 무관하므로 이 장애를 해소하지 못한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-41",
+      "run": 2,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 임베딩 재생성 누락, S3 Vectors 동기화 문제, 임베딩 모델 버전 불일치를 주원인으로 제시했다. 정답 요지의 핵심 원인인 SEARCH_DOCUMENT_VERSION 불일치로 인한 재색인 미완료(dry run만 실행)와 METADATA의 searchText/searchAttributes가 v5로 남아 BM25 검색이 저하된 것을 전혀 짚지 못했다.",
+      "fixReason": "핵심 조치는 \"PartRegistrationFunction 재실행 → 모든 부품 임베딩 재생성\"과 \"S3 Vectors 백업 후 새 벡터로 완전 교체\"이다. 실제 원인은 SEARCH_DOCUMENT_VERSION 불일치로 인한 BM25 검색용 searchText/searchAttributes 누락이며, 벡터/임베딩 문제가 아니다. 임베딩 재생성이나 S3 Vectors 교체는 이 장애를 해소하지 못하고, 정답 조치인 reindex-search-documents.ts --apply 실행(또는 버전 롤백)은 답변 어디에도 없다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-46",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 eecar-shared 패키지가 배포 패키지에 포함되지 않아 Runtime.ImportModuleError가 발생한다고 정확히 짚었다. 다만 \"npm install 누락\" 또는 \"package.json에 의존성 미정의\"를 원인으로 제시했을 뿐, 04:20 배포에서 watch-part가 eecar-shared를 값으로 import하도록 코드가 변경된 것이 핵심 원인임을 언급하지 않았다. 잘못된 단정은 없으며, 존재하지 않는 값을 확정적으로 제시하지도 않았다.",
+      "fixReason": "핵심 조치는 package.json에 eecar-shared를 의존성으로 추가하고 npm install 후 재배포하는 것이다. 그러나 정답 요지에 따르면 eecar-shared는 backend/package.json에 없어야 하는 패키지이며, 올바른 조치는 import를 타입 전용으로 바꾸거나 롤백하는 것이다. 단순히 eecar-shared를 dependencies에 추가해 배포하면 런타임 오류는 해소되지만, 정답 요지는 이를 \"하면 안 되는 조치\"에 준하는 방향(잘못된 의존성 추가)으로 볼 수 있다. 그러나 실제로 eecar-shared 패키지가 존재하고 Lambda에 포함시키면 502는 해소된다. 다만 정답 요지는 import를 타입 전용으로 바꾸거나 롤백을 권장하며, 패키지를 추가하는 것은 명시적으로 금지된 조치는 아니다. 따라서 장애 해소 여부는 yes로 볼 수 있다. 단, 코드에서 eecar-shared를 값으로 사용하는 부분이 있으므로 패키지를 추가하면 실제로 동작할 수 있다. q_works_as_written: zip 명령 및 aws cli 명령은 문법상 동작하나, package.json에 버전을 ^1.0.0으로 명시했는데 실제 버전이 다를 수 있어 불확실하지만 일반적으로 동작 가능하다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-46",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 eecar-shared가 Lambda 패키지에 포함되지 않아 Runtime.ImportModuleError가 발생한다고 정확히 짚었다. 다만 04:20 배포에서 watch-part가 eecar-shared를 값으로 import하게 된 코드 변경이 근본 원인임을 명시하지 않고, package.json 누락·번들링 실패 등 여러 가능성 중 하나로 제시했다. 또한 \"레이어로 eecar-shared 추가\"를 해결책으로 제시했는데, 정답 요지에서 이는 하면 안 되는 조치(레이어만 다시 게시)에 해당하나 이는 조치 판정 범위 외이다.",
+      "fixReason": "핵심 조치는 \"npm install 후 재배포\"(2단계)이며, 이는 eecar-shared를 package.json에 추가하거나 번들에 포함시켜 재배포하는 방향이다. 그러나 실제 원인은 eecar-shared가 package.json dependencies에 없어서 Lambda 패키지에 포함되지 않는 것이므로, 단순히 npm install 후 재배포해도 eecar-shared가 dependencies에 없으면 node_modules에 설치되지 않아 문제가 해결되지 않는다. 올바른 조치는 import를 타입 전용으로 바꾸거나 롤백이다. 또한 3단계에서 \"레이어만 다시 게시\"를 권하는데, 이는 정답 요지에서 명시적으로 \"하면 안 되는 조치\"로 지정되어 있어 틀린 조치를 앞에 권한 셈이다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-46",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 Runtime.ImportModuleError로 eecar-shared 패키지가 누락되었다는 핵심 원인을 정확히 짚었다. 다만 \"최근 배포에서 watch-part가 eecar-shared를 값으로 import하게 되었다\"는 코드 변경 사실은 언급하지 않고, CI/CD에서 npm install 누락·레이어 오류 등 여러 후보를 나열하는 데 그쳤다. 잘못된 단정은 없으며 모두 가능성 표현으로 제시했다.",
+      "fixReason": "핵심 조치는 eecar-shared를 package.json에 추가하고 재배포하는 것이다. 이 조치는 Runtime.ImportModuleError를 해소하므로 502 장애가 해결된다. 다만 정답 요지의 올바른 조치(import type으로 변경 또는 롤백)와 방향이 다르지만, eecar-shared를 실제 dependency로 추가해 패키지에 포함시키는 것도 유효한 해결책이다. 명령어 자체도 실행 가능하다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-49",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 6초 스파이크의 원인을 콜드 스타트(Init Duration 1.7~1.8초)로 정확히 짚었고, 10:12 이후 500~540ms로 정상 복귀했음도 확인했다. 다만 배포(10:05)로 인해 실행 환경이 교체되어 첫 호출들이 느렸다는 배포 맥락은 언급하지 않았으나, 핵심 원인인 콜드 스타트는 맞게 짚었다. 잘못된 단정과 관련해, 도우미는 \"Provisioned Concurrency 설정\"을 우선순위 1 개선 권장사항으로 제시했는데, 정답 요지에서 프로비저닝 동시성 도입은 하면 안 되는 조치로 명시되어 있다. 그러나 이는 조치에 해당하므로 판정 대상이 아니다. 사실과 다른 내용을 확정적으로 단정한 부분은 없다.",
+      "fixReason": "핵심 조치로 Provisioned Concurrency 설정(또는 주기적 워밍업)을 권했다. 정답 요지에 따르면 이 장애는 배포 직후 콜드 스타트로 인한 일시적 현상이며 이미 정상 복귀했으므로 조치가 필요 없다. Provisioned Concurrency 도입은 '하면 안 되는 조치'에 해당한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-49",
+      "run": 1,
+      "cause": "no",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 6초 스파이크를 \"일시적인 스파이크\"로만 표현했을 뿐, 10:05 배포로 인한 콜드 스타트(Init 1.8초)와 캐시 없는 첫 호출이 원인이라는 핵심을 전혀 짚지 못했다. 배포 이벤트와 콜드 스타트를 언급하지 않았으므로 원인 파악에 실패했다.",
+      "fixReason": "답변의 핵심 조치는 \"현재 설정 유지(메모리 증가 불필요)\"이며, 정상 복귀를 알리고 모니터링을 계속하라는 것이다. 이는 정답 요지의 \"조치 없이 정상 복귀를 알리고 관찰한다\"와 일치한다. 메모리 증설은 명확히 불필요하다고 안내했고, 불가능하거나 해로운 조치를 앞세우지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-49",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "정답 원인은 10:05 배포로 인한 콜드 스타트(Init 1.8초)와 캐시 없는 첫 호출이 결합된 일시적 지연이다. 도우미는 콜드 스타트를 여러 후보 중 하나로만 언급했고, 배포 이벤트와의 연관성을 짚지 못했으며 Bedrock 스로틀링·S3 지연 등 다른 원인을 동등하게 제시했다.",
+      "fixReason": "핵심 조치로 \"단기: 최근 로그 확인\", \"중기: Bedrock 호출에 지수 백오프 적용\", \"장기: 벡터 캐싱 도입 검토\"를 권했다. 정답 요지에 따르면 이미 정상 복귀한 상황으로 조치가 필요 없는데, 불필요한 개선 작업들을 핵심 조치로 제시했다. 메모리 증설은 불필요하다고 올바르게 안내했으나, 콜드 스타트 이후 정상 복귀임을 명확히 알리고 관찰하는 것이 올바른 조치다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-54",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "로그의 IndexWriteKeyRangeThroughputExceeded와 GSI2 핫 파티션을 주원인으로 정확히 짚었고, Bedrock과 무관하며 슬랙 알림이 오분류임도 바르게 지적했다. 다만 핫 파티션의 구체적 원인(ALL#METADATA 단일 GSI2PK로 인한 파트너 카탈로그 대량 적재)까지는 언급하지 못했으나, 핵심 원인 방향은 일치한다. 잘못된 단정으로는 온디맨드 모드 전환이 \"즉시 해결된다\"고 확정적으로 제시했는데, 정답 요지에서 온디맨드 테이블을 무턱대고 프로비저닝으로 전환하는 것은 하면 안 되는 조치로 분류되어 있고, 온디맨드 전환 자체도 핫 파티션 문제의 근본 해결책이 아님에도 \"지금 바로 온디맨드 모드로 전환하면 즉시 해결됩니다\"라고 단정했다.",
+      "fixReason": "핵심 조치는 온디맨드 모드 전환이다. 그러나 이 장애의 원인은 GSI2PK가 ALL#METADATA 하나로 집중된 핫 파티션 문제이며, 온디맨드 모드는 핫 파티션(IndexWriteKeyRangeThroughputExceeded)을 해소하지 못한다. 온디맨드 모드도 단일 파티션 키에 쓰기가 집중되면 동일하게 스로틀된다. 정답 조치(적재 중단/속도 제한, GSI2PK 샤딩)는 3번 코드 개선에서 부분적으로 언급되나 핵심으로 권하지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-54",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "로그에서 IndexWriteKeyRangeThroughputExceeded(GSI2 핫 파티션)를 정확히 짚었고, Bedrock과 무관하며 슬랙 알림이 파서 오분류임도 맞게 설명했다. 다만 GSI2PK가 ALL#METADATA 하나로 집중된다는 핵심 구조적 원인과 파트너 카탈로그 대량 적재가 트리거임은 언급하지 않고 추가 질문으로 남겼다.",
+      "fixReason": "핵심 조치(1순위)로 온디맨드 전환을 권했는데, 이는 정답 요지에서 \"하면 안 되는 조치\"로 명시된 것과 동일한 방향(온디맨드 테이블을 무턱대고 프로비저닝으로 전환의 역방향이지만, 핫 파티션 문제는 온디맨드로 전환해도 GSI2PK가 ALL#METADATA 하나로 집중되는 한 해결되지 않는다). 실제 원인은 GSI2PK 샤딩 부재 및 대량 적재 작업이며, 온디맨드 전환만으로는 단일 파티션 키 핫스팟 문제가 해소되지 않는다. 적재 작업 중단/속도 제한이나 GSI2PK 샤딩이 핵심 조치인데, 이는 3순위 이하로 밀려 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-54",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 DynamoDB GSI2의 IndexWriteKeyRangeThroughputExceeded를 원인으로 정확히 짚었고, Bedrock과 무관함도 올바르게 판단했다. 다만 GSI2 핫 파티션의 구체적 원인(ALL#METADATA 단일 파티션 키로 인한 파트너 카탈로그 대량 적재)까지는 언급하지 않았으나, 핫 파티션 문제와 GSI2 파티션 키 설계 검토를 핵심으로 제시했으므로 방향은 충분히 맞다. 온디맨드 전환을 즉시 조치로 제안한 것은 정답 요지에서 \"하면 안 되는 조치\"에 해당하지 않으나(온디맨드 테이블을 프로비저닝으로 전환이 금지 조치), 핫 파티션 문제는 온디맨드로도 해결되지 않으므로 다소 오해를 줄 수 있다. 그러나 GSI2PK 샤딩(파티션 키 설계 리뷰)도 함께 제안했으므로 잘못된 단정으로 보기는 어렵다.",
+      "fixReason": "핵심 조치는 \"DynamoDB GSI2를 온디맨드 모드로 전환\"이다. 그러나 정답 요지에 따르면 문제의 근본 원인은 GSI2PK가 ALL#METADATA 하나로 집중된 핫 파티션이며, 온디맨드 모드로 전환해도 단일 파티션 키에 쓰기가 집중되는 IndexWriteKeyRangeThroughputExceeded는 해소되지 않는다. 온디맨드 모드는 전체 용량 부족에는 효과적이지만 핫 파티션(단일 키 집중) 문제는 해결하지 못한다. 또한 정답 요지에서 \"온디맨드 테이블을 무턱대고 프로비저닝으로 전환\"을 하면 안 되는 조치로 명시하고 있으며, 반대 방향이지만 온디맨드 전환도 핫 파티션 문제를 해결하지 못한다는 점에서 q_resolves=no. 답변 어딘가에 \"파티션 키 설계 검토\"와 \"데이터 분포 균등화\"가 언급되어 있어 GSI2PK 샤딩 방향의 조치가 포함되어 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-55",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 search-ranking.js에서 applyConstraintPenalty가 export되지 않았다고 원인을 짚었다. 그러나 정답 요지는 레이어 v27에 해당 함수가 없는 것(레이어를 재빌드하지 않아 새 코드와 레이어가 불일치)이 원인이다. 도우미는 레이어 불일치/미빌드 문제를 언급하지 않고, search-ranking.js 파일 자체의 export 누락을 원인으로 단정했다. 또한 \"search-ranking.js 파일을 확인하고 export 문을 추가해주세요\"라고 사실과 다른 내용을 확정적으로 제시했다.",
+      "fixReason": "핵심 조치는 search-ranking.js에 export 문을 추가하는 것이다. 그러나 실제 원인은 레이어 v27에 applyConstraintPenalty 함수 자체가 없는 것(레이어 미빌드)이지, export 누락이 아니다. export를 추가해도 레이어가 재빌드·재배포되지 않으면 장애는 해소되지 않는다. 다만 답변 2단계에 \"Lambda Layer 업데이트\"가 언급되어 있어 레이어 재배포 조치가 포함되어 있으므로 q_correct_elsewhere는 yes로 볼 수 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-55",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 search-ranking.js에서 applyConstraintPenalty가 export되지 않아 초기화 실패가 발생한다고 정확히 짚었다. 다만 \"레이어가 재빌드되지 않아 함수 코드와 레이어 간 불일치\"라는 핵심 맥락(핫픽스 배포 후 레이어 미갱신)은 언급하지 않고, search-ranking.js 자체의 export 누락으로만 설명했다. 잘못된 단정과 관련해, 도우미는 롤백 명령에서 실제 존재하지 않는 S3 버킷 이름(eecar-lambda-deployments)과 키 패턴(VectorSearchFunction-v{이전버전}.zip)을 실제 값처럼 제시했으며, search-ranking.js 내부 코드(function applyConstraintPenalty 정의가 있으나 export만 빠진 상태)를 사실인 것처럼 단정했다. 이는 조회 자료나 시스템 프롬프트에 없는 정보를 확정적으로 제시한 것이다.",
+      "fixReason": "핵심 조치는 1순위로 제시한 이전 함수 코드 버전으로의 롤백이며, 이는 정답 요지에서 완화 조치로 인정된 올바른 조치다. 2순위로 제시한 search-ranking.js의 export 수정은 레이어를 재빌드·재배포하지 않고 /opt/nodejs 경로(레이어 내부)를 직접 수정하는 방식으로 기술되어 있어 실제로는 동작하지 않는다(Lambda 레이어는 배포 패키지로만 교체 가능). 그러나 핵심 조치인 롤백 자체는 장애를 해소하므로 q_resolves=yes.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-55",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 레이어의 search-ranking.js에 applyConstraintPenalty export가 누락되었다고 짚었다. 정답 요지는 레이어 v27에 해당 함수가 없어 Init 단계에서 실패한다는 것으로, 방향은 같지만 \"레이어를 재빌드하지 않아 발생했다\"는 핵심(함수 코드만 배포하고 레이어를 갱신하지 않은 것)을 짚지 못하고 search-ranking.js 자체의 export 누락으로 원인을 설명했다. 또한 잘못된 단정으로, 도우미는 search-ranking.js에 applyConstraintPenalty 함수가 존재하지만 export 선언만 빠진 것처럼 코드 예시를 제시했으나, 실제 원인은 레이어에 해당 함수 자체가 없는 것이다. 이는 조회 자료나 시스템 프롬프트에 없는 내용을 사실처럼 단정한 것이다.",
+      "fixReason": "핵심 조치는 search-ranking.js에서 applyConstraintPenalty의 export 선언을 추가하는 것이다. 그러나 실제 원인은 레이어 v27에 해당 함수 자체가 없는 것(레이어 미빌드)이므로, 파일 내 export 누락 수정만으로는 장애가 해소되지 않는다. 레이어를 새로 빌드·배포하는 것이 핵심인데, 이는 3번 절차에 언급되어 있으나 핵심 조치(1번)가 틀린 방향이다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-59",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 원인을 확정하지 않고 CORS, 데이터 소스 차이, 환경 변수 등 여러 후보를 제시하며 추가 확인이 필요하다고 답했다. CORS를 유력 후보 중 하나로 언급했고, 근거 부족을 인정하며 추가 정보를 요청했으므로 정답 요지에 부합한다. 다만 CORS를 명시적으로 가장 유력한 후보로 부각하지 않고 여러 후보 중 하나로만 나열했으므로 부분 정답에 해당한다.",
+      "fixReason": "답변은 CORS를 의심 포인트 중 하나로 언급하고 있으나, 핵심 조치로 가장 먼저 권한 것은 \"API Gateway ID, DynamoDB 테이블명, S3 버킷명 등을 알려달라\"는 정보 수집 요청이다. 이는 원인 확정 없이 추가 확인을 요청하는 적절한 방향이며, CORS를 유력 후보로 제시하면서도 확정하지 않았다. 브라우저 콘솔/네트워크 탭 확인을 명시적으로 권하지는 않았지만, 조사에 필요한 정보를 구체적으로 묻는 것은 올바른 조치에 해당한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-59",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 Lambda 에러가 없으므로 다른 곳에 원인이 있다고 하면서 API Gateway 스테이지 차이, DB 분리, S3 경로, 환경 변수 등을 후보로 제시했다. CORS를 유력 후보로 언급하지 않았고, 브라우저 콘솔·네트워크 탭 확인도 제안하지 않았다. 근거 부족을 인정하고 추가 확인을 요청한 점은 맞지만, 핵심 후보인 CORS를 전혀 짚지 못했으므로 부분 점수에 해당한다.",
+      "fixReason": "답변은 원인을 확정하지 않고 여러 후보를 제시하며 추가 확인을 요청했다. 그러나 핵심 후보로 API Gateway 스테이지 차이, DB 분리, S3 경로, 환경 변수를 제시했고, 정답 요지의 유력 후보인 CORS는 전혀 언급하지 않았다. 제시한 확인 사항들은 이 장애를 해소하는 방향(CORS 확인)과 무관하며, 그대로 실행해도 실제 원인(CORS 미허용)을 발견하거나 해결하지 못한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-59",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 Lambda 에러가 없음을 확인하고 원인을 특정하지 않은 채 여러 후보(데이터 소스 분리, API Gateway 라우팅, S3 경로, IAM 권한)를 제시했다. CORS를 유력 후보로 언급하지 않았고, 브라우저 콘솔·네트워크 탭 확인도 제안하지 않아 핵심 방향이 빠졌다. 그러나 근거 부족을 인정하고 추가 확인을 요청한 점은 정답 요지의 방향과 부분적으로 일치한다.",
+      "fixReason": "답변은 CORS를 후보로 전혀 언급하지 않고, 데이터 소스 분리·API Gateway 라우팅·S3 경로·IAM 권한 등을 나열했다. 핵심 조치로 \"CloudFront 분배 설정, Lambda 환경 변수, DynamoDB 데이터 확인\"을 권했는데, 이는 실제 원인(CORS 미설정)을 해소하지 못한다. 또한 원인을 확정하지는 않았지만 CORS 확인(브라우저 콘솔/네트워크 탭 또는 curl로 응답 헤더 확인)을 전혀 제시하지 않아 장애 해소로 이어지지 않는다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-60",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 OOM으로 인한 VectorSearchFunction 메모리 부족을 주원인으로 짚었고, 호출 수가 평소 수준이므로 DDoS가 아님을 올바르게 판단했다. 다만 OOM의 근본 원인(카탈로그 중복 적재로 METADATA가 9,804건으로 폭증하여 BM25 색인 재적재 시 메모리 한도 도달)은 언급하지 못하고, 검색 결과 대량 로드가 원인인 것처럼 설명했다. 방향은 맞지만 핵심 원인(중복 적재로 인한 데이터 폭증)이 빠졌으므로 partial이다.",
+      "fixReason": "핵심 조치는 Lambda 메모리를 1024MB→3008MB로 증설하는 것이다. 정답 요지에서 메모리 증설은 '완화' 조치로 인정되며, VectorSearchFunction의 OOM 문제를 실제로 완화·해소할 수 있다. 명령 자체도 AWS Lambda 콘솔에서 메모리 값을 변경하는 것으로 실행 가능하고, WAF/방화벽 같은 잘못된 조치는 앞에 제시되지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-60",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 OOM이 원인임을 맞게 짚었고 DDoS가 아님도 올바르게 판단했다. 그러나 핵심 원인인 '카탈로그 중복 적재로 METADATA가 9,804건으로 폭증하여 BM25 색인 재적재 시 메모리 한도에 도달'하는 구체적 메커니즘을 전혀 언급하지 못하고, 단순 메모리 누수나 대용량 벡터 검색 탓으로만 설명했다.",
+      "fixReason": "핵심 조치는 Lambda 메모리를 3008MB 이상으로 증가시키는 것이다. 정답 요지에서도 VectorSearchFunction 메모리 증설이 완화 조치로 인정되므로, 이 조치를 실행하면 OOM으로 인한 502 장애가 해소된다. 3008MB는 Lambda 최대 메모리(10240MB) 이내이므로 설정 가능하며, 방화벽/WAF 같은 잘못된 조치는 핵심 조치로 권하지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "shipped",
+      "scenario": "v3-60",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 OOM이 원인임을 정확히 짚었으나, \"검색 쿼리/결과 크기에 따라 됐다 안 됐다\"라고 설명했다. 핵심인 카탈로그 중복 적재로 METADATA가 대폭 증가했고 BM25 색인을 5분마다 재적재하면서 주기적으로 OOM이 발생한다는 구조는 파악하지 못했다. OOM 방향은 맞지만 주기적 패턴의 핵심 원인(중복 적재 → 데이터 폭증 → 주기적 재적재 OOM)이 빠져 있다.",
+      "fixReason": "핵심 조치는 VectorSearchFunction 메모리를 1024MB→3008MB로 증설하는 것이다. 정답 요지에서도 메모리 증설은 유효한 완화 조치로 명시되어 있으며, 실행하면 OOM으로 인한 502 반복 장애가 해소된다. Lambda 메모리는 최대 10240MB까지 설정 가능하므로 3008MB로 올리는 것은 기술적으로 가능하다. WAF·방화벽 등 DDoS 대응은 권하지 않았고, 메모리 증설을 가장 먼저 권했으므로 순서도 문제없다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-01",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 추가 정보를 요청하며 원인을 확정하지 않았고, 부품 등록 데이터 입력 문제·임베딩 생성·S3 Vectors 메타데이터를 가능성으로만 언급했다. 그러나 정답 요지는 도구 조회 없이 원인을 짚을 수 없으므로 근거 부족을 인정하고 무엇을 더 확인해야 하는지 말하는 것이 맞음의 기준이다. 도우미는 추가 질문만 했을 뿐 로그·캐시·모델 호출 로깅 등 구체적으로 무엇을 확인해야 하는지 제시하지 못했으므로 부분 정답에 해당한다.",
+      "fixReason": "답변은 원인을 확정하지 않고 추가 정보(어느 함수, 어디에 나타나는지, 패턴 등)를 구체적으로 묻고 있다. 이는 결정적 신호가 없는 상황에서 올바른 대응이다. 핵심 조치가 조사를 위한 질문이므로 장애를 해소하는 직접 조치는 아니지만, 정답 요지가 요구하는 \"근거 부족 인정 + 추가 확인 사항 제시\"에 부합한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-01",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 원인을 단정하지 않고 추가 정보(어느 필드, 언제부터, 어떤 쿼리 등)를 요청하며 근거 부족을 인정했다. 정답 요지가 요구하는 \"근거 부족 인정 + 추가 확인 사항 제시\" 방향과 일치한다. 사실과 다른 내용을 확정적으로 말한 부분도 없다.",
+      "fixReason": "답변은 확정적 조치 없이 추가 정보를 수집하기 위한 질문들을 제시했다. 정답 요지에 따르면 결정적 신호가 없는 상황에서 무엇을 더 확인해야 하는지 묻는 것이 올바른 조치이며, 답변은 발생 위치·필드·시점·쿼리 예시 등 진단에 필요한 구체적 정보를 요청하고 있다. 단, 정답 요지가 요구하는 핵심 확인 항목(EXPLAIN 캐시, 모델 호출 로깅 등)은 언급되지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-01",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 원인을 단정하지 않고 추가 정보를 요청했다. 질문에서 \"검색 이유 설명\"이라고 명시했으므로 VectorSearchFunction의 설명 필드임을 충분히 유추할 수 있어 일부 질문은 불필요하지만, 전반적으로 근거 부족을 인정하고 확인이 필요한 사항을 물어본 방향은 정답 요지와 일치한다.",
+      "fixReason": "답변은 원인을 확정하지 않고 추가 정보를 구체적으로 묻는 조사 질문으로 구성되어 있다. 정답 요지에서 요구하는 \"근거 부족을 인정하고 무엇을 더 확인해야 하는지 말하는 것\"에 부합하며, 불필요하거나 해로운 조치를 권하지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-02",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "yes",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 v1.10.0 배포 이후 VectorSearchFunction의 배치 설명 생성 로직이 큰 컨텍스트를 Haiku에 전송하는 것이 원인이라고 주원인으로 단정했다. 그러나 조회 자료에는 이를 확인할 근거가 없고, 함수 호출 수(124회)와 Bedrock 호출 수(18,420회)의 불일치가 스택 내부로 설명되지 않는다는 핵심 신호를 놓쳤다. 정답 요지는 결정적 근거가 없으므로 추가 확인이 필요하다고 인정하는 것이 맞음이다. 도우미는 방향을 v1.10.0 배포로 잡았으나 핵심(스택 외부 호출 가능성, CloudTrail/모델 호출 로그 부재)을 짚지 못했으므로 partial에 해당한다.",
+      "fixReason": "핵심 조치로 v1.9.1 롤백을 권장했다. 그러나 정답 요지에 따르면 실제 원인은 같은 계정 자격 증명으로 개발 PC에서 평가 배치를 돌린 것이며, 운영 함수 코드 롤백은 '하면 안 되는 조치'로 명시되어 있다. 또한 답변 전반에서 배포 변경이 원인이라고 근거 없이 확정하고 있어 잘못된 단정에 해당한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-02",
+      "run": 1,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "yes",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 v1.10.0 배포와 레이어 v27이 \"Batch explanation generation\" 로직을 추가했고 이것이 토큰 폭증의 원인이라고 확정했다. 그러나 조회 자료에는 배포 변경 내역에 \"검색 문서 테스트 보강, 의존성 패치\"만 있고 설명 생성 로직 추가 사실은 없다. 실제 원인은 스택 외부(개발 PC 배치 등)일 가능성이 있으며, 도구로 확인된 근거가 없어 \"근거 부족을 인정하고 추가 확인이 필요하다\"고 답했어야 한다.",
+      "fixReason": "핵심 조치는 VectorSearchFunction을 v1.9.1로 롤백하는 것이다. 그러나 정답 요지에 따르면 이 장애의 원인은 운영 스택 내 함수 변경이 아니라 같은 계정 자격 증명으로 개발 PC에서 평가 배치를 돌린 것이며, 결정적 신호가 없으므로 원인을 확정하지 말고 CloudTrail/모델 호출 로그로 사용 주체를 먼저 확인해야 한다. 답변은 근거 없이 배포 변경을 원인으로 단정하고 운영 함수 롤백을 핵심 조치로 권했는데, 이는 정답 요지에서 명시적으로 \"하면 안 되는 조치\"로 지정된 행동이다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-02",
+      "run": 2,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "yes",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 v1.10.0 배포 후 VectorSearchFunction에 추가된 \"Batch explanation generation\" 기능이 Haiku를 대량 호출한다고 확정했다. 그러나 조회 자료에는 배포 요약에 해당 기능 추가 내용이 없고, 함수 호출 수(124회)는 평소와 다르지 않아 스택 내 함수로 18,420회 호출을 설명할 수 없다. 호출 주체를 확인할 CloudTrail·모델 호출 로그가 없으므로 근거 부족을 인정하고 추가 확인이 필요하다고 해야 한다.",
+      "fixReason": "답변은 \"명확한 증거를 찾았다\"며 v1.10.0 배포와 VectorSearchFunction의 배치 기능을 원인으로 확정하고, 즉시 v1.9.1로 롤백할 것을 핵심 조치로 권했다. 그러나 정답 요지에 따르면 결정적 신호가 없어 원인을 확정할 수 없는 상황이며, 숨은 원인은 개발 PC에서 같은 계정 자격 증명으로 평가 배치를 돌린 것이다. 운영 함수 코드 롤백은 \"하면 안 되는 조치\"로 명시되어 있다. 롤백을 실행해도 장애(비용 폭증)는 해소되지 않으며, 오히려 운영 서비스를 불필요하게 되돌리는 해로운 조치다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-12",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 원인을 단정하지 않고 추가 정보를 요청했다. 정답 요지에서 결정적 신호가 없으므로 근거 부족을 인정하고 무엇을 더 확인해야 하는지 말하는 것이 올바른 답이라고 했으므로, 이 방향은 맞다. 다만 도우미는 도구 조회를 전혀 하지 않고 사용자에게만 질문했는데, 시스템 프롬프트 조사 순서에 따르면 먼저 get_function_status·get_logs 등으로 직접 확인해야 한다. 그러나 원인 판정 기준상 \"근거 부족을 인정하고 더 확인할 것을 말했다\"는 조건은 충족하므로 yes로 본다. 잘못된 단정은 없다.",
+      "fixReason": "답변은 원인을 확정하지 않고 추가 정보(기능, 지연 정도, 발생 시각 등)를 구체적으로 묻는 것을 핵심 조치로 제시했다. 이는 결정적 신호가 없는 상황에서 올바른 대응이며, 정답 요지가 요구하는 \"근거 부족 인정 + 추가 확인 사항 제시\"에 부합한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-12",
+      "run": 1,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 v1.10.0 배포를 주원인으로 확정했으나, 조회 자료에는 배포 전후 지연 비교 데이터가 없어 배포가 원인이라는 결정적 근거가 없다. 근거 부족을 인정하고 추가 확인이 필요하다고 말했어야 하는데, 배포를 원인으로 단정했으므로 틀림이다.",
+      "fixReason": "답변은 \"원인을 찾았다\"며 최근 배포(v1.10.0)를 원인으로 확정하고 의존성 패치·테스트 데이터 증가 등을 단정했다. 정답 요지에 따르면 결정적 신호가 없어 원인을 확정할 수 없으며, 올바른 조치는 LLMLatency 비교·모델 호출 로깅·X-Ray 확인 등 추가 조사다. 핵심 조치(배포 전후 성능 비교, package.json diff 확인)는 조사 방향 자체는 일부 유효하나, 근거 없이 배포를 원인으로 단정한 뒤 제시된 것이므로 잘못된 단정이 앞에 위치한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-12",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 Claude Haiku 평균 지연 8.8초와 VectorSearchFunction P99 11.1초를 근거로 \"Claude 모델 응답 자체가 느린 상태\"를 주요 원인 후보로 제시했다. 그러나 정답 요지에 따르면 이 수치만으로는 공급자 지연인지 단정할 수 없고, 평소 값과의 비교·라우팅 리전·입력 토큰 변화 등 결정적 신호가 없으므로 근거 부족을 인정하고 추가 확인이 필요하다고 해야 한다. 도우미는 추가 확인 질문을 하긴 했지만, 원인을 확정하지 않고 가능성으로만 제시했으므로 방향은 맞으나 핵심(근거 부족 명시)이 약하다.",
+      "fixReason": "답변은 \"Bedrock은 정상\"이라고 단정하고, VectorSearchFunction P99 11.1초와 Claude Haiku 8.8초 지연을 핵심 원인으로 제시했다. 그러나 정답 요지에 따르면 결정적 신호가 없어 원인을 확정할 수 없으며, 이런 수치(P99, Haiku 지연 등)는 이 시나리오에서 도구로 확인된 사실이 아니다. 답변이 근거 없는 수치를 제시하며 원인을 잘못 확정했고, 올바른 조치(LLMLatency 이전 기간 비교, 모델 호출 로깅·X-Ray 확인, 지속 시 AWS Support 문의)는 핵심으로 권하지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-20",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "present",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "Slack Incoming Webhook 장애로 인한 503 실패를 주원인으로 정확히 짚었고, 우리 코드 변경과 무관함도 올바르게 설명했다. 다만 로그 타임스탬프를 실제 값(08:06, 08:13, 08:20 UTC)과 다르게 \"07:51, 07:58, 08:05\"로 제시했으나, 이는 원인 판정보다는 잘못된 단정 항목에 해당한다.",
+      "fixReason": "핵심 조치는 \"현재로서는 할 것이 없다\"는 것으로, Slack 장애로 인한 일시적 문제이므로 우리 쪽 수정이 불필요하다고 안내했다. 이는 정답 요지와 정확히 일치하며, 추가로 CloudWatch 로그 확인이나 재시도 정책 검토 등 개선 사항도 적절히 제안했다. 다만 \"재시도 로직 작동 - 함수가 실패한 알림을 재시도했을 것\"이라는 확인되지 않은 추정이 포함되어 있으나, 핵심 조치 자체는 올바르다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-20",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "present",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "로그의 503 오류와 Slack 상태 페이지의 Incoming Webhook 장애 시간대를 연결해 Slack 공급자 장애를 주원인으로 정확히 짚었다. 복구 이후 정상화도 확인했으며, 우리 쪽 수정이 불필요하다고 바르게 판단했다. 다만 \"08:58 이후 복구됨 — 이후 알림이 정상 전송됨 (1/1 notifications sent), 응답 시간도 정상화 (2810ms → 204ms)\"는 조회 자료에 없는 수치·내용을 확정적으로 제시한 잘못된 단정에 해당한다.",
+      "fixReason": "핵심 조치는 \"아무것도 할 필요 없다\"는 것으로, 정답 요지와 일치한다. Slack 외부 장애로 인한 것이므로 우리 쪽 수정이 불필요하다는 판단이 정확하다. 향후 개선으로 제시한 재시도 로직·타임아웃 단축·모니터링 개선은 선택사항으로 덧붙인 것이며, 하면 안 되는 조치(webhook 재발급, SSM 교체 등)는 포함되지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-20",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "present",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 Slack Incoming Webhook 장애 시간대에 503 오류가 발생했음을 로그와 공급자 상태 페이지로 확인하고, 우리 코드·설정 변경과 무관하다고 정확히 짚었다. 정답 요지의 핵심 원인과 일치한다. 다만 \"09:04 UTC에 정상 전송 성공\"은 조회 자료에서 확인되지 않는 내용이나, 이는 원인 판정보다 조치 서술에 해당하므로 원인 판정에는 영향 없다.",
+      "fixReason": "핵심 조치는 \"즉시 조치 불필요\"로, Slack 장애 복구 후 정상화를 확인하는 것이다. 정답 요지와 일치하며, 놓친 오류는 CloudWatch 로그 확인, DLQ/대체 채널 등 개선 사항도 올바르게 제시했다. 잘못된 조치(webhook 재발급, 롤백 등)는 언급되지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-23",
+      "run": 0,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 DynamoDB 검색 결과 캐시(MATCH#{해시})가 원인이라고 확정적으로 주장했다. 그러나 조회 자료에는 캐시가 문제라는 직접적 근거가 없고, 정답 요지는 결정적 신호를 볼 수 없으므로 근거 부족을 인정하고 추가 확인이 필요하다고 답해야 한다고 명시한다. 도우미는 캐시를 주원인으로 단정했으므로 원인 판정은 틀림이다. 또한 캐시 초기화로 해결된다고 확정적으로 제시했는데, 이는 도구 결과에 없는 내용을 사실처럼 단정한 것이므로 잘못된 단정이 있다.",
+      "fixReason": "핵심 조치는 DynamoDB의 MATCH#* 캐시 항목 삭제다. 그러나 정답 요지에 따르면 결정적 신호가 없는 상황에서 원인을 캐시로 확정하는 것은 잘못된 단정이며, 실제 숨은 원인은 SPEC 필드 구조 불일치(material vs materialComposition)다. 캐시를 삭제해도 SPEC 구조 문제가 남아 있으면 장애가 해소되지 않는다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-23",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 에러 없음을 확인하고 결정적 신호가 없다고 판단해 추가 정보를 요청했다. 원인을 확정하지 않고 무엇을 더 확인해야 하는지 제시한 것은 정답 요지와 일치한다.",
+      "fixReason": "답변은 원인을 확정하지 않고, 검색 결과 수·부품 ID·다른 재질 비교 등 추가 확인이 필요한 사항을 구체적으로 질문하며 조사 방향을 제시했다. 이는 결정적 신호가 없는 상황에서 올바른 접근이다. 다만 S3 리인덱싱 상태 미확인을 언급하며 재색인 문제를 암시하는 뉘앙스가 있으나 확정하지는 않았고, 핵심 조치는 추가 정보 수집 질문이다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-23",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "present",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 레이어 변경, 검색 필터 변경, 데이터 스키마 변경, 캐시 문제, 부품 등록 중단 등 여러 후보를 나열하면서도 결정적 근거가 없음을 인정하고 추가 정보를 요청했다. 정답 요지대로 근거 부족을 인정하고 추가 확인 사항을 제시한 것으로 볼 수 있다.",
+      "fixReason": "답변은 원인을 확정하지 않고 추가 확인이 필요한 정보(문제 시점, 부품 수, 현재 검색 결과)를 구체적으로 묻고 있다. 핵심 조치는 추가 정보 수집이며, 이는 결정적 신호가 없는 이 상황에서 올바른 접근이다. 다만 후보 원인 중 '캐시 문제'나 '레이어 변경'을 확정하지 않고 가능성으로만 제시했으므로 단정은 아니다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-24",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "로그에서 ResourceNotFoundException(Legacy 모델, 15일 미사용)을 정확히 짚었고, 설정에서 BEDROCK_MODEL_ID가 Haiku로 지정된 것도 확인했다. 그러나 핵심인 \"콘솔에서 직접 넣은 환경 변수 재정의가 원인\"임을 명확히 짚지 못하고, 코드나 레이어 변경 탓일 가능성을 열어두며 추가 확인을 요청했다. 원인 방향은 맞지만 핵심(콘솔 환경 변수 재정의)이 빠졌다.",
+      "fixReason": "답변의 핵심 조치는 v1.10.0 배포 코드 변경 사항을 확인해달라는 추가 정보 요청이다. 원인(Legacy 모델 + 콘솔 환경변수 재정의)을 이미 에러 로그와 현재 설정으로 파악한 상태에서, 해결 조치 없이 계속 조사만 요청하고 있다. 실제로는 콘솔의 BEDROCK_MODEL_ID 환경변수를 제거하거나 유효한 모델 ID로 교체하면 즉시 해결되는 상황이므로, 불필요한 조사를 핵심으로 권한 것은 장애를 해소하지 못한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-24",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "로그의 ResourceNotFoundException을 정확히 짚고, Legacy 모델 접근 불가로 fallback 템플릿이 사용된다는 핵심 원인을 맞게 설명했다. 다만 SyntheticDataFunction 콘솔에서 직접 설정한 BEDROCK_MODEL_ID 환경 변수가 원인이라는 점(템플릿의 global 모델 대신 콘솔 재정의 값이 쓰임)은 언급하지 않았고, 해결책으로 코드 내 모델 ID 변경을 제안했으나 실제 원인은 콘솔 환경 변수 재정의이므로 핵심이 빠졌다. 또한 존재하지 않는 모델 ID(claude-3-sonnet-20240229, claude-3-5-sonnet-20241022)를 예시로 확정적으로 제시했다.",
+      "fixReason": "핵심 조치는 SyntheticDataFunction 코드에서 모델 ID를 최신 활성 모델로 변경하는 것이다. 그러나 실제 원인은 코드가 아닌 콘솔에서 직접 설정한 환경 변수 BEDROCK_MODEL_ID가 레거시 모델로 남아 있는 것이다. 코드 파일을 수정해도 콘솔 환경 변수가 코드보다 우선하므로 장애가 해소되지 않는다. 올바른 조치는 콘솔의 환경 변수 재정의를 제거하거나 sam deploy로 템플릿 환경 변수를 재적용하는 것이다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-24",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "로그의 ResourceNotFoundException(Legacy 모델, 15일 미사용)을 정확히 짚었고, 코드가 폴백으로 고정 문구를 반환한다는 흐름도 맞게 설명했다. 다만 SyntheticDataFunction 콘솔에서 직접 설정한 BEDROCK_MODEL_ID 환경 변수가 Claude 3 Haiku로 남아 있다는 핵심 원인(콘솔 오버라이드)은 언급하지 않았고, 모델 ID도 확인하지 않은 채 \"현재 사용 중인 모델 확인\"을 1단계로 제시했다. 방향은 맞지만 핵심이 빠진 partial에 해당한다.",
+      "fixReason": "핵심 조치는 \"옵션 A: Bedrock 콘솔에서 현재 모델 다시 활성화\"로, Legacy 모델 접근 재신청에 해당한다. 정답 요지에서 명시적으로 \"하면 안 되는 조치\"로 지정된 방법이다. 옵션 B(최신 모델로 변경)는 올바른 방향이나 핵심 조치보다 뒤에 제시되었고, 구체적으로 콘솔 환경변수 재정의 제거나 sam deploy로 템플릿 값 복원이 아닌 코드 파일 직접 수정을 안내하고 있어 정확도가 낮다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-26",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 캐시 키에 필터 조건이 포함되지 않아 같은 검색어면 필터가 달라도 이전 캐시를 반환한다고 정확히 짚었다. 다만 정답 요지의 핵심인 \"09:40 배포의 searchCacheKey 정리\"라는 구체적 변경 내용은 언급하지 않고 레이어 27 배포(00:52)를 원인 시점으로 지목했다. 그러나 캐시 키에서 필터가 빠진 것이 원인이라는 핵심은 맞게 짚었다. 레이어 26으로 롤백을 권했는데, 조회 자료에는 레이어 26의 ARN이 없고 도우미가 ARN을 직접 구성해 제시했으나 이는 조치 영역이므로 원인 판정에는 영향 없다.",
+      "fixReason": "핵심 조치는 레이어 26으로 롤백이며, 이는 정답 요지의 v1.10.0 롤백(완화)에 해당하는 유효한 조치다. 롤백 명령어의 ARN 형식도 올바르고, 근본 해결로 캐시 키에 필터 포함도 제시했다. 다만 기존 캐시 무효화(SEARCH_PIPELINE_VERSION 올리기 또는 MATCH#*/RESULT 항목 삭제) 언급이 없어 롤백만으로는 이미 쌓인 캐시가 남아 완전 해소가 불확실하나, 롤백 자체는 장애를 완화하는 올바른 조치다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-26",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 캐시 키에 필터가 빠진 것을 주원인으로 짚었으나, 정답 요지의 핵심인 '09:40 배포의 searchCacheKey 정리'로 인한 변경임을 특정하지 못하고 오히려 00:52 레이어 27 배포를 원인 시점으로 잘못 연결했다. 방향(캐시 키에 필터 누락)은 맞지만 핵심 원인(09:40 배포)을 짚지 못했으므로 partial이다.",
+      "fixReason": "핵심 조치는 캐시 키에 필터 조건을 포함시키는 코드 수정 후 재배포다. 이는 정답 요지의 조치(캐시 키에 필터·topK 되돌려 배포)와 일치하며, 실행 시 장애가 해소된다. 다만 기존 캐시 무효화(SEARCH_PIPELINE_VERSION 올리기 또는 기존 캐시 항목 삭제) 언급이 없어 배포 후에도 기존 캐시 히트가 잠시 지속될 수 있으나, 새 키 구조로 바뀌면 기존 MATCH#{searchQuery} 키와 달라져 사실상 자연 무효화된다. topK 누락은 있지만 필터 포함만으로도 핵심 장애는 해소된다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-26",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 캐시 키에 필터가 포함되지 않는 것을 원인으로 짚었으며, 이는 정답 요지(searchCacheKey 정리로 필터·topK가 캐시 키에서 빠짐)와 실질적으로 동일한 내용이다. 다만 09:40 배포(레이어 v27)와의 연결을 명시적으로 확인하지 않고 \"추정\"으로만 제시했으나, 핵심 원인 방향은 정확히 맞다.",
+      "fixReason": "핵심 조치로 DynamoDB의 MATCH#* 캐시 항목 삭제를 먼저 권했고, 코드에서 캐시 키에 필터를 포함하도록 수정하는 것도 함께 제시했다. 캐시 항목 삭제 + 코드 수정 병행은 정답 요지에서도 유효한 조치로 인정되며, 코드 수정 방향도 필터를 캐시 키에 되돌리는 것으로 올바르다. 단, SEARCH_PIPELINE_VERSION 무효화나 롤백 언급은 없지만 캐시 삭제와 코드 수정 병행으로 장애는 해소된다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-27",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 원인을 단정하지 않고 추가 정보를 요청했다. 정답 요지에서 결정적 신호를 볼 수 없는 상황에서 올바른 대응은 근거 부족을 인정하고 추가 확인 사항을 묻는 것이므로 원인 판단은 맞다. 다만 브라우저 네트워크 탭 확인을 제안하긴 했으나, 핵심인 /api/search/explain 400 응답 본문 확인이나 프론트 배포 이력 대조는 언급하지 않았다. 잘못된 단정은 없다.",
+      "fixReason": "답변은 원인을 확정하지 않고 추가 정보(화면, 시각, 에러 메시지, 브라우저 네트워크 탭 응답 코드 등)를 구체적으로 묻고 있다. 정답 요지가 요구하는 \"근거 부족 인정 + 추가 확인 사항 제시\" 방향과 일치하며, 브라우저 네트워크 탭 확인도 권고에 포함되어 있다. 잘못된 조치(Bedrock 단정, 쿼터 증설 등)는 전혀 언급되지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-27",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 원인을 단정하지 않고 추가 정보를 요청했다. 정답 요지에서 결정적 신호를 볼 수 없는 상황이므로 근거 부족을 인정하고 추가 확인이 필요하다고 말하는 것이 올바른 대응이며, 도우미는 이를 따랐다.",
+      "fixReason": "답변의 핵심 조치는 추가 정보를 수집하기 위한 구체적인 질문들이다. 어느 기능인지, 정확한 시각, 증상의 세부 사항을 묻고 있으며, 이는 근거가 부족한 상황에서 원인을 확정하지 않고 조사에 필요한 정보를 구체적으로 묻는 올바른 접근이다. 다만 정답 요지에서 요구하는 핵심 조사 방향(브라우저 네트워크 탭/API Gateway 액세스 로그로 400 응답 본문 확인, 프론트 배포 이력 대조)은 언급되지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-27",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 원인을 단정하지 않고 추가 정보를 요청하며 조사를 시작하려 했다. 정답 요지에서 요구하는 \"근거 부족을 인정하고 무엇을 더 확인해야 하는지 말하는 것\"에 부합한다. 사실과 다른 내용을 확정적으로 말한 부분도 없다.",
+      "fixReason": "답변은 원인을 확정하지 않고 기능 위치, 발생 시각, 에러 메시지 등 진단에 필요한 구체적 정보를 묻고 있다. 이는 근거 부족 상황에서 올바른 조치(추가 확인 사항 파악)에 해당한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-30",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "present",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "SSM 파라미터 이름 변경(/eecar/slack/webhook-url 삭제 → /eecar/prod/slack/webhook-url 생성)으로 인해 함수의 SLACK_WEBHOOK_SSM_PARAM이 구 이름을 가리켜 ParameterNotFound가 발생한다는 핵심 원인을 정확히 짚었다. 다만 IAM 정책도 구 이름(/eecar/slack/webhook-url)을 가리키고 있어 환경 변수만 바꾸면 권한 오류가 추가로 발생한다는 점을 언급하지 않았으나, 주원인 자체는 맞다.",
+      "fixReason": "핵심 조치는 환경 변수 SLACK_WEBHOOK_SSM_PARAM을 새 이름으로 변경하는 것인데, IAM 정책도 예전 이름을 가리키므로 환경 변수만 바꾸면 ssm:GetParameter 권한 오류로 여전히 실패한다. 정답 요지에서도 \"환경 변수만 바꾸고 IAM은 그대로 두기\"는 하면 안 되는 조치로 명시되어 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-30",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "SSM 파라미터 이름 변경으로 인해 환경 변수(SLACK_WEBHOOK_SSM_PARAM)와 IAM 정책이 구 경로를 가리켜 ParameterNotFound 오류가 발생한다는 핵심 원인을 정확히 짚었다. 다만 해결책에서 환경 변수만 바꾸는 방법 1을 권장했는데, 정답 요지에 따르면 환경 변수만 바꾸고 IAM은 그대로 두는 것은 하면 안 되는 조치다. 그러나 원인 판정은 조치를 포함하지 않으므로 원인 자체는 맞다.",
+      "fixReason": "핵심 조치로 환경 변수만 새 경로로 바꾸는 방법 1을 권장했으나, IAM 정책은 여전히 구 경로를 가리키므로 환경 변수만 바꾸면 ssm:GetParameter 권한이 없어 ParameterNotFound 대신 AccessDenied로 여전히 실패한다. 정답 요지에서도 \"환경 변수만 바꾸고 IAM은 그대로 두기\"는 하면 안 되는 조치로 명시되어 있다. 방법 2(IAM 정책 업데이트)는 뒤에 제시되었으나 핵심 권장 조치가 아니며, 두 가지를 함께 적용해야 해결된다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-30",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "present",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "SSM 파라미터 이름 변경(/eecar/slack/webhook-url 삭제 → /eecar/prod/slack/webhook-url 생성)으로 인해 환경 변수 SLACK_WEBHOOK_SSM_PARAM과 IAM 정책이 예전 이름을 가리켜 ParameterNotFound 오류가 발생한다는 핵심 원인을 정확히 짚었다.",
+      "fixReason": "핵심 조치는 환경 변수를 새 파라미터 이름으로 수정하고 IAM 정책도 함께 업데이트하는 것으로, 정답 요지의 \"환경 변수와 IAM 정책을 새 이름으로 함께 바꿔 배포\"와 정확히 일치한다. 제시된 ARN과 파라미터 경로도 실제 값과 일치하며 그대로 실행 가능하다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-31",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "모든 함수의 에러율 0%, 정상 응답시간, 최근 배포 이후 이상 없음을 확인하고 \"전체 상태가 정상\"이라고 올바르게 판단했다. 정답 요지의 원인(오류·스로틀 없음, 지연 정상, 변경은 일상 배포뿐)과 일치한다. 사실과 다른 내용을 확정적으로 말한 부분도 없다.",
+      "fixReason": "장애가 없는 정상 상황에서 현재 상태를 요약해 알리는 것이 올바른 조치이며, 답변은 불필요한 롤백이나 증설 없이 정상 상태를 정확히 요약하고 있다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-31",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "모든 함수의 에러율 0%, 응답 시간 정상, 최근 변경은 일상 배포뿐이며 영향 신호 없음을 확인하고 정상 상태로 올바르게 판단했다. 잘못된 단정도 없다.",
+      "fixReason": "장애가 없는 정상 상태이므로 올바른 조치는 현재 상태를 요약해 알리는 것이다. 답변은 에러율 0%, 응답시간 정상, 배포 이력 등을 정리해 \"조치 없음\"으로 현황을 전달했으며, 불필요한 롤백이나 증설 등 해로운 조치를 권하지 않았다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-31",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 모든 함수의 에러율 0%, 정상 응답시간, 최근 배포 이력을 확인한 뒤 \"특별한 조치가 필요 없다\"고 결론 내렸다. 정답 요지의 원인(오류·스로틀 없음, 지연 정상, 최근 변경은 일상 배포뿐, 영향 신호 없음)을 정확히 짚었다.",
+      "fixReason": "답변은 모든 지표가 정상임을 확인하고 \"특별한 조치가 필요 없습니다\"라고 결론 내렸다. 이는 정답 요지(조치 없이 현재 상태를 요약해 알린다)와 정확히 일치한다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-33",
+      "run": 0,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 USE_KNOWLEDGE_BASE 활성화(07:48 변경)를 주원인으로 지목했으나, 정답은 07:12 배포(v1.10.1)의 search-index 상수 정리로 BM25 색인 캐시 TTL이 사실상 0이 되어 매 요청마다 GSI2 전체 읽기가 발생한 것이다. 또한 KNOWLEDGE_BASE_ID가 비어 있어 USE_KNOWLEDGE_BASE는 실제 효과가 없음에도 이를 원인으로 확정적으로 단정했다.",
+      "fixReason": "핵심 조치는 USE_KNOWLEDGE_BASE=false로 되돌리는 것이다. 그러나 정답 요지에 따르면 KNOWLEDGE_BASE_ID가 비어 있어 USE_KNOWLEDGE_BASE는 실제로 효과가 없으며, 진짜 원인은 v1.10.1 배포로 인한 BM25 색인 캐시 TTL 상수 오류다. USE_KNOWLEDGE_BASE를 끄더라도 캐시 만료 문제는 그대로 남아 DynamoDB 읽기 급증과 응답 지연이 해소되지 않는다. 정답 요지도 USE_KNOWLEDGE_BASE를 원인으로 단정하는 것을 '하면 안 되는 조치'로 명시하고 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-33",
+      "run": 1,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 USE_KNOWLEDGE_BASE 활성화를 주원인으로 단정했으나, 실제 원인은 v1.10.1 배포(07:12)의 search-index 상수 정리로 BM25 색인 캐시가 사실상 즉시 만료되어 매 요청마다 전체 METADATA를 GSI2로 다시 읽는 것이다. 또한 KNOWLEDGE_BASE_ID가 비어 있어 USE_KNOWLEDGE_BASE=true는 실제 효과가 없음에도 이를 원인으로 확정적으로 단정했다.",
+      "fixReason": "핵심 조치는 USE_KNOWLEDGE_BASE를 false로 되돌리는 것인데, 정답 요지에서 이는 \"하면 안 되는 조치\"로 명시되어 있다(KNOWLEDGE_BASE_ID가 비어 있어 효과 없음). 실제 원인은 v1.10.1 배포로 인한 BM25 색인 캐시 TTL 상수 오류이므로, 이 조치로는 장애가 해소되지 않는다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-33",
+      "run": 2,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 USE_KNOWLEDGE_BASE=true + KNOWLEDGE_BASE_ID 공백이 BM25 캐시 미적용의 원인이라고 주원인으로 단정했다. 그러나 실제 원인은 v1.10.1 배포(07:12)의 search-index 상수 정리로 BM25 색인 TTL이 사실상 0이 되어 매 요청마다 재로드되는 것이다. USE_KNOWLEDGE_BASE 변경(07:48)은 KNOWLEDGE_BASE_ID가 비어 있어 효과가 없으며 원인이 아니다.",
+      "fixReason": "핵심 조치는 USE_KNOWLEDGE_BASE를 false로 되돌리는 것이다. 그러나 정답 요지에 따르면 KNOWLEDGE_BASE_ID가 비어 있어 USE_KNOWLEDGE_BASE는 실제로 효과가 없으며, 진짜 원인은 v1.10.1 배포로 인한 BM25 색인 캐시 TTL 상수 오류다. USE_KNOWLEDGE_BASE를 되돌려도 캐시 TTL 버그는 그대로 남아 있으므로 장애가 해소되지 않는다. 정답 요지도 USE_KNOWLEDGE_BASE를 원인으로 단정하는 것을 '하면 안 되는 조치'로 명시하고 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-35",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 AWS 서울 리전 DynamoDB DNS 오류(ENOTFOUND)를 주원인으로 정확히 짚었고, v1.10.1 배포는 원인이 아님을 명확히 밝혔다. 잘못된 단정은 없으며, \"AWS가 30분~1시간 내에 복구할 것으로 예상\"은 추정 표현이고, 함수 상태 메트릭이 0%인 것은 조회 자료에 실제로 나타난 값이다.",
+      "fixReason": "핵심 조치는 롤백하지 말고 AWS 복구를 기다리라는 것으로, 정답 요지의 올바른 조치와 정확히 일치한다. AWS 공지 확인, CloudWatch 모니터링, 상태 페이지 안내까지 포함되어 있어 장애 해소에 적합하다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-35",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 AWS 서울 리전 DynamoDB DNS 장애(ENOTFOUND)를 주원인으로 정확히 짚었고, v1.10.1 배포는 원인이 아님을 명확히 밝혔다. 롤백 불필요도 올바르게 안내했다. 잘못된 단정은 없으며, 모든 수치와 이름은 조회 자료에 근거한다.",
+      "fixReason": "핵심 조치는 롤백하지 않고 AWS 복구를 기다리며 사용자에게 공지하는 것으로, 정답 요지의 올바른 조치와 정확히 일치한다. DynamoDB DNS 장애라는 원인도 정확히 짚었고, 롤백 금지 및 모니터링·공지 순서도 적절하다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-35",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 DynamoDB 서울 리전 DNS 오류(ENOTFOUND)를 주원인으로 정확히 짚었고, v1.10.1 배포는 무관하다고 올바르게 판단했다. 롤백 불필요도 맞다. 잘못된 단정도 없다.",
+      "fixReason": "핵심 조치는 \"롤백하지 말고 AWS 복구를 기다리며 팀에 공지\"로, 정답 요지의 올바른 조치와 정확히 일치한다. 롤백 불필요 판단, 영향 범위 공지, 복구 후 확인 모두 포함되어 있다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-36",
+      "run": 0,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 IAM 정책의 와일드카드 ARN 형식 불일치를 의심 원인으로 제시했다. 정답 요지의 원인은 IAM 최종 일관성(eventual consistency)으로 인한 일시적 거부이며, 현재 권한은 정상이라는 것이다. 도우미는 권한 자체가 문제일 수 있다고 방향을 잡았고, 일시적 현상임을 짚지 못했다. 또한 현재 에러율이 0이고 권한도 정상임을 확인했음에도 \"에러가 여전히 발생 중\"이라고 단정하고, 로그 타임스탬프 해석도 잘못하여 사실과 다른 내용을 확정적으로 말했다.",
+      "fixReason": "답변의 핵심 조치는 권한 정책의 ARN 형식 불일치를 의심하며 추가 확인을 요청하는 것이다. 실제 원인은 IAM 최종 일관성으로 인한 일시적 거부이며 현재는 이미 복구된 상태다. 답변은 불필요한 권한 문제로 오진하고 있으며, 조치 없이 복구를 확인하는 올바른 방향을 제시하지 않았다. 또한 \"에러는 여전히 발생 중\"이라는 잘못된 판단을 앞세우고 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-36",
+      "run": 1,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 배포 중 일시적 권한 불일치(이전 정책으로 실행)를 원인으로 짚었으나, 정답 요지의 핵심인 'IAM 최종 일관성(eventual consistency)으로 인한 약 1분간의 지연'을 명시하지 않았다. 방향은 맞지만 핵심 메커니즘이 빠졌다. 잘못된 단정은 없으며, 로그 타임스탬프를 \"07:59~08:10\"으로 잘못 표현했으나 이는 확정적 사실 주장이 아닌 요약 오류 수준이고, 원인 설명 자체를 사실과 다르게 단정한 것은 아니다.",
+      "fixReason": "핵심 조치는 \"권한을 넓힐 필요 없다\"며 현재 상태 확인 후 관찰하라는 것으로, 정답 요지의 올바른 조치(조치 없이 복구 확인 및 관찰)와 일치한다. 불필요한 권한 확대나 롤백 등 금지 조치를 권하지 않았다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-36",
+      "run": 2,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 배포 시각과 에러 시각이 일치한다고 했으나, 실제 로그의 에러 시각은 10:02~10:02대이고 배포는 10:01:58Z로 일치하는 반면, 도우미는 \"08:00~08:11\"이라고 잘못된 시각을 확정적으로 제시했다. 또한 원인을 \"리소스 ARN 형식 변경 가능성\"으로 제시하며 IAM 최종 일관성(eventual consistency)을 짚지 못했고, 현재 권한 정책에 bedrock:InvokeModel이 inference-profile/*로 정상 존재함에도 \"리소스 ARN 형식이 변경되었을 가능성\"을 원인으로 단정했다.",
+      "fixReason": "답변의 핵심 조치는 추가 정보를 수집하기 위한 질문(현재 정상 작동 여부, 에러 중단 시점)으로, 즉각적인 권한 변경을 권하지 않고 상황을 더 파악하려는 것이다. 이는 \"조치 없이 복구를 확인하고 관찰한다\"는 정답 요지와 부합한다. 다만 답변 본문에서 \"리소스 ARN 형식이 변경되었을 가능성\"을 시사하며 권한 재설정 필요성을 열어두고 있어 방향이 다소 모호하나, 핵심 조치(질문)는 해롭지 않고 해결에 기여한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-41",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 dry run으로 실제 재색인이 실행되지 않아 기존 벡터가 구 버전으로 남아 있다는 점을 짚었다. 그러나 핵심 메커니즘인 \"METADATA의 searchText/searchAttributes가 v5로 남아 있어 코드가 버전 불일치 시 METADATA만으로 문서를 재구성하므로 SPEC·배터리 상태 줄이 빠진다\"는 BM25 검색 저하의 핵심을 언급하지 않고, S3 Vectors 임베딩 불일치(벡터 표현 방식 차이)를 주원인으로 제시했다. 또한 잘못된 단정으로, 도구 결과나 시스템 프롬프트 어디에도 없는 \"쿼리와 벡터의 표현 방식 불일치\"를 확정적으로 원인으로 제시했다.",
+      "fixReason": "핵심 조치로 `npm run reindex-search-documents -- --apply`(즉 reindex-search-documents.ts를 --apply로 실행)를 권했으며, 이는 정답 요지의 올바른 조치와 동일하다. 진단 원인 설명에 임베딩/S3 Vectors 불일치라는 오해가 섞여 있으나, 조치 자체는 v6 문서로 재색인하는 것으로 장애를 해소한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-41",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "present",
+      "fix": "no",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 04:10 배포에서 SEARCH_DOCUMENT_VERSION이 6으로 올라갔고, 04:32 재색인이 dry run으로만 실행되어 실제 쓰기가 없었다는 점을 주원인으로 정확히 짚었다. 다만 \"새 표기 사전으로 다시 임베딩\"이라고 설명해 BM25용 searchText/searchAttributes(METADATA)가 v5로 남아 SPEC·배터리 상태 줄이 빠진다는 핵심 메커니즘은 언급하지 않았으나, 원인의 방향(dry run으로 재색인 미완료)은 정확히 맞다.",
+      "fixReason": "핵심 조치는 리인덱싱 실행이며 방향은 맞다. 그러나 제시한 명령어가 `--execute` 플래그인데, 정답 요지의 스크립트는 `--apply` 플래그를 사용한다. 실제 스크립트에 `--execute`가 없다면 dry run으로 동작하거나 오류가 발생할 수 있어 그대로 실행 시 해결 여부가 불확실하다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-41",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "no"
+      },
+      "reason": "도우미는 dry run만 실행되어 DynamoDB의 부품 문서가 여전히 이전 버전(v5) 형식으로 남아 있어 BM25 매칭 정확도가 떨어진다고 짚었다. 이는 정답 요지(SEARCH_DOCUMENT_VERSION 6 배포 후 재색인이 dry run만 실행되어 METADATA가 v5로 남아 SPEC·배터리 상태 줄이 빠진 것)와 방향이 일치한다. 다만 \"코드는 버전이 다르면 METADATA만으로 문서를 다시 만들기 때문에 SPEC 줄이 빠진다\"는 핵심 메커니즘은 언급하지 않았으나, 핵심 원인(dry run으로 재색인 미완료 → v5 문서 잔존 → 사양 기반 검색 저하)은 충분히 짚었다.",
+      "fixReason": "핵심 조치는 색인 재구성 스크립트를 실제로 실행하는 것으로, 정답 요지의 --apply 실행과 동일하다. dry run이 아닌 실제 실행을 명확히 권하고 있어 장애를 해소할 수 있다. 구체적인 명령어(--apply 플래그 등)는 제시하지 않았으나 방향 자체는 올바르다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-46",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 eecar-shared 패키지가 번들에 포함되지 않아 Runtime.ImportModuleError가 발생한다고 정확히 짚었고, v1.10.1 배포에서 watch-part가 eecar-shared를 import하게 된 것이 원인임을 명시했다. 다만 \"레이어와 함수 코드를 함께 업데이트하지 않았을 가능성\"이라는 부정확한 가설을 덧붙였으나, 주원인 진단 자체는 정답 요지와 일치한다. 잘못된 단정으로는 \"eecar-utils-layer 버전 27에 해당 모듈이 포함되었는지 확인\"이라는 표현이 있는데, 이는 레이어 문제일 가능성을 제시한 것이지 확정적 단정은 아니다. 그러나 \"빌드 과정에서 레이어와 함수 코드를 함께 업데이트하지 않았을 가능성이 높습니다\"는 실제 원인(dependencies 누락)과 다른 원인을 높은 가능성으로 제시한 것이지만, \"가능성\"이라는 표현을 사용했으므로 확정적 단정은 아니다.",
+      "fixReason": "핵심 조치는 v1.10.0으로 롤백하는 것으로, 정답 요지에서도 완화 조치로 인정된 올바른 조치다. 롤백 명령도 실행 가능하며 장애를 해소한다. 다만 2번 근본 원인 확인에서 \"레이어 버전 27에 해당 모듈이 포함되었는지 확인\"을 권하는데, 이는 틀린 조치(레이어만 다시 게시)로 이어질 수 있으나 핵심 조치(롤백)보다 뒤에 나오므로 q_wrong_first=no로 판단한다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-46",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 04:20 v1.10.1 배포에서 eecar-shared 패키지가 번들에 포함되지 않아 Runtime.ImportModuleError가 발생한다고 짚었다. 이는 정답 요지의 핵심 원인(eecar-shared가 dependencies에 없어 Lambda 패키지에 포함되지 않음)과 일치한다. 다만 \"레이어 버전 미스매치\", \"빌드 실패\", \"패키지명 오류\" 등 여러 후보를 나열하며 핵심(dependencies 누락)을 확정하지 않고 가능성으로 제시했으나, 전체 맥락상 배포 변경과 패키지 누락을 주원인으로 명확히 지목했으므로 yes로 판정한다. 잘못된 단정으로는 \"레이어 버전 미스매치\"를 원인 후보로 제시했으나 이는 확정적 단정이 아닌 가능성 나열이므로 해당 없다.",
+      "fixReason": "핵심 조치로 v1.10.0 롤백을 가장 먼저 권했으며, 이는 정답 요지에서 완화 조치로 명시된 올바른 방법이다. 롤백 명령도 실행 가능하고 장애를 해소한다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-46",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 v1.10.1 배포에서 eecar-shared 패키지가 Lambda 번들에 포함되지 않아 Runtime.ImportModuleError가 발생한다고 정확히 짚었다. 정답 요지의 핵심 원인(eecar-shared가 dependencies에 없어 패키지에 포함되지 않음)과 일치하며, 잘못된 단정도 없다.",
+      "fixReason": "핵심 조치는 v1.10.0 롤백이며, 이는 정답 요지에서 명시한 완화 조치 중 하나다. 롤백 명령도 실행 가능하고 장애를 해소한다. 이후 근본 수정(import 방식 변경 또는 dependencies 추가 후 재배포)도 언급되어 있어 전체적으로 올바른 방향이다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-49",
+      "run": 0,
+      "cause": "no",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 6초 피크의 원인을 \"일시적 부하\", \"S3 Vectors 지연\", \"Bedrock 지연\" 등으로 추측했고, 10:05 배포로 인한 콜드 스타트(Init + 캐시 없는 첫 호출)라는 핵심 원인을 짚지 못했다. 심지어 get_function_config에서 lastModified가 10:05임을 조회했음에도 배포와 연결하지 않았다.",
+      "fixReason": "핵심 조치는 \"지금은 조치 불필요\"로, 정답 요지(조치 없이 정상 복귀 관찰)와 일치한다. 메모리 증설도 현 시점에서는 권하지 않았고, 6초 피크 원인 추측은 부정확하지만 조치 판정에는 영향 없다. 다만 \"P99가 8초 이상 지속되면 메모리 증가 검토\"는 하면 안 되는 조치(메모리 증설)를 뒤에 언급했으나 핵심 조치는 아니다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-49",
+      "run": 1,
+      "cause": "no",
+      "wrong": "present",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 원인을 특정하지 않고 \"아까 6초 찍혔던 원인이 뭔지 궁금하면 get_recent_changes로 확인해드릴 수 있다\"며 원인 파악을 미뤘다. 정답 요지의 핵심 원인인 10:05 배포로 인한 콜드 스타트(Init 1.8초 + 캐시 없는 조회)를 전혀 짚지 못했다. lastModified가 2026-11-06T10:05:02로 조회됐음에도 이를 원인과 연결하지 않았다.",
+      "fixReason": "핵심 조치는 \"지금은 조치 불필요\"로 정상 복귀를 알리고 모니터링을 계속하는 것이다. 이는 정답 요지(조치 없이 정상 복귀 알림 및 관찰)와 일치한다. 메모리 증설은 권장하지 않았고, 10초 초과 시 검토하라는 조건부 언급은 부가 안내 수준이다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-49",
+      "run": 2,
+      "cause": "no",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 6초 스파이크를 \"일시적 스파이크\"로만 언급했을 뿐, 10:05 배포로 인한 콜드 스타트(Init 1.8초)와 캐시 없는 첫 호출이 원인이라는 핵심을 짚지 못했다. 배포·변경 확인(get_recent_changes)도 수행하지 않았다.",
+      "fixReason": "핵심 조치는 \"메모리 증설 불필요, 현재 정상\"으로 조치 없이 정상 복귀를 알리는 것이다. 이는 정답 요지(배포 직후 콜드 스타트로 인한 일시적 지연이며 조치 불필요)와 일치한다. 다만 P99가 여전히 5.84초라고 제시하는 등 현재 메트릭 수치가 실제와 다를 수 있으나, 핵심 판단(조치 불필요, 메모리 증설 불필요)은 올바르다. 쿼리 최적화 등 부가 제안은 불필요하지만 해롭지는 않다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-54",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 GSI2 쓰기 핫 파티션(IndexWriteKeyRangeThroughputExceeded)이 원인이며 Bedrock과 무관하다고 정확히 짚었다. 파트너 카탈로그 대량 적재(import-partner-catalog)가 GSI2 쓰기를 몰아 스로틀을 유발했다는 점도 명시했고, 슬랙 알림의 BedrockThrottling은 오분류임을 밝혔다. 정답 요지의 핵심 원인을 모두 포함한다.",
+      "fixReason": "핵심 조치는 \"import-partner-catalog 작업 완료 시까지 대기 + 자동 스케일링 조정 중\"이다. 그러나 자동 스케일링은 GSI 핫 파티션(IndexWriteKeyRangeThroughputExceeded) 문제를 해결하지 못하며, 단순 대기만으로는 장애가 해소되지 않는다. 적재 작업을 멈추거나 속도를 낮추는 것이 올바른 조치인데, 답변은 \"대기\"를 1순위로 권하고 병렬도 축소는 \"필요시\" 선택지로 뒤에 배치했다. 다만 병렬도를 10으로 줄이는 조치는 답변 내에 존재하며 이는 장애를 완화할 수 있다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-54",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "로그의 IndexWriteKeyRangeThroughputExceeded(GSI2)와 13:05 파트너 카탈로그 대량 적재를 주원인으로 정확히 짚었고, Bedrock과 무관함도 올바르게 판단했다. 슬랙 알림 오분류 원인도 언급했다.",
+      "fixReason": "핵심 조치는 \"진행 중인 대량 적재 일시 중지 및 병렬도 축소(20→5)\"로, 정답 요지의 올바른 조치(적재 중단 또는 속도 저하)와 일치한다. 단, 즉시 조치 2번에서 \"프로비저닝이면 WCU 임시 증설\"을 권하고 있으나 이는 핵심 조치가 아닌 부가 안내이며, 핵심 조치 자체는 장애를 해소한다. Bedrock 증설 불필요도 명시되어 있다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-54",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "no",
+        "q_harmful": "no",
+        "q_works_as_written": "no",
+        "q_wrong_first": "yes",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 GSI2 파티션 키 범위에 쓰기가 집중된다는 IndexWriteKeyRangeThroughputExceeded를 핵심 원인으로 짚었고, Bedrock과 무관하며 알림이 잘못 분류됐다는 점도 정확히 지적했다. 다만 파트너 카탈로그 대량 적재(13:05 시작)와 GSI2PK가 ALL#METADATA 하나로 집중된다는 핵심 구조적 원인까지는 언급하지 못했다.",
+      "fixReason": "핵심 조치로 \"GSI2 온디맨드 전환 또는 쓰기 용량 2배 증가\"를 먼저 권했다. 그러나 정답 요지에 따르면 문제는 GSI2PK가 ALL#METADATA 하나로 집중된 핫 파티션이므로, 온디맨드 전환이나 단순 용량 증설로는 해결되지 않는다(IndexWriteKeyRangeThroughputExceeded는 용량이 아닌 단일 파티션 키 범위 집중 문제). 올바른 즉시 조치는 적재 작업 중단/속도 제한이며, 이는 답변 내에 명시적으로 언급되지 않았다. 근본 해결(GSI2PK 샤딩)은 2번 항목에서 언급되어 있으나 핵심 조치가 아니다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-55",
+      "run": 0,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 08:47 핫픽스로 함수 코드만 배포했고, 레이어 v27의 search-ranking.js에 applyConstraintPenalty가 없어 Init 단계에서 실패한다고 정확히 짚었다. 정답 요지의 핵심 원인과 일치한다.",
+      "fixReason": "핵심 조치로 옵션 1(함수 코드 롤백)과 옵션 2(레이어 재빌드+재배포)를 병렬 제시했으며, 옵션 1을 \"가장 빠름\"으로 먼저 제시했다. 두 조치 모두 정답 요지의 올바른 조치에 해당하고, 코드·명령도 실제로 동작 가능하다. 잘못된 조치(메모리/타임아웃 증설 등)는 포함되지 않았다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-55",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "함수 코드만 배포하고 레이어를 재빌드하지 않아 search-ranking.js에 applyConstraintPenalty가 없어 Init 단계에서 실패한다는 핵심 원인을 정확히 짚었다. 잘못된 단정도 없으며, 마지막 문장(\"있다면 export 누락 문제일 수 있습니다\")은 가능성으로 표현했다.",
+      "fixReason": "핵심 조치로 \"옵션 1: 함수 코드 롤백\"을 가장 빠른 방법으로 추천했다. 직전 함수 코드 버전으로 롤백하는 것은 정답 요지에서 완화 조치로 명시된 올바른 조치다. 옵션 2(레이어 재빌드 및 재배포)도 정답 요지의 올바른 조치와 일치하며, 두 옵션 모두 장애를 해소한다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-55",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 핫픽스로 함수 코드만 배포하고 레이어를 갱신하지 않아 새 코드가 import하는 applyConstraintPenalty가 레이어 v27에 없어 Init 단계에서 실패한다고 정확히 짚었다. 정답 요지의 핵심 원인과 일치한다.",
+      "fixReason": "핵심 조치는 \"함수 코드를 이전 버전(SHA 9fA2d1)으로 되돌리기\"로, 이는 정답 요지의 올바른 조치 중 하나인 직전 함수 코드 버전으로 롤백에 해당한다. 레이어와 함수 코드를 함께 배포하는 대안도 제시되어 있어 장애를 해소할 수 있다. 명령·코드 측면에서 특별한 오류는 없다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-59",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 CORS/ALLOWED_ORIGINS 미등록을 \"거의 확실한\" 원인으로 단정했다. 그러나 조회 자료에는 브라우저 콘솔·응답 헤더 등 CORS를 확정할 결정적 신호가 없으므로, 정답 요지에 따르면 CORS를 유력 후보로 제시하되 확인이 필요하다고 답해야 한다. 방향은 맞지만 확인 없이 확정한 점에서 잘못된 단정이 있다.",
+      "fixReason": "핵심 조치는 ALLOWED_ORIGINS에 demo.eecar.kr을 추가하고 배포하는 것이다. 이는 숨은 원인(CORS 차단)을 직접 해결하는 조치이므로 장애가 해소된다. 다만 정답 요지는 결정적 신호(브라우저 콘솔·네트워크 탭)를 먼저 확인하도록 안내하는 것이 올바른 순서인데, 이 답변은 확인 단계 없이 곧바로 코드 수정·배포를 핵심으로 권했다. 그러나 조치 자체는 실행하면 장애를 해소하며 해롭지 않다. 코드 예시도 문법상 문제없다. 다만 \"문제의 원인은 거의 확실합니다\"라며 확인 전에 원인을 단정한 점, 그리고 1단계로 코드 확인만 제시하고 브라우저 콘솔/curl 확인을 권하지 않은 점은 정답 요지의 '확인 후 조치' 순서와 다르다. 그래도 핵심 조치(ALLOWED_ORIGINS 추가 + 배포)는 장애를 해결한다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-59",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "partial",
+      "checklist": {
+        "q_resolves": "unknown",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 CORS 설정(ALLOWED_ORIGINS)을 유력 후보로 명시적으로 제시하면서 확인이 필요하다고 했다. 확정하지 않고 가능성으로 제시했으며, 추가 확인을 요청했다. 정답 요지와 일치한다.",
+      "fixReason": "핵심 조치는 CORS 설정(ALLOWED_ORIGINS)을 유력 후보로 제시하면서 API 엔드포인트와 CORS 설정을 먼저 확인해달라고 요청하는 것이다. 원인을 확정하지 않고 브라우저/코드 측 확인을 요구하는 방향으로 안내했으며, 이는 정답 요지의 올바른 조치(브라우저 콘솔·네트워크 탭 또는 ALLOWED_ORIGINS 확인)와 일치한다. 불가능하거나 해로운 조치는 없고, 명령·코드도 제시하지 않아 오동작 여지가 없다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-59",
+      "run": 2,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 서버 측 로그와 지표에 이상이 없음을 확인한 뒤, CORS 미설정을 유력 후보로 제시하면서 브라우저 개발자 도구·Network 탭으로 추가 확인을 요청했다. 결정적 신호를 볼 수 없는 상황에서 CORS를 확정하지 않고 가능성으로 제시하며 확인 방법을 안내한 것은 정답 요지와 부합한다. 다만 \"가능성이 높습니다\"라는 표현과 함께 즉시 코드 수정·배포 조치를 제안한 부분은 확인 전 단정에 가깝지만, 원인 자체는 CORS를 유력 후보로 제시하되 확인을 권한 구조이므로 정답 요지에 맞다. 잘못된 단정 측면에서, \"캐시 오염\"과 \"환경 변수 차이\"를 원인 후보로 나열한 것은 가능성 제시 수준이고, ALLOWED_ORIGINS 코드 예시의 도메인 값은 자리표시자 성격이므로 지어낸 사실 단정으로 보기 어렵다.",
+      "fixReason": "핵심 조치는 ALLOWED_ORIGINS에 demo.eecar.kr을 추가하고 레이어를 재배포하는 것이다. 정답 요지는 결정적 신호(브라우저 콘솔·응답 헤더)를 먼저 확인한 뒤 CORS 추가를 권해야 한다고 명시하며, CORS를 유력 후보로 제시하되 확인이 필요하다고 답해야 한다고 한다. 답변은 확인 절차도 함께 안내하고 있으나, 가장 강하게 권한 \"즉시 해결\" 섹션에서 확인 없이 바로 코드 수정·배포를 핵심 조치로 제시했다. 그러나 이 조치 자체는 실제 원인(ALLOWED_ORIGINS 누락)을 해결하며, 코드도 올바르게 동작하고 해롭지 않다. 확인 전 배포를 먼저 권한 점은 아쉽지만 틀린 조치를 앞에 권한 것은 아니다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-60",
+      "run": 0,
+      "cause": "partial",
+      "wrong": "present",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 OOM이 원인임을 맞게 짚었으나, 핵심인 \"카탈로그 중복 적재로 METADATA 건수가 급증했기 때문에 메모리 한도에 닿았다\"는 부분을 언급하지 않았다. 레이어 v27 배포를 원인 후보로 제시했지만, 실제 원인인 11:40~11:58 중복 적재는 확인하지 못했다. 방향(OOM)은 맞지만 핵심 원인(데이터 급증)이 빠졌으므로 partial이다.",
+      "fixReason": "핵심 조치는 VectorSearchFunction 메모리를 1024MB→3008MB로 증설하는 것이다. 정답 요지에서도 메모리 증설은 '완화' 조치로 인정하고 있으므로 장애를 해소(완화)할 수 있다. 명령어 문법도 올바르고 실행 가능하다. DDoS·방화벽 조치는 불필요하다고 명확히 부정했으므로 q_wrong_first는 no다.",
+      "pass": false,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-60",
+      "run": 1,
+      "cause": "yes",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "BM25 색인 재적재 시 메모리 한도 1024MB에 닿아 OOM으로 죽는 동안 502가 발생하고, 정상 실행 환경과 번갈아 나타난다는 핵심 원인을 정확히 짚었다. 카탈로그 중복 적재로 METADATA 건수가 급증한 것도 언급했다. 호출 수가 평소 수준이어서 DDoS가 아니라는 판단도 맞다.",
+      "fixReason": "핵심 조치는 VectorSearchFunction 메모리를 1024MB → 3008MB로 증설하는 것이다. 정답 요지에서도 메모리 증설은 유효한 완화 조치로 인정하고 있으며, 실행 시 OOM으로 인한 502 반복 패턴이 해소된다. 명령/값도 Lambda 메모리 한도(최대 10,240MB) 내의 값이므로 실행 가능하다.",
+      "pass": true,
+      "phrasePass": false
+    },
+    {
+      "variant": "candidate",
+      "scenario": "v3-60",
+      "run": 2,
+      "cause": "partial",
+      "wrong": "none",
+      "fix": "yes",
+      "checklist": {
+        "q_resolves": "yes",
+        "q_harmful": "no",
+        "q_works_as_written": "yes",
+        "q_wrong_first": "no",
+        "q_correct_elsewhere": "yes"
+      },
+      "reason": "도우미는 VectorSearchFunction의 OOM(Runtime.OutOfMemory) 로그를 근거로 메모리 부족을 주원인으로 짚었다. 정답 요지의 핵심인 '카탈로그 중복 적재로 METADATA가 대폭 증가 → BM25 색인 재적재 시 메모리 한도 초과'라는 구체적 메커니즘은 언급하지 않았으나, OOM이 원인이라는 방향은 맞다. 다만 왜 갑자기 OOM이 발생했는지(데이터 건수 폭증)를 짚지 못해 핵심이 빠진 부분 정답이다.",
+      "fixReason": "핵심 조치는 VectorSearchFunction 메모리를 2048MB로 증설하는 것으로, 정답 요지에서 '완화' 조치로 명시적으로 허용된 조치다. 명령어 문법도 올바르고 실행 가능하다. DDoS/WAF 대응은 권하지 않았고, 잘못된 조치를 앞에 두지도 않았다.",
+      "pass": false,
+      "phrasePass": false
+    }
+  ]
+}
