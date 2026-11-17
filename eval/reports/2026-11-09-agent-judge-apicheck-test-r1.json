@@ -1,0 +1,817 @@
+{
+ "meta": {
+  "date": "2026-11-09",
+  "judgeVersion": "v2.2",
+  "model": "global.anthropic.claude-sonnet-4-6",
+  "reports": [
+   "eval/reports/2026-11-06-agent-eval-holdout2-shipped.json",
+   "eval/reports/2026-11-06-agent-eval-holdout2-config.json",
+   "eval/reports/2026-11-06-agent-eval-holdout2-toolsonly.json"
+  ],
+  "items": "eval/agent/labeling/holdout2-test-key.json",
+  "inputTokens": 284564,
+  "outputTokens": 21102
+ },
+ "judgments": [
+  {
+   "item": "T19",
+   "variant": "shipped",
+   "scenario": "v2-02",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 WatchPartFunction의 IAM 역할에 dynamodb:PutItem 권한이 없어 AccessDeniedException이 발생한다고 정확히 짚었다. 이는 정답 요지(정책이 읽기 전용으로 바뀌어 PutItem이 거부됨)와 일치한다. 잘못된 단정은 없으며, 로그에서 확인된 역할명·테이블명·에러 내용을 그대로 인용했다.",
+   "fixReason": "핵심 조치는 IAM 콘솔에서 WatchPartFunctionRole에 dynamodb:PutItem 등 쓰기 권한을 포함한 정책을 추가하는 것이다. 이는 정답 요지의 쓰기 권한(PutItem) 복구와 정확히 일치하며, 제시된 JSON 정책과 CLI 명령도 문법적으로 올바르고 실행 가능하다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "T14",
+   "variant": "shipped",
+   "scenario": "v2-03",
+   "run": 2,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "yes",
+    "q_works_as_written": "no",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "정답은 KNOWLEDGE_BASE_ID 빈 문자열이 의도된 설정(USE_KNOWLEDGE_BASE=false, S3 Vectors 사용)이라는 것인데, 도우미는 이를 실수로 지워진 것으로 보고 KB ID 복구를 주원인 해결책으로 제시했다. 또한 \"에러가 없다는 게 오히려 이상합니다!\"라고 단정하고, KNOWLEDGE_BASE_ID가 없어서 정확도가 떨어진다고 확정적으로 말했으나, 실제로는 S3 Vectors를 의도적으로 사용하는 정상 설정이다.",
+   "fixReason": "핵심 조치는 KNOWLEDGE_BASE_ID를 복구(값을 채워 넣기)하는 것이다. 그러나 정답 요지에 따르면 빈 문자열은 의도된 설정(USE_KNOWLEDGE_BASE=false, S3 Vectors 사용)이므로 값을 채울 필요가 없다. 이 조치를 실행해도 장애(검색 정확도 저하)는 해소되지 않으며, 오히려 의도치 않은 KB 호출을 유발할 수 있다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T31",
+   "variant": "shipped",
+   "scenario": "v2-05",
+   "run": 1,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 \"메일 템플릿 변수 바인딩 오류\"를 주원인으로 제시했다. 정답 요지의 원인은 파서가 '없음'이라는 단어만 걸러 '위반 사항 없음' 같은 문장도 위반으로 카운트하는 파싱 로직 버그다. 방향이 전혀 다르다. 또한 도우미는 조회 자료에 없는 \"violations 데이터가 메일 템플릿에 전달되지 않는다\"는 내용을 사실처럼 단정했다.",
+   "fixReason": "답변의 핵심 조치는 \"violations 데이터가 메일 템플릿에 전달되지 않는다\"는 잘못된 원인 진단에 기반한 변수 바인딩 수정이다. 실제 원인은 파서가 '없음'이라는 단어만 정확히 매칭하여 '위반 사항 없음' 같은 문장도 위반으로 판정하는 파싱 로직 버그인데, 답변은 전혀 다른 원인(변수 미전달)을 핵심으로 제시하고 있어 이 조치를 실행해도 장애가 해소되지 않는다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T24",
+   "variant": "shipped",
+   "scenario": "v2-07",
+   "run": 2,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 \"코드만 복구할 때 배포 패키지 구조(node_modules/utils 폴더)가 누락됐다\"고 주원인을 짚었다. 정답 요지는 콘솔 롤백 후 레이어가 v22에 고정되어 parts.js가 없는 것이 원인인데, 도우미는 레이어 버전 고정 문제를 전혀 언급하지 않고 배포 패키지 구조 문제로만 설명했다.",
+   "fixReason": "핵심 조치(옵션 1)는 배포 패키지를 zip으로 묶어 재업로드하는 것인데, 실제 원인은 Lambda 레이어 버전이 v22로 고정된 것이다. 배포 패키지를 재업로드해도 레이어 버전은 변경되지 않으므로 장애가 해소되지 않는다. 옵션 3의 import 경로 변경도 /opt/nodejs 경로는 레이어에서 오는 것이므로 레이어 문제를 해결하지 못한다. 답변 어디에도 레이어 버전을 최신(v27)으로 업데이트하라는 조치는 없다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T09",
+   "variant": "shipped",
+   "scenario": "v2-10",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 첫 요청이 느린 이유를 콜드 스타트로 정확히 짚었고, punycode DeprecationWarning은 성능과 무관한 경고임을 명확히 밝혔다. 잘못된 단정도 없으며, 조회 자료와 일치한다.",
+   "fixReason": "핵심 조치로 Provisioned Concurrency 설정을 가장 먼저 권했다. 콜드 스타트는 정상 동작이므로 조치가 필요 없는 상황인데, 불필요한 조치를 핵심으로 권한 셈이다. Provisioned Concurrency 자체는 동작하지만 이 장애(정상 동작)를 '해소'할 필요가 없으므로 q_resolves=no다.",
+   "pass": false,
+   "phrasePass": true
+  },
+  {
+   "item": "T30",
+   "variant": "shipped",
+   "scenario": "v2-12",
+   "run": 2,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "로그에서 ERR_MODULE_NOT_FOUND(.js 확장자 누락)를 정확히 짚었고, Jest 환경과 Lambda 런타임의 차이로 테스트가 이를 가렸다는 핵심도 언급했다. 정답 요지와 일치한다.",
+   "fixReason": "핵심 조치는 import 경로에 .js 확장자를 추가하는 것으로, 정답 요지와 정확히 일치한다. 제시된 코드도 실제로 동작하며, 올바른 조치를 가장 먼저 권했다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "T23",
+   "variant": "shipped",
+   "scenario": "v2-13",
+   "run": 0,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 SNS Subject가 비어있거나 null이거나 특수문자가 포함된 경우를 주원인으로 제시했다. 그러나 정답 요지는 Subject가 100자 이상일 때 InvalidParameter가 발생한다는 것이 핵심 원인이다. 도우미는 100자 제한을 해결책 코드에서 언급했지만, 원인 분석에서는 \"빈 값·특수문자·null\"을 주원인으로 단정했으므로 핵심 원인을 잘못 짚었다. 또한 \"Subject가 비어있거나 특수문자 포함, 또는 null인 경우\"라고 사실과 다른 원인을 확정적으로 서술했다.",
+   "fixReason": "핵심 조치는 Subject를 100자 미만으로 자르는 것(substring(0, 100))으로, 정답 요지와 일치한다. 다만 SNS Subject 제한은 100자 미만(< 100)이므로 substring(0, 100)은 최대 100자까지 허용해 경계 조건에서 여전히 실패할 수 있다. 또한 원인 분석에서 \"빈 값/특수문자/null\"을 원인으로 제시하며 실제 원인(길이 초과)을 잘못 짚었으나, 조치 코드 자체는 길이 제한을 포함하고 있어 대부분의 경우 해결된다. 단, 정확히 100자인 Subject는 여전히 실패할 수 있어 works_as_written은 no로 판정한다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T35",
+   "variant": "shipped",
+   "scenario": "v2-13",
+   "run": 1,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 Subject가 null/undefined/빈 문자열일 때 실패한다고 주원인을 제시했다. 실제 원인은 Subject가 100자 이상일 때 SNS 제한에 걸리는 것인데, 이를 짚지 못했다. 마지막에 \"길이 제한\"을 질문으로 언급했으나 주원인으로 제시하지 않았으므로 partial에 해당하지 않는다.",
+   "fixReason": "핵심 조치는 Subject가 null/undefined/빈 문자열일 때 기본값으로 대체하는 것이다. 그러나 실제 원인은 Subject가 100자 이상일 때 InvalidParameter가 발생하는 것이므로, 빈 값 처리만으로는 장애가 해소되지 않는다. 100자 초과 케이스는 여전히 실패한다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T39",
+   "variant": "shipped",
+   "scenario": "v2-14",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 get_function_status 조회 결과를 바탕으로 모든 함수의 에러가 0건이며 정상이라고 올바르게 판단했다. 잘못된 단정도 없다.",
+   "fixReason": "모든 함수가 정상이라는 상황에서 추가 조치가 필요 없다고 안내하며 정상 상태를 확인해 주었다. 핵심 조치는 \"에러 없음, 추가 조치 불필요\"로 올바르다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "T40",
+   "variant": "shipped",
+   "scenario": "v2-16",
+   "run": 2,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 Bedrock이 아니라 JSON 파싱 오류가 원인이라고 정확히 짚었으며, 로그의 Raw response에서 따옴표 미이스케이프로 인한 깨진 JSON임을 근거로 제시했다. Bedrock 자체는 정상이라는 점도 명시했다.",
+   "fixReason": "핵심 조치(1번 즉시 조치)는 파싱 실패 시 JSON을 정제하는 폴백 로직 추가다. 이는 깨진 JSON을 일부 복구할 수 있지만, 따옴표 미이스케이프로 인한 SyntaxError는 줄바꿈·trailing comma 제거만으로는 해결되지 않아 결국 '유사도 기반 매칭' 폴백으로 떨어진다. 근본 원인(모델이 깨진 JSON을 반환하는 것)을 고치는 조치(2번 프롬프트 개선 또는 structured output 사용)는 뒤에 나오지만 핵심 조치가 아니다.",
+   "pass": false,
+   "phrasePass": true
+  },
+  {
+   "item": "T10",
+   "variant": "shipped",
+   "scenario": "v2-18",
+   "run": 2,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "로그에서 BEDROCK_MODEL_ID가 추론 프로필 없이 Sonnet 4.5 모델 ID로 설정되어 on-demand 호출이 거부되고 템플릿 폴백이 발생한다는 핵심 원인을 정확히 짚었다. 해결책으로 추론 프로필 ARN으로 변경하거나 기존 모델로 롤백하는 방안도 제시했다.",
+   "fixReason": "핵심 조치(1순위)는 Bedrock 콘솔에서 Inference Profile을 새로 생성하는 것인데, 이미 global./apac. 추론 프로필 ID를 사용하면 되므로 새 프로필 생성은 불필요하다. 그러나 2순위로 제시한 Lambda 환경변수 BEDROCK_MODEL_ID를 추론 프로필 ARN으로 변경하는 조치는 정답 요지와 일치하며 장애를 해소한다. 1순위가 불필요한 조치이긴 하나 해롭지는 않고, 올바른 조치(환경변수 변경)가 바로 뒤에 명확히 제시되어 있다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T32",
+   "variant": "shipped",
+   "scenario": "v2-21",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "모든 함수가 정상임을 확인하고, 구체적인 기능·시간대·기능명을 추가로 물어보며 정답 요지와 일치한다. 잘못된 단정도 없다.",
+   "fixReason": "답변은 현재 모든 함수가 정상임을 안내하면서, 어떤 함수·기능·시간대인지 구체적으로 묻고 있다. 이는 막연한 질문에 대한 올바른 대응이며, 정답 요지와 일치한다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "T36",
+   "variant": "shipped",
+   "scenario": "v2-24",
+   "run": 2,
+   "cause": "partial",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 TTL 삭제 지연이 정상임을 맞게 설명했으나, \"만료된 데이터가 사용자에게 나갈 수 있다\"며 TTL 검증 코드 추가를 권장했다. 정답 요지는 코드가 이미 TTL을 직접 비교하므로 문제가 없고 조치가 불필요하다는 것인데, 도우미는 코드에 TTL 비교가 없다고 가정하고 수정을 권고했다.",
+   "fixReason": "정답 요지에 따르면 코드가 TTL을 직접 비교하므로 만료 항목이 사용자에게 나가지 않으며 조치가 필요 없다. 그러나 답변은 \"만료된 데이터가 사용자에게 나갈 수 있다\"고 경고하며 TTL 검증 코드 추가와 쿼리 필터 개선을 핵심 조치로 권장했다. 이는 불필요한 조치이며 실제 장애를 해소하지 않는다.",
+   "pass": false,
+   "phrasePass": true
+  },
+  {
+   "item": "T28",
+   "variant": "shipped",
+   "scenario": "v2-27",
+   "run": 2,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "yes",
+    "q_works_as_written": "no",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 DynamoDB 저장 로직 누락을 주원인으로 단정했으나, 정답은 설계상 DB에 저장하지 않고 SNS 이메일로만 전송하는 정상 동작이다. 또한 \"현재 (잘못된 흐름)\"이라며 코드 수정이 필요하다고 확정적으로 말했는데, 이는 사실과 다른 장애를 단정한 것이다.",
+   "fixReason": "핵심 조치는 \"DynamoDB 저장 로직을 추가하라\"는 코드 수정이다. 그러나 정답 요지에 따르면 이 시스템은 설계상 DB에 저장하지 않고 SNS 이메일로만 전송하는 정상 동작이므로, 코드를 수정할 필요가 없다. 장애가 아닌 상황에 불필요한 코드 변경을 핵심 조치로 권하고 있어 장애를 해소하지 못한다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T17",
+   "variant": "shipped",
+   "scenario": "v2-29",
+   "run": 2,
+   "cause": "no",
+   "wrong": "none",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 search-document.js에 export 문이 없거나 함수명 오타가 원인일 가능성이 높다고 짚었다. 그러나 정답 요지는 \"utils를 수정했지만 레이어를 다시 빌드하지 않아 레이어에 새 코드가 반영되지 않은 것\"이 핵심 원인이다. 도우미는 레이어 미재빌드 문제를 전혀 언급하지 않았다.",
+   "fixReason": "핵심 조치는 search-document.js에 export 문이 있는지 확인하고 추가하라는 것이다. 그러나 실제 원인은 레이어를 다시 빌드하지 않아 Lambda 레이어에 새 코드가 반영되지 않은 것이다. export 문을 소스에 추가해도 레이어를 재빌드·재배포하지 않으면 /opt/nodejs/utils/search-document.js는 여전히 구버전이므로 장애가 해소되지 않는다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T16",
+   "variant": "config",
+   "scenario": "v2-02",
+   "run": 2,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "WatchPartFunction의 IAM 정책에 dynamodb:PutItem이 없어 AccessDeniedException이 발생한다고 정확히 짚었다. 정답 요지의 원인(읽기 전용 정책으로 PutItem 거부)과 일치한다.",
+   "fixReason": "핵심 조치는 IAM 정책에 dynamodb:PutItem(및 UpdateItem)을 추가하는 것으로, 이는 쓰기 권한 복구에 해당하여 장애를 해소한다. 제시된 ARN과 JSON 액션 값도 형식상 올바르게 동작한다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "T27",
+   "variant": "config",
+   "scenario": "v2-05",
+   "run": 0,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 violations 배열이 비어있을 때 \"위반 사항 없음\" 기본 메시지를 출력하는 템플릿 렌더링 버그를 주원인으로 제시했다. 정답은 파서가 '없음' 문자열만 정확히 매칭해 '위반 사항 없음' 같은 문장도 위반으로 카운트하는 파싱 로직 오류인데, 도우미는 이 핵심(파싱 오류)을 짚지 못하고 방향도 다른 원인을 주원인으로 말했다.",
+   "fixReason": "답변의 핵심 조치는 코드를 공유해달라는 추가 정보 요청이며, 구체적 수정 방향으로 \"violations가 있을 때만 메일 발송하도록 수정\"을 제안했다. 그러나 실제 원인은 파서가 '없음'이라는 정확한 문자열만 걸러내어 '위반 사항 없음' 같은 문장도 위반으로 판정하는 것이므로, 발송 조건 수정만으로는 해결되지 않는다. 파싱 로직 자체를 고쳐야 한다. 답변 어디에도 파싱 로직 수정이나 구조화 출력 사용에 대한 언급은 없다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T03",
+   "variant": "config",
+   "scenario": "v2-06",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 로그 조회 결과가 없자 함수명이 맞는지 확인을 요청하고, EECAR 함수 목록에 PaymentWebhookFunction이 없음을 사실상 안내했다. 정답 요지(해당 함수가 스택에 없다)를 핵심으로 짚었다고 볼 수 있다.",
+   "fixReason": "답변은 PaymentWebhookFunction이 스택에 없음을 사실상 인지하고, 정확한 함수명·알림 시간·에러 메시지를 요청하는 조사 질문을 핵심 조치로 제시했다. 이는 정답 요지의 올바른 조치(정확한 함수 이름이나 알림 원문 요청)와 일치한다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "T08",
+   "variant": "config",
+   "scenario": "v2-07",
+   "run": 2,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "unknown",
+    "q_harmful": "no",
+    "q_works_as_written": "unknown",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 \"레이어가 이전 버전으로 롤백된 채 코드만 재배포되어 parts.js가 없다\"고 정확히 짚었다. 정답 요지(레이어가 구버전에 고정되어 parts.js 없음)와 방향이 일치한다. 다만 레이어가 v22에 고정됐다는 구체적 버전 정보는 언급하지 않았으나, 핵심 원인(레이어 불일치로 parts.js 누락)은 명확히 맞혔다. 잘못된 단정은 없으며, 조회 자료에 없는 버전 번호를 지어내지도 않았다.",
+   "fixReason": "핵심 조치는 `npm run build:all`로 레이어를 재배포하는 것이다. 이 조치는 레이어를 최신 버전으로 다시 배포하므로 BatteryHealthAssessmentFunction이 구버전(v22) 레이어에 고정된 문제를 해소할 수 있다. 다만 `npm run build:all`이 실제로 레이어 버전을 업데이트하고 함수에 연결까지 해주는지는 프로젝트 스크립트 구성에 따라 다르나, 레이어 재배포라는 방향 자체는 올바르다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T05",
+   "variant": "config",
+   "scenario": "v2-08",
+   "run": 2,
+   "cause": "yes",
+   "wrong": "present",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "로그에서 limit=0으로 인한 DynamoDB ValidationException을 정확히 짚었고, 파트너사 호출과의 연관성도 올바르게 연결했다. 다만 에러 메시지를 \"greater than 1\"로 인용했으나 실제 로그는 \"greater than or equal to 1\"이며, 이는 사실과 다른 내용을 확정적으로 제시한 것이다.",
+   "fixReason": "핵심 조치는 입력값 검증 강화로, limit < 1일 때 400을 반환하는 코드를 추가하는 것이다. 이는 정답 요지의 조치(입력 검증 후 400 반환)와 정확히 일치하며 장애를 해소한다. 다만 제시된 코드는 Math.max(1, ...)로 먼저 limit을 1 이상으로 강제 변환한 뒤 isNaN/limit<1 검사를 하므로, 실제로 400을 반환하는 분기에 도달하는 경우는 NaN(비숫자 문자열)뿐이고 limit=0은 Math.max에 의해 1로 바뀌어 400이 반환되지 않는다. 즉 limit=0 케이스가 400이 아닌 정상 처리(limit=1로 변환)되어 버린다. 이는 장애 해소(500 제거)는 되지만 코드가 의도대로 동작하지 않는 문제가 있다.",
+   "pass": false,
+   "phrasePass": true
+  },
+  {
+   "item": "T07",
+   "variant": "config",
+   "scenario": "v2-11",
+   "run": 2,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 제한 시간 3초가 너무 짧아 타임아웃이 발생하고, DynamoDB 저장 후 실패 메시지가 뜨지만 부품은 등록된다고 정확히 짚었다. 정답 요지의 핵심 원인(제한 시간 3초로 인한 타임아웃 → 부품 등록 후 실패 응답 → 중복 등록)을 주원인으로 명확히 설명했다.",
+   "fixReason": "핵심 조치는 제한 시간을 3초에서 15초로 늘리는 것으로, 원래 값(60초)과 다르지만 충분히 여유 있는 값으로 올리는 것이므로 장애를 해소한다. 15초는 예상 처리 시간(2.5~3.5초)을 충분히 커버하며, 동작에 문제가 없다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "T21",
+   "variant": "config",
+   "scenario": "v2-17",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "로그의 \"Duplicate error suppressed\" 메시지를 근거로 중복 제거 로직이 원인임을 주원인으로 짚었고, 256MB 메모리는 원인이 아님을 명확히 밝혔다. 정답 요지와 일치한다.",
+   "fixReason": "답변의 핵심 조치는 \"VectorSearchFunction의 근본 원인 파악\"(로그 조회)이며, 메모리 증설은 불필요하다고 명확히 밝혔다. 슬랙 알림이 가끔만 오는 것은 의도된 중복 제거 로직 때문임을 정확히 설명하고, 별도 조치가 필요 없음을 사실상 안내하고 있다. 다만 핵심으로 권한 조치가 \"VectorSearch 에러 원인 파악을 위한 로그 조회\"로, 이는 장애(슬랙 알림 누락 오해) 해소와 직접 관련 없는 추가 조사이나, 알림 동작 자체는 정상임을 명확히 전달했다. 중복 제거 정책 검토(옵션)는 부가적 제안이며 핵심 조치는 아니다.",
+   "pass": true,
+   "phrasePass": true
+  },
+  {
+   "item": "T04",
+   "variant": "config",
+   "scenario": "v2-18",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "unknown",
+    "q_harmful": "no",
+    "q_works_as_written": "no",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "BEDROCK_MODEL_ID가 추론 프로필 없이 Sonnet 4.5 모델 ID로 변경되어 on-demand 호출이 거부되고 템플릿 폴백이 발생한다는 핵심 원인을 정확히 짚었다. 다만 조치에서 제시한 ARN 형식(\"arn:aws:bedrock:ap-northeast-2::inference-profile/default/...\")은 실제 존재하지 않는 값을 확정적으로 제시했으므로 잘못된 단정에 해당한다.",
+   "fixReason": "핵심 조치는 BEDROCK_MODEL_ID를 추론 프로필 ARN으로 변경하는 것이다. 그런데 제시한 ARN 형식(\"arn:aws:bedrock:ap-northeast-2::inference-profile/default/...\")은 실제 AWS 추론 프로필 ARN 형식과 다르며, 정답 요지에서 권장하는 \"us./apac. 접두사 형식(예: apac.anthropic.claude-sonnet-4-5-20250929-v1:0)\" 또는 원래 값으로 되돌리는 방식도 아니다. 또한 Bedrock 콘솔에서 프로필을 새로 생성하라는 첫 번째 단계는 불필요하거나 잘못된 절차다. ARN 형식이 실제로 동작하지 않을 가능성이 높아 q_works_as_written=no로 판정한다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T37",
+   "variant": "config",
+   "scenario": "v2-19",
+   "run": 2,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "로그에서 `suitableApplications.slice(...).join is not a function` TypeError를 정확히 짚고, 배열이 아닌 문자열로 저장된 것이 원인임을 주원인으로 명확히 제시했다. 정답 요지와 일치한다.",
+   "fixReason": "핵심 조치는 코드에 방어적 처리를 추가하는 것(2번)으로, suitableApplications가 문자열일 때 JSON.parse로 배열로 변환하는 코드다. 이는 정답 요지의 \"코드가 문자열도 처리하게 한다\"에 해당하며 장애를 해소한다. 단, JSON.parse 처리 시 \"EV,HEV,PHEV\" 같은 쉼표 구분 문자열은 JSON.parse가 실패해 예외가 발생할 수 있으나, 정답 요지의 핵심 원인은 JSON 직렬화된 문자열이므로 주요 케이스는 해결된다. 1번(데이터 정제)도 정답 요지의 \"데이터를 배열로 고친다\"에 해당하며 함께 제시되었다.",
+   "pass": true,
+   "phrasePass": true
+  },
+  {
+   "item": "T20",
+   "variant": "config",
+   "scenario": "v2-20",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 GetPartsFunction IAM 정책에 GSI 인덱스 ARN 권한이 없어 GSI Query가 실패한다고 정확히 짚었다. 조회 자료(권한 정책, 에러 로그)에서 확인된 사실과 일치하며, 프론트엔드 샘플 데이터 폴백도 언급했다. 잘못 단정한 내용은 없으며, 코드 예시의 ARN·역할명·인덱스명 모두 조회 자료에 실제로 존재하는 값이다.",
+   "fixReason": "핵심 조치는 GSI1, GSI2 인덱스 ARN을 IAM 정책 Resource에 추가하는 것으로, 정답 요지(인덱스 ARN 권한 추가)와 정확히 일치한다. 제시된 ARN 형식(table/.../index/GSI1, GSI2)도 올바르며, 그대로 실행하면 GSI Query 권한 부족 문제가 해소된다. 다만 정답 요지의 와일드카드(index/*)와 달리 GSI1·GSI2만 명시했으나, 해당 인덱스들이 실제 사용 중인 인덱스라면 장애는 해결된다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "T18",
+   "variant": "config",
+   "scenario": "v2-24",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 \"만료된 캐시가 사용자에게 나가지 않는다\"고 결론을 맞게 짚었고, DynamoDB TTL 삭제가 백그라운드에서 늦게 처리된다는 핵심 원인도 언급했다. 코드가 TTL을 직접 비교하므로 문제가 없다는 점은 명시하지 않았으나, 결론적으로 정상 동작임을 올바르게 판단했다.",
+   "fixReason": "답변의 핵심 메시지는 \"현재 상황은 정상\"이며 조치가 필요 없다는 것이고, 만료된 캐시가 사용자에게 나가지 않는다고 안심시키고 있다. 이는 정답 요지(조치 불필요)와 일치한다. 다만 \"권장사항\"으로 TTL 설정 재확인, 캐시 만료 시간 조정 검토 등을 제시했으나 이는 선택적 개선사항으로 제시된 것이며, 핵심 조치는 \"조치 불필요\"로 올바르다.",
+   "pass": false,
+   "phrasePass": true
+  },
+  {
+   "item": "T26",
+   "variant": "config",
+   "scenario": "v2-25",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "로그에서 Runtime.OutOfMemory와 Memory Size: 128MB, Max Memory Used: 128MB를 확인하고, 메모리 부족이 원인임을 주원인으로 정확히 짚었다. 512MB로 증가 권장도 정답 조치와 일치한다.",
+   "fixReason": "핵심 조치는 Lambda 메모리를 128MB에서 512MB 이상으로 늘리는 것으로, 정답 요지와 정확히 일치한다. 그대로 실행하면 전체 카탈로그 로드 시 OOM 문제가 해소된다.",
+   "pass": true,
+   "phrasePass": true
+  },
+  {
+   "item": "T12",
+   "variant": "toolsonly",
+   "scenario": "v2-01",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "로그에서 DynamoDB ValidationException(Item size has exceeded the maximum allowed size)을 확인하고, 업체가 올린 base64 이미지가 포함된 니로 배터리 데이터가 DynamoDB 400KB 한도를 초과해 검색 캐시 저장이 실패한다고 정확히 짚었다. 정답 요지의 핵심 원인과 일치한다.",
+   "fixReason": "핵심 조치는 \"사진을 S3에 저장하고 DynamoDB에는 S3 URL만 저장\"하는 것인데, 이는 부품 등록 구조를 바꾸는 것이지 캐시 저장 로직을 수정하는 것이 아니다. 정답 요지의 원인은 검색 결과 캐시 항목이 400KB를 초과하는 것이므로, 캐시에서 이미지 필드를 제외하거나 캐시 저장을 건너뛰는 조치가 필요하다. 제안된 조치대로 S3 URL로 바꾸더라도 이미 캐시에 저장된 초과 항목이 남아 있고, 캐시 조회 시 실패가 계속될 수 있어 장애가 즉시 해소된다고 보기 어렵다. 다만 3단계에서 기존 데이터 삭제 후 재등록을 언급하고 있어 캐시가 갱신될 여지는 있으나, 핵심 조치 자체가 캐시 문제를 직접 겨냥하지 않는다.",
+   "pass": false,
+   "phrasePass": true
+  },
+  {
+   "item": "T38",
+   "variant": "toolsonly",
+   "scenario": "v2-06",
+   "run": 2,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 조회 결과와 시스템 프롬프트의 함수 목록을 근거로 PaymentWebhookFunction이 스택에 존재하지 않는다고 정확히 짚었으며, 사실과 다른 내용을 확정적으로 단정한 부분도 없다.",
+   "fixReason": "답변은 PaymentWebhookFunction이 스택에 없음을 확인하고, 정확한 함수명을 요청하는 것을 핵심 조치로 제시했다. 이는 정답 요지의 올바른 조치와 정확히 일치한다.",
+   "pass": true,
+   "phrasePass": true
+  },
+  {
+   "item": "T15",
+   "variant": "toolsonly",
+   "scenario": "v2-10",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 콜드 스타트를 원인 중 하나로 언급했지만, punycode 경고가 성능에 간접적으로 영향을 준다고 주장하며 이를 수정하도록 권장했다. 정답은 punycode 경고가 원인과 무관하며 조치가 불필요하다는 것인데, 도우미는 경고 수정이 Cold Start를 50~100ms 개선할 수 있다고 확정적으로 제시했다. 이는 사실과 다른 내용을 확정적으로 단정한 것이다.",
+   "fixReason": "핵심 조치는 punycode 경고를 제거하는 것(require 제거, 패키지 교체, Node.js 업그레이드 등)이다. 그러나 정답 요지에 따르면 첫 요청 지연은 콜드 스타트이고 punycode 경고는 원인과 무관하므로, 이 조치를 실행해도 장애(콜드 스타트 지연)는 해소되지 않는다. 또한 불필요한 조치를 올바른 조치(조치 불필요)보다 앞에 권하고 있다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T06",
+   "variant": "toolsonly",
+   "scenario": "v2-17",
+   "run": 2,
+   "cause": "partial",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "yes",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 로그에서 \"Duplicate error suppressed\" 메시지를 확인하고 중복 제거 로직이 원인임을 짚었으나, 이를 의도된 정상 동작이 아닌 수정이 필요한 문제로 단정하며 5분 윈도우를 1분으로 단축하라고 권고했다. 정답 요지는 5분 중복 제거 창이 의도된 동작이므로 조치가 필요 없다는 것이다. 원인 방향(중복 제거 로직)은 맞지만, 이를 버그로 단정한 점에서 핵심이 빠졌다.",
+   "fixReason": "핵심 조치는 \"중복 제거 윈도우를 5분→1분으로 단축\"이다. 그러나 정답 요지에 따르면 5분 중복 제거 창은 의도된 동작이므로 조치가 필요 없다. 윈도우를 줄이면 알림 빈도는 늘어나지만 이 장애(의도된 동작)를 \"해결\"하는 것이 아니라 불필요한 변경이다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T11",
+   "variant": "toolsonly",
+   "scenario": "v2-21",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "모든 함수가 정상임을 확인하고, 구체적인 함수명·시각·에러 종류를 추가로 물어보며 정보 부족 상황을 바르게 처리했다. 사실과 다른 내용을 확정적으로 단정한 부분도 없다.",
+   "fixReason": "답변은 현재 조회 결과상 정상임을 알리고, 특정 함수명·시각·에러 종류 등 구체적인 정보를 추가로 묻고 있다. 이는 막연한 질문에 대한 올바른 대응이며, 정답 요지의 조치와 일치한다.",
+   "pass": true,
+   "phrasePass": true
+  },
+  {
+   "item": "T13",
+   "variant": "toolsonly",
+   "scenario": "v2-23",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "로그에서 429 Too Many Requests를 확인하고 Slack 웹훅 레이트 제한이 원인임을 주원인으로 정확히 짚었다. \"1초에 1개 요청 제한\"이라는 구체적 수치는 조회 자료나 시스템 프롬프트에 없는 값이지만, 확정적으로 단정하지 않고 일반적 설명 수준으로 제시했으므로 잘못된 단정으로 보기 어렵다.",
+   "fixReason": "핵심 조치로 지수 백오프 구현을 가장 먼저 권했으며, 이는 Slack 429 레이트 리밋 상황에서 Retry-After를 준수하는 재시도 로직에 해당한다. 배치 알림(여러 에러를 하나로 묶어 전송)도 함께 제시되어 정답 요지의 조치를 포함한다. 타임아웃 증가(10초→30초)는 레이트 리밋 해소와 무관하지만 핵심 조치가 아닌 부가 항목이다.",
+   "pass": true,
+   "phrasePass": true
+  },
+  {
+   "item": "T29",
+   "variant": "toolsonly",
+   "scenario": "v2-25",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "로그와 설정에서 Runtime.OutOfMemory 및 memoryMB:128을 확인하고, 메모리 128MB가 전체 검색 시 부족하다는 점을 주원인으로 정확히 짚었다. 512MB로 증가 조치도 제시했다.",
+   "fixReason": "핵심 조치는 Lambda 메모리를 128MB에서 512MB로 늘리는 것으로, 정답 요지와 정확히 일치한다. 명령어나 코드 없이 콘솔 조작으로 안내했으나 동작에 문제가 없다.",
+   "pass": true,
+   "phrasePass": true
+  },
+  {
+   "item": "T33",
+   "variant": "toolsonly",
+   "scenario": "v2-26",
+   "run": 1,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 임베딩 토큰화 방식, 유사도 임계값, 인덱싱 지연 등을 원인으로 제시했으나, 정답인 '7일 결과 캐시가 등록 전 결과를 반환하는 것'은 전혀 언급하지 않았다. 또한 띄어쓰기/토큰화 문제를 주원인으로 제시했으나 이는 정답과 다르다.",
+   "fixReason": "핵심 조치는 유사도 임계값 완화(0.75→0.70)와 부분 매칭 로직 추가인데, 실제 원인은 7일 결과 캐시가 오래된 결과를 반환하는 것이다. 캐시 무효화 없이 임계값을 조정하거나 쿼리 전처리를 바꿔도 캐시된 결과가 계속 반환되므로 장애가 해소되지 않는다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T34",
+   "variant": "toolsonly",
+   "scenario": "v2-27",
+   "run": 0,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "yes",
+    "q_works_as_written": "no",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 DynamoDB 권한 부재로 저장이 실패한다고 단정했지만, 실제 원인은 ContactInquiryFunction이 설계상 DynamoDB에 저장하지 않고 SNS로만 알림을 보내는 구조이기 때문이다. 로그에도 에러 없이 \"notification sent successfully\"만 기록되어 있고, 에러율도 0이다. 도우미는 존재하지 않는 DynamoDB 저장 로직과 AccessDenied 에러를 사실인 것처럼 단정했다.",
+   "fixReason": "핵심 조치는 DynamoDB IAM 권한 추가인데, 실제 원인은 설계상 DB 저장 자체를 하지 않고 SNS 이메일로만 발송하는 구조이므로 권한을 추가해도 장애(DB에 항목이 없는 것)는 해소되지 않는다. 고장이 아님에도 불필요한 인프라 변경을 핵심 조치로 권하고 있다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T22",
+   "variant": "toolsonly",
+   "scenario": "v2-28",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 IAM 권한 부족(SNS:Publish 미허용)을 주원인으로 짚었다. 그러나 정답 요지의 핵심 원인은 IAM 정책의 리소스 항목에 오타(eecar-notification)가 있어 실제 토픽(eecar-notifications)과 불일치한다는 것이다. 로그에서 접근 대상 ARN이 eecar-notifications로 보이므로 오타 여부까지는 확인되지 않지만, 도우미는 오타 문제를 전혀 언급하지 않고 단순 권한 누락으로만 진단했다. 방향(SNS 권한 문제)은 맞지만 핵심 원인(정책 리소스 오타)을 짚지 못했으므로 partial이다. 또한 도우미는 로그에 실제로 존재하는 ARN(eecar-notifications)을 그대로 사용했고, 존재하지 않는 값을 지어내지 않았으므로 잘못된 단정은 없다.",
+   "fixReason": "핵심 조치는 IAM 정책에 올바른 SNS 리소스 ARN(eecar-notifications)에 대한 sns:Publish 권한을 추가하는 것이다. 실제 원인은 정책 리소스에 오타(eecar-notification)가 있어 권한이 잘못 설정된 것인데, 답변의 조치(올바른 ARN으로 권한 추가)를 실행하면 결과적으로 올바른 토픽에 Publish 권한이 부여되어 장애가 해소된다. 명령/코드에 제시된 ARN(eecar-notifications)은 올바르며 그대로 동작한다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T25",
+   "variant": "toolsonly",
+   "scenario": "v2-28",
+   "run": 2,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "로그에서 SNS 권한 오류(AuthorizationErrorException)를 정확히 찾아냈고, 정책의 리소스가 'eecar-notification'(오타)으로 되어 있어 실제 토픽 'eecar-notifications'에 Publish 권한이 없다는 핵심 원인을 짚었다. 정답 요지(SNS 정책 리소스 오타)와 일치한다. 다만 도우미는 \"정책과 코드 불일치\"로 표현하며 코드 수정(옵션 2)도 동등한 해결책으로 제시했으나, 원인 자체는 정확히 파악했다. 잘못된 단정으로는, 실제 SNS 토픽명이 'eecar-notifications'임을 조회 자료 없이 단정했으나, 로그에 'eecar-notifications'가 명시되어 있으므로 지어낸 것이 아니다.",
+   "fixReason": "핵심 조치(옵션 1)는 IAM 정책의 SNS 리소스 ARN을 eecar-notifications로 수정하는 것으로, 정답 요지의 오타 수정과 동일한 해결책이다. 명령/ARN도 구체적으로 제시되어 있고 그대로 실행 가능하다. 단, 옵션 2는 실제 존재하는 SNS 주제(eecar-notifications)가 아닌 오타 주제(eecar-notification)로 코드를 맞추는 잘못된 방향이지만, 옵션 1이 권장(⭐)으로 먼저 제시되어 있으므로 핵심 조치는 옵션 1이다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "T02",
+   "variant": "toolsonly",
+   "scenario": "v2-29",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "present",
+   "fix": "no",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "no"
+   },
+   "reason": "도우미는 레이어 미재빌드 문제를 언급하지 않고, search-document.js에 export가 없다는 것을 주원인으로 짚었다. 방향은 맞지만(레이어의 search-document.js에 truncateForEmbedding이 없음), 핵심인 \"레이어를 다시 빌드하지 않아 새 코드가 반영되지 않았다\"는 점을 빠뜨렸다. 또한 해결책으로 search-document.js에 export를 직접 추가하라고 제안했는데, 이는 레이어 재빌드 없이 소스만 수정하는 것으로 실제 원인과 다른 접근이다.",
+   "fixReason": "핵심 조치는 search-document.js에 export를 추가하는 것이다. 그러나 실제 원인은 파일 자체에 export가 없는 게 아니라 레이어를 다시 빌드하지 않아 배포된 레이어에 새 코드가 반영되지 않은 것이다. export를 추가해도 레이어를 재빌드·재배포하지 않으면 /opt/nodejs/utils/search-document.js는 여전히 구버전이므로 장애가 해소되지 않는다. 레이어 재빌드 없이 소스 파일만 수정해 재배포해도 동일한 문제가 반복된다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "T01",
+   "variant": "toolsonly",
+   "scenario": "v2-30",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 함수명 오타 가능성을 첫 번째로 제시하고, MaterialPropertySearchFunction이라는 정확한 이름까지 명시적으로 안내했다. 다만 이를 확정하지 않고 여러 후보 중 하나로 제시했으며, 추가 확인을 요청했다. 정답 요지의 핵심(함수명 오타, 실제 함수는 정상)을 사실상 짚었으나 확정적으로 결론 내리지 않은 점이 아쉽지만, 방향과 핵심 내용은 맞다.",
+   "fixReason": "답변은 MaterialSearchFunction이 존재하지 않음을 확인하고, 실제 함수명이 MaterialPropertySearchFunction일 가능성을 안내하며 추가 확인을 요청했다. 이는 정답 요지(정확한 함수 이름 안내, 에러 없음 답변)와 일치하는 올바른 조치다. 불필요하거나 해로운 조치는 없다.",
+   "pass": true,
+   "phrasePass": true
+  }
+ ]
+}

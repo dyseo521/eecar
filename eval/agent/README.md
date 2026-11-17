@@ -7,7 +7,7 @@
 v3부터 표현 목록 대신 **검증한 판정 모델**로 채점한다(E-33). 표현 목록은 기준 판정과 일치도가 낮아 폐기했다(κ 0.36). 아래 "채점 (결정적 규칙)" 절은 v1·v2의 방식이다.
 
 - **시나리오**: `scenarios_v3.json` 60개. 실제 장애 분포를 따라 구성했다(E-34). `scenarios_v3_dev.json` 20개로 고치고, `scenarios_v3_holdout.json` 40개는 사전 등록 뒤 한 번만 쓴다. **홀드아웃은 내용을 열지 않는다.**
-- **판정 모델**: `../ts/agent-judge.ts` (v2.2, Sonnet 4.6). 3회 다수결의 시험용 40건 기준 TPR 81%, TNR 92%, κ 0.74. 통과율과 함께 보정값(Rogan-Gladen)을 보고한다. 한 건마다 저장하고 `--resume`으로 잇는다.
+- **판정 모델 (LLM Judge)**: `../ts/agent-judge.ts` (v2.3, Sonnet 4.6). 검증은 v2.2에서 했고, v2.3은 근거 부족 범주의 조치 기준만 바꿨다(E-34). 3회 다수결의 시험용 40건 기준 TPR 81%, TNR 92%, κ 0.74. 통과율과 함께 보정값(Rogan-Gladen)을 보고한다. 한 건마다 저장하고 `--resume`으로 잇는다.
 - **보조 지표**: `../ts/agent-structured-score.ts`. 판정 일치, 장애 놓침, 과잉 단정을 모델 없이 계산한다.
 - **시계**: 로그는 자체 시각을 그대로 쓰고, 시나리오의 현재는 마지막 로그의 1분 뒤다(`scenarioClock`). 재실행 결과가 같아 판정 모델의 재현 자료와 일치한다.
 - **후보 구성** (`--variant candidate`): 조사 도구 + `candidate-system-prompt.txt` + 현재 시각 + 결론 시점 제출 강제. `--free-text`는 제출을 강제하지 않는다.
@@ -24,11 +24,31 @@ bash eval/agent/run_holdout_v3.sh
 
 **토큰 예산을 먼저 계산한다**(A-42). 평가는 운영과 같은 계정 할당량을 쓰고, 일일 한도는 공시되지 않았다(Sonnet 4.6 약 1,000만 토큰에서 관측). 실행 1회: v1.9.1 Haiku 약 1만, 후보 Haiku 약 4.9만. 판정 1건: Sonnet 약 9,200.
 
+## 결과 (시나리오 v3 이후, 2026-11-09~11)
+
+모두 Anthropic API로 실행했다(AWS 비용 없음). 운영은 Bedrock의 Haiku 4.5다. Haiku 5.5와 Sonnet 5.5는 Bedrock 계정에서 아직 쓸 수 없어 운영에 넣지 않았다.
+
+| 기록 | 비교 | 평가셋 | 결과 | 판단 |
+|---|---|---|---|---|
+| E-35 | v1.9.1 대 후보 구성 (조사 도구, 구조화 진단), Haiku 4.5 | v3 홀드아웃 40개 × 3회, 사전 등록 | 10.0% → 37.5%, +27.5%p [+15.0, +40.0] | 채택, 운영 반영 |
+| E-36 | 같은 후보, 모델만 Haiku 5.5 | 같은 홀드아웃 (탐색용) | 37.5% → 65.0% | 탐색 결과, 채택 판단에 쓰지 않음 |
+| E-39 | `hypothesis` 판정만 Sonnet 5.5로 재진단 | v3 시나리오 40개 × 2회 (여러 번 쓴 평가셋) | 71.3% → 77.5%, +6.3%p [+1.3, +13.8] | 전환 후보 |
+| E-41 | 조회 도구 3종 (`search_code`, `get_request_breakdown`, `get_resource_policy`) | 새 시나리오 24개 × 2회 (`scenarios_v5_tools.json`) | 33.3% → 66.7%, +33.3%p [+12.5, +54.2] | 채택 후보, 도구는 운영 반영 |
+| E-42 | E-41 구성 + Sonnet 5.5 재진단 | 같은 새 시나리오 | 66.7% → 72.9%, +6.3%p [−2.1, +14.6] | 사전 조건 충족, 구간이 0을 포함 |
+| E-43 | 재진단 대상 선별을 외부 판정 모델(Jev)로 | 판정이 붙은 Haiku 5.5 실행 128회 (오프라인) | AUC 0.59~0.70, 현재 규칙 0.63 | 채택하지 않음 |
+
+- 구간은 시나리오 단위 쌍체 부트스트랩 95% 구간이다.
+- E-41, E-42의 새 시나리오는 새 도구가 필요하도록 구성했으므로, 효과의 크기는 실제 장애 분포를 대표하지 않는다.
+- 판정 모델은 엄격한 쪽으로 틀린다(시험용 TPR 81%, TNR 92%). 통과율은 낮게 잡힐 가능성이 크다.
+
 ## 구성
 
 | 경로 | 내용 |
 |---|---|
-| `scenarios.json` | dev 시나리오 20개. 2개는 운영 CloudWatch 로그 원문, 18개는 AWS SDK·Lambda 실제 오류 형식의 합성 |
+| `scenarios_v3.json`, `scenarios_v3_dev.json`, `scenarios_v3_holdout.json` | 시나리오 v3 60개와 dev 20, 홀드아웃 40 분할 (`split_v3.py`) |
+| `scenarios_v5_tools.json` | 조회 도구 3종 확인용 새 시나리오 24개 (E-41) |
+| `candidate-system-prompt.txt` | 후보 구성의 시스템 프롬프트 |
+| `scenarios.json` | (v1) dev 시나리오 20개. 2개는 운영 CloudWatch 로그 원문, 18개는 AWS SDK·Lambda 실제 오류 형식의 합성 |
 | `holdout_scenarios.json` | 블라인드 홀드아웃 15개. 프롬프트·오케스트레이터·dev 시나리오를 보지 않은 별도 에이전트가 썼다 |
 | `baseline-system-prompt.txt` | A-35 수정 전 시스템 프롬프트 (`--variant baseline` 재현용) |
 | `holdout_v2_scenarios.json` | 블라인드 홀드아웃 v2 30개 (E-31에서 사전 등록, 한 번 씀). 함수 설정·권한 세계 상태 포함 |
@@ -72,7 +92,7 @@ node --import tsx --import ./eval/ts/opt-alias.mjs eval/ts/agent-eval.ts --regra
 
 `opt-alias.mjs`는 Lambda 코드의 `/opt/nodejs/utils/*` import를 `backend/src/utils/`로 연결한다.
 
-## 결과 (2026-11-06)
+## 이전 결과 (v1·v2, 2026-11-06)
 
 pass@1은 전체 실행 중 통과 비율, pass^3은 3회 모두 통과한 시나리오 비율이다.
 

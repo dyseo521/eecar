@@ -1,0 +1,395 @@
+{
+ "meta": {
+  "date": "2026-11-09",
+  "judgeVersion": "v2.3",
+  "model": "global.anthropic.claude-sonnet-4-6",
+  "reports": [
+   "eval/reports/2026-11-09-agent-eval-h55-s55esc.json"
+  ],
+  "items": "eval/reports/h55-s55esc-items.json",
+  "inputTokens": 245502,
+  "outputTokens": 10392
+ },
+ "judgments": [
+  {
+   "item": "h55|v3-04|1",
+   "variant": "h55",
+   "scenario": "v3-04",
+   "run": 1,
+   "cause": "no",
+   "wrong": "present",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "yes",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 레이어 v27 배포가 원인이라고 주원인으로 단정했다. 그러나 정답 요지는 결정적 신호를 도구로 볼 수 없으므로 근거 부족을 인정하고 추가 확인 사항을 제시하는 것이 올바른 답이다. 도우미는 레이어 코드 변경을 주원인으로 확정했고, 버킷 정책·KMS 암호화 등은 '확인하지 못한 것'으로만 언급했다. 또한 VECTORS_BUCKET_NAME 버킷을 읽는다고 추정하며 허용 범위 밖 버킷 접근을 주요 원인 후보로 제시했는데, 이는 도구 결과에 없는 내용을 확정적으로 말한 것이다.",
+   "fixReason": "핵심 조치는 레이어 v26으로 롤백(2번)이다. 그러나 정답 요지에 따르면 결정적 신호를 도구로 확인할 수 없는 사례이므로, 확인되지 않은 원인(레이어 코드 변경)을 전제로 롤백을 핵심 조치로 권하는 것은 부적절하다. 실제 숨은 원인은 SSE-KMS 키 암호화로 재업로드된 규정 파일에 대한 kms:Decrypt 권한 누락이며, 레이어 롤백으로는 해결되지 않는다. 버킷 정책·KMS 암호화 확인은 '확인하지 못한 것' 섹션에 언급되어 있으나 핵심 조치가 아닌 후순위로 배치되었다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-08|1",
+   "variant": "h55",
+   "scenario": "v3-08",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 웨비나 후 트래픽 급증으로 두 함수의 동시 실행 합이 계정 동시성 한도에 닿았다고 주원인을 정확히 짚었다. 메모리 부족이 아님도 명시했다. 다만 계정 한도 값(50)은 확인하지 못했다고 밝혔고, 한도 값을 지어내지 않았다.",
+   "fixReason": "핵심 조치는 Service Quotas에서 Lambda 동시 실행 계정 한도 확인 및 상향 요청, 예약 동시성 조정으로, 이는 계정 동시성 한도 초과로 인한 스로틀 장애의 올바른 해결책이다. 메모리 증설은 명확히 부정하고 있다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-11|0",
+   "variant": "h55",
+   "scenario": "v3-11",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 원인을 확정하지 않고 \"SNS 구독 상태나 그 뒤쪽에 있을 가능성이 높다\"고 후보로만 제시하면서, 도구로 확정할 수 없음을 명시하고 추가 확인 항목을 안내했다. 정답 요지가 요구하는 \"근거 부족 인정 + 추가 확인 안내\" 방식과 일치한다.",
+   "fixReason": "답변은 원인을 확정하지 않고 SNS 구독 상태, CloudWatch 지표, 스팸 필터 등 타당한 다음 확인 항목을 핵심으로 제시했다. 확인 전에 롤백·설정 변경 등을 바로 권하지 않았으며, 변경 조치는 \"확인되면 검토할 조치\"로 뒤에 덧붙였다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-06|0",
+   "variant": "h55",
+   "scenario": "v3-06",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 ComplianceCheckFunction 자체 실행 시간은 정상이고, 비동기 호출 후 시작까지 약 72~76분 대기가 발생했음을 로그로 확인했다. 결정적 신호(AsyncEventAge 등)가 없어 원인을 확정하지 않고 추가 확인이 필요하다고 바르게 판단했다.",
+   "fixReason": "답변은 원인을 확정하지 않고 AsyncEventAge 등 비동기 지표와 AWS Health 확인을 핵심으로 제시했으며, 확인되지 않은 원인을 전제로 한 변경(롤백·코드 수정 등)을 즉시 권하지 않았다. 정답 요지의 올바른 조치와 일치한다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-08|0",
+   "variant": "h55",
+   "scenario": "v3-08",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 웨비나 후 트래픽 급증으로 두 함수의 동시 실행 합이 계정 동시성 한도에 닿아 스로틀이 발생했다고 주원인을 정확히 짚었다. 메모리 부족이 아님도 명시했다. 다만 계정 한도 값(50)을 도구로 확인하지 못해 가설로 표현했으나, 방향과 핵심은 정답 요지와 일치한다.",
+   "fixReason": "핵심 조치는 계정 동시 실행 한도 확인 및 상향 요청, 예약 동시성 조정으로, 정답 요지의 올바른 조치와 일치한다. 메모리 증설은 명시적으로 권하지 않는다고 밝혔다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-06|1",
+   "variant": "h55",
+   "scenario": "v3-06",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 ComplianceCheckFunction 자체 실행은 정상이고, 비동기 호출 대기열 구간에서 70분 이상 지연이 발생했을 가능성이 크다고 짚으면서도, 결정적 근거(AsyncEventAge 등)가 없어 확정할 수 없다고 밝혔다. 추가 확인이 필요하다는 방향이 정답 요지와 일치한다.",
+   "fixReason": "답변은 원인을 확정하지 않고 근거 부족을 인정하며, 핵심 조치로 AsyncEventAge·AsyncEventsReceived·AsyncEventsDropped 지표 확인과 예약 동시성 설정 확인을 제시했다. 확인 전 코드·설정 변경을 명시적으로 하지 않겠다고 밝혔으며, 정답 요지의 올바른 조치와 일치한다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-10|0",
+   "variant": "h55",
+   "scenario": "v3-10",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 \"공격인지 클라이언트 버그인지 크롤러인지 가를 수 없다\"며 원인 미확정으로 결론 냈다. 정답 요지는 5XX=0, Lambda 오류·지연 정상, 존재하지 않는 경로를 두드리는 자동 스캐너가 API Gateway에서 거부되는 패턴으로 사용자 영향 없음을 주원인으로 제시한다. 도우미는 방향(Lambda 단계 이전 거절 가능성)은 언급했으나 스캐너/자동화 봇 패턴이라는 핵심 판단을 내리지 않고 여러 후보 중 하나로만 나열했다.",
+   "fixReason": "핵심 조치는 \"지금 차단이나 긴급 대응을 할 근거가 없다\"며 먼저 4XX 상태코드·경로·IP 등을 확인하라는 것이다. 이는 정답 요지(사용자 영향 없음, 긴급 대응 불필요, 관찰 유지 후 WAF 등 일반 작업 검토)와 일치한다. 불가능하거나 해로운 조치를 앞세우지 않았고, 조사 후 WAF rate-based 규칙 등 올바른 대응도 언급되어 있다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-32|1",
+   "variant": "h55",
+   "scenario": "v3-32",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 멘션 이벤트가 Lambda까지 도달하지 않는다는 점을 짚고, 원인을 확정하지 않은 채 Slack Event Subscriptions 상태 등 추가 확인이 필요하다고 올바르게 판단했다. 잘못된 단정 없이 여러 후보를 가능성으로만 제시했다.",
+   "fixReason": "답변은 원인을 확정하지 않고 근거 부족을 인정하며, 핵심 조치로 Slack Event Subscriptions 상태·전송 실패 기록·app_mentions:read 권한·API Gateway 로그 등을 먼저 확인하도록 안내했다. 확인 전 변경은 권하지 않았으며, 정답 요지의 올바른 확인 항목(Event Subscriptions 상태, 앱 소유자 메일 대신 전송 실패 기록, app_mentions:read 범위, 채널 초대 여부)을 모두 포함한다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-32|0",
+   "variant": "h55",
+   "scenario": "v3-32",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 멘션 이벤트가 Lambda에 도달하지 않음을 확인하고, 도구로 원인을 확정할 수 없다고 밝히면서 Slack Event Subscriptions 상태 확인 등 추가 확인 사항을 제시했다. 정답 요지가 요구하는 \"근거 부족 인정 + 추가 확인 안내\" 방식에 부합한다.",
+   "fixReason": "답변은 원인을 확정하지 않고 Event Subscriptions 상태·Recent deliveries·API Gateway 4xx 확인 등 타당한 다음 확인 단계를 핵심으로 제시했다. 확인되지 않은 원인을 전제로 한 변경(롤백, 코드 수정 등)은 \"확인되면 검토할 조치\"로 뒤에 덧붙였을 뿐 핵심 조치가 아니다. 정답 요지의 올바른 조치(Event Subscriptions 상태·비활성화 메일 확인 후 재활성화)와 방향이 일치한다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-28|0",
+   "variant": "h55",
+   "scenario": "v3-28",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 원인을 확정하지 않고 \"가설(확인 필요)\"로 제시하며, 데이터 형식·경로 불일치 가능성을 후보로 들었다. 정답 요지도 근거 부족을 인정하고 추가 확인 사항을 제시하는 것이 올바른 답이라고 명시하며, 숨은 원인을 후보로 드는 것은 괜찮다고 했다. 도우미는 확정 없이 두 후보를 제시하고 확인 사항을 나열했으므로 방향이 맞다. 잘못된 단정과 관련해, 도우미는 모든 원인을 가능성으로만 표현했고 사실과 다른 내용을 확정적으로 말한 부분이 없다.",
+   "fixReason": "핵심 조치로 SOH 필터 코드 경로·자료형 확인, 212건 METADATA batteryHealth 구조 확인 등 근거 수집을 먼저 제시하고, 변경(재적재·보정)은 \"확인되면 검토할 조치\"로 뒤에 덧붙였다. 확인되지 않은 원인을 전제로 즉각 변경을 권하지 않아 올바른 접근이다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-28|1",
+   "variant": "h55",
+   "scenario": "v3-28",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 \"필터가 SOH 값을 못 찾는 경우\"이며 \"데이터 스키마 불일치로 추정\"한다고 하면서도, 확인하지 못한 것을 명시하고 추가 확인을 먼저 권했다. 원인을 확정하지 않고 근거 부족을 인정하며 확인 방향을 제시했으므로 정답 요지에 부합한다. 다만 analyze_error 결과의 \"필드가 없을 때 undefined >= 70이 false가 되어 조용히 제외됨\"이나 \"0~1 대 0~100 스케일\" 등 숨은 원인 후보를 가능성으로 언급했으나 확정하지는 않았다.",
+   "fixReason": "핵심 조치는 파트너 배터리 아이템 1건의 METADATA를 직접 조회해 SOH 값의 위치와 타입을 확인하는 것으로, 확인되지 않은 원인을 전제로 변경을 바로 권하지 않고 근거를 얻기 위한 타당한 다음 확인을 제시하고 있다. 재적재·필터 수정은 확인 결과에 따라 달라진다고 명시해 조건부로 덧붙였다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-19|1",
+   "variant": "h55",
+   "scenario": "v3-19",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 \"04:23Z 이후 약 4시간 18분 동안 실행 기록이 없어 데이터 누락 때문에 알람이 울렸을 가능성이 크다\"고 짚었고, TreatMissingData: breaching 설정도 점검하라고 언급했다. 실제 검색은 정상임을 근거로 제시했다. 정답 요지의 핵심(합성 검사 미실행 → 지표 결측 → breaching 설정으로 알람 발생, 실제 검색 정상)과 방향이 일치한다. 다만 TreatMissingData: breaching을 확정하지 않고 \"점검하라\"는 수준으로 남겼으나, 이는 조회 자료에 해당 설정값이 없어 확인 불가한 상황이므로 적절한 표현이다.",
+   "fixReason": "핵심 조치는 canary 스케줄러(EventBridge 규칙) 및 실행 주체 활성 상태 확인·복구이며, 수동 실행으로 지표 재개를 권하고 있다. 이는 정답 요지의 올바른 조치(search-canary 워크플로 복구 및 수동 실행)와 일치한다. 재색인은 명확히 하지 말라고 안내했다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-38|1",
+   "variant": "h55",
+   "scenario": "v3-38",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 doc v5 재색인이 doc v6 재색인보다 늦게 끝나 186건을 v5로 덮어썼고, 그 결과 약칭과 사양 필드가 빠졌다고 주원인으로 정확히 짚었다. 조회 자료의 변경 이력(02:05 v5 시작 → 02:26 v6 완료 → 02:41 v5 완료)을 근거로 제시했으며, 정답 요지와 일치한다.",
+   "fixReason": "핵심 조치는 최신 main(v1.10.1, doc v6)에서 reindex-search-documents --apply를 단독으로 다시 실행하는 것으로, 정답 요지의 올바른 조치와 일치한다. 이를 실행하면 186건이 v6으로 복구되어 장애가 해소된다. 명령어도 실제 사용된 스크립트명과 동일하며 동작에 문제가 없다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-39|0",
+   "variant": "h55",
+   "scenario": "v3-39",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 JSON 배열이 잘려 파싱 실패 후 폴백 문구로 대체된다는 핵심 메커니즘은 정확히 짚었으나, 그 원인인 EXPLANATION_MAX_TOKENS를 1800→300으로 줄인 05:32 배포를 특정하지 못했다. 레이어 v28 배포를 언급했지만 원인으로 단정하지 않았고, max_tokens 값 자체를 \"확인하지 못했다\"고 유보했다.",
+   "fixReason": "핵심 조치는 max_tokens를 확인해 후보 수에 맞게 늘리거나 배치 분할 호출로 제시했다. 이는 EXPLANATION_MAX_TOKENS를 충분한 값으로 올리는 것과 동일하며, 실제 원인(토큰 한도 축소로 JSON 잘림)을 해소한다. 명령·코드는 제시하지 않았으나 방향 자체는 올바르다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-45|1",
+   "variant": "h55",
+   "scenario": "v3-45",
+   "run": 1,
+   "cause": "partial",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 S3_VECTORS_BUCKET이 빈 값으로 배포된 것을 유력 후보(a)로 제시했지만, 확정하지 않고 S3 Vectors 서비스 지연 가능성(b)도 병렬 후보로 남겨 두었다. 정답 원인(S3_VECTORS_BUCKET 빈 값 → 레거시 경로 폴백)을 주원인으로 단정하지 않고 여러 후보 중 하나로만 말했으므로 partial이다.",
+   "fixReason": "핵심 조치로 \"지연 시작 시각 확인 후 S3VectorsBucketName을 eecar-vectors-index-12234628로 복원\"을 권했다. 이는 정답 요지의 올바른 조치와 일치하며, 실행 시 장애가 해소된다. 다만 조치 전에 여러 확인 단계를 먼저 요구하는 구조이므로 핵심 조치 자체는 올바르나 즉시 실행이 아닌 조건부 권고 형태다. 명령·값 자체는 정확하고 해롭지 않다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-58|0",
+   "variant": "h55",
+   "scenario": "v3-58",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 v1.10.1 배포(05:30 UTC)의 slack-notification 서식 변경이 Slack webhook 400 Bad Request를 유발해 알림이 전달되지 않는다고 주원인으로 짚었다. 이는 정답 요지와 일치한다. GetParts 소켓 오류는 이미 지나간 일시 오류로 별개 취급했다.",
+   "fixReason": "핵심 조치는 v1.10.1을 v1.10.0으로 롤백하는 것으로, 이는 정답 요지의 올바른 조치(v1.10.0으로 롤백)와 정확히 일치한다. 롤백하면 slack-notification 서식이 이전 상태로 돌아가 Slack webhook 400 오류가 해소되고 알림이 정상 전달된다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-58|1",
+   "variant": "h55",
+   "scenario": "v3-58",
+   "run": 1,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 05:30 UTC v1.10.1 배포에서 slack-notification 메시지 형식(스택 추적 블록 확장, 심각도 버튼 추가)이 변경된 것이 Slack webhook의 400 Bad Request 거부 원인이라고 주원인으로 짚었다. 이는 정답 요지와 일치한다. 400은 메시지 형식 문제이므로 webhook URL 자체는 유효하다는 점도 언급했다.",
+   "fixReason": "핵심 조치는 v1.10.1을 v1.10.0으로 롤백하는 것으로, 이는 정답 요지의 올바른 조치(v1.10.0으로 롤백)와 정확히 일치한다. 이후 Block Kit 제한 검증 및 재배포도 안내하고 있어 완전한 해결 경로를 제시한다. GetParts 함수 수정이나 롤백, webhook URL 재발급 등 하면 안 되는 조치는 권하지 않았다.",
+   "pass": true,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-48|0",
+   "variant": "h55",
+   "scenario": "v3-48",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "present",
+   "fix": "partial",
+   "checklist": {
+    "q_resolves": "no",
+    "q_harmful": "yes",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "yes",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 레이어 v27 배포를 주원인 후보로 강하게 제시하고 롤백을 첫 번째 조치로 권했다. 그러나 정답 요지의 원인은 잘못된 template(숫자 cathodeType)을 넣은 시험 호출이며, 레이어 변경과는 무관하다. 방향(cathode 값이 문자열이 아님)은 부분적으로 맞지만, 핵심인 \"시험용 잘못된 입력값 문제이며 사용자 영향 없음\"을 짚지 못했다.",
+   "fixReason": "핵심 조치는 레이어를 v26으로 롤백하는 것이다. 그러나 정답 요지에 따르면 이 오류는 개발·운영용 합성 데이터 API에 잘못된 template(숫자 cathodeType)을 넣어 시험한 호출이 실패한 것으로, 사용자 영향이 없고 곧이어 정상 호출도 성공했다. 즉 레이어 v27 자체가 문제가 아니라 입력값이 문제이므로 롤백해도 장애가 해소되지 않으며, 오히려 불필요한 롤백으로 다른 기능에 영향을 줄 수 있다.",
+   "pass": false,
+   "phrasePass": false
+  },
+  {
+   "item": "h55|v3-45|0",
+   "variant": "h55",
+   "scenario": "v3-45",
+   "run": 0,
+   "cause": "partial",
+   "wrong": "present",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 05:20 스택 업데이트(S3VectorsBucketName이 빈 값으로 배포)를 원인 후보로 제시했으나, \"확정하지 못했다\"며 추가 확인이 필요하다고 유보했다. 정답은 해당 변경이 원인임을 확정하는 것이므로, 방향은 맞지만 핵심(빈 값 → 레거시 경로 폴백)을 확정하지 못한 partial에 해당한다.",
+   "fixReason": "답변의 핵심 조치는 \"먼저 VectorSearchMs 메트릭을 며칠 치 조회해 지연이 05:20 UTC 전후 어디서 올랐는지 확인하라\"는 조사 요청이다. 이는 조건부로 올바른 조치(05:20 이후라면 스택 롤백 또는 S3VectorsBucketName을 eecar-vectors-index-12234628으로 재배포)를 제시하기 전 선행 확인 단계로 제시되었다. 실제 원인은 05:20 스택 업데이트에서 S3_VECTORS_BUCKET이 빈 문자열로 배포된 것이므로, 메트릭 조회 후 스택 파라미터를 이전 값으로 되돌리는 조치는 장애를 해소한다. 핵심 조치로 권한 스택 파라미터 복원(eecar-vectors-index-12234628 지정 재배포)은 올바르며, 명령/코드/ARN 등 구체적 코드는 제시되지 않아 오동작 요소가 없다. 다만 조사 선행을 핵심으로 내세워 즉각 조치가 다소 뒤로 밀렸으나, 조사 자체가 구체적이고 올바른 조치가 명확히 포함되어 있다.",
+   "pass": false,
+   "phrasePass": false
+  }
+ ]
+}
