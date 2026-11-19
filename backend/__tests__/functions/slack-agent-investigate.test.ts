@@ -121,6 +121,17 @@ describe('getServiceMetrics', () => {
   it('rejects unknown services with a usable message', async () => {
     expect(await getServiceMetrics('s3')).toMatchObject({ error: expect.stringContaining('bedrock') });
   });
+
+  it('tells the agent that zero canary runs are expected while the schedule is off (A-52)', async () => {
+    cwMock.on(GetMetricStatisticsCommand).resolves({ Datapoints: [] });
+    delete process.env.SEARCH_CANARY_ENABLED;
+    expect(await getServiceMetrics('canary', 24)).toMatchObject({ scheduled: false, runs: 0, note: expect.stringContaining('정상') });
+    process.env.SEARCH_CANARY_ENABLED = 'true';
+    const on = await getServiceMetrics('canary', 24) as Record<string, unknown>;
+    expect(on).toMatchObject({ scheduled: true, runs: 0 });
+    expect(on.note).toBeUndefined();
+    delete process.env.SEARCH_CANARY_ENABLED;
+  });
 });
 
 describe('getProviderStatus', () => {

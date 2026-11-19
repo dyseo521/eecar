@@ -21,6 +21,7 @@ const LAMBDA_FUNCTIONS = [
   'MaterialPropertySearchFunction',
   'ContactInquiryFunction',
   'SlackNotificationFunction',
+  'SearchCanaryFunction',
 ];
 
 /**

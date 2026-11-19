@@ -16,6 +16,7 @@ export const COMPONENTS = [
   'lambda:VectorSearchFunction', 'lambda:PartRegistrationFunction', 'lambda:ComplianceCheckFunction', 'lambda:GetPartsFunction',
   'lambda:WatchPartFunction', 'lambda:ProposalFunction', 'lambda:SyntheticDataFunction', 'lambda:BatteryHealthAssessmentFunction',
   'lambda:MaterialPropertySearchFunction', 'lambda:ContactInquiryFunction', 'lambda:SlackNotificationFunction', 'lambda:SlackAgentFunction',
+  'lambda:SearchCanaryFunction',
   'layer:eecar-utils-layer', 'dynamodb:eecar-parts-table', 's3:vectors-bucket', 's3:documents-bucket', 's3vectors:parts-vectors',
   'apigateway:eecar-api', 'bedrock:claude', 'bedrock:titan', 'sns:eecar-notifications', 'ssm:parameter', 'slack:platform', 'client:request', 'aws:region', 'none',
 ] as const;

@@ -2,6 +2,16 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: EECAR - B2B Platform for Used EV Parts Trading
 
+Parameters:
+  # 검색 합성 검사의 일정 실행과 중단 경보를 켠다 (DECISION_LOG A-52). 꺼 두면 수동 실행만 한다
+  SearchCanaryEnabled:
+    Type: String
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+
+Conditions:
+  SearchCanaryOn: !Equals [!Ref SearchCanaryEnabled, 'true']
+
 Globals:
   Function:
     Runtime: nodejs24.x  # nodejs20.x 지원 종료(2026-04-30), 24.x 지원 종료 2028-04-30 (docs/DECISION_LOG.md A-19)
@@ -415,6 +425,43 @@ Resources:
                 - logs:PutLogEvents
               Resource: '*'
 
+  # 검색 합성 검사의 일정 실행 (DECISION_LOG A-39, A-52). GitHub 일정 실행은 간격이 불규칙해(중앙값 7시간) EventBridge Scheduler로 옮겼다
+  SearchCanaryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/dist/functions/search-canary/
+      Handler: index.handler
+      Description: 운영 검색 합성 검사 (결과 조건, 후보 수, LLM 설명 폴백)
+      MemorySize: 256
+      # 요청 7개 x 요청당 제한 15초
+      Timeout: 120
+      Environment:
+        Variables:
+          EECAR_API_URL: !Sub 'https://${EECARApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+          CANARY_TOKEN_SSM_PARAM: /eecar/canary-token
+          SLACK_WEBHOOK_SSM_PARAM: /eecar/slack/webhook-url
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource:
+                - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/eecar/canary-token'
+                - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/eecar/slack/webhook-url'
+      Events:
+        Hourly:
+          Type: ScheduleV2
+          Properties:
+            Name: !Sub '${AWS::StackName}-search-canary'
+            Description: 검색 합성 검사 매시 실행 (A-52)
+            ScheduleExpression: cron(17 * * * ? *)
+            FlexibleTimeWindow:
+              Mode: 'OFF'
+            State: !If [SearchCanaryOn, ENABLED, DISABLED]
+            # 실패한 실행을 다시 부르지 않는다. 다음 시각에 다시 돈다
+            RetryPolicy:
+              MaximumRetryAttempts: 0
+
   # 자동이 2.0: AI DevOps 어시스턴트 (Slack Bot + ReAct Agent)
   SlackAgentFunction:
     Type: AWS::Serverless::Function
@@ -433,6 +480,7 @@ Resources:
           AGENT_COMPLEX_MODEL_ID: global.anthropic.claude-sonnet-4-6
           STACK_NAME: !Ref AWS::StackName
           API_ACCESS_LOG_GROUP: !Ref ApiAccessLogGroup
+          SEARCH_CANARY_ENABLED: !Ref SearchCanaryEnabled
           SLACK_SIGNING_SECRET_SSM_PARAM: /eecar/slack/signing-secret
           BEDROCK_KB_ID_SSM_PARAM: /eecar/bedrock/kb-id
           S3_VECTORS_BUCKET: eecar-vectors-index-12234628
@@ -906,9 +954,10 @@ Resources:
         - !GetAtt SlackNotificationFunction.Arn
 
   # 합성 검사(canary)의 벡터 후보가 0이거나 검사가 멈추면 경보 (DECISION_LOG A-39)
-  # 검사는 GitHub Actions가 매시 실행한다. 일정 실행은 몇십 분 늦어질 수 있어 3시간 연속일 때만 경보한다
+  # 일정이 꺼져 있으면 만들지 않는다. 데이터 없음을 경보로 보므로 계속 ALARM에 머물고, 자동이가 이를 장애로 읽는다 (A-52)
   SearchCanaryVectorAlarm:
     Type: AWS::CloudWatch::Alarm
+    Condition: SearchCanaryOn
     Properties:
       AlarmName: !Sub '${AWS::StackName}-search-canary-vector'
       AlarmDescription: Search canary saw no vector candidates (vector search silently off or index empty), or the canary stopped running.
@@ -919,13 +968,13 @@ Resources:
           Value: Canary
       Statistic: Minimum
       Period: 3600
-      # GitHub 일정 실행의 실측 간격은 중앙값 5.7시간, 최대 7.9시간이라 3시간 기준은 오탐이 계속 났다 (A-45)
-      EvaluationPeriods: 12
-      DatapointsToAlarm: 12
+      # EventBridge Scheduler가 매시 호출한다. 한 번 빠져도 울리지 않도록 3시간 연속일 때만 경보한다 (A-52, 이전 GitHub 일정 실행은 12시간, A-45)
+      EvaluationPeriods: 3
+      DatapointsToAlarm: 3
       Threshold: 1
       ComparisonOperator: LessThanThreshold
       TreatMissingData: breaching
-      # 경보는 메일이 아니라 Slack으로 보낸다 (A-45). 검색이 실제로 실패하면 워크플로가 실행 때마다 바로 Slack에 알린다
+      # 경보는 메일이 아니라 Slack으로 보낸다 (A-45). 검색이 실제로 실패하면 합성 검사 함수가 실행 때마다 바로 Slack에 알린다
       AlarmActions:
         - !GetAtt SlackNotificationFunction.Arn
       OKActions:

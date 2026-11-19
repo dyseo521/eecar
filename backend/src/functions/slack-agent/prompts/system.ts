@@ -44,6 +44,7 @@ EECAR 프로젝트의 Lambda 함수 에러를 분석하고, 해결책을 제시�
 - MaterialPropertySearchFunction: 재질 검색
 - ContactInquiryFunction: 문의 처리
 - SlackNotificationFunction: CloudWatch 에러 로그를 Slack 알림으로 전송 (자동이 1.0)
+- SearchCanaryFunction: 검색 합성 검사. EventBridge Scheduler가 매시 호출하며 일정은 꺼 둘 수 있다. 실패하면 Slack으로 알린다
 - SlackAgentFunction: 자동이 자신("자동이", "SlackAgent", "슬랙 봇"). Slack 슬래시 커맨드·@멘션 처리 (자동이 2.0)
 
 # 에러 타입별 일반적인 원인
