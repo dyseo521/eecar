@@ -11,7 +11,7 @@ EECAR는 1세대 전기차(2010년대 초반)의 수명 종료에 따라 증가�
 | 항목 | 값 |
 |------|-----|
 | 코드베이스 | 10,000+ LOC |
-| Lambda 함수 | 12개 (서버리스 마이크로서비스) |
+| Lambda 함수 | 13개 (서버리스 마이크로서비스) |
 | 부품 카테고리 | 11개 (배터리, 모터, 인버터, 차체 부품 등) |
 | 배포 리전 | AWS ap-northeast-2 (서울) |
 
@@ -63,6 +63,7 @@ EECAR는 1세대 전기차(2010년대 초반)의 수명 종료에 따라 증가�
 
 ### 모니터링
 - AWS X-Ray 분산 추적 (Lambda, API Gateway 전 구간)
+- 검색 합성 검사: 정해진 질의 5개로 결과 조건, 후보 수, LLM 설명 폴백을 확인 (EventBridge Scheduler, 일정은 현재 꺼 둠)
 - CloudWatch Dashboard 통합 모니터링
 
 ## 기술 스택
@@ -73,7 +74,7 @@ EECAR는 1세대 전기차(2010년대 초반)의 수명 종료에 따라 증가�
 - React Context API (인증)
 
 ### Backend
-- AWS Lambda (Node.js 24) - 12개 서버리스 함수
+- AWS Lambda (Node.js 24) - 13개 서버리스 함수
 - Lambda Layer 공통 유틸리티
 
 ### AI/ML
@@ -111,7 +112,7 @@ eecar/
 │   └── vite.config.ts
 ├── backend/               # Lambda 함수들
 │   ├── src/
-│   │   ├── functions/     # Lambda 함수별 디렉토리 (12개)
+│   │   ├── functions/     # Lambda 함수별 디렉토리 (13개)
 │   │   └── utils/         # Lambda Layer 공통 유틸리티
 │   ├── local-server/      # 로컬 개발용 Express mock 서버
 │   └── package.json
@@ -122,7 +123,7 @@ eecar/
 └── docs/                  # 문서, 결정 기록
 ```
 
-### Lambda 함수 목록 (12개)
+### Lambda 함수 목록 (13개)
 
 | 함수 | 설명 |
 |------|------|
@@ -138,6 +139,7 @@ eecar/
 | contact-inquiry | 일반 문의 처리 (SNS) |
 | slack-notification | Lambda 에러 모니터링 (v1: push) |
 | slack-agent | 자동이 2.0 AI DevOps 어시스턴트 (v2: ReAct) |
+| search-canary | 검색 합성 검사 (EventBridge Scheduler 매시 호출, 현재 꺼 둠) |
 
 ## 빠른 시작
 
@@ -184,7 +186,7 @@ npm run deploy
 | deploy-frontend | master push | S3 + CloudFront 배포 |
 | deploy-backend | v*.*.* 태그 | SAM 배포, Lambda 업데이트 |
 | deploy-api-docs | schemas/types 변경 | OpenAPI 명세 생성 후 커밋 (GitHub Pages는 끔) |
-| search-canary | 매시 17분 | 운영 검색 합성 검사 (결과 0건, LLM 폴백, 벡터 누락 탐지) |
+| search-canary | 수동 실행 | 운영 검색 합성 검사 (결과 0건, LLM 폴백, 벡터 누락 탐지). 일정 실행은 EventBridge Scheduler가 맡고 현재는 꺼 둠 |
 | security-scan | PR + 주간 스케줄 | 의존성 취약점 검사 |
 
 ### 배포 프로세스

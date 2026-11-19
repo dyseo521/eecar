@@ -1,11 +1,10 @@
-# 운영 검색 합성 검사 (DECISION_LOG A-39)
+# 운영 검색 합성 검사의 수동 실행 (DECISION_LOG A-39, A-52)
 # 오류 없이 품질이 떨어지는 장애(결과 0건, LLM 폴백, 벡터 누락)는 에러 알림으로 잡히지 않았다 (C-06, C-09, C-26).
-# 배포 역할에 EventBridge 권한이 없어 Lambda 스케줄 대신 GitHub Actions 일정 실행을 쓴다.
+# 일정 실행은 EventBridge Scheduler + SearchCanaryFunction으로 옮겼다. GitHub 일정 실행은 "매시"로 등록해도
+# 실제 간격이 중앙값 7.0시간, 최대 10.8시간이었다. 이 워크플로는 배포 직후 손으로 확인할 때 쓴다.
 name: Search Canary
 
 on:
-  schedule:
-    - cron: '17 * * * *'  # 매시 17분 (정각 혼잡을 피함). 23분으로 등록한 일정이 돌지 않아 다시 등록했다 (A-43)
   workflow_dispatch:
 
 permissions:

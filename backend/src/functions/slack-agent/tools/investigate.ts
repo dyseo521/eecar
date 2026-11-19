@@ -208,7 +208,14 @@ export async function getServiceMetrics(service: string, hours = 24, functionNam
     // 검색 합성 검사(A-39): 벡터 후보가 0이면 오류 없이 벡터 검색이 꺼진 것이다
     const r = await cloudWatch.send(new GetMetricStatisticsCommand({ Namespace: 'EECAR/Search', MetricName: 'VectorCandidates', Dimensions: [{ Name: 'Operation', Value: 'Canary' }], StartTime: since, EndTime: end, Period: period, Statistics: ['Minimum', 'SampleCount'] }));
     const points = r.Datapoints ?? [];
-    return { service, windowHours: hours, runs: points.reduce((a, d) => a + (d.SampleCount ?? 0), 0), minVectorCandidates: points.length ? Math.min(...points.map(d => d.Minimum ?? 0)) : null };
+    // 일정이 꺼져 있으면 실행 0회가 정상이다. 이를 알리지 않으면 검사가 멈춘 장애로 읽는다 (A-52)
+    const scheduled = process.env.SEARCH_CANARY_ENABLED === 'true';
+    return {
+      service, windowHours: hours, scheduled,
+      runs: points.reduce((a, d) => a + (d.SampleCount ?? 0), 0),
+      minVectorCandidates: points.length ? Math.min(...points.map(d => d.Minimum ?? 0)) : null,
+      ...(scheduled ? {} : { note: '합성 검사 일정이 꺼져 있어 실행 수 0은 정상이다. 수동 실행 결과만 있을 수 있다' }),
+    };
   }
   if (service === 'bedrock') {
     const models = [...new Set([process.env.BEDROCK_MODEL_ID, process.env.AGENT_MODEL_ID, process.env.AGENT_COMPLEX_MODEL_ID, 'amazon.titan-embed-text-v2:0'].filter(Boolean) as string[])];
