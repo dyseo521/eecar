@@ -7,11 +7,11 @@ import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedroc
 import { S3VectorsClient, QueryVectorsCommand, PutVectorsCommand } from '@aws-sdk/client-s3vectors';
 import { DynamoDBDocumentClient, BatchGetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 import {
-  MEMORY_MIN_SIMILARITY, MemoryRecord, cosine, formatRecall, memoryIndexText, mergeRecord, rankMemories, recordFromDiagnosis, sameCase,
+  MAX_PROPOSALS_PER_RUN, MEMORY_MIN_SIMILARITY, MemoryRecord, cosine, formatRecall, memoryIndexText, memoryLine, mergeRecord, proposalsFromSteps, rankMemories, recordFromDiagnosis, recordFromProposal, sameCase,
 } from '../../src/functions/slack-agent/tools/memory-core.js';
 import { recallMemory, saveMemoryRecord } from '../../src/functions/slack-agent/tools/memory.js';
 import { handleMemoryFeedback } from '../../src/functions/slack-agent/handlers/memory-feedback.js';
-import { prepareFeedback, feedbackBlocks } from '../../src/functions/slack-agent/handlers/app-mention.js';
+import { prepareFeedback, prepareProposals, feedbackBlocks } from '../../src/functions/slack-agent/handlers/app-mention.js';
 import { PRODUCTION_TOOL_NAMES, executeTool } from '../../src/functions/slack-agent/tools/index.js';
 import type { Diagnosis } from '../../src/functions/slack-agent/tools/diagnosis.js';
 
@@ -23,7 +23,7 @@ const NOW = '2026-11-24T00:00:00.000Z';
 
 function record(key: string, over: Partial<MemoryRecord> = {}): MemoryRecord {
   return {
-    key, outcome: 'confirmed', verdict: 'root_cause', question: '검색이 0건이에요', summary: '색인 이름 오타', cause: 'S3_VECTORS_INDEX 값이 틀림',
+    key, kind: 'case', outcome: 'confirmed', verdict: 'root_cause', question: '검색이 0건이에요', summary: '색인 이름 오타', cause: 'S3_VECTORS_INDEX 값이 틀림',
     functionName: 'VectorSearchFunction', component: 'lambda:VectorSearchFunction', faultType: 'config_env_wrong', evidence: [],
     codeVersion: 'v1', createdAt: NOW, lastSeenAt: NOW, count: 1, ...over,
   };
@@ -183,6 +183,13 @@ describe('memory tools', () => {
   it('does not let the model write memories in production', () => {
     expect(PRODUCTION_TOOL_NAMES).toContain('recall_memory');
     expect(PRODUCTION_TOOL_NAMES).not.toContain('save_memory');
+    expect(PRODUCTION_TOOL_NAMES).toContain('propose_memory');
+  });
+
+  it('accepts a proposal without saving anything', async () => {
+    expect(await executeTool('propose_memory', { fact: 'VectorSearch의 제한 시간 30초는 의도된 값', evidence: 'Timeout: 30' })).toMatchObject({ success: true, data: { proposed: true } });
+    expect(s3vMock.commandCalls(PutVectorsCommand)).toHaveLength(0);
+    expect(await executeTool('propose_memory', { fact: ' ', evidence: 'x' })).toMatchObject({ success: false });
   });
 
   it('wraps recall results with a note that memories are hypotheses', async () => {
@@ -190,5 +197,45 @@ describe('memory tools', () => {
     ddbMock.on(BatchGetCommand).resolves({ Responses: {} });
     const res = await executeTool('recall_memory', { query: 'x' });
     expect(res).toMatchObject({ success: true, data: { memories: [], note: expect.stringContaining('관련 기억 없음') } });
+  });
+});
+
+describe('memory proposals', () => {
+  const step = (fact: string, fn?: string) => ({ action: 'propose_memory', actionInput: { fact, evidence: 'Timeout: 30', ...(fn ? { functionName: fn } : {}) } });
+
+  it('takes at most two distinct proposals from a run', () => {
+    const got = proposalsFromSteps([step('a', 'VectorSearchFunction'), { action: 'get_logs', actionInput: {} }, step('a'), step('b'), step('c')]);
+    expect(got.map(p => p.fact)).toEqual(['a', 'b']);
+    expect(got).toHaveLength(MAX_PROPOSALS_PER_RUN);
+    expect(got[0].functionName).toBe('VectorSearchFunction');
+  });
+
+  it('stores a confirmed proposal as a fact and drops a rejected one', async () => {
+    const proposal = { fact: 'VectorSearch의 제한 시간 30초는 의도된 값', evidence: 'Timeout: 30', functionName: 'VectorSearchFunction' };
+    const pending = { id: 'f1', question: '느려요', proposal, codeVersion: 'v1', createdAt: NOW };
+    const saved: MemoryRecord[] = [];
+    const save = async (r: MemoryRecord) => { saved.push(r); return { action: 'added' as const, key: r.key, count: 1 }; };
+    expect(await handleMemoryFeedback({ id: 'f1', outcome: 'refuted', userId: 'U1' }, { claim: async () => pending, save })).toContain('기억하지 않았습니다');
+    expect(saved).toHaveLength(0);
+    expect(await handleMemoryFeedback({ id: 'f1', outcome: 'confirmed', userId: 'U1' }, { claim: async () => pending, save, now: () => NOW })).toContain('환경 사실');
+    expect(saved[0]).toMatchObject({ kind: 'fact', outcome: 'confirmed', functionName: 'VectorSearchFunction', summary: proposal.fact, codeVersion: 'v1' });
+    expect(memoryIndexText(saved[0])).toContain('사실: VectorSearch의');
+  });
+
+  it('keeps facts and incident cases apart when deduplicating, and labels facts when shown', () => {
+    const fact = recordFromProposal('q', { fact: 'x', evidence: 'y', functionName: 'VectorSearchFunction' }, { key: 'f', now: NOW, codeVersion: 'v1' })!;
+    expect(sameCase(fact, record('c', { faultType: undefined }))).toBe(false);
+    const [view] = rankMemories([{ key: 'f', similarity: 0.9 }], new Map([['f', fact]]));
+    expect(memoryLine(view)).toContain('환경 사실');
+  });
+
+  it('records a pending item per proposal so the user can confirm it later', async () => {
+    const saved: any[] = [];
+    let n = 0;
+    const got = await prepareProposals('q', [step('a', 'VectorSearchFunction'), step('b')] as any, { save: async p => { saved.push(p); }, version: async () => 'v3', id: () => `p${++n}`, now: () => NOW });
+    expect(got.map(g => g.id)).toEqual(['p1', 'p2']);
+    expect(saved[0]).toMatchObject({ id: 'p1', proposal: { fact: 'a' }, codeVersion: 'v3' });
+    expect(saved[1].codeVersion).toBeUndefined();
+    expect(JSON.stringify(feedbackBlocks('p1', 'proposal'))).toContain('기억하기');
   });
 });

@@ -20,7 +20,8 @@ import { getResourcePolicy } from './resource-policy.js';
  */
 export const PRODUCTION_TOOL_NAMES = [
   // save_memory는 뺐다. 모델이 검증 없이 기억을 쓰면 질문만으로 기억을 오염시킬 수 있다. 저장은 사람의 버튼 피드백으로만 한다 (A-53)
-  'analyze_error', 'get_logs', 'get_function_status', 'get_error_summary', 'recall_memory',
+  // 대신 propose_memory로 제안만 하고, 사람이 확인하면 저장된다
+  'analyze_error', 'get_logs', 'get_function_status', 'get_error_summary', 'recall_memory', 'propose_memory',
   'get_function_config', 'get_function_permissions', 'get_recent_changes', 'get_service_metrics', 'get_provider_status', 'submit_diagnosis',
   'search_code', 'get_request_breakdown', 'get_resource_policy',
 ];
@@ -258,6 +259,22 @@ export const TOOLS: Tool[] = [
       required: ['query'],
     },
   },
+  {
+    name: 'propose_memory',
+    description:
+      '조사 중 도구 결과로 확인한, 다음 조사에서도 쓸모 있는 환경 사실을 기억 후보로 제안합니다. 사람이 확인해야 저장되고, 이 도구는 아무것도 바로 저장하지 않습니다. '
+      + '제안할 것: 오래 유지되고 다시 찾기 번거로운 사실 (의도된 설정값, 함수 간 의존, 이 환경에서 반복되는 함정). '
+      + '제안하지 않을 것: 이번 장애의 원인(진단 아래 버튼으로 따로 기록된다), 도구 결과에 없는 추측, 비밀값, 곧 바뀔 값. 한 번의 조사에서 최대 2개.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        fact: { type: 'string', description: '기억할 사실 한 문장' },
+        evidence: { type: 'string', description: '이 사실을 확인한 도구 결과의 문구' },
+        functionName: { type: 'string', description: '관련 함수 (선택)' },
+      },
+      required: ['fact', 'evidence'],
+    },
+  },
   // 이전 평가(baseline, legacy 변형) 재현용 정의. 운영 목록(PRODUCTION_TOOL_NAMES)에는 없고 실행부도 없다 (A-53)
   {
     name: 'save_memory',
@@ -371,6 +388,12 @@ export async function executeTool(
           topK: Number(input.topK) || undefined,
         });
         return { success: true, data: formatRecall(memories) };
+      }
+
+      case 'propose_memory': {
+        // 저장하지 않는다. 답변을 보낸 뒤 제안마다 확인 버튼을 붙이고, 사람이 확인하면 저장한다 (handlers/app-mention.ts)
+        if (!String(input.fact ?? '').trim()) return { success: false, error: 'fact가 비었습니다' };
+        return { success: true, data: { proposed: true, note: '사람이 확인하면 기억에 저장됩니다. 지금 진단에는 이 제안을 근거로 쓰지 마세요.' } };
       }
 
       default:

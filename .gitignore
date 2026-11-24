@@ -70,3 +70,6 @@ docs/INFRASTRUCTURE_ARCHITECTURE.md
 docs/generated-diagrams
 
 doc/
+
+# 평가용 기억 임베딩 캐시 (A-53)
+eval/agent/.memory-embed-cache.json

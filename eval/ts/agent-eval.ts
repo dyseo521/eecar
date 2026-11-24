@@ -5,8 +5,8 @@
  *
  * - 에이전트(orchestrator.runReActAgent)는 운영 코드 그대로 실행한다.
  * - 도구는 시나리오의 고정 데이터(eval/agent/scenarios.json)로 응답한다. 운영 도구와 같은 반환 형태다.
- *   analyze_error는 실제 Claude 분석을 하되 외부 컨텍스트(Bedrock KB, 장기 기억)는 비운다.
- *   save_memory는 쓰지 않고 호출만 기록한다.
+ *   analyze_error는 실제 Claude 분석을 하되 Bedrock KB는 비운다. 장기 기억은 시나리오의 memories로 운영과 같은 검색을 한다(없으면 빈 결과, A-53).
+ *   save_memory는 쓰지 않고 호출만 기록한다. propose_memory는 운영처럼 제안만 받는다.
  * - 채점은 결정적 규칙이다: 원인 표현, 조치 표현, 오진 표현, 필요한 도구 호출.
  * - 결과: eval/reports/<날짜>-agent-eval[-tag].{json,md}
  *
@@ -23,6 +23,8 @@ import { runPool } from './run-pool.js';
 import { reduceLogs } from '../../backend/src/functions/slack-agent/tools/log-reduce.js';
 import { searchCode } from '../../backend/src/functions/slack-agent/tools/code-search.js';
 import { SUBMIT_DIAGNOSIS_TOOL } from '../../backend/src/functions/slack-agent/tools/diagnosis.js';
+import { formatRecall } from '../../backend/src/functions/slack-agent/tools/memory-core.js';
+import { makeScenarioRecall } from './memory-eval.js';
 
 interface Fixture {
   status?: { invocations: number; errors: number; avgDuration: number };
@@ -276,6 +278,7 @@ const baseStatus = (s: { invocations: number; errors: number; avgDuration: numbe
 
 export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, legacyTools = false, options: { reduceLogs?: boolean } = {}) {
   normalizeScenario(scenario);
+  const recall = makeScenarioRecall(scenario as never);
   return async (name: string, input: Record<string, unknown>) => {
     calls.push({ name, ...(input.functionName ? { functionName: String(input.functionName) } : {}) });
     const fn = String(input.functionName ?? '');
@@ -381,14 +384,17 @@ export function makeTools(scenario: Scenario, calls: Call[], analyzeError: any, 
         const lastOccurred = logEntries(found?.fixture.logs ?? []).filter(e => e.level === 'ERROR').pop()?.timestamp ?? scenarioClock(scenario);
         return { success: true, data: rows.map(([errorType, count]) => ({ errorType, count, lastOccurred })) };
       }
+      // 시나리오에 넣어 둔 기억으로 운영과 같은 검색 경로를 돌린다. 기억이 없는 시나리오는 늘 '관련 기억 없음' (A-53, E-44)
       case 'recall_memory':
-        return { success: true, data: [] };
+        return { success: true, data: formatRecall(await recall({ query: String(input.query ?? ''), functionName: input.functionName ? String(input.functionName) : undefined, topK: Number(input.topK) || undefined })) };
       case 'save_memory':
         return { success: true, data: { saved: false, note: '평가에서는 저장하지 않음' } };
+      case 'propose_memory':
+        return { success: true, data: { proposed: true, note: '사람이 확인하면 기억에 저장됩니다. 지금 진단에는 이 제안을 근거로 쓰지 마세요.' } };
       case 'analyze_error': {
         const analysis = await analyzeError(
           { errorMessage: String(input.errorMessage ?? ''), functionName: fn || 'Unknown' },
-          { searchCodebase: async () => [], recallMemory: async () => [] }
+          { searchCodebase: async () => [], recallMemory: recall }
         );
         return { success: true, data: analysis };
       }

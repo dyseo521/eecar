@@ -15,7 +15,7 @@ import { LambdaClient, GetFunctionConfigurationCommand } from '@aws-sdk/client-l
 import type { Diagnosis } from './diagnosis.js';
 import { resolveFunction } from './cloudwatch.js';
 import {
-  MemoryHit, MemoryOutcome, MemoryRecord, MemoryView, MEMORY_DUPLICATE_SIMILARITY, MEMORY_RECALL_LIMIT,
+  MemoryHit, MemoryOutcome, MemoryProposal, MemoryRecord, MemoryView, MEMORY_DUPLICATE_SIMILARITY, MEMORY_RECALL_LIMIT,
   memoryIndexText, memoryQueryText, mergeRecord, rankMemories, sameCase,
 } from './memory-core.js';
 
@@ -148,10 +148,12 @@ export async function deleteMemory(key: string): Promise<void> {
   await ddb.send(new DeleteCommand({ TableName: table(), Key: { PK: `JADONGMEM#${key}`, SK: 'RECORD' } }));
 }
 
+/** 버튼 피드백을 기다리는 항목. 진단(원인 맞음 / 틀림) 또는 에이전트의 기억 제안(기억하기 / 기억하지 않기) */
 export interface PendingDiagnosis {
   id: string;
   question: string;
-  diagnosis: Diagnosis;
+  diagnosis?: Diagnosis;
+  proposal?: MemoryProposal;
   codeVersion?: string;
   createdAt: string;
 }

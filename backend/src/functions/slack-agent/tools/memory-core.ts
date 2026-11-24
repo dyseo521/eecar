@@ -22,9 +22,20 @@ export const MEMORY_DUPLICATE_SIMILARITY = 0.8;
 export const MEMORY_RECALL_LIMIT = 3;
 
 export type MemoryOutcome = 'confirmed' | 'refuted';
+/** case: 사람이 확인한 진단 / fact: 에이전트가 제안하고 사람이 확인한 환경 사실 (예: 의도된 설정값, 함수 간 의존) */
+export type MemoryKind = 'case' | 'fact';
+/** 한 번의 조사에서 받는 기억 제안 수. 많으면 확인 부담이 커져 아무것도 확인하지 않게 된다 (판단) */
+export const MAX_PROPOSALS_PER_RUN = 2;
+
+export interface MemoryProposal {
+  fact: string;
+  evidence: string;
+  functionName?: string;
+}
 
 export interface MemoryRecord {
   key: string;
+  kind: MemoryKind;
   /** confirmed: 사람이 원인이 맞다고 확인 / refuted: 사람이 원인이 틀렸다고 확인 (피해야 할 판단) */
   outcome: MemoryOutcome;
   verdict: string;
@@ -50,6 +61,7 @@ export interface MemoryHit {
 }
 
 export interface MemoryView {
+  kind: MemoryKind;
   outcome: MemoryOutcome;
   similarity: number;
   sameFunction: boolean;
@@ -84,7 +96,10 @@ const sameName = (a?: string, b?: string) =>
   Boolean(a && b) && a!.toLowerCase().replace(/function$/, '') === b!.toLowerCase().replace(/function$/, '');
 
 /** 색인 문장: 원문 대화 대신 함수, 장애 유형, 질문, 결론, 원인만 쓴다 (LongMemEval의 사실 기반 키) */
-export function memoryIndexText(r: Pick<MemoryRecord, 'functionName' | 'component' | 'faultType' | 'question' | 'summary' | 'cause'>): string {
+export function memoryIndexText(r: Pick<MemoryRecord, 'kind' | 'functionName' | 'component' | 'faultType' | 'question' | 'summary' | 'cause'>): string {
+  if (r.kind === 'fact') {
+    return [`함수: ${r.functionName ?? '공통'}`, `사실: ${clip(r.summary, 400)}`, r.question ? `질문: ${clip(r.question, 300)}` : ''].filter(Boolean).join('\n');
+  }
   return [
     `함수: ${r.functionName ?? r.component ?? '알 수 없음'}`,
     r.faultType ? `장애 유형: ${r.faultType}` : '',
@@ -109,6 +124,7 @@ export function recordFromDiagnosis(
   const functionName = functionOf(d.component);
   return {
     key: meta.key,
+    kind: 'case',
     outcome: meta.outcome,
     verdict: d.verdict,
     question: clip(question, 500),
@@ -127,9 +143,54 @@ export function recordFromDiagnosis(
   };
 }
 
+/**
+ * 에이전트의 기억 제안을 기억 한 건으로 만든다. 무엇을 기억할지는 에이전트가 고르고, 사실인지는 사람이 확인한다 (A-53).
+ * 사람이 거절한 제안은 저장하지 않는다.
+ */
+export function recordFromProposal(
+  question: string,
+  p: MemoryProposal,
+  meta: { key: string; codeVersion?: string; now: string; confirmedBy?: string },
+): MemoryRecord | null {
+  const fact = clip(p.fact, 400);
+  if (!fact) return null;
+  return {
+    key: meta.key,
+    kind: 'fact',
+    outcome: 'confirmed',
+    verdict: 'fact',
+    question: clip(question, 300),
+    summary: fact,
+    evidence: p.evidence ? [clip(p.evidence, 300)] : [],
+    ...(p.functionName ? { functionName: p.functionName, component: `lambda:${p.functionName}` } : {}),
+    ...(meta.codeVersion ? { codeVersion: meta.codeVersion } : {}),
+    createdAt: meta.now,
+    lastSeenAt: meta.now,
+    count: 1,
+    ...(meta.confirmedBy ? { confirmedBy: meta.confirmedBy } : {}),
+  };
+}
+
+/** 에이전트 실행 기록에서 기억 제안을 꺼낸다 (최대 MAX_PROPOSALS_PER_RUN개, 같은 문장은 한 번) */
+export function proposalsFromSteps(steps: Array<{ action?: string; actionInput?: Record<string, unknown> }>): MemoryProposal[] {
+  const seen = new Set<string>();
+  const out: MemoryProposal[] = [];
+  for (const s of steps) {
+    if (s.action !== 'propose_memory' || !s.actionInput) continue;
+    const fact = clip(String(s.actionInput.fact ?? ''), 400);
+    if (!fact || seen.has(fact)) continue;
+    seen.add(fact);
+    const fn = s.actionInput.functionName ? String(s.actionInput.functionName) : undefined;
+    out.push({ fact, evidence: clip(String(s.actionInput.evidence ?? ''), 300), ...(fn ? { functionName: fn } : {}) });
+    if (out.length >= MAX_PROPOSALS_PER_RUN) break;
+  }
+  return out;
+}
+
 /** 같은 사례로 볼 조건 (갱신 후보). 유사도 조건은 저장 단계에서 함께 본다 */
 export function sameCase(a: MemoryRecord, b: MemoryRecord): boolean {
-  return (a.functionName ?? a.component) === (b.functionName ?? b.component)
+  return (a.kind ?? 'case') === (b.kind ?? 'case')
+    && (a.functionName ?? a.component) === (b.functionName ?? b.component)
     && (a.faultType ?? '') === (b.faultType ?? '')
     && a.outcome === b.outcome
     && (a.codeVersion ?? '') === (b.codeVersion ?? '');
@@ -158,6 +219,7 @@ export function rankMemories(
     if (!r || h.similarity < min) continue;
     const current = r.functionName ? opts.currentVersions?.get(r.functionName) : undefined;
     views.push({
+      kind: r.kind ?? 'case',
       outcome: r.outcome,
       similarity: Math.round(h.similarity * 100) / 100,
       sameFunction: sameName(opts.functionName, r.functionName),
@@ -185,12 +247,15 @@ export function formatRecall(memories: MemoryView[]): RecallResult {
     memories,
     note: '과거 기억은 확인할 가설이다. 기억만으로 root_cause를 쓰지 말고 도구로 지금 증상과 맞는지 확인한다. '
       + 'outcome=refuted는 사람이 틀렸다고 확인한 판단이므로 같은 결론을 내리기 전에 근거를 다시 본다. '
-      + 'codeChanged=true는 기억 이후 코드가 바뀌어 원인이 달라졌을 수 있다.',
+      + 'kind=fact는 사람이 확인한 환경 사실이다. codeChanged=true는 기억 이후 코드가 바뀌어 원인이나 사실이 달라졌을 수 있다.',
   };
 }
 
 /** analyze_error 프롬프트와 Slack 표시용 한 줄 */
 export function memoryLine(m: MemoryView): string {
+  if (m.kind === 'fact') {
+    return `${m.functionName ?? '공통'} 환경 사실 (확인됨${m.codeChanged ? ', 이후 코드 변경됨' : ''}, 유사도 ${m.similarity}): ${m.summary}`;
+  }
   const tag = m.outcome === 'refuted' ? '틀린 것으로 확인된 판단' : `확인된 원인, ${m.count}회`;
   const changed = m.codeChanged ? ', 이후 코드 변경됨' : '';
   return `${m.functionName ?? '함수 미상'} ${m.faultType ?? ''} (${tag}${changed}, 유사도 ${m.similarity}): ${m.cause ?? m.summary}`.replace(/\s+/g, ' ');

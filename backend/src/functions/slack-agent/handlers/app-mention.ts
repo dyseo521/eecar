@@ -9,7 +9,7 @@ import { getBotToken } from '../slack-verifier.js';
 import { runReActAgent } from '../orchestrator.js';
 import type { Diagnosis } from '../tools/diagnosis.js';
 import { codeVersion, savePendingDiagnosis } from '../tools/memory.js';
-import { functionOf } from '../tools/memory-core.js';
+import { MemoryProposal, functionOf, proposalsFromSteps } from '../tools/memory-core.js';
 
 /**
  * 원인을 말한 진단이면 버튼 피드백을 받을 대기 항목을 남기고 id를 돌려준다 (A-53).
@@ -34,17 +34,43 @@ export async function prepareFeedback(
   }
 }
 
-/** 진단 아래에 붙는 피드백 버튼 */
-export function feedbackBlocks(id: string): SlackBlock[] {
+/**
+ * 에이전트의 기억 제안마다 확인 대기 항목을 남긴다 (A-53). 무엇을 기억할지는 에이전트가, 사실인지는 사람이 정한다.
+ * 실패한 제안은 건너뛴다.
+ */
+export async function prepareProposals(
+  question: string,
+  steps: AgentStep[] | undefined,
+  deps: { save?: typeof savePendingDiagnosis; version?: typeof codeVersion; id?: () => string; now?: () => string } = {},
+): Promise<Array<{ id: string; proposal: MemoryProposal }>> {
+  const out: Array<{ id: string; proposal: MemoryProposal }> = [];
+  for (const proposal of proposalsFromSteps(steps ?? [])) {
+    try {
+      const id = (deps.id ?? (() => randomUUID().replace(/-/g, '').slice(0, 16)))();
+      const version = proposal.functionName ? await (deps.version ?? codeVersion)(proposal.functionName) : undefined;
+      await (deps.save ?? savePendingDiagnosis)({ id, question, proposal, ...(version ? { codeVersion: version } : {}), createdAt: (deps.now ?? (() => new Date().toISOString()))() });
+      out.push({ id, proposal });
+    } catch (error) {
+      console.warn('[memory] 기억 제안 저장 실패:', (error as Error).name);
+    }
+  }
+  return out;
+}
+
+/** 진단 아래(원인 맞음 / 틀림) 또는 기억 제안 아래(기억하기 / 기억하지 않기)에 붙는 버튼 */
+export function feedbackBlocks(id: string, kind: 'diagnosis' | 'proposal' = 'diagnosis'): SlackBlock[] {
+  const [yes, no, hint] = kind === 'diagnosis'
+    ? ['원인 맞음', '원인 틀림', '원인이 맞는지 알려 주시면 비슷한 장애를 조사할 때 참고합니다']
+    : ['기억하기', '기억하지 않기', '확인한 사실만 기억합니다'];
   return [
     {
       type: 'actions',
       elements: [
-        { type: 'button', text: { type: 'plain_text', text: '원인 맞음' }, style: 'primary', action_id: 'memory_confirm', value: id },
-        { type: 'button', text: { type: 'plain_text', text: '원인 틀림' }, action_id: 'memory_refute', value: id },
+        { type: 'button', text: { type: 'plain_text', text: yes }, style: 'primary', action_id: 'memory_confirm', value: id },
+        { type: 'button', text: { type: 'plain_text', text: no }, action_id: 'memory_refute', value: id },
       ],
     },
-    { type: 'context', elements: [{ type: 'mrkdwn', text: '원인이 맞는지 알려 주시면 비슷한 장애를 조사할 때 참고합니다' }] },
+    { type: 'context', elements: [{ type: 'mrkdwn', text: hint }] },
   ];
 }
 
@@ -102,6 +128,10 @@ export async function handleAppMention(event: SlackEvent): Promise<void> {
     // 결과를 Slack으로 전송. 원인을 말한 진단에는 원인 맞음 / 틀림 버튼을 붙인다 (A-53)
     const feedbackId = await prepareFeedback(userMessage, result.diagnosis);
     await postMessage(channel, result.response, thread_ts || ts, result.steps, feedbackId);
+    // 에이전트가 제안한 환경 사실은 답변 뒤에 하나씩 확인을 받는다
+    for (const { id, proposal } of await prepareProposals(userMessage, result.steps)) {
+      await postMessage(channel, `💡 *기억 제안*${proposal.functionName ? ` (${proposal.functionName})` : ''}\n${proposal.fact}\n근거: ${proposal.evidence}`, thread_ts || ts, undefined, id, 'proposal');
+    }
   } catch (error) {
     console.error('Error handling app mention:', error);
     await postErrorMessage(channel, thread_ts || ts);
@@ -116,7 +146,8 @@ async function postMessage(
   message: string,
   threadTs?: string,
   steps?: AgentStep[],
-  feedbackId?: string
+  feedbackId?: string,
+  feedbackKind: 'diagnosis' | 'proposal' = 'diagnosis'
 ): Promise<void> {
   const botToken = await getBotToken();
 
@@ -151,7 +182,7 @@ async function postMessage(
     });
   }
 
-  if (feedbackId) blocks.push(...feedbackBlocks(feedbackId));
+  if (feedbackId) blocks.push(...feedbackBlocks(feedbackId, feedbackKind));
 
   const response = await fetch('https://slack.com/api/chat.postMessage', {
     method: 'POST',
