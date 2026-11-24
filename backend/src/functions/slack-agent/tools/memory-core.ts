@@ -14,10 +14,16 @@
 import type { Diagnosis } from './diagnosis.js';
 
 /**
- * 이 값보다 덜 비슷한 기억은 돌려주지 않는다. 시나리오 v3 dev에서 같은 장애 쌍과 다른 장애 쌍의 유사도 분포로 정했다 (A-53, 측정 + 판단)
+ * 이 값보다 덜 비슷한 기억은 돌려주지 않는다 (A-53, 측정 + 판단, eval/ts/memory-threshold.ts).
+ * 시나리오 v3의 root_cause 39개에서 질문 문장 대 기억 색인 문장으로 쟀다. 0.55에서 원인이 다른 쌍은 0%만 남고,
+ * 같은 사건을 같은 표현으로 물은 경우는 87~90%가 남는다. 질문 10개 중 1개에는 원인이 다른 기억이 하나 걸린다.
+ * 0.45는 그 비율이 36~51%였다. 같은 원인을 다른 표현으로 물은 쌍은 이 자료에 없어 E-44에서 잰다.
  */
-export const MEMORY_MIN_SIMILARITY = 0.45;
-/** 같은 함수, 같은 장애 유형, 같은 판정, 같은 코드 버전에서 이 값 이상이면 새로 쓰지 않고 갱신한다 (A-53, 판단) */
+export const MEMORY_MIN_SIMILARITY = 0.55;
+/**
+ * 같은 함수, 같은 장애 유형, 같은 판정, 같은 코드 지문에서 이 값 이상이면 새로 쓰지 않고 갱신한다 (A-53, 측정 + 판단).
+ * v3에서 서로 다른 사건인 기억 쌍의 최대 유사도가 0.764였다. 여유가 작아 sameCase 조건과 함께 쓴다.
+ */
 export const MEMORY_DUPLICATE_SIMILARITY = 0.8;
 export const MEMORY_RECALL_LIMIT = 3;
 
