@@ -114,7 +114,7 @@ const SHORT_FINAL_CHARS = 200;
  * 기억, 코드, 설정처럼 고정된 값을 조회하는 도구. 로그, 지표, 변경 이력 같은 운영 상태는 보지 않는다.
  * 이 도구만 쓰고 끝난 요청은 장애 조사가 아니라 조회 질문으로 본다 (A-50)
  */
-const LOOKUP_TOOLS = new Set(['recall_memory', 'save_memory', 'search_code', 'get_function_config', 'get_function_permissions', 'get_resource_policy']);
+const LOOKUP_TOOLS = new Set(['recall_memory', 'save_memory', 'propose_memory', 'search_code', 'get_function_config', 'get_function_permissions', 'get_resource_policy']);
 const SMALL_TALK = /^(안녕|하이|ㅎㅇ|hello|hi\b|hey\b|고마워|감사|수고|도움말|help\b|누구(야|세요)|뭐\s*할\s*수)/i;
 const SMALL_TALK_MAX_CHARS = 30;
 const EMPTY_RESPONSE_MESSAGE = '답변을 만들지 못했습니다. 잠시 후 다시 시도해 주세요.';

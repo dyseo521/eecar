@@ -5,7 +5,8 @@
 import { Tool, ToolResult } from '../types.js';
 import { analyzeError } from './analyze-error.js';
 import { getLambdaStatus, getRecentLogs, getErrorSummary, getAllLambdaStatuses } from './cloudwatch.js';
-import { recallMemory, saveMemory } from './memory.js';
+import { recallMemory } from './memory.js';
+import { formatRecall } from './memory-core.js';
 import { getFunctionConfig, getFunctionPermissions } from './config.js';
 import { getProviderStatus, getRecentChanges, getServiceMetrics } from './investigate.js';
 import { SUBMIT_DIAGNOSIS_TOOL } from './diagnosis.js';
@@ -18,7 +19,9 @@ import { getResourcePolicy } from './resource-policy.js';
  * 조회 도구는 모두 읽기 전용이다. 조치는 제안까지만 하고 실행하지 않는다.
  */
 export const PRODUCTION_TOOL_NAMES = [
-  'analyze_error', 'get_logs', 'get_function_status', 'get_error_summary', 'recall_memory', 'save_memory',
+  // save_memory는 뺐다. 모델이 검증 없이 기억을 쓰면 질문만으로 기억을 오염시킬 수 있다. 저장은 사람의 버튼 피드백으로만 한다 (A-53)
+  // 대신 propose_memory로 제안만 하고, 사람이 확인하면 저장된다
+  'analyze_error', 'get_logs', 'get_function_status', 'get_error_summary', 'recall_memory', 'propose_memory',
   'get_function_config', 'get_function_permissions', 'get_recent_changes', 'get_service_metrics', 'get_provider_status', 'submit_diagnosis',
   'search_code', 'get_request_breakdown', 'get_resource_policy',
 ];
@@ -236,26 +239,43 @@ export const TOOLS: Tool[] = [
   {
     name: 'recall_memory',
     description:
-      '과거 유사한 에러의 해결 사례를 S3 Vectors에서 검색합니다.',
+      '사람이 원인이 맞다(confirmed) 또는 틀렸다(refuted)고 확인한 과거 진단을 검색합니다. 유사도 기준을 넘는 기억만 돌려주고, 같은 함수의 기억을 먼저 보여 줍니다. 기억은 확인할 가설이지 근거가 아닙니다.',
     input_schema: {
       type: 'object',
       properties: {
         query: {
           type: 'string',
-          description: '검색 쿼리 (에러 타입, 키워드 등)',
+          description: '지금 증상 (사용자 질문이나 에러 문구)',
         },
         functionName: {
           type: 'string',
-          description: '특정 함수로 필터 (선택)',
+          description: '증상이 있는 함수 (선택). 이 함수의 기억을 먼저 보여 준다',
         },
         topK: {
           type: 'number',
-          description: '반환할 최대 결과 수 (기본 5)',
+          description: '반환할 최대 결과 수 (기본 3, 최대 5)',
         },
       },
       required: ['query'],
     },
   },
+  {
+    name: 'propose_memory',
+    description:
+      '조사 중 도구 결과로 확인한, 다음 조사에서도 쓸모 있는 환경 사실을 기억 후보로 제안합니다. 사람이 확인해야 저장되고, 이 도구는 아무것도 바로 저장하지 않습니다. '
+      + '제안할 것: 오래 유지되고 다시 찾기 번거로운 사실 (의도된 설정값, 함수 간 의존, 이 환경에서 반복되는 함정). '
+      + '제안하지 않을 것: 이번 장애의 원인(진단 아래 버튼으로 따로 기록된다), 도구 결과에 없는 추측, 비밀값, 곧 바뀔 값. 한 번의 조사에서 최대 2개.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        fact: { type: 'string', description: '기억할 사실 한 문장' },
+        evidence: { type: 'string', description: '이 사실을 확인한 도구 결과의 문구' },
+        functionName: { type: 'string', description: '관련 함수 (선택)' },
+      },
+      required: ['fact', 'evidence'],
+    },
+  },
+  // 이전 평가(baseline, legacy 변형) 재현용 정의. 운영 목록(PRODUCTION_TOOL_NAMES)에는 없고 실행부도 없다 (A-53)
   {
     name: 'save_memory',
     description:
@@ -365,21 +385,15 @@ export async function executeTool(
         const memories = await recallMemory({
           query: String(input.query),
           functionName: input.functionName ? String(input.functionName) : undefined,
-          topK: Number(input.topK) || 5,
+          topK: Number(input.topK) || undefined,
         });
-        return { success: true, data: memories };
+        return { success: true, data: formatRecall(memories) };
       }
 
-      case 'save_memory': {
-        const saved = await saveMemory({
-          errorType: String(input.errorType),
-          functionName: String(input.functionName),
-          resolution: String(input.resolution),
-          codeChanges: input.codeChanges
-            ? String(input.codeChanges).split(',')
-            : undefined,
-        });
-        return { success: saved, data: { saved } };
+      case 'propose_memory': {
+        // 저장하지 않는다. 답변을 보낸 뒤 제안마다 확인 버튼을 붙이고, 사람이 확인하면 저장한다 (handlers/app-mention.ts)
+        if (!String(input.fact ?? '').trim()) return { success: false, error: 'fact가 비었습니다' };
+        return { success: true, data: { proposed: true, note: '사람이 확인하면 기억에 저장됩니다. 지금 진단에는 이 제안을 근거로 쓰지 마세요.' } };
       }
 
       default:

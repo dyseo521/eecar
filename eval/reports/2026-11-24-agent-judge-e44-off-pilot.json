@@ -1,0 +1,34 @@
+{
+ "meta": {
+  "date": "2026-11-24",
+  "judgeVersion": "v2.3",
+  "model": "global.anthropic.claude-sonnet-4-6",
+  "reports": [
+   "eval/reports/2026-11-24-agent-eval-e44-off-pilot.json"
+  ],
+  "items": null,
+  "inputTokens": 14821,
+  "outputTokens": 628
+ },
+ "judgments": [
+  {
+   "variant": "h55",
+   "scenario": "v6-01",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 00:41 SSM 파라미터 갱신 시 alias/eecar-ssm-params 키로 저장되었고, 이 키 정책이 SlackNotificationFunctionRole의 복호화를 허용하지 않아 AccessDeniedException이 발생한다고 정확히 짚었다. 웜 컨테이너 캐시로 일부만 성공하다 끊긴 메커니즘도 설명했으며, Slack 웹훅 지연 공지는 무관하다고 바르게 판단했다. 정답 요지의 핵심 원인을 모두 포함한다.",
+   "fixReason": "핵심 조치는 KMS 키 정책에 SlackNotificationFunctionRole의 kms:Decrypt(kms:ViaService ssm 조건)를 추가하거나, 파라미터를 기본 키로 다시 저장하는 것이다. 두 방법 모두 정답 요지의 올바른 조치와 일치하며, 이후 warm 컨테이너 교체(함수 설정 갱신)까지 안내하고 있어 장애가 해소된다. 단, 답변이 \"함수 IAM 역할에 kms:Decrypt 추가\"를 별도로 권하지 않고 키 정책 수정을 핵심으로 제시했으므로 정답 요지의 경고 사항에 해당하지 않는다.",
+   "pass": true,
+   "phrasePass": false
+  }
+ ]
+}

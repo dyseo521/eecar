@@ -12,7 +12,8 @@ import {
   RetrieveCommand,
 } from '@aws-sdk/client-bedrock-agent-runtime';
 import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
-import { ErrorAnalysis, MemoryResult } from '../types.js';
+import { ErrorAnalysis } from '../types.js';
+import { MemoryView, memoryLine } from './memory-core.js';
 import { recallMemory } from './memory.js';
 import { ERROR_ANALYSIS_PROMPT } from '../prompts/system.js';
 
@@ -68,7 +69,8 @@ export async function analyzeError(input: AnalyzeErrorInput, deps: AnalyzeErrorD
   // 병렬로 컨텍스트 수집
   const [codeContext, pastSolutions] = await Promise.all([
     (deps.searchCodebase ?? searchCodebase)(errorType, functionName),
-    (deps.recallMemory ?? recallMemory)({ query: `${errorType} ${functionName}`, topK: 3 }),
+    // 에러 문구로 찾는다. 이전에는 에러 타입과 함수 이름만으로 찾아 증상이 다른 기억도 걸렸다 (A-53)
+    (deps.recallMemory ?? recallMemory)({ query: errorMessage, functionName, topK: 3 }),
   ]);
 
   // Claude로 분석
@@ -161,7 +163,7 @@ async function callClaudeForAnalysis(context: {
   errorMessage: string;
   stackTrace?: string;
   codeContext: string[];
-  pastSolutions: MemoryResult[];
+  pastSolutions: MemoryView[];
 }): Promise<{
   cause: string;
   solutions: string[];
@@ -181,9 +183,7 @@ async function callClaudeForAnalysis(context: {
     .replace(
       '{pastSolutions}',
       context.pastSolutions.length > 0
-        ? context.pastSolutions
-            .map((p) => `- ${p.memory.errorType}: ${p.memory.resolution}`)
-            .join('\n')
+        ? `${context.pastSolutions.map(m => `- ${memoryLine(m)}`).join('\n')}\n(과거 사례는 확인할 가설이다. 지금 증상과 맞는지 따로 확인한다)`
         : '(과거 해결 사례 없음)'
     );
 

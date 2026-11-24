@@ -5,7 +5,7 @@
 
 import { SlackEvent } from '../types.js';
 import { getBotToken } from '../slack-verifier.js';
-import { saveMemory } from '../tools/memory.js';
+import { dispatchJob } from '../async-dispatch.js';
 
 /**
  * Interaction 타입
@@ -75,9 +75,10 @@ async function handleBlockActions(
   console.log('Block action:', { action_id: action.action_id, value: action.value });
 
   switch (action.action_id) {
-    case 'mark_resolved':
-      // 에러 해결됨 버튼
-      return await handleMarkResolved(payload, action.value);
+    case 'memory_confirm':
+    case 'memory_refute':
+      // 진단 아래의 원인 맞음 / 원인 틀림 버튼 (A-53)
+      return await handleMemoryButton(payload, action.action_id === 'memory_confirm' ? 'confirmed' : 'refuted', action.value);
 
     case 'view_details':
       // 상세 보기 버튼
@@ -98,46 +99,24 @@ async function handleBlockActions(
 }
 
 /**
- * 에러 해결됨 처리 (학습)
+ * 원인 맞음 / 틀림 버튼. 임베딩과 저장은 3초를 넘길 수 있어 비동기 작업으로 넘기고 바로 응답한다 (A-36과 같은 이유).
+ * 이전의 mark_resolved는 버튼 값에 해결책 문장을 담아 그대로 저장했고, 그 버튼을 붙이는 메시지는 없었다 (A-53)
  */
-async function handleMarkResolved(
+async function handleMemoryButton(
   payload: InteractionPayload,
+  outcome: 'confirmed' | 'refuted',
   value?: string
 ): Promise<unknown> {
-  if (!value) {
-    return { ok: true };
-  }
-
+  if (!value) return { ok: true };
   try {
-    // value: "errorType:functionName:resolution" 형식
-    const [errorType, functionName, ...resolutionParts] = value.split(':');
-    const resolution = resolutionParts.join(':') || '해결됨 (상세 정보 없음)';
-
-    // 기억에 저장 (S3 Vectors)
-    await saveMemory({
-      errorType,
-      functionName,
-      resolution,
-      resolvedBy: payload.user.id,
-    });
-
-    // 응답 업데이트
-    if (payload.response_url) {
-      await updateMessage(payload.response_url, {
-        text: `✅ 해결 사례가 저장되었습니다! 자동이가 학습했습니다. 🧠\n\n*에러:* ${errorType}\n*함수:* ${functionName}\n*해결:* ${resolution}`,
-        replace_original: false,
-        response_type: 'ephemeral',
-      });
-    }
-
-    return { ok: true };
+    await dispatchJob({ type: 'memory_feedback', id: value, outcome, userId: payload.user.id, responseUrl: payload.response_url });
   } catch (error) {
-    console.error('Error saving resolution:', error);
-    return {
-      response_type: 'ephemeral',
-      text: '해결 사례 저장 중 오류가 발생했습니다.',
-    };
+    console.error('Failed to dispatch memory feedback:', (error as Error).name);
+    if (payload.response_url) {
+      await updateMessage(payload.response_url, { text: '피드백을 기록하지 못했습니다. 잠시 후 다시 눌러 주세요.', replace_original: false, response_type: 'ephemeral' });
+    }
   }
+  return { ok: true };
 }
 
 /**

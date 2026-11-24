@@ -7,6 +7,7 @@
  * 에이전트·판정 코드는 그대로 두고 BedrockRuntimeClient.send만 바꾼다.
  *
  * - 안전: Converse·InvokeModel 외의 Bedrock 호출은 막는다. 이 모듈이 켜지면 AWS로 나가는 모델 호출은 없다.
+ *   예외는 EVAL_ALLOW_TITAN=1일 때의 Titan 임베딩뿐이다(기억 검색, A-53).
  * - 조건 유지: API 버전을 2023-06-01로 고정한다. 최신 버전은 temperature를 받지 않아 운영·판정 검증 때와 조건이 달라진다.
  * - 키: 저장소 루트 .env에서 읽어 클라이언트에만 넘긴다. 환경 변수, 로그, 명령줄에 두지 않는다.
  * - 지출 상한: 호출마다 사용량을 홈 디렉터리의 JSONL에 남기고(내용 없이 토큰 수만), EVAL_USD_CAP(기본 50)을 넘으면 멈춘다.
@@ -161,8 +162,18 @@ async function invokeModel(input) {
   return { body: new TextEncoder().encode(JSON.stringify(response)) };
 }
 
-bedrock.BedrockRuntimeClient.prototype.send = async function send(command) {
+const bedrockSend = bedrock.BedrockRuntimeClient.prototype.send;
+/**
+ * 예외: EVAL_ALLOW_TITAN=1이면 Titan 임베딩만 실제 Bedrock으로 보낸다 (A-53, E-44, 사용자 허용).
+ * 기억 검색은 운영과 같은 Titan v2 벡터여야 하고, 호출당 수백 토큰이라 비용이 무시할 수준이다. 모델 호출은 그대로 막는다.
+ */
+const TITAN_EMBED = /^amazon\.titan-embed-text-v2/;
+
+bedrock.BedrockRuntimeClient.prototype.send = async function send(command, ...rest) {
   if (command instanceof bedrock.ConverseCommand) return converse(command.input);
+  if (command instanceof bedrock.InvokeModelCommand && process.env.EVAL_ALLOW_TITAN === '1' && TITAN_EMBED.test(command.input.modelId ?? '')) {
+    return bedrockSend.call(this, command, ...rest);
+  }
   if (command instanceof bedrock.InvokeModelCommand) return invokeModel(command.input);
   throw new Error(`평가에서 허용하지 않은 Bedrock 호출: ${command.constructor.name}`);
 };

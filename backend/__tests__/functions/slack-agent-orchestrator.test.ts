@@ -109,8 +109,11 @@ describe('runReActAgent', () => {
     await runReActAgent('상태 알려줘', context, { converse, emit: false, modelOverride: HAIKU });
     await runReActAgent('상태 알려줘', context, { converse, emit: false, modelOverride: HAIKU, toolNames: ['get_logs', 'get_function_config'] });
     // 사전 등록 홀드아웃을 통과해 운영에 노출한다 (E-35, A-46)
+    // save_memory 대신 propose_memory: 제안만 하고 저장은 사람이 확인한 뒤에 한다 (A-53)
     expect(seen[0]).toHaveLength(15);
+    expect(seen[0]).toContain('propose_memory');
     expect(seen[0]).toContain('get_function_config');
+    expect(seen[0]).not.toContain('save_memory');
     expect(seen[1]).toEqual(['get_logs', 'get_function_config']);
   });
 

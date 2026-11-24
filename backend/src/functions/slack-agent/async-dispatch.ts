@@ -18,7 +18,9 @@ export const EVENT_DEDUP_TTL_SECONDS = 24 * 60 * 60;
 
 export type JadongJob =
   | { type: 'app_mention'; event: SlackEvent }
-  | { type: 'slash_command'; event: SlackEvent };
+  | { type: 'slash_command'; event: SlackEvent }
+  /** 진단 아래 버튼 피드백을 기억으로 옮긴다 (A-53) */
+  | { type: 'memory_feedback'; id: string; outcome: 'confirmed' | 'refuted'; userId: string; responseUrl?: string };
 
 /**
  * event_id를 처음 처리하는지 확인한다. 이미 있으면 false (Slack 재시도 또는 중복 전달).
