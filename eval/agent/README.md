@@ -36,6 +36,7 @@ bash eval/agent/run_holdout_v3.sh
 | E-41 | 조회 도구 3종 (`search_code`, `get_request_breakdown`, `get_resource_policy`) | 새 시나리오 24개 × 2회 (`scenarios_v5_tools.json`) | 33.3% → 66.7%, +33.3%p [+12.5, +54.2] | 채택 후보, 도구는 운영 반영 |
 | E-42 | E-41 구성 + Sonnet 5.5 재진단 | 같은 새 시나리오 | 66.7% → 72.9%, +6.3%p [−2.1, +14.6] | 사전 조건 충족, 구간이 0을 포함 |
 | E-43 | 재진단 대상 선별을 외부 판정 모델(Jev)로 | 판정이 붙은 Haiku 5.5 실행 128회 (오프라인) | AUC 0.59~0.70, 현재 규칙 0.63 | 채택하지 않음 |
+| E-44 | 장기 기억 없음 대 있음 (A-53의 하한 0.55) | 새 시나리오 12개 × 2회 (재발 6, 미끼 3, 코드 변경 3) | 재발 7/12 → 9/12, 미끼 0/6 → 4/6, 코드 변경 4/6 → 5/6 | 재발 기준 미충족. 기억이 검색되지 않은 같은 입력 15회에서도 7 → 11로 바뀌어 차이는 잡음 안. 다른 기억이 걸린 경우 0회 |
 
 - 구간은 시나리오 단위 쌍체 부트스트랩 95% 구간이다.
 - E-41, E-42의 새 시나리오는 새 도구가 필요하도록 구성했으므로, 효과의 크기는 실제 장애 분포를 대표하지 않는다.
@@ -47,6 +48,7 @@ bash eval/agent/run_holdout_v3.sh
 |---|---|
 | `scenarios_v3.json`, `scenarios_v3_dev.json`, `scenarios_v3_holdout.json` | 시나리오 v3 60개와 dev 20, 홀드아웃 40 분할 (`split_v3.py`) |
 | `scenarios_v5_tools.json` | 조회 도구 3종 확인용 새 시나리오 24개 (E-41) |
+| `scenarios_v6_memory.json` | 장기 기억 평가 시나리오 12개와 시드 기억 (E-44). `build_v6_conditions.py`가 조건별 파일(`_off`, `_on`)을 만든다 |
 | `candidate-system-prompt.txt` | 후보 구성의 시스템 프롬프트 |
 | `scenarios.json` | (v1) dev 시나리오 20개. 2개는 운영 CloudWatch 로그 원문, 18개는 AWS SDK·Lambda 실제 오류 형식의 합성 |
 | `holdout_scenarios.json` | 블라인드 홀드아웃 15개. 프롬프트·오케스트레이터·dev 시나리오를 보지 않은 별도 에이전트가 썼다 |

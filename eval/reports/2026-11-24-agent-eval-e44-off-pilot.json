@@ -1,0 +1,273 @@
+{
+  "meta": {
+    "date": "2026-11-24",
+    "model": "routing(default)",
+    "runs": 1,
+    "variant": "h55",
+    "scenarioFile": "eval/agent/scenarios_v6_memory_off.json",
+    "tag": "e44-off-pilot"
+  },
+  "summary": {
+    "scenarios": 1,
+    "runsPerScenario": 1,
+    "passAt1": 0,
+    "passHatK": 0,
+    "cause": 0,
+    "fix": 0,
+    "noWrongClaim": 1,
+    "tools": 1,
+    "evidence": 1,
+    "avgTurns": 4,
+    "avgToolCalls": 8,
+    "avgInputTokens": 42957,
+    "avgOutputTokens": 5216,
+    "avgCostUsd": 0.08171445000000001,
+    "totalCostUsd": 0.08171445000000001,
+    "avgLatencyMs": 24274,
+    "maxTurnsRuns": 0,
+    "errorRuns": 0
+  },
+  "byScenario": [
+    {
+      "id": "v6-01",
+      "title": "새 알림 채널이 조용함",
+      "source": "v6",
+      "category": "RECUR",
+      "passRate": 0,
+      "passAll": false,
+      "runs": 1
+    }
+  ],
+  "results": [
+    {
+      "id": "v6-01",
+      "run": 0,
+      "source": "v6",
+      "code": "RECUR",
+      "title": "새 알림 채널이 조용함",
+      "cause": false,
+      "fix": false,
+      "noWrongClaim": true,
+      "tools": true,
+      "evidence": true,
+      "pass": false,
+      "graded": false,
+      "matched": {
+        "cause": [],
+        "fix": [],
+        "wrong": []
+      },
+      "calls": [
+        {
+          "name": "recall_memory",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_provider_status"
+        },
+        {
+          "name": "get_recent_changes"
+        },
+        {
+          "name": "get_function_status",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_logs",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_function_permissions",
+          "functionName": "SlackNotificationFunction"
+        },
+        {
+          "name": "get_resource_policy"
+        },
+        {
+          "name": "propose_memory",
+          "functionName": "SlackNotificationFunction"
+        }
+      ],
+      "response": "*🎯 원인 확인*\n알림이 안 가는 원인은 Slack 웹훅 지연이 아니라 우리 쪽 권한 문제입니다. 오늘 00:41 UTC(한국 시간 09:41)에 webhook URL 파라미터를 새 채널 값으로 갱신하면서 KMS 키(alias/eecar-ssm-params)로 암호화했는데, SlackNotificationFunction 역할은 이 키를 복호화할 수 없어 웹훅 URL을 읽지 못하고 알림 전송 전에 실패하고 있습니다.\n\n*원인*: SSM 파라미터 /eecar/slack/webhook-url을 2026-11-23T00:41:07Z에 콘솔(console:user-d)에서 version 6으로 덮어쓰면서 keyId를 alias/eecar-ssm-params로 지정했다. 이 KMS 키의 정책은 SlackAgentFunctionRole(eecar-stack-SlackAgentFunctionRole-NwDKuLOZm9ly)에만 kms:Decrypt(kms:ViaService = ssm)를 허용하고, SlackNotificationFunctionRole(eecar-stack-SlackNotificationFunctionRole-8P4lsCMRjFFO)은 허용하지 않는다. 그래서 SlackNotificationFunction이 getSlackWebhookUrl에서 AccessDeniedException을 받아 웹훅 URL을 얻지 못한다. Slack 웹훅 지연 공지(01:05Z 시작, monitoring)는 분 단위 지연이고, 이 실패는 Slack이 아니라 함수 쪽 접근 거부라서 공지가 원인은 아니다.\n_ssm:parameter · kms_access_denied_\n\n*근거*\n• [\"get_logs(SlackNotificationFunction): \\\"Failed to process CloudWatch Logs event: AccessDeniedException: The ciphertext refers to a customer master key that does not exist, does not exist in this region, or you are not allowed to access.\\\" at getSlackWebhookUrl\",\\\"get_function_status: invocations 31, errors 18, errorRate 58.06%, lastError 2026-11-23T05:02:44.640Z Status: error\\\",\\\"get_recent_changes: 2026-11-23T00:41:07Z ssm_param /eecar/slack/webhook-url PutParameter SecureString 값 갱신 (알림 채널을 #eecar-ops-alerts로 옮기며 새 webhook 등록), version 6, keyId alias/eecar-ssm-params, overwrite true, actor console:user-d\\\",\\\"get_resource_policy(alias/eecar-ssm-params): Statement AllowSlackAgentDecryptViaSSM, Principal role/eecar-stack-SlackAgentFunctionRole-NwDKuLOZm9ly, Action kms:Decrypt, Condition kms:ViaService ssm.ap-northeast-2.amazonaws.com; SlackNotificationFunctionRole 항목 없음\\\",\\\"get_function_permissions: SlackNotificationFunctionRolePolicy1 ssm:GetParameter on parameter/eecar/slack/webhook-url, kms:Decrypt 권한 없음\\\",\\\"get_provider_status: slack incident \\\\\\\"Incoming webhooks delayed for some workspaces\\\\\\\" status monitoring, body \\\\\\\"Some customers may see delays of a few minutes\\\\\\\"\\\",\\\"get_logs: 2026-11-23T01:22:40Z 및 03:05 이전 일부 호출은 Successfully sent 1/1 notifications to Slack (이미 떠 있던 컨테이너가 이전에 읽은 값을 캐시한 것으로 보임, 확인 안 됨)\\\"]\n\n*기여 요인*\n• webhook 값을 KMS 키로 암호화하면서 알림 함수 역할을 키 정책에 포함하지 않음\n• warm 컨테이너가 이전 웹훅 값을 잠시 재사용해 일부만 성공하다가, 새 컨테이너(Init 이후)부터 전부 실패함\n• 함수 오류가 SlackNotificationFunction 자체의 오류 알림으로 나가지 못해 실패가 바로 드러나지 않음 (확인 안 됨)\n\n*조치*: 1) 가장 안전한 방법: alias/eecar-ssm-params 키 정책(KMS 키 관리자 역할 eecar-security-admin이 수정)에 Principal arn:aws:iam::425454508084:role/eecar-stack-SlackNotificationFunctionRole-8P4lsCMRjFFO, Action kms:Decrypt, Condition kms:ViaService = ssm.ap-northeast-2.amazonaws.com 문을 추가. 2) 또는 웹훅 파라미터를 기존 방식(이전 키 또는 기본 키)으로 다시 저장. 이 경우 #eecar-ops-alerts 웹훅 URL이 바뀌므로 값만 다시 쓰고 키 정책은 건드리지 않는다. 3) 키 정책을 바꾼 뒤 SlackNotificationFunction의 warm 컨테이너를 비우려면 함수 설정을 한 번 갱신한다.\n확인: SlackNotificationFunction 로그에서 getSlackWebhookUrl AccessDeniedException이 사라지고 \"Successfully sent N/N notifications to Slack\"이 나오는지 확인. 다른 함수에서 에러를 일부러 내서 #eecar-ops-alerts에 메시지가 도착하는지 확인. get_function_status의 errorRate가 떨어지는지 확인.\n되돌리기: 키 정책 문을 추가했다면 해당 Statement만 제거한다. 파라미터를 다시 썼다면 이전 버전(version 5)으로 되돌리되, 이 경우 알림은 예전 채널로 간다.\n\n*확인하지 못한 것*\n• 키 갱신 전 version 5가 어떤 키로 암호화돼 있었는지는 확인하지 못했다(get_recent_changes에 이전 keyId 정보 없음). 그래서 키 정책 수정과 파라미터 재저장 중 무엇이 맞는지는 키 관리자가 정해야 한다. 키 정책 수정은 실제 콘솔에서 확인하지 않았다. SlackNotificationFunction 역할이 KMS 키 정책 외에 IAM에서도 kms:Decrypt가 필요한지도 확인하지 못했다(현재 역할 정책에는 없음). 구독 필터 자체가 정상인지는 확인하지 못했다.",
+      "diagnosis": {
+        "verdict": "root_cause",
+        "summary": "알림이 안 가는 원인은 Slack 웹훅 지연이 아니라 우리 쪽 권한 문제입니다. 오늘 00:41 UTC(한국 시간 09:41)에 webhook URL 파라미터를 새 채널 값으로 갱신하면서 KMS 키(alias/eecar-ssm-params)로 암호화했는데, SlackNotificationFunction 역할은 이 키를 복호화할 수 없어 웹훅 URL을 읽지 못하고 알림 전송 전에 실패하고 있습니다.",
+        "component": "ssm:parameter",
+        "fault_type": "kms_access_denied",
+        "cause": "SSM 파라미터 /eecar/slack/webhook-url을 2026-11-23T00:41:07Z에 콘솔(console:user-d)에서 version 6으로 덮어쓰면서 keyId를 alias/eecar-ssm-params로 지정했다. 이 KMS 키의 정책은 SlackAgentFunctionRole(eecar-stack-SlackAgentFunctionRole-NwDKuLOZm9ly)에만 kms:Decrypt(kms:ViaService = ssm)를 허용하고, SlackNotificationFunctionRole(eecar-stack-SlackNotificationFunctionRole-8P4lsCMRjFFO)은 허용하지 않는다. 그래서 SlackNotificationFunction이 getSlackWebhookUrl에서 AccessDeniedException을 받아 웹훅 URL을 얻지 못한다. Slack 웹훅 지연 공지(01:05Z 시작, monitoring)는 분 단위 지연이고, 이 실패는 Slack이 아니라 함수 쪽 접근 거부라서 공지가 원인은 아니다.",
+        "evidence": "[\"get_logs(SlackNotificationFunction): \\\"Failed to process CloudWatch Logs event: AccessDeniedException: The ciphertext refers to a customer master key that does not exist, does not exist in this region, or you are not allowed to access.\\\" at getSlackWebhookUrl\",\\\"get_function_status: invocations 31, errors 18, errorRate 58.06%, lastError 2026-11-23T05:02:44.640Z Status: error\\\",\\\"get_recent_changes: 2026-11-23T00:41:07Z ssm_param /eecar/slack/webhook-url PutParameter SecureString 값 갱신 (알림 채널을 #eecar-ops-alerts로 옮기며 새 webhook 등록), version 6, keyId alias/eecar-ssm-params, overwrite true, actor console:user-d\\\",\\\"get_resource_policy(alias/eecar-ssm-params): Statement AllowSlackAgentDecryptViaSSM, Principal role/eecar-stack-SlackAgentFunctionRole-NwDKuLOZm9ly, Action kms:Decrypt, Condition kms:ViaService ssm.ap-northeast-2.amazonaws.com; SlackNotificationFunctionRole 항목 없음\\\",\\\"get_function_permissions: SlackNotificationFunctionRolePolicy1 ssm:GetParameter on parameter/eecar/slack/webhook-url, kms:Decrypt 권한 없음\\\",\\\"get_provider_status: slack incident \\\\\\\"Incoming webhooks delayed for some workspaces\\\\\\\" status monitoring, body \\\\\\\"Some customers may see delays of a few minutes\\\\\\\"\\\",\\\"get_logs: 2026-11-23T01:22:40Z 및 03:05 이전 일부 호출은 Successfully sent 1/1 notifications to Slack (이미 떠 있던 컨테이너가 이전에 읽은 값을 캐시한 것으로 보임, 확인 안 됨)\\\"]",
+        "contributing": [
+          "webhook 값을 KMS 키로 암호화하면서 알림 함수 역할을 키 정책에 포함하지 않음",
+          "warm 컨테이너가 이전 웹훅 값을 잠시 재사용해 일부만 성공하다가, 새 컨테이너(Init 이후)부터 전부 실패함",
+          "함수 오류가 SlackNotificationFunction 자체의 오류 알림으로 나가지 못해 실패가 바로 드러나지 않음 (확인 안 됨)"
+        ],
+        "not_verified": "키 갱신 전 version 5가 어떤 키로 암호화돼 있었는지는 확인하지 못했다(get_recent_changes에 이전 keyId 정보 없음). 그래서 키 정책 수정과 파라미터 재저장 중 무엇이 맞는지는 키 관리자가 정해야 한다. 키 정책 수정은 실제 콘솔에서 확인하지 않았다. SlackNotificationFunction 역할이 KMS 키 정책 외에 IAM에서도 kms:Decrypt가 필요한지도 확인하지 못했다(현재 역할 정책에는 없음). 구독 필터 자체가 정상인지는 확인하지 못했다.",
+        "fix": {
+          "action": "1) 가장 안전한 방법: alias/eecar-ssm-params 키 정책(KMS 키 관리자 역할 eecar-security-admin이 수정)에 Principal arn:aws:iam::425454508084:role/eecar-stack-SlackNotificationFunctionRole-8P4lsCMRjFFO, Action kms:Decrypt, Condition kms:ViaService = ssm.ap-northeast-2.amazonaws.com 문을 추가. 2) 또는 웹훅 파라미터를 기존 방식(이전 키 또는 기본 키)으로 다시 저장. 이 경우 #eecar-ops-alerts 웹훅 URL이 바뀌므로 값만 다시 쓰고 키 정책은 건드리지 않는다. 3) 키 정책을 바꾼 뒤 SlackNotificationFunction의 warm 컨테이너를 비우려면 함수 설정을 한 번 갱신한다.",
+          "type": "fix",
+          "verify": "SlackNotificationFunction 로그에서 getSlackWebhookUrl AccessDeniedException이 사라지고 \"Successfully sent N/N notifications to Slack\"이 나오는지 확인. 다른 함수에서 에러를 일부러 내서 #eecar-ops-alerts에 메시지가 도착하는지 확인. get_function_status의 errorRate가 떨어지는지 확인.",
+          "rollback": "키 정책 문을 추가했다면 해당 Statement만 제거한다. 파라미터를 다시 썼다면 이전 버전(version 5)으로 되돌리되, 이 경우 알림은 예전 채널로 간다."
+        }
+      },
+      "metrics": {
+        "runId": "e8b88a4b-1c36-4b3a-ae91-5634e6433251",
+        "turns": 4,
+        "stopReason": "final",
+        "modelCalls": {
+          "global.anthropic.claude-haiku-4-5-20251001-v1:0": 4
+        },
+        "inputTokens": 42957,
+        "outputTokens": 5216,
+        "cacheReadTokens": 24537,
+        "cacheWriteTokens": 8179,
+        "estimatedCostUsd": 0.08171445000000001,
+        "toolCalls": 8,
+        "toolErrors": 0,
+        "modelFallbacks": 0,
+        "tools": [
+          {
+            "name": "recall_memory",
+            "ok": true,
+            "latencyMs": 1,
+            "resultChars": 70
+          },
+          {
+            "name": "get_provider_status",
+            "ok": true,
+            "latencyMs": 1,
+            "resultChars": 443
+          },
+          {
+            "name": "get_recent_changes",
+            "ok": true,
+            "latencyMs": 10,
+            "resultChars": 548
+          },
+          {
+            "name": "get_function_status",
+            "ok": true,
+            "latencyMs": 1,
+            "resultChars": 398
+          },
+          {
+            "name": "get_logs",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 18726
+          },
+          {
+            "name": "get_function_permissions",
+            "ok": true,
+            "latencyMs": 1,
+            "resultChars": 1327
+          },
+          {
+            "name": "get_resource_policy",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 964
+          },
+          {
+            "name": "propose_memory",
+            "ok": true,
+            "latencyMs": 0,
+            "resultChars": 72
+          }
+        ],
+        "latencyMs": 24274
+      },
+      "steps": [
+        {
+          "thought": "먼저 과거 사례와 공급자 상태, 최근 변경, 알림 함수 상태를 함께 확인하겠습니다.",
+          "action": "recall_memory",
+          "actionInput": {
+            "query": "Slack 에러 알림이 채널에 안 옴 웹훅 SlackNotificationFunction",
+            "functionName": "SlackNotificationFunction"
+          },
+          "observation": "{\"memories\":[],\"note\":\"관련 기억 없음. 유사도 0.55 이상인 과거 사례가 없으니 기억 없이 조사한다.\"}"
+        },
+        {
+          "thought": "먼저 과거 사례와 공급자 상태, 최근 변경, 알림 함수 상태를 함께 확인하겠습니다.",
+          "action": "get_provider_status",
+          "actionInput": {},
+          "observation": "{\"aws\":{\"region\":\"ap-northeast-2\",\"notices\":[]},\"anthropic\":{\"indicator\":\"none\",\"description\":\"All Systems Operational\",\"incidents\":[]},\"slack\":{\"status\":\"active\",\"incidents\":[{\"title\":\"Incoming webhooks delayed for some workspaces\",\"status\":\"monitoring\",\"startedAt\":\"2026-11-23T01:05:00Z\",\"body\":\"Some customers may see delays of a few minutes when messages are posted via incoming webhooks. A fix has been applied and we are monitoring.\"}]}}"
+        },
+        {
+          "thought": "먼저 과거 사례와 공급자 상태, 최근 변경, 알림 함수 상태를 함께 확인하겠습니다.",
+          "action": "get_recent_changes",
+          "actionInput": {
+            "hours": 24
+          },
+          "observation": "{\"windowHours\":168,\"changes\":[{\"time\":\"2026-11-23T00:41:07Z\",\"type\":\"ssm_param\",\"target\":\"/eecar/slack/webhook-url\",\"actor\":\"console:user-d\",\"summary\":\"PutParameter: SecureString 값 갱신 (알림 채널을 #eecar-ops-alerts로 옮기며 새 webhook 등록)\",\"details\":{\"version\":6,\"type\":\"SecureString\",\"keyId\":\"alias/eecar-ssm-params\",\"overwrite\":true}},{\"time\":\"2026-11-19T05:12:40Z\",\"type\":\"stack_update\",\"target\":\"eecar-stack\",\"actor\":\"github-actions\",\"summary\":\"SearchCanary 일정 변경 (EventBridge Scheduler 규칙만 수정)\",\"details\":"
+        },
+        {
+          "thought": "먼저 과거 사례와 공급자 상태, 최근 변경, 알림 함수 상태를 함께 확인하겠습니다.",
+          "action": "get_function_status",
+          "actionInput": {
+            "functionName": "SlackNotificationFunction",
+            "days": 1
+          },
+          "observation": "{\"functionName\":\"SlackNotificationFunction\",\"invocations\":31,\"errors\":18,\"avgDuration\":236,\"errorRate\":58.06451612903226,\"lastError\":{\"message\":\"2026-11-23T05:02:44.640Z REPORT RequestId: 22cff50d-56b6-36ed-fcdc-8ed1a21f1bc6\\tDuration: 204.00 ms\\tBilled Duration: 204 ms\\tMemory Size: 256 MB\\tMax Memory Used: 93 MB\\tInit Duration: 412.57 ms\\tStatus: error\",\"timestamp\":\"2026-11-23T05:02:44.640Z\"}}"
+        },
+        {
+          "thought": "먼저 과거 사례와 공급자 상태, 최근 변경, 알림 함수 상태를 함께 확인하겠습니다.",
+          "action": "get_logs",
+          "actionInput": {
+            "functionName": "SlackNotificationFunction",
+            "filter": "ALL",
+            "minutes": 720
+          },
+          "observation": "[{\"timestamp\":\"2026-11-22T23:58:12.101Z\",\"message\":\"2026-11-22T23:58:12.101Z START RequestId: dce3d271-28ed-e448-952d-b4129a18de6f Version: $LATEST\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-22T23:58:12.139Z\",\"message\":\"2026-11-22T23:58:12.139Z\\tdce3d271-28ed-e448-952d-b4129a18de6f\\tINFO\\tProcessing 1 log events from /aws/lambda/eecar-stack-VectorSearchFunction-yXyHE1D702wX\",\"level\":\"INFO\"},{\"timestamp\":\"2026-11-22T23:58:12.167Z\",\"message\":\"2026-11-22T23:58:12.167Z\\tdce3d271-28ed-e448-952d-b4129a18d"
+        },
+        {
+          "thought": "로그에 원인이 거의 드러났습니다. 공급자 쪽 지연보다 SSM 파라미터 암호 해독 실패가 먼저 보입니다. 함수 권한과 KMS 키 정책을 확인하겠습니다.",
+          "action": "get_function_permissions",
+          "actionInput": {
+            "functionName": "SlackNotificationFunction"
+          },
+          "observation": "{\"functionName\":\"SlackNotificationFunction\",\"found\":true,\"roleName\":\"eecar-stack-SlackNotificationFunctionRole-8P4lsCMRjFFO\",\"statements\":[{\"policy\":\"SlackNotificationFunctionRolePolicy0\",\"effect\":\"Allow\",\"actions\":[\"dynamodb:GetItem\",\"dynamodb:DeleteItem\",\"dynamodb:PutItem\",\"dynamodb:Scan\",\"dynamodb:Query\",\"dynamodb:UpdateItem\",\"dynamodb:BatchWriteItem\",\"dynamodb:BatchGetItem\",\"dynamodb:DescribeTable\",\"dynamodb:ConditionCheckItem\"],\"resources\":[\"arn:aws:dynamodb:ap-northeast-2:425454508084:tabl"
+        },
+        {
+          "thought": "로그에 원인이 거의 드러났습니다. 공급자 쪽 지연보다 SSM 파라미터 암호 해독 실패가 먼저 보입니다. 함수 권한과 KMS 키 정책을 확인하겠습니다.",
+          "action": "get_resource_policy",
+          "actionInput": {
+            "resource": "alias/eecar-ssm-params"
+          },
+          "observation": "{\"resource\":\"alias/eecar-ssm-params\",\"found\":true,\"type\":\"kms\",\"keyArn\":\"arn:aws:kms:ap-northeast-2:425454508084:key/5d3a91c2-7e4b-4f08-9b61-0c2e8f7a4d19\",\"aliases\":[\"alias/eecar-ssm-params\"],\"keyManager\":\"CUSTOMER\",\"keyState\":\"Enabled\",\"policy\":{\"Version\":\"2012-10-17\",\"Id\":\"eecar-ssm-params-policy\",\"Statement\":[{\"Sid\":\"KeyAdministrators\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::425454508084:role/eecar-security-admin\"},\"Action\":[\"kms:Create*\",\"kms:Describe*\",\"kms:Enable*\",\"kms:List*\",\"k"
+        },
+        {
+          "thought": "propose_memory 호출",
+          "action": "propose_memory",
+          "actionInput": {
+            "fact": "SlackNotificationFunction은 SSM /eecar/slack/webhook-url을 읽는다. 이 파라미터는 KMS 키 alias/eecar-ssm-params로 암호화되며, 키 정책은 SlackAgentFunctionRole에만 kms:Decrypt를 허용한다. SlackNotificationFunctionRole은 허용되어 있지 않다.",
+            "evidence": "get_resource_policy(alias/eecar-ssm-params) 키 정책 Sid AllowSlackAgentDecryptViaSSM만 kms:Decrypt 허용. get_recent_changes: PutParameter version 6, keyId alias/eecar-ssm-params (console:user-d, 2026-11-23T00:41:07Z). 로그: AccessDeniedException: The ciphertext refers to a customer master key...",
+            "functionName": "SlackNotificationFunction"
+          },
+          "observation": "{\"proposed\":true,\"note\":\"사람이 확인하면 기억에 저장됩니다. 지금 진단에는 이 제안을 근거로 쓰지 마세요.\"}"
+        },
+        {
+          "thought": "진단 제출",
+          "action": "submit_diagnosis",
+          "actionInput": {
+            "verdict": "root_cause",
+            "summary": "알림이 안 가는 원인은 Slack 웹훅 지연이 아니라 우리 쪽 권한 문제입니다. 오늘 00:41 UTC(한국 시간 09:41)에 webhook URL 파라미터를 새 채널 값으로 갱신하면서 KMS 키(alias/eecar-ssm-params)로 암호화했는데, SlackNotificationFunction 역할은 이 키를 복호화할 수 없어 웹훅 URL을 읽지 못하고 알림 전송 전에 실패하고 있습니다.",
+            "component": "ssm:parameter",
+            "fault_type": "kms_access_denied",
+            "cause": "SSM 파라미터 /eecar/slack/webhook-url을 2026-11-23T00:41:07Z에 콘솔(console:user-d)에서 version 6으로 덮어쓰면서 keyId를 alias/eecar-ssm-params로 지정했다. 이 KMS 키의 정책은 SlackAgentFunctionRole(eecar-stack-SlackAgentFunctionRole-NwDKuLOZm9ly)에만 kms:Decrypt(kms:ViaService = ssm)를 허용하고, SlackNotificationFunctionRole(eecar-stack-SlackNotificationFunctionRole-8P4lsCMRjFFO)은 허용하지 않는다. 그래서 SlackNotificationFunction이 getSlackWebhookUrl에서 AccessDeniedException을 받아 웹훅 URL을 얻지 못한다. Slack 웹훅 지연 공지(01:05Z 시작, monitoring)는 분 단위 지연이고, 이 실패는 Slack이 아니라 함수 쪽 접근 거부라서 공지가 원인은 아니다.",
+            "evidence": "[\"get_logs(SlackNotificationFunction): \\\"Failed to process CloudWatch Logs event: AccessDeniedException: The ciphertext refers to a customer master key that does not exist, does not exist in this region, or you are not allowed to access.\\\" at getSlackWebhookUrl\",\\\"get_function_status: invocations 31, errors 18, errorRate 58.06%, lastError 2026-11-23T05:02:44.640Z Status: error\\\",\\\"get_recent_changes: 2026-11-23T00:41:07Z ssm_param /eecar/slack/webhook-url PutParameter SecureString 값 갱신 (알림 채널을 #eecar-ops-alerts로 옮기며 새 webhook 등록), version 6, keyId alias/eecar-ssm-params, overwrite true, actor console:user-d\\\",\\\"get_resource_policy(alias/eecar-ssm-params): Statement AllowSlackAgentDecryptViaSSM, Principal role/eecar-stack-SlackAgentFunctionRole-NwDKuLOZm9ly, Action kms:Decrypt, Condition kms:ViaService ssm.ap-northeast-2.amazonaws.com; SlackNotificationFunctionRole 항목 없음\\\",\\\"get_function_permissions: SlackNotificationFunctionRolePolicy1 ssm:GetParameter on parameter/eecar/slack/webhook-url, kms:Decrypt 권한 없음\\\",\\\"get_provider_status: slack incident \\\\\\\"Incoming webhooks delayed for some workspaces\\\\\\\" status monitoring, body \\\\\\\"Some customers may see delays of a few minutes\\\\\\\"\\\",\\\"get_logs: 2026-11-23T01:22:40Z 및 03:05 이전 일부 호출은 Successfully sent 1/1 notifications to Slack (이미 떠 있던 컨테이너가 이전에 읽은 값을 캐시한 것으로 보임, 확인 안 됨)\\\"]",
+            "contributing": [
+              "webhook 값을 KMS 키로 암호화하면서 알림 함수 역할을 키 정책에 포함하지 않음",
+              "warm 컨테이너가 이전 웹훅 값을 잠시 재사용해 일부만 성공하다가, 새 컨테이너(Init 이후)부터 전부 실패함",
+              "함수 오류가 SlackNotificationFunction 자체의 오류 알림으로 나가지 못해 실패가 바로 드러나지 않음 (확인 안 됨)"
+            ],
+            "fix_type": "fix",
+            "fix_action": "1) 가장 안전한 방법: alias/eecar-ssm-params 키 정책(KMS 키 관리자 역할 eecar-security-admin이 수정)에 Principal arn:aws:iam::425454508084:role/eecar-stack-SlackNotificationFunctionRole-8P4lsCMRjFFO, Action kms:Decrypt, Condition kms:ViaService = ssm.ap-northeast-2.amazonaws.com 문을 추가. 2) 또는 웹훅 파라미터를 기존 방식(이전 키 또는 기본 키)으로 다시 저장. 이 경우 #eecar-ops-alerts 웹훅 URL이 바뀌므로 값만 다시 쓰고 키 정책은 건드리지 않는다. 3) 키 정책을 바꾼 뒤 SlackNotificationFunction의 warm 컨테이너를 비우려면 함수 설정을 한 번 갱신한다.",
+            "fix_rollback": "키 정책 문을 추가했다면 해당 Statement만 제거한다. 파라미터를 다시 썼다면 이전 버전(version 5)으로 되돌리되, 이 경우 알림은 예전 채널로 간다.",
+            "fix_verify": "SlackNotificationFunction 로그에서 getSlackWebhookUrl AccessDeniedException이 사라지고 \"Successfully sent N/N notifications to Slack\"이 나오는지 확인. 다른 함수에서 에러를 일부러 내서 #eecar-ops-alerts에 메시지가 도착하는지 확인. get_function_status의 errorRate가 떨어지는지 확인.",
+            "not_verified": "키 갱신 전 version 5가 어떤 키로 암호화돼 있었는지는 확인하지 못했다(get_recent_changes에 이전 keyId 정보 없음). 그래서 키 정책 수정과 파라미터 재저장 중 무엇이 맞는지는 키 관리자가 정해야 한다. 키 정책 수정은 실제 콘솔에서 확인하지 않았다. SlackNotificationFunction 역할이 KMS 키 정책 외에 IAM에서도 kms:Decrypt가 필요한지도 확인하지 못했다(현재 역할 정책에는 없음). 구독 필터 자체가 정상인지는 확인하지 못했다."
+          }
+        }
+      ]
+    }
+  ]
+}

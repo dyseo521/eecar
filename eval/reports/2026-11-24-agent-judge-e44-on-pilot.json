@@ -1,0 +1,34 @@
+{
+ "meta": {
+  "date": "2026-11-24",
+  "judgeVersion": "v2.3",
+  "model": "global.anthropic.claude-sonnet-4-6",
+  "reports": [
+   "eval/reports/2026-11-24-agent-eval-e44-on-pilot.json"
+  ],
+  "items": null,
+  "inputTokens": 16972,
+  "outputTokens": 626
+ },
+ "judgments": [
+  {
+   "variant": "h55",
+   "scenario": "v6-01",
+   "run": 0,
+   "cause": "yes",
+   "wrong": "none",
+   "fix": "yes",
+   "checklist": {
+    "q_resolves": "yes",
+    "q_harmful": "no",
+    "q_works_as_written": "yes",
+    "q_wrong_first": "no",
+    "q_correct_elsewhere": "yes"
+   },
+   "reason": "도우미는 00:41 UTC에 /eecar/slack/webhook-url을 alias/eecar-ssm-params 키로 갱신했고, 이 키 정책이 SlackNotificationFunction 역할의 kms:Decrypt를 허용하지 않아 AccessDeniedException이 발생한다고 정확히 짚었다. 캐시로 인해 콜드 스타트 전까지 이전 URL로 전송되다 끊긴 현상도 설명했으며, Slack 공지는 무관하다고 바르게 판단했다. 정답 요지의 핵심 원인을 모두 포함한다.",
+   "fixReason": "핵심 조치 A안은 (a) IAM 역할 정책에 kms:Decrypt 추가 + (b) 키 정책에 해당 역할 허용 문장 추가로 구성된다. 정답 요지에 따르면 키 정책에 루트 위임이 없어 IAM 정책만 수정해서는 효과가 없으므로, (b) 키 정책 수정을 함께 권한 A안은 실제로 장애를 해소한다. 명령·ARN 등 구체적 값도 제시되어 있고 동작 가능하다. 올바른 조치(키 정책에 SlackNotificationFunction 역할의 kms:Decrypt 추가)가 핵심으로 먼저 제시되었다.",
+   "pass": true,
+   "phrasePass": false
+  }
+ ]
+}
