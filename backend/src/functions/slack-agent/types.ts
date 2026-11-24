@@ -1,3 +1,4 @@
+import type { MemoryView } from './tools/memory-core.js';
 /**
  * 자동이 2.0 타입 정의
  */
@@ -76,26 +77,10 @@ export interface ErrorAnalysis {
   cause: string;
   solutions: string[];
   relatedCode?: string[];
-  pastSolutions?: MemoryResult[];
+  pastSolutions?: MemoryView[];
 }
 
-// 기억 저장/검색
-export interface Memory {
-  key: string;
-  errorType: string;
-  functionName: string;
-  resolution: string;
-  codeChanges?: string[];
-  resolvedBy?: string;
-  successCount: number;
-  createdAt: number;
-  lastUsed?: number;
-}
-
-export interface MemoryResult {
-  memory: Memory;
-  score: number;
-}
+// 기억 저장/검색은 tools/memory-core.ts (MemoryRecord, MemoryView)
 
 // Lambda 상태
 export interface LambdaStatus {
@@ -129,7 +114,8 @@ export interface SlackBlock {
     text: string;
     emoji?: boolean;
   };
-  elements?: SlackContextElement[];
+  // context 블록은 텍스트 요소, actions 블록은 버튼 요소를 담는다
+  elements?: Array<SlackContextElement | SlackBlockElement>;
   fields?: Array<{ type: string; text: string }>;
   accessory?: SlackBlockElement;
 }

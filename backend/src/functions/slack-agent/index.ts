@@ -11,6 +11,7 @@ import { verifySlackRequest } from './slack-verifier.js';
 import { handleSlashCommand } from './handlers/slash-command.js';
 import { handleAppMention } from './handlers/app-mention.js';
 import { handleInteraction } from './handlers/interaction.js';
+import { handleMemoryFeedback } from './handlers/memory-feedback.js';
 import { SlackEvent } from './types.js';
 import { claimSlackEvent, dispatchJob, isJobEvent, JadongJob, postToResponseUrl } from './async-dispatch.js';
 import { emitMetrics } from '/opt/nodejs/utils/emf.js';
@@ -154,6 +155,10 @@ export async function runJob(job: JadongJob): Promise<void> {
   try {
     if (job.type === 'app_mention') {
       await handleAppMention(job.event);
+      return;
+    }
+    if (job.type === 'memory_feedback') {
+      await handleMemoryFeedback(job);
       return;
     }
     const responseUrl = job.event.response_url;

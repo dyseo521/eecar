@@ -3,9 +3,50 @@
  * @자동이 멘션 처리 (자연어 대화)
  */
 
+import { randomUUID } from 'crypto';
 import { SlackEvent, SlackBlock, AgentStep } from '../types.js';
 import { getBotToken } from '../slack-verifier.js';
 import { runReActAgent } from '../orchestrator.js';
+import type { Diagnosis } from '../tools/diagnosis.js';
+import { codeVersion, savePendingDiagnosis } from '../tools/memory.js';
+import { functionOf } from '../tools/memory-core.js';
+
+/**
+ * 원인을 말한 진단이면 버튼 피드백을 받을 대기 항목을 남기고 id를 돌려준다 (A-53).
+ * 코드 지문은 진단 시점에 잡는다. 나중에 잡으면 그 사이 배포로 바뀐 코드가 기록된다.
+ * 실패해도 답변은 보낸다(버튼만 빠진다).
+ */
+export async function prepareFeedback(
+  question: string,
+  diagnosis: Diagnosis | undefined,
+  deps: { save?: typeof savePendingDiagnosis; version?: typeof codeVersion; id?: () => string; now?: () => string } = {},
+): Promise<string | undefined> {
+  if (!diagnosis || (diagnosis.verdict !== 'root_cause' && diagnosis.verdict !== 'hypothesis')) return undefined;
+  try {
+    const id = (deps.id ?? (() => randomUUID().replace(/-/g, '').slice(0, 16)))();
+    const fn = functionOf(diagnosis.component);
+    const version = fn ? await (deps.version ?? codeVersion)(fn) : undefined;
+    await (deps.save ?? savePendingDiagnosis)({ id, question, diagnosis, ...(version ? { codeVersion: version } : {}), createdAt: (deps.now ?? (() => new Date().toISOString()))() });
+    return id;
+  } catch (error) {
+    console.warn('[memory] 피드백 대기 항목 저장 실패:', (error as Error).name);
+    return undefined;
+  }
+}
+
+/** 진단 아래에 붙는 피드백 버튼 */
+export function feedbackBlocks(id: string): SlackBlock[] {
+  return [
+    {
+      type: 'actions',
+      elements: [
+        { type: 'button', text: { type: 'plain_text', text: '원인 맞음' }, style: 'primary', action_id: 'memory_confirm', value: id },
+        { type: 'button', text: { type: 'plain_text', text: '원인 틀림' }, action_id: 'memory_refute', value: id },
+      ],
+    },
+    { type: 'context', elements: [{ type: 'mrkdwn', text: '원인이 맞는지 알려 주시면 비슷한 장애를 조사할 때 참고합니다' }] },
+  ];
+}
 
 // Slack section 블록의 text 한도. 넘으면 메시지 전체가 거부되어 사용자가 아무것도 받지 못한다
 const SLACK_SECTION_LIMIT = 3000;
@@ -58,8 +99,9 @@ export async function handleAppMention(event: SlackEvent): Promise<void> {
       currentTime: new Date().toISOString(),
     });
 
-    // 결과를 Slack으로 전송
-    await postMessage(channel, result.response, thread_ts || ts, result.steps);
+    // 결과를 Slack으로 전송. 원인을 말한 진단에는 원인 맞음 / 틀림 버튼을 붙인다 (A-53)
+    const feedbackId = await prepareFeedback(userMessage, result.diagnosis);
+    await postMessage(channel, result.response, thread_ts || ts, result.steps, feedbackId);
   } catch (error) {
     console.error('Error handling app mention:', error);
     await postErrorMessage(channel, thread_ts || ts);
@@ -73,7 +115,8 @@ async function postMessage(
   channel: string,
   message: string,
   threadTs?: string,
-  steps?: AgentStep[]
+  steps?: AgentStep[],
+  feedbackId?: string
 ): Promise<void> {
   const botToken = await getBotToken();
 
@@ -107,6 +150,8 @@ async function postMessage(
       ],
     });
   }
+
+  if (feedbackId) blocks.push(...feedbackBlocks(feedbackId));
 
   const response = await fetch('https://slack.com/api/chat.postMessage', {
     method: 'POST',

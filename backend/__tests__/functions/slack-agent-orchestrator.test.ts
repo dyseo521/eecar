@@ -109,8 +109,10 @@ describe('runReActAgent', () => {
     await runReActAgent('상태 알려줘', context, { converse, emit: false, modelOverride: HAIKU });
     await runReActAgent('상태 알려줘', context, { converse, emit: false, modelOverride: HAIKU, toolNames: ['get_logs', 'get_function_config'] });
     // 사전 등록 홀드아웃을 통과해 운영에 노출한다 (E-35, A-46)
-    expect(seen[0]).toHaveLength(15);
+    // save_memory는 운영 목록에서 뺐다. 저장은 사람의 버튼 피드백으로만 한다 (A-53)
+    expect(seen[0]).toHaveLength(14);
     expect(seen[0]).toContain('get_function_config');
+    expect(seen[0]).not.toContain('save_memory');
     expect(seen[1]).toEqual(['get_logs', 'get_function_config']);
   });
 

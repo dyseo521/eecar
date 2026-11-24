@@ -7,6 +7,7 @@ import { SlackEvent, SlackBlock } from '../types.js';
 import { getLambdaStatus, getRecentLogs } from '../tools/cloudwatch.js';
 import { analyzeError } from '../tools/analyze-error.js';
 import { recallMemory } from '../tools/memory.js';
+import { memoryLine } from '../tools/memory-core.js';
 
 // Lambda 함수 목록 (EECAR 프로젝트)
 const LAMBDA_FUNCTIONS = [
@@ -293,13 +294,10 @@ async function handleAnalyzeCommand(args: string[]): Promise<unknown> {
         text: {
           type: 'mrkdwn',
           text:
-            '*📚 과거 해결 사례:*\n' +
+            '*📚 비슷한 과거 진단:*\n' +
             analysis.pastSolutions
               .slice(0, 2)
-              .map(
-                (p) =>
-                  `• ${p.memory.resolution} (성공 ${p.memory.successCount}회)`
-              )
+              .map((m) => `• ${memoryLine(m)}`)
               .join('\n'),
         },
       });
@@ -351,16 +349,16 @@ async function handleMemoryCommand(args: string[]): Promise<unknown> {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `\`${query}\`와 관련된 기억이 없습니다.\n에러 해결 후 \`해결됨\` 피드백을 주시면 자동이가 학습합니다! 🧠`,
+          text: `\`${query}\`와 관련된 기억이 없습니다.\n자동이 진단 아래의 \`원인 맞음\` 또는 \`원인 틀림\` 버튼을 누르면 기억으로 남습니다.`,
         },
       });
     } else {
       const memoryText = memories
         .map(
           (m, i) =>
-            `*${i + 1}. ${m.memory.errorType}* (${m.memory.functionName})\n` +
-            `   해결: ${m.memory.resolution}\n` +
-            `   성공: ${m.memory.successCount}회 | 유사도: ${(m.score * 100).toFixed(0)}%`
+            `*${i + 1}. ${m.functionName ?? '함수 미상'} ${m.faultType ?? ''}* (${m.outcome === 'refuted' ? '틀린 것으로 확인' : `확인 ${m.count}회`}${m.codeChanged ? ', 이후 코드 변경' : ''})\n` +
+            `   ${m.cause ?? m.summary}\n` +
+            `   유사도: ${(m.similarity * 100).toFixed(0)}%`
         )
         .join('\n\n');
 
